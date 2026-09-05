@@ -1,0 +1,16 @@
+.venv/
+.idea/
+.DS_Store
+__pycache__/
+*.py[cod]
+.build/
+spikes/**/.build/
+untracked/
+
+# Local audio samples and generated normalization outputs.
+samples/
+dist/
+.qwen38-work/
+.agents/
+.serena/
+.bb/
