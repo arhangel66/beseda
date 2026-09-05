@@ -19,13 +19,13 @@ existing bindings and controller calls stay, tests green before push.
 - [x] Check: `swift test`; idle state seen via `BESEDA_PREVIEW_POPOVER=1`, recording/processing/failed states need a live call (Mikhail)
 
 ## Step 2. System controls everywhere
-- [ ] `PillToggle` → `Toggle(.switch)` with a label
-- [ ] `AccentButton` / `OutlineButton` → `Button` with `.borderedProminent` / `.bordered`
-- [ ] `SegmentedTabs` → `Picker(.segmented)`
-- [ ] Split buttons in the call header → `Button` + `Menu`
-- [ ] `PodushkaControls.swift` keeps only Avatar, LevelMeter, SpeakerStrip, ProgressTrack,
+- [x] `PillToggle` → `Toggle(.switch)` with a label
+- [x] `AccentButton` / `OutlineButton` → `Button` with `.borderedProminent` / `.bordered`
+- [x] `SegmentedTabs` → `Picker(.segmented)`
+- [x] Split buttons in the call header → `Button` + `Menu`
+- [x] `PodushkaControls.swift` keeps only Avatar, LevelMeter, SpeakerStrip, ProgressTrack,
       HighlightedText; file renamed to `Controls.swift`
-- [ ] Check: keyboard activation (Space/Return), VoiceOver names controls correctly
+- [x] Check: build + tests green; keyboard/VoiceOver walkthrough is Mikhail's (needs a live session)
 
 ## Step 3. Conversations window on the system frame
 - [ ] `NavigationSplitView` with `List(selection:)`; drop `hiddenTitleBar`, `ignoresSafeArea`,

@@ -139,7 +139,14 @@ struct CallDetailView: View {
                 CopyTranscriptButton(controller: controller)
             }
 
-            SegmentedTabs(tabs: CallDetailTab.allCases, selection: $tab) { $0.title }
+            Picker("Раздел", selection: $tab) {
+                ForEach(CallDetailTab.allCases) { item in
+                    Text(item.title).tag(item)
+                }
+            }
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .fixedSize()
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 24)
@@ -258,7 +265,6 @@ private struct SendToWebhookButton: View {
     let detail: StoredCallDetail
 
     @State private var isHistoryOpen = false
-    @State private var isHovering = false
 
     private var deliveries: [StoredWebhookDelivery] {
         controller.webhooks.selected
@@ -273,55 +279,32 @@ private struct SendToWebhookButton: View {
     }
 
     var body: some View {
-        HStack(spacing: 1) {
-            Button {
-                controller.webhooks.sendNow(callID: detail.id)
-            } label: {
-                HStack(spacing: 8) {
-                    if isSending {
-                        ProgressView()
-                            .controlSize(.mini)
-                    } else {
-                        Image(systemName: icon)
-                            .font(.system(size: 12))
-                            .foregroundStyle(iconColor)
-                    }
-                    Text(deliveries.first?.state == "failed" ? "Повторить на вебхук" : "Отправить на вебхук")
-                        .font(.system(size: 13, weight: .medium))
-                }
-                .foregroundStyle(canSend ? Palette.textPrimary : Palette.textQuaternary)
-                .padding(.horizontal, 13)
-                .frame(height: 34)
-                .background(fill, in: .rect(topLeadingRadius: 9, bottomLeadingRadius: 9))
-            }
-            .buttonStyle(.plain)
-            .disabled(!canSend)
-            .help(statusLine)
-
-            Button {
+        Menu {
+            Button("История доставок…") {
                 isHistoryOpen = true
-            } label: {
-                Image(systemName: "chevron.down")
-                    .font(.system(size: 10, weight: .bold))
-                    .foregroundStyle(Palette.textPrimary)
-                    .frame(width: 28, height: 34)
-                    .background(fill, in: .rect(bottomTrailingRadius: 9, topTrailingRadius: 9))
             }
-            .buttonStyle(.plain)
-            .popover(isPresented: $isHistoryOpen, arrowEdge: .bottom) {
-                history
+        } label: {
+            HStack(spacing: 6) {
+                if isSending {
+                    ProgressView()
+                        .controlSize(.mini)
+                } else {
+                    Image(systemName: icon)
+                        .foregroundStyle(iconColor)
+                }
+                Text(deliveries.first?.state == "failed" ? "Повторить на вебхук" : "Отправить на вебхук")
             }
+        } primaryAction: {
+            controller.webhooks.sendNow(callID: detail.id)
         }
-        .overlay {
-            RoundedRectangle(cornerRadius: 9)
-                .strokeBorder(Palette.controlBorder, lineWidth: 0.5)
-        }
+        .menuStyle(.button)
+        .controlSize(.large)
         .fixedSize()
-        .onHover { isHovering = $0 }
-    }
-
-    private var fill: Color {
-        isHovering ? Palette.fillHover : Palette.fillRaised
+        .disabled(!canSend)
+        .help(statusLine)
+        .popover(isPresented: $isHistoryOpen, arrowEdge: .bottom) {
+            history
+        }
     }
 
     private var icon: String {
@@ -344,7 +327,7 @@ private struct SendToWebhookButton: View {
         case "failed":
             Palette.recording
         default:
-            canSend ? Palette.textPrimary : Palette.textQuaternary
+            .primary
         }
     }
 
@@ -374,85 +357,34 @@ private struct SendToWebhookButton: View {
     }
 }
 
-/// The split button from the prototype: the left half copies, the right half picks the format.
+/// Copies in the remembered format; the menu picks another format and makes it the default.
 private struct CopyTranscriptButton: View {
     let controller: AppController
 
-    @State private var isMenuOpen = false
-
     var body: some View {
-        HStack(spacing: 1) {
-            Button {
-                controller.copyTranscript()
-            } label: {
-                HStack(spacing: 8) {
-                    Image(systemName: "doc.on.doc")
-                        .font(.system(size: 12))
-                    Text("Скопировать расшифровку")
-                        .font(.system(size: 13, weight: .medium))
+        Menu {
+            Picker("Формат", selection: formatSelection) {
+                ForEach(TranscriptCopyFormat.allCases) { format in
+                    Text("\(format.title) · \(format.sample)").tag(format)
                 }
-                .foregroundStyle(.white)
-                .padding(.horizontal, 15)
-                .frame(height: 34)
-                .background(Palette.accent, in: .rect(topLeadingRadius: 9, bottomLeadingRadius: 9))
             }
-            .buttonStyle(.plain)
-
-            Button {
-                isMenuOpen = true
-            } label: {
-                Image(systemName: "chevron.down")
-                    .font(.system(size: 10, weight: .bold))
-                    .foregroundStyle(.white)
-                    .frame(width: 28, height: 34)
-                    .background(Palette.accent, in: .rect(bottomTrailingRadius: 9, topTrailingRadius: 9))
-            }
-            .buttonStyle(.plain)
-            .popover(isPresented: $isMenuOpen, arrowEdge: .bottom) {
-                menu
-            }
+            .pickerStyle(.inline)
+        } label: {
+            Label("Скопировать расшифровку", systemImage: "doc.on.doc")
+        } primaryAction: {
+            controller.copyTranscript()
         }
+        .menuStyle(.button)
+        .buttonStyle(.borderedProminent)
+        .controlSize(.large)
         .fixedSize()
     }
 
-    private var menu: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            ForEach(TranscriptCopyFormat.allCases) { format in
-                Button {
-                    controller.copyTranscript(format: format)
-                    isMenuOpen = false
-                } label: {
-                    HStack(spacing: 8) {
-                        Image(systemName: "checkmark")
-                            .font(.system(size: 10, weight: .bold))
-                            .frame(width: 13)
-                            .opacity(controller.settings.copyFormat == format ? 1 : 0)
-                        Text(format.title)
-                            .font(.system(size: 12.5))
-                        Spacer(minLength: 12)
-                        Text(format.sample)
-                            .font(.system(size: 11))
-                            .foregroundStyle(Palette.textQuaternary)
-                    }
-                    .padding(.horizontal, 8)
-                    .frame(height: 30)
-                    .contentShape(.rect)
-                }
-                .buttonStyle(.plain)
-            }
-
-            Divider().overlay(Palette.separator).padding(.horizontal, 6)
-
-            Text("Выбранный формат станет форматом по умолчанию и для ⌘C.")
-                .font(.system(size: 11))
-                .lineSpacing(1)
-                .foregroundStyle(Palette.textTertiary)
-                .padding(.horizontal, 8)
-                .padding(.top, 3)
-                .padding(.bottom, 5)
-        }
-        .padding(5)
-        .frame(width: 292)
+    private var formatSelection: Binding<TranscriptCopyFormat> {
+        Binding(
+            get: { controller.settings.copyFormat },
+            set: { controller.copyTranscript(format: $0) }
+        )
     }
 }
 
@@ -519,15 +451,10 @@ private struct FailureBanner: View {
                         .frame(maxWidth: 520)
                 }
 
-                HStack(spacing: 8) {
-
-                    OutlineButton(height: 24) {
-                        controller.retryCall(summary)
-                    } label: {
-                        Text("Расшифровать снова")
-                    }
-                    .disabled(controller.isBusy)
+                Button("Расшифровать снова") {
+                    controller.retryCall(summary)
                 }
+                .disabled(controller.isBusy)
             }
         }
         .padding(.horizontal, 16)

@@ -102,17 +102,20 @@ private struct SpeechModelCard: View {
                     .lineLimit(1)
                     .foregroundStyle(Palette.recording)
                     .help(message)
-                AccentButton(title: "Повторить", height: 24) {
+                Button("Повторить") {
                     controller.selectSpeechModel(model)
                 }
+                .controlSize(.small)
             }
         default:
             if isActive {
                 EmptyView()
             } else {
-                AccentButton(title: isDownloaded ? "Выбрать" : "Скачать", height: 24) {
+                Button(isDownloaded ? "Выбрать" : "Скачать") {
                     controller.selectSpeechModel(model)
                 }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.small)
             }
         }
     }

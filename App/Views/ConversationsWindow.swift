@@ -112,5 +112,6 @@ struct ConversationsWindow: View {
             .padding(.horizontal, 10)
             .frame(height: Metrics.controlHeight)
         }
+        .buttonStyle(.plain)
     }
 }

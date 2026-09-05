@@ -294,22 +294,18 @@ private struct IntegrationSettings: View {
                 Spacer(minLength: 0)
 
                 if controller.calendarService.isAuthorized {
-                    OutlineButton(height: 24) {
+                    Button("Выбрать календари") {
                         isCalendarPickerOpen = true
-                    } label: {
-                        Text("Выбрать календари")
-                            .font(.system(size: 12))
                     }
+                    .controlSize(.small)
                     .popover(isPresented: $isCalendarPickerOpen, arrowEdge: .bottom) {
                         CalendarPicker(controller: controller)
                     }
                 } else {
-                    OutlineButton(height: 24) {
+                    Button("Открыть доступ") {
                         openPrivacySettings()
-                    } label: {
-                        Text("Открыть доступ")
-                            .font(.system(size: 12))
                     }
+                    .controlSize(.small)
                 }
             }
             .padding(.horizontal, 12)
@@ -417,10 +413,8 @@ private struct WebhookSettings: View {
                 .frame(height: 26)
                 .background(Palette.fillHover, in: .rect(cornerRadius: Metrics.controlCorner))
 
-                OutlineButton(height: 26) {
+                Button(isSecretShown ? "Скрыть" : "Показать") {
                     isSecretShown.toggle()
-                } label: {
-                    Text(isSecretShown ? "Скрыть" : "Показать")
                 }
             }
 
@@ -439,12 +433,11 @@ private struct WebhookSettings: View {
 
     private var testRow: some View {
         HStack(spacing: 10) {
-            AccentButton(
-                title: webhooks.isTesting ? "Отправляю…" : "Отправить тест",
-                isEnabled: !webhooks.isTesting
-            ) {
+            Button(webhooks.isTesting ? "Отправляю…" : "Отправить тест") {
                 webhooks.sendTest()
             }
+            .buttonStyle(.borderedProminent)
+            .disabled(webhooks.isTesting)
 
             Text(webhooks.testResult ?? "Отправлю пробный запрос, сервис его пропустит")
                 .font(.system(size: 12.5))
@@ -501,12 +494,10 @@ struct WebhookDeliveryRow: View {
                 .foregroundStyle(stateColor)
 
             if inJournal, delivery.state == "failed", !controller.webhooks.sending.contains(delivery.callID) {
-                OutlineButton(height: 22) {
+                Button("Повторить") {
                     controller.webhooks.sendNow(callID: delivery.callID)
-                } label: {
-                    Text("Повторить")
-                        .font(.system(size: 11.5))
                 }
+                .controlSize(.small)
             }
         }
     }
@@ -588,17 +579,13 @@ private struct SummarySettings: View {
                     .frame(height: 26)
                     .background(Palette.fillHover, in: .rect(cornerRadius: Metrics.controlCorner))
 
-                OutlineButton(height: 26) {
+                Button("Обновить") {
                     controller.refreshSummaryModels()
-                } label: {
-                    Text("Обновить")
                 }
 
                 if LocalModelSupport.isInstalled, controller.isServerDown {
-                    OutlineButton(height: 26) {
+                    Button(controller.isStartingLocalModelServer ? "Запускаю…" : "Запустить") {
                         controller.startLocalModelServer()
-                    } label: {
-                        Text(controller.isStartingLocalModelServer ? "Запускаю…" : "Запустить")
                     }
                     .disabled(controller.isStartingLocalModelServer)
                 }
@@ -650,11 +637,10 @@ private struct SummarySettings: View {
                 Text("Промпт")
                     .font(.system(size: 12.5, weight: .semibold))
                 Spacer(minLength: 0)
-                OutlineButton(height: 24) {
+                Button("Сбросить") {
                     settings.summaryPrompt = ""
-                } label: {
-                    Text("Сбросить")
                 }
+                .controlSize(.small)
             }
 
             ZStack(alignment: .topLeading) {
@@ -688,12 +674,11 @@ private struct SummarySettings: View {
 
     private var checkRow: some View {
         HStack(spacing: 10) {
-            AccentButton(
-                title: controller.isCheckingSummary ? "Проверяю…" : "Проверить",
-                isEnabled: !controller.isCheckingSummary
-            ) {
+            Button(controller.isCheckingSummary ? "Проверяю…" : "Проверить") {
                 controller.checkSummaryConnection()
             }
+            .buttonStyle(.borderedProminent)
+            .disabled(controller.isCheckingSummary)
 
             if let summaryCheckResult = controller.summaryCheckResult {
                 Text(summaryCheckResult)
@@ -725,10 +710,8 @@ private struct AboutSettings: View {
                         .foregroundStyle(Palette.textTertiary)
                 }
 
-                OutlineButton(height: 26) {
+                Button("Проверить сейчас…") {
                     updater.checkForUpdates()
-                } label: {
-                    Text("Проверить сейчас")
                 }
             } else {
                 Text("Сборка для разработки: обновления не проверяются.")
@@ -762,8 +745,10 @@ private struct SettingRow: View {
                     .foregroundStyle(Palette.textTertiary)
             }
             Spacer(minLength: 0)
-            PillToggle(isOn: $isOn)
-                .padding(.top, 1)
+            Toggle(label, isOn: $isOn)
+                .toggleStyle(.switch)
+                .labelsHidden()
+                .controlSize(.small)
         }
     }
 }
@@ -827,9 +812,10 @@ private struct StorageSettings: View {
                     .lineSpacing(2)
                     .foregroundStyle(Palette.textTertiary)
                 Spacer(minLength: 0)
-                AccentButton(title: "Очистить сейчас") {
+                Button("Очистить сейчас") {
                     controller.runCleanupNow()
                 }
+                .buttonStyle(.borderedProminent)
             }
 
             Rectangle()

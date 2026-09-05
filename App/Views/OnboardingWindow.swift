@@ -59,23 +59,17 @@ struct OnboardingWindow: View {
 
                 Spacer()
 
-                OutlineButton(height: 30) {
-                    guard step > 1 else {
-                        return
-                    }
+                Button("Назад") {
                     step -= 1
-                } label: {
-                    Text("Назад").font(.system(size: 13))
                 }
-                .opacity(step == 1 ? 0.35 : 1)
+                .disabled(step == 1)
 
-                AccentButton(
-                    title: advanceTitle,
-                    height: 30,
-                    isEnabled: canAdvance
-                ) {
+                Button(advanceTitle) {
                     advance()
                 }
+                .buttonStyle(.borderedProminent)
+                .keyboardShortcut(.defaultAction)
+                .disabled(!canAdvance)
             }
             .padding(.horizontal, 40)
             .padding(.top, 20)
@@ -147,9 +141,11 @@ struct OnboardingWindow: View {
                     )
 
                     HStack(spacing: 14) {
-                        AccentButton(title: testButtonTitle, height: 30, isEnabled: !monitor.isRunning) {
+                        Button(testButtonTitle) {
                             monitor.start()
                         }
+                        .buttonStyle(.borderedProminent)
+                        .disabled(monitor.isRunning)
                         Text(testHint)
                             .font(.system(size: 12.5))
                             .foregroundStyle(Palette.textSecondary)
@@ -292,7 +288,8 @@ private struct PermissionRow: View {
                         .foregroundStyle(Palette.textTertiary)
                 }
             case .idle, .denied:
-                AccentButton(title: action, height: 26, action: onGrant)
+                Button(action, action: onGrant)
+                    .buttonStyle(.borderedProminent)
             }
         }
         .padding(.horizontal, 14)

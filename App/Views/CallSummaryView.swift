@@ -34,7 +34,9 @@ struct CallSummaryView: View {
 
     private var empty: some View {
         VStack(spacing: 10) {
-            AccentButton(title: "Сделать саммари", systemImage: "sparkles", height: 34, action: onGenerate)
+            Button("Сделать саммари", systemImage: "sparkles", action: onGenerate)
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
 
             Text("Коротко: о чём говорили, о чём договорились и что осталось открытым.")
                 .font(.system(size: 12.5))
@@ -52,7 +54,10 @@ struct CallSummaryView: View {
 
             runningLine("Читаю расшифровку")
 
-            AccentButton(title: "Сделать саммари", systemImage: "sparkles", height: 34, isEnabled: false, action: onGenerate)
+            Button("Сделать саммари", systemImage: "sparkles", action: onGenerate)
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .disabled(true)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 40)
@@ -89,9 +94,8 @@ struct CallSummaryView: View {
                     runningLine("Считаю заново")
                 }
             } else {
-                OutlineButton(height: 24, action: onGenerate) {
-                    Text("Заново")
-                }
+                Button("Заново", action: onGenerate)
+                    .controlSize(.small)
             }
         }
     }
@@ -125,10 +129,8 @@ struct CallSummaryView: View {
                 HStack(spacing: 8) {
                     recoveryButton
 
-                    OutlineButton(height: 24, action: onGenerate) {
-                        Text("Повторить")
-                    }
-                    .disabled(isRunning)
+                    Button("Повторить", action: onGenerate)
+                        .disabled(isRunning)
                 }
             }
         }
@@ -145,17 +147,14 @@ struct CallSummaryView: View {
     private var recoveryButton: some View {
         switch recovery {
         case .startServer:
-            AccentButton(title: "Запустить LM Studio", height: 24, action: onRecover)
+            Button("Запустить LM Studio", action: onRecover)
+                .buttonStyle(.borderedProminent)
         case .openSettings:
             if let controller {
                 SettingsSectionLink(section: "summary", controller: controller) {
                     Text("Открыть настройки")
-                        .font(.system(size: 12.5, weight: .medium))
-                        .foregroundStyle(Color.white)
-                        .padding(.horizontal, 24 * 0.42)
-                        .frame(height: 24)
-                        .background(Palette.accent, in: .rect(cornerRadius: 24 * 0.27))
                 }
+                .buttonStyle(.borderedProminent)
             }
         case nil:
             EmptyView()

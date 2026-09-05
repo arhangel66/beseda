@@ -92,12 +92,11 @@ struct PlayerBar: View {
                         .monospacedDigit()
                         .foregroundStyle(Palette.textSecondary)
 
-                    OutlineButton(height: 24) {
+                    Button(player.speedLabel) {
                         player.cycleSpeed()
-                    } label: {
-                        Text(player.speedLabel)
-                            .font(.system(size: 11.5))
                     }
+                    .controlSize(.small)
+                    .help("Скорость воспроизведения")
                 } else {
                     missingAudioNote
                 }
@@ -191,8 +190,8 @@ struct PlayerBar: View {
             Text("Аудио удалено по правилу хранения")
             SettingsSectionLink(section: "storage", controller: controller) {
                 Text("Настроить")
-                    .foregroundStyle(Palette.accent)
             }
+            .buttonStyle(.link)
         }
         .font(.system(size: 11.5))
         .foregroundStyle(Palette.textTertiary)
