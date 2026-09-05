@@ -35,26 +35,26 @@ private struct SpeechModelCard: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
                 Text(model.title)
-                    .font(.system(size: 13.5, weight: .semibold))
+                    .font(.body.weight(.semibold))
                 if isActive {
                     Text("Активная")
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(Palette.okText)
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(Color.green)
                         .padding(.horizontal, 7)
                         .padding(.vertical, 2)
-                        .background(Palette.okText.opacity(0.14), in: .capsule)
+                        .background(Color.green.opacity(0.14), in: .capsule)
                 }
                 Spacer(minLength: 0)
                 trailingControl
             }
 
             Text(model.subtitle)
-                .font(.system(size: 11.5))
-                .foregroundStyle(Palette.textTertiary)
+                .font(.caption)
+                .foregroundStyle(.tertiary)
                 .fixedSize(horizontal: false, vertical: true)
 
             Rectangle()
-                .fill(Palette.separator)
+                .fill(Color(nsColor: .separatorColor))
                 .frame(height: 0.5)
 
             HStack(spacing: 8) {
@@ -66,18 +66,13 @@ private struct SpeechModelCard: View {
                         controller.removeSpeechModel(model)
                     }
                     .buttonStyle(.plain)
-                    .foregroundStyle(Palette.recording)
+                    .foregroundStyle(Color.red)
                 }
             }
-            .font(.system(size: 11.5))
-            .foregroundStyle(Palette.textTertiary)
+            .font(.caption)
+            .foregroundStyle(.tertiary)
         }
-        .padding(14)
-        .background(Palette.windowBackground.opacity(0.5), in: .rect(cornerRadius: Metrics.cardCorner))
-        .overlay {
-            RoundedRectangle(cornerRadius: Metrics.cardCorner)
-                .strokeBorder(isActive ? Palette.accent.opacity(0.5) : Palette.separator, lineWidth: isActive ? 1 : 0.5)
-        }
+        .padding(.vertical, 4)
     }
 
     @ViewBuilder
@@ -93,14 +88,14 @@ private struct SpeechModelCard: View {
                     ProgressView().controlSize(.small)
                 }
             }
-            .font(.system(size: 11.5))
-            .foregroundStyle(Palette.textSecondary)
+            .font(.caption)
+            .foregroundStyle(Color.secondary)
         case .failed(let message):
             HStack(spacing: 10) {
                 Text(message)
-                    .font(.system(size: 11))
+                    .font(.caption)
                     .lineLimit(1)
-                    .foregroundStyle(Palette.recording)
+                    .foregroundStyle(Color.red)
                     .help(message)
                 Button("Повторить") {
                     controller.selectSpeechModel(model)

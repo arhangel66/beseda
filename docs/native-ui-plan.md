@@ -45,11 +45,11 @@ existing bindings and controller calls stay, tests green before push.
 - [ ] Check: ⌘, opens the right pane, deep links from summary/player still land (screen busy; pending)
 
 ## Step 5. Palette and type
-- [ ] Text colours → `.primary/.secondary/.tertiary`; accent → `Color.accentColor`;
+- [x] Text colours → `.primary/.secondary/.tertiary`; accent → `Color.accentColor`;
       backgrounds → system materials; keep speaker colours, `searchHit`, recording red
-- [ ] Font sizes → `.body/.callout/.caption/.headline/.title2`
-- [ ] Delete unused `Palette` and `Metrics` members
-- [ ] Check: dark mode, Increase Contrast, custom accent colour
+- [x] Font sizes → `.body/.callout/.caption/.headline/.title2`
+- [x] Delete unused `Palette` and `Metrics` members
+- [ ] Check: dark mode, Increase Contrast, custom accent colour (screen busy; pending)
 
 ## Step 6. Shortcuts and copy
 - [ ] `Commands`: ⌘R record, ⇧⌘C copy transcript, ⌘F search, Space/←/→ in the player

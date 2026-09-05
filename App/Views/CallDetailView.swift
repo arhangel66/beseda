@@ -79,7 +79,6 @@ struct CallDetailView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
-        .background(Palette.windowBackground)
         .onChange(of: controller.selectedCallDetail?.id) { _, _ in
             isLogOpen = false
             player.load(controller.selectedCallDetail?.summary)
@@ -226,9 +225,9 @@ struct SendToWebhookButton: View {
     private var iconColor: Color {
         switch deliveries.first?.state {
         case "delivered":
-            Palette.okText
+            Color.green
         case "failed":
-            Palette.recording
+            Color.red
         default:
             .primary
         }
@@ -244,12 +243,12 @@ struct SendToWebhookButton: View {
     private var history: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text("Доставки")
-                .font(.system(size: 12.5, weight: .semibold))
+                .font(.callout.weight(.semibold))
                 .padding(.bottom, 2)
             if deliveries.isEmpty {
                 Text(statusLine)
-                    .font(.system(size: 12))
-                    .foregroundStyle(Palette.textTertiary)
+                    .font(.callout)
+                    .foregroundStyle(.tertiary)
             }
             ForEach(deliveries) { delivery in
                 WebhookDeliveryRow(delivery: delivery, inJournal: false, controller: controller)
@@ -304,11 +303,11 @@ private struct ProgressBanner: View {
 
             VStack(alignment: .leading, spacing: 8) {
                 Text(stage.title)
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.body.weight(.semibold))
 
                 Text(stage.caption())
-                    .font(.system(size: 12.5))
-                    .foregroundStyle(Palette.textSecondary)
+                    .font(.callout)
+                    .foregroundStyle(Color.secondary)
 
                 ProgressTrack(value: stage.overall)
                     .frame(maxWidth: 420)
@@ -316,10 +315,10 @@ private struct ProgressBanner: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 14)
-        .background(Palette.accent.opacity(0.09), in: .rect(cornerRadius: Metrics.cardCorner))
+        .background(Color.accentColor.opacity(0.09), in: .rect(cornerRadius: Metrics.cardCorner))
         .overlay {
             RoundedRectangle(cornerRadius: Metrics.cardCorner)
-                .strokeBorder(Palette.accent.opacity(0.3), lineWidth: 0.5)
+                .strokeBorder(Color.accentColor.opacity(0.3), lineWidth: 0.5)
         }
     }
 }
@@ -335,18 +334,18 @@ private struct FailureBanner: View {
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: "exclamationmark.triangle")
-                .font(.system(size: 15))
-                .foregroundStyle(Palette.recording)
+                .font(.headline)
+                .foregroundStyle(Color.red)
                 .padding(.top, 1)
 
             VStack(alignment: .leading, spacing: 8) {
                 Text(isRuntimeMissing ? "Расшифровка не собралась: модель не скачана" : "Расшифровка не собралась")
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.body.weight(.semibold))
 
                 Text(bodyText)
-                    .font(.system(size: 12.5))
+                    .font(.callout)
                     .lineSpacing(3)
-                    .foregroundStyle(Palette.textSecondary)
+                    .foregroundStyle(Color.secondary)
                     .frame(maxWidth: 520, alignment: .leading)
 
                 if isRuntimeMissing {
@@ -362,10 +361,10 @@ private struct FailureBanner: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 14)
-        .background(Palette.recording.opacity(0.09), in: .rect(cornerRadius: Metrics.cardCorner))
+        .background(Color.red.opacity(0.09), in: .rect(cornerRadius: Metrics.cardCorner))
         .overlay {
             RoundedRectangle(cornerRadius: Metrics.cardCorner)
-                .strokeBorder(Palette.recording.opacity(0.3), lineWidth: 0.5)
+                .strokeBorder(Color.red.opacity(0.3), lineWidth: 0.5)
         }
     }
 
@@ -398,7 +397,7 @@ private struct TranscriptLines: View {
     var body: some View {
         if detail.segments.isEmpty {
             Text(detail.markdownText ?? "Расшифровки пока нет.")
-                .font(.system(size: 14))
+                .font(.body)
                 .lineSpacing(4)
                 .textSelection(.enabled)
                 .frame(maxWidth: 680, alignment: .leading)
@@ -529,16 +528,16 @@ private struct CallInfo: View {
                 ForEach(rows, id: \.key) { row in
                     GridRow {
                         Text(row.key)
-                            .foregroundStyle(Palette.textTertiary)
+                            .foregroundStyle(.tertiary)
                             .gridColumnAlignment(.leading)
                             .frame(width: 168, alignment: .leading)
                         Text(row.value)
-                            .font(.system(size: 11.5, design: .monospaced))
+                            .font(.caption.monospaced())
                             .textSelection(.enabled)
                     }
                 }
             }
-            .font(.system(size: 12.5))
+            .font(.callout)
 
             VStack(alignment: .leading, spacing: 10) {
                 Button {
@@ -546,25 +545,25 @@ private struct CallInfo: View {
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: "chevron.right")
-                            .font(.system(size: 10, weight: .bold))
+                            .font(.caption.weight(.bold))
                             .rotationEffect(.degrees(isLogOpen ? 90 : 0))
                         Text("Технический лог")
                     }
-                    .font(.system(size: 12.5))
-                    .foregroundStyle(Palette.accent)
+                    .font(.callout)
+                    .foregroundStyle(Color.accentColor)
                 }
                 .buttonStyle(.plain)
 
                 if isLogOpen {
                     Text(logText)
-                        .font(.system(size: 10.5, design: .monospaced))
+                        .font(.caption.monospaced())
                         .lineSpacing(5)
-                        .foregroundStyle(Palette.textSecondary)
+                        .foregroundStyle(Color.secondary)
                         .textSelection(.enabled)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 14)
                         .padding(.vertical, 12)
-                        .background(Palette.fillSubtle, in: .rect(cornerRadius: Metrics.rowCorner))
+                        .background(Color.primary.opacity(0.06), in: .rect(cornerRadius: Metrics.rowCorner))
                 }
             }
         }

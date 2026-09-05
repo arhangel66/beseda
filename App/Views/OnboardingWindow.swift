@@ -26,20 +26,19 @@ struct OnboardingWindow: View {
                 HStack(spacing: 6) {
                     ForEach(1...Self.stepCount, id: \.self) { index in
                         Capsule()
-                            .fill(index <= step ? Palette.accent : Palette.toggleOff)
+                            .fill(index <= step ? Color.accentColor : Color.primary.opacity(0.16))
                             .frame(width: 34, height: 3)
                     }
                 }
 
                 Text(Self.texts[step - 1].0)
-                    .font(.system(size: 24, weight: .semibold))
-                    .tracking(-0.5)
+                    .font(.title2.weight(.semibold))
                     .padding(.top, 12)
 
                 Text(Self.texts[step - 1].1)
-                    .font(.system(size: 14))
+                    .font(.body)
                     .lineSpacing(4)
-                    .foregroundStyle(Palette.textSecondary)
+                    .foregroundStyle(Color.secondary)
                     .frame(maxWidth: 480, alignment: .leading)
             }
             .padding(.horizontal, 40)
@@ -54,8 +53,8 @@ struct OnboardingWindow: View {
 
             HStack(spacing: 12) {
                 Text(footnote)
-                    .font(.system(size: 12))
-                    .foregroundStyle(Palette.textQuaternary)
+                    .font(.callout)
+                    .foregroundStyle(.quaternary)
 
                 Spacer()
 
@@ -76,8 +75,7 @@ struct OnboardingWindow: View {
             .padding(.bottom, 24)
         }
         .frame(width: 640, height: 520)
-        .background(Palette.windowBackground)
-        .foregroundStyle(Palette.textPrimary)
+        .foregroundStyle(Color.primary)
         .onAppear {
             permissions.refresh()
         }
@@ -94,11 +92,11 @@ struct OnboardingWindow: View {
                 ForEach(Self.promises, id: \.self) { promise in
                     HStack(alignment: .top, spacing: 12) {
                         Image(systemName: "checkmark")
-                            .font(.system(size: 13, weight: .bold))
-                            .foregroundStyle(Palette.ok)
+                            .font(.body.weight(.bold))
+                            .foregroundStyle(Color.green)
                             .padding(.top, 3)
                         Text(promise)
-                            .font(.system(size: 14))
+                            .font(.body)
                             .lineSpacing(4)
                     }
                 }
@@ -107,8 +105,8 @@ struct OnboardingWindow: View {
             VStack(alignment: .leading, spacing: 16) {
                 SpeechModelList(controller: controller)
                 Text(runtimeHint)
-                    .font(.system(size: 12.5))
-                    .foregroundStyle(Palette.textSecondary)
+                    .font(.callout)
+                    .foregroundStyle(Color.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
         case 2:
@@ -135,7 +133,7 @@ struct OnboardingWindow: View {
                 VStack(spacing: 16) {
                     LevelMeter(
                         level: max(monitor.microphoneLevel, monitor.systemAudioLevel),
-                        color: Palette.ok,
+                        color: Color.green,
                         barCount: 48,
                         height: 44
                     )
@@ -147,13 +145,13 @@ struct OnboardingWindow: View {
                         .buttonStyle(.borderedProminent)
                         .disabled(monitor.isRunning)
                         Text(testHint)
-                            .font(.system(size: 12.5))
-                            .foregroundStyle(Palette.textSecondary)
+                            .font(.callout)
+                            .foregroundStyle(Color.secondary)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .padding(20)
-                .background(Palette.fillHover, in: .rect(cornerRadius: Metrics.windowCorner))
+                .background(Color.primary.opacity(0.05), in: .rect(cornerRadius: Metrics.windowCorner))
             }
         }
     }
@@ -262,11 +260,11 @@ private struct PermissionRow: View {
         HStack(spacing: 14) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(label)
-                    .font(.system(size: 13.5, weight: .medium))
+                    .font(.body.weight(.medium))
                 Text(detail)
-                    .font(.system(size: 12))
+                    .font(.callout)
                     .lineSpacing(2)
-                    .foregroundStyle(Palette.textSecondary)
+                    .foregroundStyle(Color.secondary)
             }
 
             Spacer(minLength: 0)
@@ -275,17 +273,17 @@ private struct PermissionRow: View {
             case .granted:
                 HStack(spacing: 7) {
                     Image(systemName: "checkmark")
-                        .font(.system(size: 12, weight: .bold))
+                        .font(.callout.weight(.bold))
                     Text("Готово")
                 }
-                .font(.system(size: 12.5))
-                .foregroundStyle(Palette.okText)
+                .font(.callout)
+                .foregroundStyle(Color.green)
             case .checking:
                 HStack(spacing: 8) {
                     ProgressView().controlSize(.small)
                     Text("Проверяю")
-                        .font(.system(size: 12.5))
-                        .foregroundStyle(Palette.textTertiary)
+                        .font(.callout)
+                        .foregroundStyle(.tertiary)
                 }
             case .idle, .denied:
                 Button(action, action: onGrant)
@@ -294,7 +292,7 @@ private struct PermissionRow: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 13)
-        .background(Palette.fillHover, in: .rect(cornerRadius: Metrics.cardCorner))
+        .background(Color.primary.opacity(0.05), in: .rect(cornerRadius: Metrics.cardCorner))
     }
 
     private var detail: String {

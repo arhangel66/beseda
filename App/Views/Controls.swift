@@ -4,7 +4,6 @@ struct Avatar: View {
     let initials: String?
     var fallbackSymbol = "waveform"
     var size: CGFloat = 22
-    var isSelected = false
 
     var body: some View {
         Group {
@@ -16,9 +15,9 @@ struct Avatar: View {
                     .font(.system(size: size * 0.46))
             }
         }
-        .foregroundStyle(isSelected ? Color.white : Palette.avatarText)
+        .foregroundStyle(.secondary)
         .frame(width: size, height: size)
-        .background(isSelected ? Color.white.opacity(0.24) : Palette.avatarBackground, in: .circle)
+        .background(.quaternary, in: .circle)
     }
 }
 
@@ -26,7 +25,6 @@ struct Avatar: View {
 struct HighlightedText: View {
     let text: String
     let query: String
-    var isSelected = false
 
     var body: some View {
         Text(attributed)
@@ -39,7 +37,7 @@ struct HighlightedText: View {
               let range = result.range(of: query, options: .caseInsensitive) else {
             return result
         }
-        result[range].backgroundColor = isSelected ? Color.white.opacity(0.3) : Palette.searchHit
+        result[range].backgroundColor = Color.yellow.opacity(0.45)
         return result
     }
 }
@@ -47,7 +45,7 @@ struct HighlightedText: View {
 /// A row of bars driven by the real capture level; the hump makes the middle read loudest.
 struct LevelMeter: View {
     let level: Double
-    var color: Color = Palette.ok
+    var color: Color = Color.green
     var barCount = 26
     var height: CGFloat = 18
 
@@ -74,7 +72,7 @@ struct LevelMeter: View {
 /// bar is allowed to stand still when the step it draws is standing still.
 struct ProgressTrack: View {
     let value: Double
-    var tint: Color = Palette.accent
+    var tint: Color = Color.accentColor
 
     var body: some View {
         GeometryReader { geometry in
@@ -109,11 +107,11 @@ struct ToastOverlay: View {
 
     var body: some View {
         Text(text)
-            .font(.system(size: 12.5))
-            .foregroundStyle(.white)
+            .font(.callout)
             .padding(.horizontal, 18)
             .padding(.vertical, 10)
-            .background(.black.opacity(0.82), in: .rect(cornerRadius: Metrics.cardCorner))
+            .background(.regularMaterial, in: .rect(cornerRadius: Metrics.cardCorner))
+            .shadow(color: .black.opacity(0.15), radius: 8, y: 2)
             .transition(.opacity.combined(with: .move(edge: .bottom)))
     }
 }

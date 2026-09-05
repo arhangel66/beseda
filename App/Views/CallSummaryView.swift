@@ -39,8 +39,8 @@ struct CallSummaryView: View {
                 .controlSize(.large)
 
             Text("Коротко: о чём говорили, о чём договорились и что осталось открытым.")
-                .font(.system(size: 12.5))
-                .foregroundStyle(Palette.textSecondary)
+                .font(.callout)
+                .foregroundStyle(Color.secondary)
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)
@@ -75,14 +75,14 @@ struct CallSummaryView: View {
                 Text("\(base)…")
             }
         }
-        .font(.system(size: 12.5))
-        .foregroundStyle(Palette.textSecondary)
+        .font(.callout)
+        .foregroundStyle(Color.secondary)
     }
 
     private func ready(_ text: String) -> some View {
         VStack(alignment: .leading, spacing: 16) {
             Text(rendered(text))
-                .font(.system(size: 14))
+                .font(.body)
                 .lineSpacing(5)
                 .textSelection(.enabled)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -112,18 +112,18 @@ struct CallSummaryView: View {
     private func errorCard(_ message: String) -> some View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: "exclamationmark.triangle")
-                .font(.system(size: 15))
-                .foregroundStyle(Palette.recording)
+                .font(.headline)
+                .foregroundStyle(Color.red)
                 .padding(.top, 1)
 
             VStack(alignment: .leading, spacing: 8) {
                 Text("Саммари не получилось")
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.body.weight(.semibold))
 
                 Text(message)
-                    .font(.system(size: 12.5))
+                    .font(.callout)
                     .lineSpacing(3)
-                    .foregroundStyle(Palette.textSecondary)
+                    .foregroundStyle(Color.secondary)
                     .frame(maxWidth: 520, alignment: .leading)
 
                 HStack(spacing: 8) {
@@ -136,10 +136,10 @@ struct CallSummaryView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 14)
-        .background(Palette.recording.opacity(0.09), in: .rect(cornerRadius: Metrics.cardCorner))
+        .background(Color.red.opacity(0.09), in: .rect(cornerRadius: Metrics.cardCorner))
         .overlay {
             RoundedRectangle(cornerRadius: Metrics.cardCorner)
-                .strokeBorder(Palette.recording.opacity(0.3), lineWidth: 0.5)
+                .strokeBorder(Color.red.opacity(0.3), lineWidth: 0.5)
         }
     }
 

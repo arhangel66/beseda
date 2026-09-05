@@ -79,7 +79,7 @@ struct PlayerBar: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            Divider().overlay(Palette.separator)
+            Divider().overlay(Color(nsColor: .separatorColor))
 
             HStack(spacing: 16) {
                 playButton
@@ -88,9 +88,9 @@ struct PlayerBar: View {
 
                 if player.isAvailable {
                     Text(player.clockLabel)
-                        .font(.system(size: 12, design: .monospaced))
+                        .font(.callout.monospaced())
                         .monospacedDigit()
-                        .foregroundStyle(Palette.textSecondary)
+                        .foregroundStyle(Color.secondary)
 
                     Button(player.speedLabel) {
                         player.cycleSpeed()
@@ -104,7 +104,7 @@ struct PlayerBar: View {
             .padding(.horizontal, 24)
             .padding(.vertical, 12)
         }
-        .background(Palette.playerBackground)
+        .background(.bar)
         .onAppear { rebuildLanes() }
         .onChange(of: detail.id) { _, _ in rebuildLanes() }
         .onChange(of: detail.speakerNames) { _, _ in rebuildLanes() }
@@ -159,12 +159,12 @@ struct PlayerBar: View {
         HStack(spacing: -Self.avatarOverlap) {
             ForEach(lanes) { lane in
                 Text(lane.initial)
-                    .font(.system(size: 9.5, weight: .semibold))
+                    .font(.caption.weight(.semibold))
                     .foregroundStyle(lane.style.ink)
                     .frame(width: Self.avatarSize, height: Self.avatarSize)
                     .background(lane.style.soft, in: .circle)
                     .overlay {
-                        Circle().strokeBorder(Palette.playerBackground, lineWidth: 1.5)
+                        Circle().strokeBorder(Color(nsColor: .windowBackgroundColor), lineWidth: 1.5)
                     }
                     .help("\(lane.label) · \(Int((lane.share * 100).rounded()))%")
             }
@@ -174,15 +174,15 @@ struct PlayerBar: View {
     private var missingAudioNote: some View {
         HStack(spacing: 7) {
             Image(systemName: "speaker.slash")
-                .font(.system(size: 11))
+                .font(.caption)
             Text("Аудио удалено по правилу хранения")
             SettingsSectionLink(section: "storage", controller: controller) {
                 Text("Настроить")
             }
             .buttonStyle(.link)
         }
-        .font(.system(size: 11.5))
-        .foregroundStyle(Palette.textTertiary)
+        .font(.caption)
+        .foregroundStyle(.tertiary)
     }
 
     private var progress: Double {
@@ -224,12 +224,12 @@ private struct SpeakerStrip: View {
             }
             if progress > 0 {
                 let cursor = CGRect(x: progress * size.width - 0.75, y: 0, width: 1.5, height: size.height)
-                context.fill(Path(cursor), with: .color(Palette.accent))
+                context.fill(Path(cursor), with: .color(Color.accentColor))
             }
         }
         .frame(height: Self.height)
         .frame(maxWidth: .infinity)
-        .background(Palette.laneTrack, in: .rect(cornerRadius: Self.height / 2))
+        .background(Color.primary.opacity(0.08), in: .rect(cornerRadius: Self.height / 2))
         .clipShape(.rect(cornerRadius: Self.height / 2))
     }
 }
@@ -241,9 +241,9 @@ private struct ProgressRail: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack(alignment: .leading) {
-                Capsule().fill(Palette.laneTrack)
+                Capsule().fill(Color.primary.opacity(0.08))
                 Capsule()
-                    .fill(Palette.accent)
+                    .fill(Color.accentColor)
                     .frame(width: geometry.size.width * progress)
             }
         }
