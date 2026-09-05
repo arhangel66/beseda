@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Dev loop: debug build, install into ~/Applications, relaunch.
+# Dev loop: debug build, install into /Applications, relaunch.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
