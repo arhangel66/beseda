@@ -6,6 +6,7 @@ private enum SettingsSection: String, CaseIterable, Identifiable {
     case storage
     case integrations
     case summary
+    case about
 
     var id: String {
         rawValue
@@ -21,6 +22,8 @@ private enum SettingsSection: String, CaseIterable, Identifiable {
             "Интеграции"
         case .summary:
             "Саммари"
+        case .about:
+            "О программе"
         }
     }
 
@@ -34,6 +37,8 @@ private enum SettingsSection: String, CaseIterable, Identifiable {
             "calendar"
         case .summary:
             "sparkles"
+        case .about:
+            "info.circle"
         }
     }
 }
@@ -60,6 +65,8 @@ struct SettingsWindow: View {
                         IntegrationSettings(controller: controller)
                     case .summary:
                         SummarySettings(controller: controller)
+                    case .about:
+                        AboutSettings(controller: controller)
                     }
                 }
                 .padding(.horizontal, 22)
@@ -694,6 +701,48 @@ private struct SummarySettings: View {
                     .foregroundStyle(Palette.textSecondary)
             }
         }
+    }
+}
+
+private struct AboutSettings: View {
+    let controller: AppController
+
+    private var updater: AppUpdater {
+        controller.updater
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Beseda \(updater.version)")
+                .font(.system(size: 15, weight: .semibold))
+
+            if updater.isAvailable {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Обновления ставятся сами, раз в час проверяется новая версия.")
+                        .font(.system(size: 12.5))
+                    Text(lastCheckNote)
+                        .font(.system(size: 11.5))
+                        .foregroundStyle(Palette.textTertiary)
+                }
+
+                OutlineButton(height: 26) {
+                    updater.checkForUpdates()
+                } label: {
+                    Text("Проверить сейчас")
+                }
+            } else {
+                Text("Сборка для разработки: обновления не проверяются.")
+                    .font(.system(size: 12.5))
+                    .foregroundStyle(Palette.textSecondary)
+            }
+        }
+    }
+
+    private var lastCheckNote: String {
+        guard let date = updater.lastCheckDate else {
+            return "Ещё не проверялось"
+        }
+        return "Последняя проверка: " + date.formatted(date: .abbreviated, time: .shortened)
     }
 }
 

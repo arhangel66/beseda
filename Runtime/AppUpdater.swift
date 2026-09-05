@@ -51,6 +51,10 @@ final class AppUpdater: NSObject {
         controller = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: self, userDriverDelegate: nil)
     }
 
+    var lastCheckDate: Date? {
+        controller?.updater.lastUpdateCheckDate
+    }
+
     func checkForUpdates() {
         // an LSUIElement agent is not active, so Sparkle's panel would open behind other windows
         NSApplication.shared.activate(ignoringOtherApps: true)
