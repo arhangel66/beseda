@@ -119,7 +119,7 @@ extension Color {
 
     /// SwiftUI resolves an unnamed dynamic NSColor once, in light; a named one stays dynamic
     private init(light: NSColor, dark: NSColor) {
-        let name = NSColor.Name("podushka-\(light.description)-\(dark.description)")
+        let name = NSColor.Name("beseda-\(light.description)-\(dark.description)")
         self.init(nsColor: NSColor(name: name) { appearance in
             appearance.bestMatch(from: [.aqua, .darkAqua]) == .darkAqua ? dark : light
         })

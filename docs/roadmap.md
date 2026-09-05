@@ -1,6 +1,6 @@
 # Roadmap — September 2026
 
-Context: Podushka runs on two Macs (Mikhail and his wife). Updates are a zip copied by
+Context: Beseda runs on two Macs (Mikhail and his wife). Updates are a zip copied by
 hand. The review from GPT Astra (2026-09-05) was checked against the code; the items
 below are the ones that survived. Public distribution (Developer ID, notarisation,
 licence audit) is deliberately out: nobody outside the family runs the app yet.

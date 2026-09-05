@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Assembles and signs Podushka.app from a SwiftPM bin dir.
+# Assembles and signs Beseda.app from a SwiftPM bin dir.
 # Usage: bundle_app.sh <bin-dir> <app-dir> [release]
 # Only a release bundle gets the Sparkle keys: a dev build with a feed URL would
 # replace itself with the published version at the next scheduled check.
@@ -10,12 +10,12 @@ APP_DIR="$2"
 FLAVOR="${3:-dev}"
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
-SU_FEED_URL="https://raw.githubusercontent.com/arhangel66/podushka/main/appcast.xml"
+SU_FEED_URL="https://raw.githubusercontent.com/arhangel66/beseda/main/appcast.xml"
 SU_PUBLIC_ED_KEY="tR1eNuK7eLy8yy+rAC+mXLGoQqNlwbj1dXktcF5C64U="
 
 rm -rf "$APP_DIR"
 mkdir -p "$APP_DIR/Contents/MacOS" "$APP_DIR/Contents/Resources"
-cp "$BIN_DIR/Podushka" "$APP_DIR/Contents/MacOS/Podushka"
+cp "$BIN_DIR/Beseda" "$APP_DIR/Contents/MacOS/Beseda"
 cp "$ROOT/Resources/Info.plist" "$APP_DIR/Contents/Info.plist"
 VERSION="$(tr -d '[:space:]' < "$ROOT/VERSION")"
 PLIST="$APP_DIR/Contents/Info.plist"
@@ -35,7 +35,7 @@ fi
 mkdir -p "$APP_DIR/Contents/Frameworks" "$APP_DIR/Contents/Resources/licenses"
 cp -R "$BIN_DIR/CTranscribe.framework" "$APP_DIR/Contents/Frameworks/"
 cp -R "$BIN_DIR/Sparkle.framework" "$APP_DIR/Contents/Frameworks/"
-install_name_tool -add_rpath "@executable_path/../Frameworks" "$APP_DIR/Contents/MacOS/Podushka"
+install_name_tool -add_rpath "@executable_path/../Frameworks" "$APP_DIR/Contents/MacOS/Beseda"
 cp "$ROOT/Vendor/TranscribeCpp/LICENSE" "$APP_DIR/Contents/Resources/licenses/transcribe-cpp-LICENSE-MIT"
 cp "$ROOT/.build/artifacts/sparkle/Sparkle/LICENSE" "$APP_DIR/Contents/Resources/licenses/sparkle-LICENSE"
 # actool turns the Icon Composer source into both the macOS 26 icon (Assets.car) and the

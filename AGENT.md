@@ -1,8 +1,8 @@
-# 📄 AGENT.md: Podushka Project Overview
+# 📄 AGENT.md: Beseda Project Overview
 
-Этот файл предназначен для быстрой ориентации ИИ-агентов в проекте **Podushka**.
+Этот файл предназначен для быстрой ориентации ИИ-агентов в проекте **Beseda**.
 
-## 🎯 Проект: Podushka
+## 🎯 Проект: Beseda
 **Тип:** Local macOS Call Recorder & Transcriber (PoC)
 **Основная задача:** Автоматическая запись (микрофон + системный звук), нормализация аудио, транскрибация через ASR-воркер и управление архивом записей.
 
@@ -18,7 +18,7 @@
 
 ### Речевой движок (ASR)
 *   **Library:** [transcribe.cpp](https://github.com/handy-computer/transcribe.cpp) (ggml + Metal), слинкована в приложение через `Vendor/TranscribeCpp` и xcframework из релиза v0.2.3.
-*   **Модели:** GGUF, каталог в `Transcription/SpeechModel.swift` — Parakeet v3 (25 языков, 485 МБ) и GigaAM v3 от Сбера (только русский, 261 МБ). Скачиваются в `~/Library/Application Support/Podushka/runtime/models` и сверяются по sha256.
+*   **Модели:** GGUF, каталог в `Transcription/SpeechModel.swift` — Parakeet v3 (25 языков, 485 МБ) и GigaAM v3 от Сбера (только русский, 261 МБ). Скачиваются в `~/Library/Application Support/Beseda/runtime/models` и сверяются по sha256.
 *   **Task:** Speech-to-Text в том же процессе; отдельного воркера и Python больше нет.
 
 ---
@@ -36,7 +36,7 @@
 ├── Runtime/           # Установка модели: скачивание с проверкой хеша → прогрев, состояние по файлам на диске
 ├── Vendor/            # Swift-обёртка transcribe.cpp (MIT, скопирована из тега v0.2.3)
 ├── Webhooks/          # Отправка готовой расшифровки на URL (payload, sender, очередь с повторами)
-├── scripts/           # Сборка (build_podushka_app.sh) и упаковка в zip (package_podushka.sh)
+├── scripts/           # Сборка (build_app.sh) и упаковка в zip (package_app.sh)
 ├── spikes/            # Прототипы/тесты
 ├── docs/              # Техническая документация и планы
 ├── untracked/         # Черновики, спайки, дизайн (данные приложения живут в Application Support)
@@ -65,7 +65,7 @@
 
 ### Команды запуска:
 *   **Тесты:** `swift test`
-*   **Сборка приложения:** `./scripts/build_podushka_app.sh`
+*   **Сборка приложения:** `./scripts/build_app.sh`
 
 ---
 
@@ -73,6 +73,6 @@
 *   **При правке UI:** Смотри в `App/Views` и `App/DesignSystem.swift`.
 *   **При проблемах с аудио:** Исследуй `Audio/`.
 *   **При работе с данными:** Используй `Storage/` или `App/Storage`.
-*   **При анализе логов:** Проверяй `untracked/podushka-app.log`.
+*   **При анализе логов:** Проверяй `~/Library/Application Support/Beseda/beseda-app.log`.
 
 ---

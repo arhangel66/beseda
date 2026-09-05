@@ -5,7 +5,7 @@ enum TranscriptMerger {
         try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
 
         var lines: [String] = []
-        lines.append("# Podushka Test Transcript")
+        lines.append("# Beseda Test Transcript")
         lines.append("")
         lines.append("- Created: \(result.createdAt.formatted(date: .complete, time: .standard))")
         lines.append("- Raw audio: \(result.rawAudioURL.path)")
@@ -35,7 +35,7 @@ enum TranscriptMerger {
         try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
 
         var lines: [String] = []
-        lines.append("# Podushka Dual Transcript")
+        lines.append("# Beseda Dual Transcript")
         lines.append("")
         lines.append("- Created: \(result.createdAt.formatted(date: .complete, time: .standard))")
         lines.append("- Session: \(result.sessionDirectory.path)")

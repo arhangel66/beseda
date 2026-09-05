@@ -86,7 +86,7 @@ final class MicrophoneCapture: @unchecked Sendable {
             return
         }
         if permission == .denied {
-            throw AudioCaptureError.permissionDenied("Microphone permission is denied for Podushka")
+            throw AudioCaptureError.permissionDenied("Microphone permission is denied for Beseda")
         }
 
         let granted = await withCheckedContinuation { continuation in

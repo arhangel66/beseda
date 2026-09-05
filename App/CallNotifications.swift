@@ -4,8 +4,8 @@ import UserNotifications
 /// Tells the owner after the fact: a banner when an automatic recording starts, one when a transcript is ready.
 @MainActor
 final class CallNotifier: NSObject, @preconcurrency UNUserNotificationCenterDelegate {
-    private static let autoRecordingCategory = "app.podushka.autoRecording"
-    private static let cancelActionID = "app.podushka.cancelAndDelete"
+    private static let autoRecordingCategory = "app.beseda.autoRecording"
+    private static let cancelActionID = "app.beseda.cancelAndDelete"
 
     var onCancelAutoRecording: (() -> Void)?
     var onOpenCalls: (() -> Void)?
@@ -43,7 +43,7 @@ final class CallNotifier: NSObject, @preconcurrency UNUserNotificationCenterDele
     func autoRecordingStarted(appName: String) {
         let content = UNMutableNotificationContent()
         content.title = "Recording your \(appName) call"
-        content.body = "Podushka started on its own."
+        content.body = "Beseda started on its own."
         content.categoryIdentifier = Self.autoRecordingCategory
         post(content)
     }

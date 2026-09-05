@@ -44,7 +44,7 @@ final class SystemAudioTap: @unchecked Sendable {
     func start(expectedDuration: TimeInterval) throws {
         let excludedProcesses = translateCurrentProcessToAudioObject().map { [$0] } ?? []
         let description = CATapDescription(stereoGlobalTapButExcludeProcesses: excludedProcesses)
-        description.name = "Podushka System Audio"
+        description.name = "Beseda System Audio"
         description.isPrivate = true
         description.muteBehavior = CATapMuteBehavior(rawValue: 0)!
 
@@ -61,9 +61,9 @@ final class SystemAudioTap: @unchecked Sendable {
         self.recorder = recorder
 
         let tapUID = try getStringProperty(tapID, selector: kAudioTapPropertyUID)
-        let aggregateUID = "app.podushka.aggregate.\(UUID().uuidString)"
+        let aggregateUID = "app.beseda.aggregate.\(UUID().uuidString)"
         let aggregateDescription: [String: Any] = [
-            kAudioAggregateDeviceNameKey: "Podushka System Audio Aggregate",
+            kAudioAggregateDeviceNameKey: "Beseda System Audio Aggregate",
             kAudioAggregateDeviceUIDKey: aggregateUID,
             kAudioAggregateDeviceIsPrivateKey: true,
             kAudioAggregateDeviceTapListKey: [
@@ -81,7 +81,7 @@ final class SystemAudioTap: @unchecked Sendable {
         )
 
         let streamFormat = format
-        let queue = DispatchQueue(label: "app.podushka.system-audio-tap")
+        let queue = DispatchQueue(label: "app.beseda.system-audio-tap")
         var localIOProcID: AudioDeviceIOProcID?
         let block: AudioDeviceIOBlock = { _, inputData, _, _, _ in
             do {

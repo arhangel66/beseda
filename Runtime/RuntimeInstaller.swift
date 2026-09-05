@@ -176,7 +176,7 @@ final class RuntimeInstaller {
         let digest = try Self.sha256(of: partial)
         guard digest == model.sha256 else {
             try? FileManager.default.removeItem(at: partial)
-            throw PodushkaError.processFailed("Файл модели повреждён при скачивании")
+            throw BesedaError.processFailed("Файл модели повреждён при скачивании")
         }
         try? FileManager.default.removeItem(at: target)
         try FileManager.default.moveItem(at: partial, to: target)
@@ -224,7 +224,7 @@ enum FileDownloader {
             from: source, delegate: DownloadProgress(onProgress: onProgress)
         )
         if let http = response as? HTTPURLResponse, http.statusCode != 200 {
-            throw PodushkaError.processFailed("Сервер ответил \(http.statusCode)")
+            throw BesedaError.processFailed("Сервер ответил \(http.statusCode)")
         }
         try? FileManager.default.removeItem(at: destination)
         try FileManager.default.moveItem(at: temporary, to: destination)

@@ -1,13 +1,29 @@
-# Podushka
+# Beseda
 
-Local macOS call recorder and transcriber proof of concept.
+Beseda records your work calls on a Mac, transcribes them locally and keeps a
+searchable archive. Nothing leaves the Mac unless you switch an integration on.
 
-## Menu Bar App
+## Install
+
+Requirements: Apple Silicon, macOS 14.2 or newer, about 3 GB of free disk and an
+internet connection for the first launch (the speech model is downloaded then).
+
+1. Download `Beseda-<version>.zip` from the [latest release](https://github.com/arhangel66/beseda/releases/latest)
+   and unpack it. Move `Beseda.app` into `/Applications`.
+2. Open the app once. macOS says it cannot verify the developer: the app is signed
+   but not notarised. Close that dialog, open System Settings → Privacy & Security,
+   scroll down and press «Open Anyway» next to Beseda. Only on the first launch.
+3. Beseda lives in the menu bar. Follow the onboarding: allow the microphone and
+   system audio, pick a speech model, make a test recording.
+
+Installed copies update themselves through Sparkle. See `docs/install.md` for
+details and `docs/release.md` for publishing.
+
+## Building from source
 
 ```bash
-cd /Users/mikhail/w/learning/podushka
-./scripts/build_podushka_app.sh
-open ~/Applications/Podushka.app
+./scripts/build_app.sh          # debug build into ~/Applications/Beseda.app
+swift test
 ```
 
 The app lives in the menu bar and opens one window, `Разговоры`. The menu bar
@@ -17,7 +33,7 @@ microphone and system audio stay quiet for 60 seconds the app stops it on its
 own. It records microphone and system audio into separate raw WAV files,
 normalizes both to 16 kHz mono with AVAudioConverter, transcribes them in-process
 with transcribe.cpp, and writes files under
-`~/Library/Application Support/Podushka/calls/`.
+`~/Library/Application Support/Beseda/calls/`.
 
 Each dual test call folder contains:
 
@@ -28,7 +44,7 @@ Each dual test call folder contains:
 - `transcript.md`
 
 The app also maintains a local SQLite index at
-`~/Library/Application Support/Podushka/calls.sqlite` with call
+`~/Library/Application Support/Beseda/calls.sqlite` with call
 status, ASR job metadata, and timestamped transcript segments. The window groups
 calls by day, searches inside transcripts, plays a call back from its two WAV
 files with a waveform scrubber, and shows the per-call ASR speed and the model
@@ -43,7 +59,7 @@ a sweep runs at launch and once a day, and transcripts are never swept.
 finished transcript is POSTed as JSON to the configured address with the secret
 in the `Authorization` and `X-Podushka-Secret` headers. The body carries the
 Krisp-compatible keys kushetka's `/api/webhooks/krisp` expects (`event`,
-`meeting.started_at`, `transcript.text`) next to podushka's own `call`,
+`meeting.started_at`, `transcript.text`) next to Beseda's own `call`,
 `participants`, `dialogue` and `summary`. Every attempt is a row in
 `webhook_deliveries`: network errors and 5xx are retried after 1, 5 and 30
 minutes, 4xx stops, and `Отправить тест` sends a probe the server skips. The
@@ -59,17 +75,15 @@ from a card list, in onboarding and later under Настройки → Хран�
 | Parakeet v3 (default) | 25 | 485 MB |
 | GigaAM v3 (Sber) | Russian | 261 MB |
 
-The file lands in `~/Library/Application Support/Podushka/runtime/models` and is
+The file lands in `~/Library/Application Support/Beseda/runtime/models` and is
 checked against a pinned sha256 before it is used. Speech recognition itself is
 [transcribe.cpp](https://github.com/handy-computer/transcribe.cpp) linked into
 the app, so nothing else is installed at runtime. See
 `docs/speech-model-choice-plan.md`.
 
-## Giving the app to someone else
+## Giving a dev build to someone else
 
-`./scripts/package_podushka.sh` builds and zips `dist/Podushka-<VERSION>.zip`;
-see `docs/install.md` for what the recipient does. The app is signed with an
-Apple Development certificate and not notarised, so the first launch needs
-«Open Anyway» in System Settings.
+`./scripts/package_app.sh` builds and zips `dist/Beseda-<VERSION>.zip` without the
+updater; `./scripts/release.sh` publishes a real release.
 
 The UI follows the system appearance in both light and dark.

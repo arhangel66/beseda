@@ -3,12 +3,12 @@
 import PackageDescription
 
 let package = Package(
-    name: "Podushka",
+    name: "Beseda",
     platforms: [
         .macOS(.v14)
     ],
     products: [
-        .executable(name: "Podushka", targets: ["Podushka"])
+        .executable(name: "Beseda", targets: ["Beseda"])
     ],
     dependencies: [
         .package(url: "https://github.com/FluidInference/FluidAudio.git", from: "0.15.6"),
@@ -36,7 +36,7 @@ let package = Package(
             ]
         ),
         .executableTarget(
-            name: "Podushka",
+            name: "Beseda",
             dependencies: [
                 .product(name: "FluidAudio", package: "FluidAudio"),
                 .product(name: "Sparkle", package: "Sparkle"),
@@ -86,9 +86,9 @@ let package = Package(
             ]
         ),
         .testTarget(
-            name: "PodushkaTests",
-            dependencies: ["Podushka"],
-            path: "Tests/PodushkaTests"
+            name: "BesedaTests",
+            dependencies: ["Beseda"],
+            path: "Tests/BesedaTests"
         )
     ]
 )

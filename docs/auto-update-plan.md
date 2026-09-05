@@ -2,7 +2,7 @@
 
 ## Context
 
-Two Macs run Podushka. An update today is `scripts/package_podushka.sh`, a zip sent by
+Two Macs run Beseda. An update today is `scripts/package_app.sh`, a zip sent by
 hand, a drag into `/Applications` and one more «Open Anyway» because the bundle is not
 notarised. Goal: publish from Mikhail's Mac with one command; the other Mac picks the
 new version up on its own, no dialogs.
@@ -16,8 +16,8 @@ Facts that shape the design:
 - The app is a menu bar agent (`LSUIElement`) that is rarely quit.
 - The app records calls. An update must never relaunch the app mid-recording.
 - The source tree is not in git; a separate public repo holds only releases.
-- `build_podushka_app.sh` is a dev-loop script: debug build, `pkill -x Podushka`, then
-  relaunch. `package_podushka.sh` calls it, so today every zip for the other Mac kills
+- `build_app.sh` is a dev-loop script: debug build, `pkill -x Beseda`, then
+  relaunch. `package_app.sh` calls it, so today every zip for the other Mac kills
   the app on Mikhail's Mac, mid-recording if one is running. The release build must not
   go through that script.
 - Sparkle with `SUAutomaticallyUpdate` downloads in the background but installs on
@@ -29,12 +29,12 @@ Facts that shape the design:
 
 ### Hosting
 
-Public GitHub repo `arhangel66/podushka`:
+Public GitHub repo `arhangel66/beseda`:
 
 ```
 appcast.xml                  committed, served as
-                             https://raw.githubusercontent.com/arhangel66/podushka/main/appcast.xml
-Releases/v0.2.1              asset Podushka-0.2.1.zip
+                             https://raw.githubusercontent.com/arhangel66/beseda/main/appcast.xml
+Releases/v0.2.1              asset Beseda-0.2.1.zip
 ```
 
 The appcast entry's `enclosure url` points at the release asset. Raw GitHub caches for
@@ -43,7 +43,7 @@ up to five minutes, which is fine for an hourly check.
 ### Bundle
 
 ```
-Podushka.app/Contents/Frameworks/Sparkle.framework   copied from the SwiftPM bin path
+Beseda.app/Contents/Frameworks/Sparkle.framework   copied from the SwiftPM bin path
                                                        like CTranscribe.framework
 Info.plist
   SUFeedURL                  the appcast URL
@@ -83,26 +83,26 @@ footer so the second Mac can be checked at a glance.
 
 ### Release script
 
-`scripts/release_podushka.sh`, one command:
+`scripts/release.sh`, one command:
 
 1. `swift build -c release`; bundle exactly like the dev script but without `pkill`,
    without touching `~/Applications`; `CFBundleShortVersionString` from `VERSION`,
    `CFBundleVersion` from a timestamp with seconds (Sparkle orders by it; the current
    minute-resolution stamp would make two builds in one minute indistinguishable).
-2. `ditto` into `dist/Podushka-<version>.zip`.
+2. `ditto` into `dist/Beseda-<version>.zip`.
 3. `generate_appcast dist/` from Sparkle's `bin/` — signs the zip with the key in the
    Keychain and rewrites `dist/appcast.xml` with a per-version entry.
-4. `gh release create v<version> dist/Podushka-<version>.zip` in the releases repo,
+4. `gh release create v<version> dist/Beseda-<version>.zip` in the releases repo,
    copy `appcast.xml` there, commit and push.
 
-`build_podushka_app.sh` and `package_podushka.sh` stay for the dev loop; the release
+`build_app.sh` and `package_app.sh` stay for the dev loop; the release
 script reuses the bundling by moving it into `scripts/lib/bundle_app.sh` that both call.
 
 ## Steps
 
 Each step: RED (build, test or check fails) → GREEN, `swift test` from the repo root.
 
-- [x] **0. Hosting decision** — GitHub public repo `arhangel66/podushka` (2026-09-05) or a
+- [x] **0. Hosting decision** — GitHub public repo `arhangel66/beseda` (2026-09-05) or a
   folder on Mikhail's own server. Everything below assumes GitHub; only the upload part
   of step 5 changes otherwise.
 
@@ -110,7 +110,7 @@ Each step: RED (build, test or check fails) → GREEN, `swift test` from the rep
   product `Sparkle`. `scripts/lib/bundle_app.sh`: copy `Sparkle.framework` into
   `Contents/Frameworks`, take a `release` flag that decides whether the `SU*` keys are
   written; both existing scripts call it without the flag. Check: the built app
-  launches, `otool -L Contents/MacOS/Podushka` lists `@rpath/Sparkle.framework`,
+  launches, `otool -L Contents/MacOS/Beseda` lists `@rpath/Sparkle.framework`,
   `codesign --verify --strict --deep` passes, the dev bundle's plist has no `SUFeedURL`.
 
 - [x] **2. Keys and plist** — the tools ship inside the SwiftPM artifact
@@ -132,7 +132,7 @@ Each step: RED (build, test or check fails) → GREEN, `swift test` from the rep
   version line. Check: the button brings Sparkle's "You're up to date" panel to the
   front against a feed with no newer entry.
 
-- [x] **5. `scripts/release_podushka.sh`** — as designed; `docs/release.md` with the
+- [x] **5. `scripts/release.sh`** — as designed; `docs/release.md` with the
   three-line how-to (bump `VERSION`, run the script, done). Check: run it for 0.2.1,
   `dist/appcast.xml` validates with `xmllint`, the release page shows the zip, the raw
   appcast URL serves the new entry.
@@ -159,7 +159,7 @@ Each step: RED (build, test or check fails) → GREEN, `swift test` from the rep
   accident: it lives under a different name and refuses to run when `VERSION` matches
   the last published tag. Mikhail's own Mac runs the dev build of the same code, so a
   release goes out after it has survived a day there.
-- Until step 5 lands, `package_podushka.sh` still kills the app on Mikhail's Mac: do not
+- Until step 5 lands, `package_app.sh` still kills the app on Mikhail's Mac: do not
   package while a call is being recorded.
 - Sparkle relaunches the app after install; the menu bar agent reappears on its own.
   Auto-recording detection restarts with it; a call that starts during the two-second

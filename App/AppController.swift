@@ -198,7 +198,7 @@ final class AppController {
     }
 
     init() {
-        // before anything logs or opens the index: the files may still be in the checkout
+        // before anything logs or opens the index: the folder may still carry the old name
         let migration = Result { try LegacyDataMigration.run(from: AppPaths.legacyDataDirectory, to: AppPaths.current) }
         webhooks = WebhookService(store: callStore, settings: settings)
         let transcriber = transcriber
@@ -231,8 +231,8 @@ final class AppController {
         observeAutoDetectSettings()
 
         switch migration {
-        case .success(let moved) where !moved.isEmpty:
-            appendLog("Moved \(moved.joined(separator: ", ")) from \(AppPaths.legacyDataDirectory.path)")
+        case .success(true):
+            appendLog("Moved \(AppPaths.legacyDataDirectory.path) to \(AppPaths.current.dataDirectory.path)")
         case .failure(let error):
             appendLog("Legacy data left in place: \(error.localizedDescription)")
         default:
@@ -1182,7 +1182,7 @@ final class AppController {
                 appendLog("Retry succeeded for \(callID)")
 
             default:
-                throw PodushkaError.processFailed("Unsupported call kind: \(summary.kind)")
+                throw BesedaError.processFailed("Unsupported call kind: \(summary.kind)")
             }
         } catch {
             lastError = error.localizedDescription
@@ -1218,7 +1218,7 @@ final class AppController {
 
     private func requireFile(at url: URL) throws {
         guard fileManager.fileExists(atPath: url.path) else {
-            throw PodushkaError.processFailed("Missing audio file: \(url.lastPathComponent)")
+            throw BesedaError.processFailed("Missing audio file: \(url.lastPathComponent)")
         }
     }
 
@@ -1680,7 +1680,7 @@ final class AppController {
             try handle.write(contentsOf: Data(line.utf8))
             try handle.close()
         } catch {
-            fputs("Podushka log write failed: \(error)\n", stderr)
+            fputs("Beseda log write failed: \(error)\n", stderr)
         }
     }
 }

@@ -23,7 +23,7 @@ final class LocalTranscriber: @unchecked Sendable {
     }
 
     private let paths: AppPaths
-    private let queue = DispatchQueue(label: "app.podushka.transcriber")
+    private let queue = DispatchQueue(label: "app.beseda.transcriber")
     private var selected: SpeechModel
     private var loaded: Loaded?
     private var idleShutdown: DispatchWorkItem?
@@ -137,7 +137,7 @@ final class LocalTranscriber: @unchecked Sendable {
 
         let modelURL = selected.localURL(in: paths.modelsDirectory)
         guard FileManager.default.fileExists(atPath: modelURL.path) else {
-            throw PodushkaError.runtimeMissing
+            throw BesedaError.runtimeMissing
         }
         let handle = try TranscribeCpp.Model(path: modelURL.path)
         let loaded = Loaded(model: selected, handle: handle, session: try handle.session())
@@ -187,11 +187,11 @@ final class LocalTranscriber: @unchecked Sendable {
             pcmFormat: file.processingFormat,
             frameCapacity: AVAudioFrameCount(file.length)
         ) else {
-            throw PodushkaError.processFailed("Could not allocate a buffer for \(url.lastPathComponent)")
+            throw BesedaError.processFailed("Could not allocate a buffer for \(url.lastPathComponent)")
         }
         try file.read(into: buffer)
         guard let channel = buffer.floatChannelData?[0] else {
-            throw PodushkaError.processFailed("No audio in \(url.lastPathComponent)")
+            throw BesedaError.processFailed("No audio in \(url.lastPathComponent)")
         }
         return Array(UnsafeBufferPointer(start: channel, count: Int(buffer.frameLength)))
     }

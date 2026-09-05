@@ -160,7 +160,7 @@ private final class MicrophoneProcessWatcher: @unchecked Sendable {
         mElement: kAudioObjectPropertyElementWildcard
     )
 
-    private let queue = DispatchQueue(label: "app.podushka.mic-watcher")
+    private let queue = DispatchQueue(label: "app.beseda.mic-watcher")
     private let onChange: @Sendable (Set<String>) -> Void
 
     private var inputByObject: [AudioObjectID: Bool] = [:]

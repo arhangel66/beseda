@@ -154,7 +154,7 @@ private struct RecordingSettings: View {
 
             SettingRow(
                 label: "Запускать при входе в систему",
-                hint: loginItemNote ?? "Podushka будет ждать звонка в меню-баре",
+                hint: loginItemNote ?? "Beseda будет ждать звонка в меню-баре",
                 isOn: Binding(get: { isLoginItemOn }, set: { setLoginItem($0) })
             )
 
@@ -184,7 +184,7 @@ private struct RecordingSettings: View {
             return loginItemError
         }
         if loginItemStatus == .requiresApproval {
-            return "Подтвердите Podushka в Системных настройках → Основные → Объекты входа."
+            return "Подтвердите Beseda в Системных настройках → Основные → Объекты входа."
         }
         return nil
     }

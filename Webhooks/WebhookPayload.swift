@@ -1,7 +1,7 @@
 import Foundation
 
 /// The JSON body of a webhook delivery. `event`, `meeting` and `transcript` mirror the Krisp
-/// shape kushetka already accepts; everything else is podushka's own and is ignored there.
+/// shape kushetka already accepts; everything else is Beseda's own and is ignored there.
 struct WebhookPayload: Encodable {
     struct Meeting: Encodable {
         let id: String
@@ -114,7 +114,7 @@ struct WebhookPayload: Encodable {
         let stamp = now.iso8601WithFractions
         return WebhookPayload(
             event: testEvent,
-            meeting: Meeting(id: "test", name: "Тестовая отправка из Podushka", startedAt: stamp),
+            meeting: Meeting(id: "test", name: "Тестовая отправка из Beseda", startedAt: stamp),
             transcript: Transcript(text: "Вы: тест"),
             call: Call(id: "test", startedAt: stamp, endedAt: stamp, durationSec: 0, app: nil, kind: "test"),
             participants: [],

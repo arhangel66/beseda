@@ -29,11 +29,11 @@ enum ExecutableResolver {
             }
         }
 
-        throw PodushkaError.executableNotFound(names.joined(separator: ", "))
+        throw BesedaError.executableNotFound(names.joined(separator: ", "))
     }
 }
 
-enum PodushkaError: LocalizedError {
+enum BesedaError: LocalizedError {
     case executableNotFound(String)
     case processFailed(String)
     case invalidWorkerResponse(String)

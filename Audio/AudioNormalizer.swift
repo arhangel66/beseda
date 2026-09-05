@@ -23,7 +23,7 @@ enum AudioNormalizer {
         guard let target = AVAudioFormat(
             commonFormat: .pcmFormatInt16, sampleRate: sampleRate, channels: 1, interleaved: true
         ), let converter = AVAudioConverter(from: input.processingFormat, to: target) else {
-            throw PodushkaError.processFailed("Cannot convert \(inputURL.lastPathComponent) to 16 kHz mono")
+            throw BesedaError.processFailed("Cannot convert \(inputURL.lastPathComponent) to 16 kHz mono")
         }
         converter.sampleRateConverterQuality = .max
         try? FileManager.default.removeItem(at: outputURL)
@@ -37,7 +37,7 @@ enum AudioNormalizer {
               let outputBuffer = AVAudioPCMBuffer(
                   pcmFormat: target, frameCapacity: AVAudioFrameCount(Double(inputCapacity) * ratio) + 64
               ) else {
-            throw PodushkaError.processFailed("Cannot allocate audio buffers")
+            throw BesedaError.processFailed("Cannot allocate audio buffers")
         }
 
         let feed = InputFeed(file: input, buffer: inputBuffer)
@@ -120,7 +120,7 @@ enum ProcessRunner {
                 } else {
                     let detail = stderrText.isEmpty ? stdoutText : stderrText
                     continuation.resume(
-                        throwing: PodushkaError.processFailed(
+                        throwing: BesedaError.processFailed(
                             "\(executableURL.lastPathComponent) exited with \(process.terminationStatus): \(detail)"
                         )
                     )
@@ -205,7 +205,7 @@ enum ProcessRunner {
                 } else {
                     let detail = stderrText.isEmpty ? stdoutText : stderrText
                     continuation.resume(
-                        throwing: PodushkaError.processFailed(
+                        throwing: BesedaError.processFailed(
                             "\(executableURL.lastPathComponent) exited with \(process.terminationStatus): \(detail)"
                         )
                     )

@@ -277,7 +277,7 @@ enum CallStoreError: LocalizedError {
 
 final class CallStore {
     private let dbURL: URL
-    private let queue = DispatchQueue(label: "app.podushka.call-store")
+    private let queue = DispatchQueue(label: "app.beseda.call-store")
 
     init(dbURL: URL = AppPaths.current.callIndexURL) {
         self.dbURL = dbURL

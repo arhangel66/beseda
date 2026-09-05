@@ -107,7 +107,7 @@ final class WebhookSender: Sendable {
         request.setValue(secret, forHTTPHeaderField: "X-Podushka-Secret")
         request.setValue(event, forHTTPHeaderField: "X-Podushka-Event")
         request.setValue(deliveryID, forHTTPHeaderField: "X-Podushka-Delivery")
-        request.setValue("Podushka", forHTTPHeaderField: "User-Agent")
+        request.setValue("Beseda", forHTTPHeaderField: "User-Agent")
         return request
     }
 

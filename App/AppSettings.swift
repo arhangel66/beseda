@@ -44,23 +44,23 @@ enum RetentionRule: String, CaseIterable, Identifiable, Sendable {
 @Observable
 final class AppSettings {
     private let defaults: UserDefaults
-    private let autoDetectKey = "podushka.autoDetectEnabled"
-    private let enabledCallAppsKey = "podushka.enabledCallApps"
-    private let rawRetentionKey = "podushka.rawAudioRetention"
-    private let normalizedRetentionKey = "podushka.normalizedAudioRetention"
-    private let stopOnSilenceKey = "podushka.stopOnSilence"
-    private let notifyWhenReadyKey = "podushka.notifyWhenReady"
-    private let onboardingDoneKey = "podushka.onboardingDone"
-    private let copyFormatKey = "podushka.copyFormat"
-    private let calendarEnabledKey = "podushka.calendarEnabled"
-    private let calendarIdentifiersKey = "podushka.calendarIdentifiers"
-    private let summaryServerURLKey = "podushka.summaryServerURL"
-    private let summaryModelKey = "podushka.summaryModel"
-    private let summaryPromptKey = "podushka.summaryPrompt"
-    private let webhookEnabledKey = "podushka.webhookEnabled"
-    private let webhookURLKey = "podushka.webhookURL"
-    private let webhookSecretKey = "podushka.webhookSecret"
-    private let speechModelKey = "podushka.speechModel"
+    private let autoDetectKey = "beseda.autoDetectEnabled"
+    private let enabledCallAppsKey = "beseda.enabledCallApps"
+    private let rawRetentionKey = "beseda.rawAudioRetention"
+    private let normalizedRetentionKey = "beseda.normalizedAudioRetention"
+    private let stopOnSilenceKey = "beseda.stopOnSilence"
+    private let notifyWhenReadyKey = "beseda.notifyWhenReady"
+    private let onboardingDoneKey = "beseda.onboardingDone"
+    private let copyFormatKey = "beseda.copyFormat"
+    private let calendarEnabledKey = "beseda.calendarEnabled"
+    private let calendarIdentifiersKey = "beseda.calendarIdentifiers"
+    private let summaryServerURLKey = "beseda.summaryServerURL"
+    private let summaryModelKey = "beseda.summaryModel"
+    private let summaryPromptKey = "beseda.summaryPrompt"
+    private let webhookEnabledKey = "beseda.webhookEnabled"
+    private let webhookURLKey = "beseda.webhookURL"
+    private let webhookSecretKey = "beseda.webhookSecret"
+    private let speechModelKey = "beseda.speechModel"
 
     var autoDetectEnabled: Bool {
         didSet {
@@ -175,6 +175,9 @@ final class AppSettings {
     }
 
     init(defaults: UserDefaults = .standard) {
+        if defaults === UserDefaults.standard, let legacy = UserDefaults(suiteName: "app.podushka.Podushka") {
+            AppSettings.importLegacyValues(from: legacy, into: defaults)
+        }
         self.defaults = defaults
         self.autoDetectEnabled = AppSettings.bool(defaults, autoDetectKey, otherwise: false)
         self.enabledCallApps = (defaults.array(forKey: enabledCallAppsKey) as? [String])
@@ -198,6 +201,17 @@ final class AppSettings {
         self.webhookURL = defaults.string(forKey: webhookURLKey) ?? ""
         self.webhookSecret = defaults.string(forKey: webhookSecretKey) ?? ""
         self.speechModelID = defaults.string(forKey: speechModelKey) ?? SpeechModel.default.id
+    }
+
+    /// the settings written while the app was called Podushka; a value already set under
+    /// the new name wins, so this runs at most once per key
+    static func importLegacyValues(from legacy: UserDefaults, into defaults: UserDefaults) {
+        for (key, value) in legacy.dictionaryRepresentation() where key.hasPrefix("podushka.") {
+            let newKey = "beseda." + key.dropFirst("podushka.".count)
+            if defaults.object(forKey: newKey) == nil {
+                defaults.set(value, forKey: newKey)
+            }
+        }
     }
 
     private static func bool(_ defaults: UserDefaults, _ key: String, otherwise fallback: Bool) -> Bool {

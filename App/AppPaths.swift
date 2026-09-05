@@ -1,6 +1,6 @@
 import Foundation
 
-/// Where Podushka keeps its files. Everything it creates sits under one Application Support
+/// Where Beseda keeps its files. Everything it creates sits under one Application Support
 /// folder, so uninstalling is deleting the app and that folder. The speech engine is compiled
 /// into the binary, so the only thing installed at runtime is the model file itself.
 struct AppPaths {
@@ -9,7 +9,7 @@ struct AppPaths {
     static let current = AppPaths(
         dataDirectory: FileManager.default
             .urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("Podushka", isDirectory: true)
+            .appendingPathComponent("Beseda", isDirectory: true)
     )
 
     /// the checkout this binary was compiled from; only meaningful on the developer's Mac
@@ -24,9 +24,9 @@ struct AppPaths {
         return URL(fileURLWithPath: FileManager.default.currentDirectoryPath, isDirectory: true)
     }()
 
-    /// the pre-bundle layout: calls and the index under `untracked/` in the checkout
+    /// the folder the app used while it was called Podushka
     static var legacyDataDirectory: URL {
-        sourceRoot.appendingPathComponent("untracked", isDirectory: true)
+        current.dataDirectory.deletingLastPathComponent().appendingPathComponent("Podushka", isDirectory: true)
     }
 
     var callsDirectory: URL {
@@ -38,7 +38,7 @@ struct AppPaths {
     }
 
     var appLogURL: URL {
-        dataDirectory.appendingPathComponent("podushka-app.log")
+        dataDirectory.appendingPathComponent("beseda-app.log")
     }
 
     var runtimeDirectory: URL {
@@ -89,38 +89,22 @@ enum PythonRuntimeCleanup {
     }
 }
 
-/// Moves the developer-layout files into Application Support the first time the new build runs.
+/// Moves the Podushka-era folder to the Beseda one the first time the renamed app runs,
+/// so calls, the index, settings files and the downloaded model come along.
 enum LegacyDataMigration {
-    private static let items = ["calls", "calls.sqlite", "calls.sqlite-wal", "calls.sqlite-shm", "podushka-app.log"]
-
-    /// the names that moved; nothing moves once the data directory has an index of its own
+    /// true when the folder moved; nothing moves once the new folder exists
     @discardableResult
-    static func run(from legacy: URL, to paths: AppPaths) throws -> [String] {
+    static func run(from legacy: URL, to paths: AppPaths) throws -> Bool {
         let fileManager = FileManager.default
-        guard !fileManager.fileExists(atPath: paths.callIndexURL.path),
-              fileManager.fileExists(atPath: legacy.appendingPathComponent("calls.sqlite").path) else {
-            return []
+        guard !fileManager.fileExists(atPath: paths.dataDirectory.path),
+              fileManager.fileExists(atPath: legacy.path) else {
+            return false
         }
-        try fileManager.createDirectory(at: paths.dataDirectory, withIntermediateDirectories: true)
-        var moved: [String] = []
-        for item in items {
-            let source = legacy.appendingPathComponent(item)
-            let target = paths.dataDirectory.appendingPathComponent(item)
-            guard fileManager.fileExists(atPath: source.path) else {
-                continue
-            }
-            if item == "podushka-app.log", fileManager.fileExists(atPath: target.path) {
-                // the new build may have logged a line or two before this ran; keep both
-                let handle = try FileHandle(forWritingTo: target)
-                try handle.seekToEnd()
-                try handle.write(contentsOf: Data(contentsOf: source))
-                try handle.close()
-                try fileManager.removeItem(at: source)
-            } else {
-                try fileManager.moveItem(at: source, to: target)
-            }
-            moved.append(item)
+        try fileManager.moveItem(at: legacy, to: paths.dataDirectory)
+        let oldLog = paths.dataDirectory.appendingPathComponent("podushka-app.log")
+        if fileManager.fileExists(atPath: oldLog.path) {
+            try fileManager.moveItem(at: oldLog, to: paths.appLogURL)
         }
-        return moved
+        return true
     }
 }
