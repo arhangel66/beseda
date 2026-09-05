@@ -40,18 +40,18 @@ Stays as is:
 
 Each step: `swift test` green, then the dev build launches.
 
-- [ ] **1. Git.** `git init`, review `.gitignore` (`untracked/`, `samples/`, `dist/`,
+- [x] **1. Git.** `git init`, review `.gitignore` (`untracked/`, `samples/`, `dist/`,
   `.build/` are already there; add `.qwen38-work/`), scan the tree for personal data
   and secrets before the first commit (`grep -rniE "secret|token|password|@gmail"`
   over tracked files). First commit as "Podushka 0.2.2" so the rename is a readable
   diff.
 
-- [ ] **2. Rename in SwiftPM and the bundle.** `Package.swift` product/targets,
+- [x] **2. Rename in SwiftPM and the bundle.** `Package.swift` product/targets,
   `Tests/BesedaTests`, `@testable import Beseda`, `BesedaApp`, `BesedaError`.
   `Resources/Info.plist`: executable, name, identifier, usage descriptions.
   Dispatch-queue labels and notification category ids get the `app.beseda.` prefix.
 
-- [ ] **3. Data and settings migration.** `AppPaths.dataDirectory` → `Beseda`.
+- [x] **3. Data and settings migration.** `AppPaths.dataDirectory` → `Beseda`.
   `LegacyDataMigration` is replaced: when `…/Beseda` does not exist and `…/Podushka`
   does, move the whole directory (the untracked-layout migration is obsolete: it ran
   on the only Mac that had that layout). `AppSettings`: on first launch with an empty
@@ -59,18 +59,18 @@ Each step: `swift test` green, then the dev build launches.
   "app.podushka.Podushka")` into the `beseda.*` key. Tests: directory moved once and
   not again; defaults copied once, existing new values not overwritten.
 
-- [ ] **4. User-facing texts and log lines.** Onboarding, settings hints, notification
+- [x] **4. User-facing texts and log lines.** Onboarding, settings hints, notification
   body, mic-permission error, transcript headers, aggregate device names.
 
-- [ ] **5. Scripts and docs.** Rename the three scripts, `bundle_app.sh` constants
+- [x] **5. Scripts and docs.** Rename the three scripts, `bundle_app.sh` constants
   (feed URL to `arhangel66/beseda`), `release.sh` additionally requires a clean git
   tree, tags `v<version>` and pushes the tag. README (the GitHub one merges into the
   repo README), AGENT.md, install.md, release.md, roadmap, auto-update plan.
 
-- [ ] **6. GitHub.** `gh repo rename beseda`, delete releases `v0.2.1` and `v0.2.2`
+- [x] **6. GitHub.** `gh repo rename beseda`, delete releases `v0.2.1` and `v0.2.2`
   and their tags, push `main`. `VERSION` → 0.3.0, `./scripts/release.sh`.
 
-- [ ] **7. Mikhail's Mac.** Quit Podushka, install `Beseda-0.3.0.zip`, grant the
+- [x] **7. Mikhail's Mac.** *(done 2026-09-05: folder, settings and models moved, 0.3.0 → 0.3.1 updated itself in 10 s once the feed cache had expired)* Quit Podushka, install `Beseda-0.3.0.zip`, grant the
   permissions, check: the archive is there, the model is not re-downloaded, settings
   kept, login item switched on. Delete `Podushka.app`. Then publish 0.3.1 with a
   visible change and confirm the automatic update still works under the new name.

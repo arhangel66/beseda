@@ -2,8 +2,9 @@
 
 1. Bump `VERSION`.
 2. `./scripts/release.sh`.
-3. Done: installed copies update themselves within an hour (Sparkle checks hourly and
-   installs as soon as no call is being recorded). «Обновления» in the menu bar popover
+3. Done: installed copies update themselves within about an hour (GitHub caches the
+   feed for five minutes, Sparkle checks hourly and installs as soon as no call is
+   being recorded). «Обновления» in the menu bar popover
    forces a check.
 
 The script makes a release build, signs the zip with the EdDSA key from this Mac's
