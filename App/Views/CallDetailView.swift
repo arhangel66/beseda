@@ -24,9 +24,6 @@ enum CallDetailTab: String, CaseIterable, Identifiable {
 struct CallDetailView: View {
     let controller: AppController
     let player: CallPlayer
-    /// with the list hidden the reading column centres itself, as in the prototype
-    var isReadingCentred = false
-
     @State private var tab = CallDetailTab.transcript
     @State private var isLogOpen = false
 
@@ -70,7 +67,7 @@ struct CallDetailView: View {
                             CallInfo(detail: detail, isLogOpen: $isLogOpen, controller: controller)
                         }
                     }
-                    .frame(maxWidth: .infinity, alignment: isReadingCentred ? .center : .leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 24)
                     .padding(.top, 18)
                     .padding(.bottom, 24)
@@ -97,46 +94,21 @@ struct CallDetailView: View {
 
     private func header(_ detail: StoredCallDetail) -> some View {
         let summary = detail.summary
-        return VStack(alignment: .leading, spacing: 16) {
-            HStack(alignment: .top, spacing: 14) {
-                VStack(alignment: .leading, spacing: 7) {
-                    Text(summary.whenHeadline)
-                        .font(.system(size: 21, weight: .semibold))
-                        .monospacedDigit()
-                        .tracking(-0.3)
-
-                    NameLine(controller: controller, summary: summary)
-
-                    HStack(spacing: 8) {
-                        HStack(spacing: 6) {
-                            Avatar(initials: nil, fallbackSymbol: summary.isDual ? "person.2" : "mic", size: 20)
-                            Text(summary.isDual ? "Вы и собеседник" : "Микрофон")
-                        }
-                        separatorDot
-                        Text(summary.appLabel)
-
-                        if summary.isDual {
-                            HStack(spacing: 5) {
-                                Image(systemName: "mic")
-                                    .font(.system(size: 9))
-                                Text("два канала")
-                            }
-                            .font(.system(size: 11))
-                            .padding(.horizontal, 7)
-                            .frame(height: 19)
-                            .background(Palette.fillSubtle, in: .rect(cornerRadius: 5))
-                        }
+        return VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 6) {
+                    if summary.isFromCalendar {
+                        Image(systemName: "calendar")
+                            .foregroundStyle(.secondary)
                     }
-                    .font(.system(size: 12))
-                    .foregroundStyle(Palette.textSecondary)
+                    Text(summary.displayTitle)
+                        .font(.title2.weight(.semibold))
+                        .lineLimit(2)
+                        .textSelection(.enabled)
                 }
-
-                Spacer(minLength: 0)
-
-                if controller.settings.webhookEnabled || !controller.webhooks.selected.isEmpty {
-                    SendToWebhookButton(controller: controller, detail: detail)
-                }
-                CopyTranscriptButton(controller: controller)
+                Text("\(summary.whenHeadline) · \(summary.appLabel) · \(summary.isDual ? "микрофон и системный звук" : "только микрофон")")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
             }
 
             Picker("Раздел", selection: $tab) {
@@ -152,115 +124,46 @@ struct CallDetailView: View {
         .padding(.horizontal, 24)
         .padding(.top, 20)
     }
-
-    private var separatorDot: some View {
-        Text("·").opacity(0.4)
-    }
 }
 
-/// The name of the conversation, where it came from, and the way to change it.
-private struct NameLine: View {
+/// Which calendar event this call belongs to; the event gives the call its name.
+struct LinkEventButton: View {
     let controller: AppController
     let summary: StoredCallSummary
 
-    @State private var isPickerOpen = false
-
     var body: some View {
-        HStack(spacing: 8) {
-            if summary.isFromCalendar {
-                Image(systemName: "calendar")
-                    .font(.system(size: 12))
-                    .opacity(0.55)
-            }
-
-            Text(summary.displayTitle)
-                .font(.system(size: 14.5, weight: .medium))
-                .lineLimit(2)
-
-            Text(summary.titleSource)
-                .font(.system(size: 11))
-                .foregroundStyle(Palette.textSecondary)
-                .padding(.horizontal, 7)
-                .frame(height: 19)
-                .background(Palette.fillSubtle, in: .rect(cornerRadius: 5))
-
-            if controller.settings.calendarEnabled {
-                Button {
-                    isPickerOpen = true
-                } label: {
-                    Text(summary.isFromCalendar ? "Изменить" : "Привязать событие")
-                        .font(.system(size: 12.5))
-                        .foregroundStyle(Palette.accent)
-                }
-                .buttonStyle(.plain)
-                .popover(isPresented: $isPickerOpen, arrowEdge: .bottom) {
-                    EventPicker(controller: controller, summary: summary, isOpen: $isPickerOpen)
+        Menu {
+            Section("События рядом с \(summary.whenDescription)") {
+                ForEach(controller.eventCandidates(for: summary)) { event in
+                    Button {
+                        controller.assignEvent(event, to: summary)
+                    } label: {
+                        if event.title == summary.eventTitle {
+                            Label("\(event.title) · \(event.timeDescription)", systemImage: "checkmark")
+                        } else {
+                            Text("\(event.title) · \(event.timeDescription)")
+                        }
+                    }
                 }
             }
-        }
-    }
-}
-
-private struct EventPicker: View {
-    let controller: AppController
-    let summary: StoredCallSummary
-    @Binding var isOpen: Bool
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text("События рядом с \(summary.whenDescription)")
-                .font(.system(size: 11))
-                .foregroundStyle(Palette.textTertiary)
-                .padding(.horizontal, 8)
-                .padding(.top, 6)
-                .padding(.bottom, 4)
-
-            ForEach(controller.eventCandidates(for: summary)) { event in
-                row(title: event.title, meta: event.timeDescription, isChosen: event.title == summary.eventTitle) {
-                    controller.assignEvent(event, to: summary)
-                }
-            }
-
-            row(title: "Без события", meta: "название останется по теме разговора", isChosen: !summary.isFromCalendar) {
+            Button {
                 controller.assignEvent(nil, to: summary)
-            }
-        }
-        .padding(5)
-        .frame(width: 320)
-    }
-
-    private func row(title: String, meta: String, isChosen: Bool, action: @escaping () -> Void) -> some View {
-        Button {
-            action()
-            isOpen = false
-        } label: {
-            HStack(spacing: 8) {
-                Image(systemName: "checkmark")
-                    .font(.system(size: 10, weight: .bold))
-                    .frame(width: 13)
-                    .opacity(isChosen ? 1 : 0)
-                VStack(alignment: .leading, spacing: 1) {
-                    Text(title)
-                        .font(.system(size: 12.5))
-                        .lineLimit(1)
-                    Text(meta)
-                        .font(.system(size: 11))
-                        .foregroundStyle(Palette.textTertiary)
-                        .lineLimit(1)
+            } label: {
+                if summary.isFromCalendar {
+                    Text("Без события")
+                } else {
+                    Label("Без события", systemImage: "checkmark")
                 }
-                Spacer(minLength: 0)
             }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 6)
-            .contentShape(.rect)
+        } label: {
+            Label(summary.isFromCalendar ? "Событие" : "Привязать событие", systemImage: "calendar.badge.plus")
         }
-        .buttonStyle(.plain)
+        .help(summary.isFromCalendar ? "Название взято из календаря" : "Назвать разговор по событию календаря")
     }
 }
 
-/// Krisp's «Send to Webhook»: the left half sends, the right half opens the attempt history.
 /// The icon carries the last outcome so the row stays one line.
-private struct SendToWebhookButton: View {
+struct SendToWebhookButton: View {
     let controller: AppController
     let detail: StoredCallDetail
 
@@ -358,7 +261,7 @@ private struct SendToWebhookButton: View {
 }
 
 /// Copies in the remembered format; the menu picks another format and makes it the default.
-private struct CopyTranscriptButton: View {
+struct CopyTranscriptButton: View {
     let controller: AppController
 
     var body: some View {
@@ -501,13 +404,14 @@ private struct TranscriptLines: View {
                 .frame(maxWidth: 680, alignment: .leading)
         } else {
             let active = activeIndex
-            LazyVStack(alignment: .leading, spacing: 14) {
+            LazyVStack(alignment: .leading, spacing: 4) {
                 ForEach(Array(detail.segments.enumerated()), id: \.element.id) { index, segment in
                     TranscriptLine(
                         segment: segment,
                         name: SpeakerNaming.name(for: segment.speaker, overrides: detail.speakerNames),
                         initial: SpeakerNaming.initial(for: segment.speaker, overrides: detail.speakerNames),
                         query: query,
+                        showsSpeaker: index == 0 || detail.segments[index - 1].speaker != segment.speaker,
                         isActive: index == active,
                         onSeek: { player.seek(to: segment.startSec) },
                         onRename: { startRenaming(segment.speaker) }
@@ -544,11 +448,14 @@ private extension TranscriptLines {
     }
 }
 
+/// One line of the transcript. Back-to-back lines of one speaker share a header, so a long
+/// turn reads as one paragraph; the timestamp is the seek control, the text stays selectable.
 private struct TranscriptLine: View {
     let segment: StoredTranscriptSegment
     let name: String
     let initial: String
     let query: String
+    let showsSpeaker: Bool
     let isActive: Bool
     let onSeek: () -> Void
     let onRename: () -> Void
@@ -558,44 +465,56 @@ private struct TranscriptLine: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 5) {
-            HStack(spacing: 8) {
-                Text(initial)
-                    .font(.system(size: 10, weight: .semibold))
-                    .foregroundStyle(style.ink)
-                    .frame(width: 20, height: 20)
-                    .background(style.soft, in: .circle)
+        VStack(alignment: .leading, spacing: 4) {
+            if showsSpeaker {
+                HStack(spacing: 8) {
+                    Text(initial)
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(style.ink)
+                        .frame(width: 20, height: 20)
+                        .background(style.soft, in: .circle)
 
-                Text(name)
-                    .font(.system(size: 12.5, weight: .semibold))
+                    Text(name)
+                        .font(.callout.weight(.semibold))
 
-                Text(CallFormatting.mmss(segment.startSec))
-                    .font(.system(size: 11.5, design: .monospaced))
-                    .monospacedDigit()
-                    .foregroundStyle(isActive ? Palette.accent : Palette.textQuaternary)
+                    timestamp
+                }
+                .padding(.top, 10)
             }
 
-            HighlightedText(text: segment.text, query: query)
-                .font(.system(size: 14))
-                .lineSpacing(4)
-                .textSelection(.enabled)
-                .padding(.leading, 10)
-                .overlay(alignment: .leading) {
-                    Rectangle()
-                        .fill(style.bar)
-                        .frame(width: 2)
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                HighlightedText(text: segment.text, query: query)
+                    .font(.body)
+                    .lineSpacing(3)
+                    .textSelection(.enabled)
+                if !showsSpeaker {
+                    timestamp
                 }
-                .padding(.leading, 9)
+            }
+            .padding(.leading, 10)
+            .overlay(alignment: .leading) {
+                Rectangle()
+                    .fill(style.bar)
+                    .frame(width: 2)
+            }
+            .padding(.leading, 9)
         }
         .padding(.horizontal, 10)
-        .padding(.vertical, 6)
+        .padding(.vertical, 2)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(isActive ? Palette.activeLine : .clear, in: .rect(cornerRadius: Metrics.rowCorner))
-        .contentShape(.rect)
-        .onTapGesture(perform: onSeek)
+        .background(isActive ? Color.accentColor.opacity(0.1) : .clear, in: .rect(cornerRadius: Metrics.rowCorner))
         .contextMenu {
+            Button("Перейти к \(CallFormatting.mmss(segment.startSec))", action: onSeek)
             Button("Переименовать участника…", action: onRename)
         }
+    }
+
+    private var timestamp: some View {
+        Button(CallFormatting.mmss(segment.startSec), action: onSeek)
+            .buttonStyle(.plain)
+            .font(.caption.monospacedDigit())
+            .foregroundStyle(isActive ? Color.accentColor : Color.secondary)
+            .help("Перейти к этому месту записи")
     }
 }
 

@@ -23,7 +23,6 @@ struct BesedaApp: App {
                 }
         }
         .defaultSize(width: 1100, height: 720)
-        .windowStyle(.hiddenTitleBar)
 
         MenuBarExtra {
             MenuBarPopover(controller: controller, openConversations: { showConversations() })

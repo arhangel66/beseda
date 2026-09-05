@@ -117,38 +117,41 @@ struct PlayerBar: View {
             player.togglePlay()
         } label: {
             Image(systemName: player.isPlaying ? "pause.fill" : "play.fill")
-                .font(.system(size: 14))
-                .foregroundStyle(player.isAvailable ? Color.white : Palette.textQuaternary)
-                .frame(width: 34, height: 34)
-                .background(player.isAvailable ? Palette.accent : Palette.fillSubtle, in: .circle)
+                .frame(width: 16)
         }
-        .buttonStyle(.plain)
+        .keyboardShortcut(.space, modifiers: [])
+        .help(player.isPlaying ? "Пауза (пробел)" : "Воспроизвести (пробел)")
         .disabled(!player.isAvailable)
     }
 
+    /// the strip is decoration under a real slider: the slider owns the drag, the keyboard and VoiceOver
     private var track: some View {
-        GeometryReader { geometry in
-            let railWidth = geometry.size.width - legendWidth
-            Group {
+        HStack(spacing: Self.legendGap) {
+            ZStack {
                 if lanes.isEmpty {
                     // a failed call still has audio but no lines to draw the strip from
                     ProgressRail(progress: progress)
                 } else {
-                    HStack(spacing: Self.legendGap) {
-                        SpeakerStrip(lanes: lanes, progress: progress)
-                        legend
-                    }
+                    SpeakerStrip(lanes: lanes, progress: progress)
                 }
+                Slider(value: position, in: 0...max(duration, 1))
+                    .controlSize(.mini)
+                    .opacity(player.isAvailable ? 0.85 : 0)
+                    .disabled(!player.isAvailable)
+                    .accessibilityLabel("Позиция воспроизведения")
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .contentShape(.rect)
-            .gesture(
-                DragGesture(minimumDistance: 0)
-                    .onChanged { seek(at: $0.location.x, railOrigin: 0, railWidth: railWidth) }
-                    .onEnded { seek(at: $0.location.x, railOrigin: 0, railWidth: railWidth) }
-            )
+            if !lanes.isEmpty {
+                legend
+            }
         }
         .frame(height: Self.avatarSize)
+    }
+
+    private var position: Binding<Double> {
+        Binding(
+            get: { min(player.currentTime, duration) },
+            set: { player.seek(to: $0) }
+        )
     }
 
     /// Krisp's row of initials: who is in the call, hover for the name and share.
@@ -166,21 +169,6 @@ struct PlayerBar: View {
                     .help("\(lane.label) · \(Int((lane.share * 100).rounded()))%")
             }
         }
-    }
-
-    private var legendWidth: CGFloat {
-        guard !lanes.isEmpty else {
-            return 0
-        }
-        return Self.legendGap + Self.avatarSize + CGFloat(lanes.count - 1) * (Self.avatarSize - Self.avatarOverlap)
-    }
-
-    private func seek(at x: CGFloat, railOrigin: CGFloat, railWidth: CGFloat) {
-        guard player.isAvailable, railWidth > 0 else {
-            return
-        }
-        let fraction = (x - railOrigin) / railWidth
-        player.seek(to: min(1, max(0, fraction)) * duration)
     }
 
     private var missingAudioNote: some View {

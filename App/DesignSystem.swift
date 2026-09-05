@@ -92,7 +92,6 @@ enum Metrics {
     static let cardCorner: CGFloat = 10
     static let rowCorner: CGFloat = 8
     static let controlCorner: CGFloat = 7
-    static let sidebarWidth: CGFloat = 300
     static let controlHeight: CGFloat = 26
 }
 

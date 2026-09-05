@@ -28,13 +28,13 @@ existing bindings and controller calls stay, tests green before push.
 - [x] Check: build + tests green; keyboard/VoiceOver walkthrough is Mikhail's (needs a live session)
 
 ## Step 3. Conversations window on the system frame
-- [ ] `NavigationSplitView` with `List(selection:)`; drop `hiddenTitleBar`, `ignoresSafeArea`,
+- [x] `NavigationSplitView` with `List(selection:)`; drop `hiddenTitleBar`, `ignoresSafeArea`,
       the traffic-light spacer, the sidebar toggle, manual row highlight
-- [ ] `.navigationTitle`, `.toolbar` (copy menu, link event, record), `.searchable` in the sidebar
-- [ ] Header: topic is the title; date · duration · app · participants on one secondary line
-- [ ] Transcript: consecutive lines of one speaker merged; seek on the timestamp, not the line
-- [ ] Player: `Slider` over the speaker strip; legend outside the drag area; Space = play/pause
-- [ ] Check: ⌘F, arrow keys in the list, resizable sidebar, full screen
+- [x] `.navigationTitle`, `.toolbar` (copy menu, link event, record), `.searchable` in the sidebar
+- [x] Header: topic is the title; date · duration · app · participants on one secondary line
+- [x] Transcript: consecutive lines of one speaker merged; seek on the timestamp, not the line
+- [x] Player: `Slider` over the speaker strip; legend outside the drag area; Space = play/pause
+- [ ] Check: ⌘F, arrow keys in the list, resizable sidebar, full screen (screen busy; pending)
 
 ## Step 4. Settings and app menu
 - [ ] `TabView` + `Form(.grouped)`: Основные / Запись / Обработка / Хранение / Интеграции

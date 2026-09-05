@@ -104,18 +104,6 @@ struct SettingsSectionLink<Label: View>: View {
     }
 }
 
-struct SectionCaption: View {
-    let text: String
-
-    var body: some View {
-        Text(text)
-            .font(.system(size: 11, weight: .semibold))
-            .tracking(0.5)
-            .textCase(.uppercase)
-            .foregroundStyle(Palette.textQuaternary)
-    }
-}
-
 struct ToastOverlay: View {
     let text: String
 
