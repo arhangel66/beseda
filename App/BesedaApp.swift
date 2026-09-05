@@ -44,6 +44,18 @@ struct BesedaApp: App {
         Settings {
             SettingsWindow(controller: controller)
         }
+        .commands {
+            CommandGroup(replacing: .appInfo) {
+                Button("О Beseda") {
+                    NSApplication.shared.orderFrontStandardAboutPanel(nil)
+                }
+                if controller.updater.isAvailable {
+                    Button("Проверить обновления…") {
+                        controller.updater.checkForUpdates()
+                    }
+                }
+            }
+        }
 
         // screenshots of the menu-bar window without clicking the status item;
         // opened at launch when BESEDA_PREVIEW_POPOVER is set

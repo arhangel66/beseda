@@ -37,12 +37,12 @@ existing bindings and controller calls stay, tests green before push.
 - [ ] Check: ⌘F, arrow keys in the list, resizable sidebar, full screen (screen busy; pending)
 
 ## Step 4. Settings and app menu
-- [ ] `TabView` + `Form(.grouped)`: Основные / Запись / Обработка / Хранение / Интеграции
-- [ ] Основные: login item, notifications, updates (auto-update toggle, version, last check, Проверить сейчас…)
-- [ ] Обработка: speech model + summary model; server URL and prompt under «Дополнительно»
-- [ ] App menu via `CommandGroup`: «О Beseda», «Проверить обновления…»; remove `AboutSettings`
-- [ ] Honest processing note: name the real destination when the summary server is remote
-- [ ] Check: ⌘, opens the right pane, deep links from the popover still land
+- [x] `TabView` + `Form(.grouped)`: Основные / Запись / Обработка / Хранение / Интеграции
+- [x] Основные: login item, notifications, updates (auto-update toggle, version, last check, Проверить сейчас…)
+- [x] Обработка: speech model + summary model; server URL and prompt under «Дополнительно»
+- [x] App menu via `CommandGroup`: «О Beseda», «Проверить обновления…»; remove `AboutSettings`
+- [x] Honest processing note: name the real destination when the summary server is remote
+- [ ] Check: ⌘, opens the right pane, deep links from summary/player still land (screen busy; pending)
 
 ## Step 5. Palette and type
 - [ ] Text colours → `.primary/.secondary/.tertiary`; accent → `Color.accentColor`;

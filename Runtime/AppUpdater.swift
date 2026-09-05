@@ -55,6 +55,12 @@ final class AppUpdater: NSObject {
         controller?.updater.lastUpdateCheckDate
     }
 
+    /// Sparkle downloads and stages updates on its own; off means it only asks
+    var installsAutomatically: Bool {
+        get { controller?.updater.automaticallyDownloadsUpdates ?? false }
+        set { controller?.updater.automaticallyDownloadsUpdates = newValue }
+    }
+
     func checkForUpdates() {
         // an LSUIElement agent is not active, so Sparkle's panel would open behind other windows
         NSApplication.shared.activate(ignoringOtherApps: true)

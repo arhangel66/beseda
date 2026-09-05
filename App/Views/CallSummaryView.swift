@@ -151,7 +151,7 @@ struct CallSummaryView: View {
                 .buttonStyle(.borderedProminent)
         case .openSettings:
             if let controller {
-                SettingsSectionLink(section: "summary", controller: controller) {
+                SettingsSectionLink(section: "processing", controller: controller) {
                     Text("Открыть настройки")
                 }
                 .buttonStyle(.borderedProminent)
