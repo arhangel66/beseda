@@ -1,5 +1,8 @@
+import AVFAudio
 import SwiftUI
 
+/// The menu-bar window. Its shape never changes with the app state: status, recording
+/// controls, the latest call, then the same commands in the same place.
 struct MenuBarPopover: View {
     let controller: AppController
     let openConversations: () -> Void
@@ -7,21 +10,15 @@ struct MenuBarPopover: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             modelInstallLine
-            Group {
-                if controller.isRecording {
-                    recording
-                } else if let stage = controller.jobStage {
-                    job(stage)
-                } else if let lastCall {
-                    done(lastCall)
-                } else {
-                    idle
-                }
-            }
+            statusRow
+            controls
+            Divider()
+            latestCalls
+            Divider()
+            commands
         }
         .padding(14)
         .frame(width: 340)
-        .foregroundStyle(Palette.textPrimary)
         .onAppear {
             controller.refreshRecentCalls()
         }
@@ -36,14 +33,14 @@ struct MenuBarPopover: View {
                 ProgressView(value: fraction ?? 0)
                     .frame(width: 90)
                 Text("Скачиваю \(controller.runtime.model.title)")
-                    .font(.system(size: 11.5))
-                    .foregroundStyle(Palette.textTertiary)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
                 Spacer(minLength: 0)
                 if let fraction {
                     Text("\(Int((fraction * 100).rounded()))%")
-                        .font(.system(size: 11.5))
+                        .font(.caption)
                         .monospacedDigit()
-                        .foregroundStyle(Palette.textTertiary)
+                        .foregroundStyle(.secondary)
                 }
             }
         }
@@ -56,225 +53,270 @@ struct MenuBarPopover: View {
         return controller.recentCalls.first { $0.id == id }
     }
 
-    // MARK: - Idle
+    // MARK: - Status
 
-    private var idle: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(spacing: 10) {
-                AppMark(size: 26)
-                VStack(alignment: .leading, spacing: 1) {
-                    Text("Готов записывать")
-                        .font(.system(size: 13, weight: .semibold))
-                    Text("Микрофон и системный звук на месте")
-                        .font(.system(size: 11))
-                        .foregroundStyle(Palette.textTertiary)
-                }
-            }
-
-            AccentButton(title: "Записать звонок", systemImage: "record.circle", height: 34) {
-                controller.startCallRecording()
-            }
-            .frame(maxWidth: .infinity)
-
-            HStack(spacing: 8) {
-                PillToggle(isOn: Bindable(controller.settings).autoDetectEnabled, width: 30)
-                Text("Включать запись, когда начинается звонок")
-                    .font(.system(size: 11.5))
-                    .foregroundStyle(Palette.textTertiary)
-            }
-
-            divider
-
-            if !controller.recentCalls.isEmpty {
-                VStack(alignment: .leading, spacing: 2) {
-                    SectionCaption(text: "Последние")
-                        .padding(.horizontal, 4)
-                        .padding(.bottom, 4)
-
-                    ForEach(controller.recentCalls.prefix(3)) { call in
-                        RecentRow(call: call) {
-                            controller.selectCall(call)
-                            openConversations()
-                        }
-                    }
-                }
-
-                divider
-            }
-
-            HStack(spacing: 14) {
-                LinkText("Все разговоры", action: openConversations)
-                SettingsLink {
-                    Text("Настройки")
-                        .font(.system(size: 12))
-                        .foregroundStyle(Palette.textSecondary)
-                }
-                .buttonStyle(.plain)
-                if controller.updater.isAvailable {
-                    LinkText("Обновления") { controller.updater.checkForUpdates() }
-                }
-                Spacer()
-                Text(controller.updater.version)
-                    .font(.system(size: 11))
-                    .foregroundStyle(Palette.textTertiary)
-                LinkText("Выйти") { controller.quit() }
-            }
-        }
-    }
-
-    // MARK: - Recording
-
-    private var recording: some View {
-        VStack(alignment: .leading, spacing: 14) {
+    private var statusRow: some View {
+        VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 9) {
-                PulsingDot()
-                Text(controller.isPaused ? "Пауза" : "Записываю звонок")
-                    .font(.system(size: 13, weight: .semibold))
-                Spacer()
-                Text(CallFormatting.mmss(controller.elapsedRecordingSeconds))
-                    .font(.system(size: 20, weight: .medium, design: .monospaced))
-                    .monospacedDigit()
-            }
-
-            VStack(spacing: 10) {
-                meterRow(icon: "mic", level: controller.microphoneLevel, color: Palette.ok, label: "я")
-                meterRow(icon: "speaker.wave.2", level: controller.systemAudioLevel, color: Palette.accent, label: "собеседник")
-            }
-
-            HStack(spacing: 8) {
-                Button {
-                    controller.stopActiveRecording()
-                } label: {
-                    HStack(spacing: 8) {
-                        RoundedRectangle(cornerRadius: 2)
-                            .fill(.white)
-                            .frame(width: 9, height: 9)
-                        Text("Остановить")
-                    }
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 32)
-                    .background(Palette.recording, in: .rect(cornerRadius: 9))
+                statusIcon
+                    .frame(width: 18)
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(statusTitle)
+                        .font(.headline)
+                    Text(statusSubtitle)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(2)
                 }
-                .buttonStyle(.plain)
-
-                OutlineButton(height: 32) {
-                    controller.togglePause()
-                } label: {
-                    Text(controller.isPaused ? "Продолжить" : "Пауза")
-                        .font(.system(size: 13))
+                Spacer(minLength: 0)
+                if controller.isRecording {
+                    Text(CallFormatting.mmss(controller.elapsedRecordingSeconds))
+                        .font(.title3.monospacedDigit())
                 }
             }
-
-            Text(controller.isPaused
-                 ? "Пауза. Аудио не пишется."
-                 : hintText)
-                .font(.system(size: 11.5))
-                .lineSpacing(2)
-                .foregroundStyle(Palette.textTertiary)
+            if let stage = controller.jobStage {
+                ProgressView(value: stage.overall)
+            }
         }
     }
 
-    private var hintText: String {
-        controller.settings.stopOnSilence
-            ? "Остановлю сама после минуты тишины · оба канала идут"
-            : "Оба канала идут · остановите вручную"
+    @ViewBuilder
+    private var statusIcon: some View {
+        switch controller.status {
+        case .recording, .callRecording, .autoRecording:
+            if controller.isPaused {
+                Image(systemName: "pause.circle.fill").foregroundStyle(.orange)
+            } else {
+                PulsingDot()
+            }
+        case .working:
+            ProgressView().controlSize(.small)
+        case .failed:
+            Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.red)
+        case .idle, .completed:
+            Image(systemName: microphoneDenied ? "mic.slash" : "checkmark.circle")
+                .foregroundStyle(microphoneDenied ? .red : .green)
+        }
+    }
+
+    private var statusTitle: String {
+        switch controller.status {
+        case .recording, .callRecording:
+            controller.isPaused ? "Пауза" : "Идёт запись"
+        case .autoRecording(let app):
+            controller.isPaused ? "Пауза · \(app)" : "Идёт запись · \(app)"
+        case .working(let stage):
+            stage.title
+        case .failed:
+            "Не получилось"
+        case .completed where lastCall != nil:
+            "Расшифровка готова"
+        case .idle, .completed:
+            "Готова к записи"
+        }
+    }
+
+    private var statusSubtitle: String {
+        switch controller.status {
+        case .recording, .callRecording, .autoRecording:
+            if controller.isPaused {
+                return "Аудио не пишется"
+            }
+            return controller.settings.stopOnSilence
+                ? "Остановится после минуты тишины"
+                : "Остановите вручную"
+        case .working(let stage):
+            return stage.caption()
+        case .failed(let message):
+            return message
+        case .idle, .completed:
+            if microphoneDenied {
+                return "Нет доступа к микрофону"
+            }
+            return controller.settings.autoDetectEnabled
+                ? "Автозапись включена, жду звонка"
+                : "Автозапись выключена"
+        }
+    }
+
+    /// the only permission that can be read without side effects; system audio is only
+    /// known once a tap is opened
+    private var microphoneDenied: Bool {
+        AVAudioApplication.shared.recordPermission == .denied
+    }
+
+    // MARK: - Controls
+
+    @ViewBuilder
+    private var controls: some View {
+        if controller.isRecording {
+            VStack(spacing: 8) {
+                meterRow(icon: "mic", level: controller.microphoneLevel, color: .green, label: "микрофон")
+                meterRow(icon: "speaker.wave.2", level: controller.systemAudioLevel, color: .accentColor, label: "собеседник")
+            }
+            HStack(spacing: 8) {
+                Button(controller.isPaused ? "Продолжить" : "Пауза") {
+                    controller.togglePause()
+                }
+                Button("Остановить") {
+                    controller.stopActiveRecording()
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.red)
+                .keyboardShortcut("r", modifiers: .command)
+            }
+        } else {
+            HStack(spacing: 10) {
+                Button("Начать запись") {
+                    controller.startCallRecording()
+                }
+                .buttonStyle(.borderedProminent)
+                .keyboardShortcut("r", modifiers: .command)
+                .disabled(controller.isBusy)
+                if controller.isBusy {
+                    Text("после расшифровки")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer(minLength: 0)
+                Toggle("Автозапись", isOn: Bindable(controller.settings).autoDetectEnabled)
+                    .toggleStyle(.switch)
+                    .controlSize(.small)
+            }
+            if controller.jobStage != nil {
+                Text("Разговор уже сохранён. Окно можно закрыть: расшифровка допишется в фоне.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
     }
 
     private func meterRow(icon: String, level: Double, color: Color, label: String) -> some View {
         HStack(spacing: 10) {
             Image(systemName: icon)
-                .font(.system(size: 12))
-                .foregroundStyle(Palette.textSecondary)
+                .font(.callout)
+                .foregroundStyle(.secondary)
                 .frame(width: 14)
             LevelMeter(level: level, color: color)
             Text(label)
-                .font(.system(size: 10.5))
-                .foregroundStyle(Palette.textTertiary)
+                .font(.caption)
+                .foregroundStyle(.secondary)
                 .frame(width: 66, alignment: .trailing)
         }
     }
 
-    // MARK: - Job
+    // MARK: - Latest calls
 
-    private func job(_ stage: JobStage) -> some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(spacing: 10) {
-                ProgressView()
-                    .controlSize(.small)
-                VStack(alignment: .leading, spacing: 1) {
-                    Text(stage.title)
-                        .font(.system(size: 13, weight: .semibold))
-                    Text(stage.caption())
-                        .font(.system(size: 11.5))
-                        .foregroundStyle(Palette.textTertiary)
+    @ViewBuilder
+    private var latestCalls: some View {
+        if let call = lastCall {
+            readyCard(call)
+        } else if !controller.recentCalls.isEmpty {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Последние")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 8)
+                    .padding(.bottom, 2)
+                ForEach(controller.recentCalls.prefix(3)) { call in
+                    RecentRow(call: call) {
+                        controller.selectCall(call)
+                        openConversations()
+                    }
                 }
             }
-
-            ProgressTrack(value: stage.overall)
-
-            Text("Разговор уже сохранён. Можно закрыть окно — допишу расшифровку в фоне и покажу уведомление.")
-                .font(.system(size: 11.5))
-                .lineSpacing(2)
-                .foregroundStyle(Palette.textTertiary)
+        } else {
+            Text("Разговоров пока нет")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 8)
         }
     }
 
-    // MARK: - Done
-
-    private func done(_ call: StoredCallSummary) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 9) {
-                Image(systemName: "checkmark")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundStyle(Palette.ok)
-                Text("Расшифровка готова")
-                    .font(.system(size: 13, weight: .semibold))
-            }
-
-            VStack(alignment: .leading, spacing: 6) {
+    private func readyCard(_ call: StoredCallSummary) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 3) {
                 Text(call.displayTitle)
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.headline)
                     .lineLimit(2)
                 Text("\(call.appLabel) · \(call.durationDescription)")
-                    .font(.system(size: 11.5))
-                    .foregroundStyle(Palette.textTertiary)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
                 if let preview = call.previewText {
                     Text(preview)
-                        .font(.system(size: 12.5))
-                        .lineSpacing(3)
+                        .font(.callout)
                         .lineLimit(3)
-                        .foregroundStyle(Palette.textSecondary)
-                        .padding(.top, 2)
+                        .foregroundStyle(.secondary)
                 }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(12)
-            .background(Palette.fillRaised, in: .rect(cornerRadius: 9))
-
             HStack(spacing: 8) {
-                OutlineButton(height: 30) {
+                Button("Открыть") {
                     controller.selectCall(call)
                     controller.lastReadyCallID = nil
                     openConversations()
-                } label: {
-                    Text("Открыть")
                 }
-
-                AccentButton(title: "Скопировать", systemImage: "doc.on.doc", height: 30) {
+                Button("Скопировать расшифровку") {
                     controller.selectCall(call)
                     controller.copyTranscript()
                 }
-                .frame(maxWidth: .infinity)
             }
+            .controlSize(.small)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(10)
+        .background(.quaternary.opacity(0.5), in: .rect(cornerRadius: 8))
     }
 
-    private var divider: some View {
-        Rectangle()
-            .fill(Palette.separator)
-            .frame(height: 0.5)
+    // MARK: - Commands
+
+    private var commands: some View {
+        VStack(spacing: 1) {
+            MenuRow(title: "Разговоры…", action: openConversations)
+            SettingsLink {
+                MenuRowLabel(title: "Настройки…", shortcut: "⌘,")
+            }
+            .buttonStyle(.plain)
+            MenuRow(title: "Завершить Beseda", shortcut: "⌘Q") { controller.quit() }
+                .keyboardShortcut("q", modifiers: .command)
+        }
+    }
+}
+
+/// A popover line that behaves like a menu item: full-width, highlighted on hover.
+private struct MenuRow: View {
+    let title: String
+    var shortcut: String?
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            MenuRowLabel(title: title, shortcut: shortcut)
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+private struct MenuRowLabel: View {
+    let title: String
+    var shortcut: String?
+
+    @State private var isHovering = false
+
+    var body: some View {
+        HStack {
+            Text(title)
+            Spacer()
+            if let shortcut {
+                Text(shortcut)
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+            }
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .contentShape(.rect)
+        .background(isHovering ? Color.primary.opacity(0.06) : .clear, in: .rect(cornerRadius: 5))
+        .onHover { isHovering = $0 }
     }
 }
 
@@ -290,43 +332,21 @@ private struct RecentRow: View {
                 Avatar(initials: call.initials, fallbackSymbol: call.fallbackSymbol, size: 20)
                 VStack(alignment: .leading, spacing: 1) {
                     Text(call.displayTitle)
-                        .font(.system(size: 12.5))
                         .lineLimit(1)
                     Text(call.isFailed ? "не расшифрован" : "\(call.whenDescription) · \(call.durationDescription)")
-                        .font(.system(size: 10.5))
-                        .foregroundStyle(Palette.textTertiary)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                         .lineLimit(1)
                 }
                 Spacer(minLength: 0)
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 9, weight: .bold))
-                    .foregroundStyle(Palette.textPrimary.opacity(0.3))
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(.tertiary)
             }
             .padding(.horizontal, 8)
-            .padding(.vertical, 6)
-            .background(isHovering ? Palette.fillHover : .clear, in: .rect(cornerRadius: Metrics.controlCorner))
-        }
-        .buttonStyle(.plain)
-        .onHover { isHovering = $0 }
-    }
-}
-
-private struct LinkText: View {
-    let title: String
-    let action: () -> Void
-
-    @State private var isHovering = false
-
-    init(_ title: String, action: @escaping () -> Void) {
-        self.title = title
-        self.action = action
-    }
-
-    var body: some View {
-        Button(action: action) {
-            Text(title)
-                .font(.system(size: 12))
-                .foregroundStyle(isHovering ? Palette.accent : Palette.textSecondary)
+            .padding(.vertical, 5)
+            .contentShape(.rect)
+            .background(isHovering ? Color.primary.opacity(0.06) : .clear, in: .rect(cornerRadius: 5))
         }
         .buttonStyle(.plain)
         .onHover { isHovering = $0 }
@@ -340,29 +360,10 @@ struct PulsingDot: View {
 
     var body: some View {
         Circle()
-            .fill(Palette.recording)
+            .fill(.red)
             .frame(width: size, height: size)
             .opacity(isPulsing ? 0.35 : 1)
             .animation(.easeInOut(duration: 0.7).repeatForever(autoreverses: true), value: isPulsing)
             .onAppear { isPulsing = true }
-    }
-}
-
-struct AppMark: View {
-    var size: CGFloat = 26
-
-    var body: some View {
-        Image(systemName: "waveform")
-            .font(.system(size: size * 0.55, weight: .medium))
-            .foregroundStyle(.white)
-            .frame(width: size, height: size)
-            .background(
-                LinearGradient(
-                    colors: [Color(hex: 0x5B6CFF), Color(hex: 0x2A3AD0)],
-                    startPoint: .top,
-                    endPoint: .bottom
-                ),
-                in: .rect(cornerRadius: size * 0.27)
-            )
     }
 }

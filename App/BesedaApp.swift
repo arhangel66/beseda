@@ -34,12 +34,24 @@ struct BesedaApp: App {
                     Text(label)
                 }
             }
+            .onAppear {
+                if ProcessInfo.processInfo.environment["BESEDA_PREVIEW_POPOVER"] != nil {
+                    openWindow(id: "popover-preview")
+                }
+            }
         }
         .menuBarExtraStyle(.window)
 
         Settings {
             SettingsWindow(controller: controller)
         }
+
+        // screenshots of the menu-bar window without clicking the status item;
+        // opened at launch when BESEDA_PREVIEW_POPOVER is set
+        Window("Popover preview", id: "popover-preview") {
+            MenuBarPopover(controller: controller, openConversations: { showConversations() })
+        }
+        .windowResizability(.contentSize)
     }
 
     private func showConversations() {

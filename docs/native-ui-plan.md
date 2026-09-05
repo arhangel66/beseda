@@ -8,15 +8,15 @@ Rules for every step: system controls over custom ones, delete what becomes unus
 existing bindings and controller calls stay, tests green before push.
 
 ## Step 1. Menu-bar popover: constant skeleton
-- [ ] Layout never changes shape by state: status row → recording controls → last call → commands
-- [ ] Status row covers ready / recording / paused / processing / failed with an honest subtitle
+- [x] Layout never changes shape by state: status row → recording controls → last call → commands
+- [x] Status row covers ready / recording / paused / processing / failed with an honest subtitle
       (microphone permission, auto-record on/off, error text with a next step)
-- [ ] Recording controls: `Начать запись` (disabled with reason while processing), pause/stop
+- [x] Recording controls: `Начать запись` (disabled with reason while processing), pause/stop
       with level meters while recording; system `Button` and `Toggle`
-- [ ] Menu-bar icon reflects pause
-- [ ] Commands block always present: Разговоры…, Настройки…, Завершить Beseda with ⌘ hints
-- [ ] Version and «Обновления» leave the popover (they move to the app menu in step 4)
-- [ ] Check: `swift test`, open popover in every state on the dev build
+- [x] Menu-bar icon reflects pause
+- [x] Commands block always present: Разговоры…, Настройки…, Завершить Beseda with ⌘ hints
+- [x] Version and «Обновления» leave the popover (they move to the app menu in step 4)
+- [x] Check: `swift test`; idle state seen via `BESEDA_PREVIEW_POPOVER=1`, recording/processing/failed states need a live call (Mikhail)
 
 ## Step 2. System controls everywhere
 - [ ] `PillToggle` → `Toggle(.switch)` with a label

@@ -155,7 +155,7 @@ final class AppController {
     }
 
     var menuBarSystemImage: String {
-        status.systemImage
+        isPaused && isRecording ? "pause.circle" : status.systemImage
     }
 
     /// mm:ss while recording, an ellipsis while the transcript is being built
