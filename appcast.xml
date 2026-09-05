@@ -1,0 +1,15 @@
+<?xml version="1.0" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>Beseda</title>
+        <item>
+            <title>0.3.0</title>
+            <pubDate>Sat, 05 Sep 2026 13:49:01 +0300</pubDate>
+            <sparkle:version>20260905134859</sparkle:version>
+            <sparkle:shortVersionString>0.3.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.2</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <enclosure url="https://github.com/arhangel66/beseda/releases/download/v0.3.0/Beseda-0.3.0.zip" length="15463262" type="application/octet-stream" sparkle:edSignature="96ZpSBl95jnTwM84PVS+GzW+V5NaT1zPIlvg/HaaDUugrsbQAaLMyj8T5iibmVdIxJAzubhztNVR1nrj2DnCCA=="/>
+        </item>
+    </channel>
+</rss>
