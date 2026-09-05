@@ -119,8 +119,7 @@ struct PlayerBar: View {
             Image(systemName: player.isPlaying ? "pause.fill" : "play.fill")
                 .frame(width: 16)
         }
-        .keyboardShortcut(.space, modifiers: [])
-        .help(player.isPlaying ? "Пауза (пробел)" : "Воспроизвести (пробел)")
+        .help(player.isPlaying ? "Пауза" : "Воспроизвести")
         .disabled(!player.isAvailable)
     }
 

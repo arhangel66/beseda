@@ -15,11 +15,19 @@ struct CallSidebar: View {
             if !controller.upcomingEvents.isEmpty {
                 UpcomingEvents(controller: controller)
                     .listRowSeparator(.hidden)
+                    .selectionDisabled()
             }
 
             if controller.isRecording {
                 LiveRecordingRow(controller: controller)
                     .listRowSeparator(.hidden)
+                    .selectionDisabled()
+            }
+
+            if controller.groupedCalls.isEmpty && !controller.isRecording {
+                emptyState
+                    .listRowSeparator(.hidden)
+                    .selectionDisabled()
             }
 
             ForEach(controller.groupedCalls) { group in
@@ -36,11 +44,6 @@ struct CallSidebar: View {
             }
         }
         .listStyle(.sidebar)
-        .overlay {
-            if controller.groupedCalls.isEmpty && !controller.isRecording {
-                emptyState
-            }
-        }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             Text(controller.storageLine)
                 .font(.caption)

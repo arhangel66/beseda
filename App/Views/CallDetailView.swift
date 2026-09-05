@@ -182,6 +182,10 @@ struct SendToWebhookButton: View {
 
     var body: some View {
         Menu {
+            Button("Отправить сейчас") {
+                controller.webhooks.sendNow(callID: detail.id)
+            }
+            .disabled(!canSend)
             Button("История доставок…") {
                 isHistoryOpen = true
             }
@@ -197,12 +201,16 @@ struct SendToWebhookButton: View {
                 Text(deliveries.first?.state == "failed" ? "Повторить на вебхук" : "Отправить на вебхук")
             }
         } primaryAction: {
-            controller.webhooks.sendNow(callID: detail.id)
+            // the history half of the old split button was always live; a disabled Menu would hide it
+            if canSend {
+                controller.webhooks.sendNow(callID: detail.id)
+            } else {
+                isHistoryOpen = true
+            }
         }
         .menuStyle(.button)
         .controlSize(.large)
         .fixedSize()
-        .disabled(!canSend)
         .help(statusLine)
         .popover(isPresented: $isHistoryOpen, arrowEdge: .bottom) {
             history
@@ -265,28 +273,26 @@ struct CopyTranscriptButton: View {
 
     var body: some View {
         Menu {
-            Picker("Формат", selection: formatSelection) {
-                ForEach(TranscriptCopyFormat.allCases) { format in
-                    Text("\(format.title) · \(format.sample)").tag(format)
+            ForEach(TranscriptCopyFormat.allCases) { format in
+                Button {
+                    controller.copyTranscript(format: format)
+                } label: {
+                    if controller.settings.copyFormat == format {
+                        Label("\(format.title) · \(format.sample)", systemImage: "checkmark")
+                    } else {
+                        Text("\(format.title) · \(format.sample)")
+                    }
                 }
             }
-            .pickerStyle(.inline)
         } label: {
             Label("Скопировать расшифровку", systemImage: "doc.on.doc")
         } primaryAction: {
             controller.copyTranscript()
         }
         .menuStyle(.button)
-        .buttonStyle(.borderedProminent)
         .controlSize(.large)
         .fixedSize()
-    }
-
-    private var formatSelection: Binding<TranscriptCopyFormat> {
-        Binding(
-            get: { controller.settings.copyFormat },
-            set: { controller.copyTranscript(format: $0) }
-        )
+        .help("Скопировать в формате «\(controller.settings.copyFormat.title)» (⇧⌘C); в меню — другие форматы")
     }
 }
 
@@ -309,7 +315,7 @@ private struct ProgressBanner: View {
                     .font(.callout)
                     .foregroundStyle(Color.secondary)
 
-                ProgressTrack(value: stage.overall)
+                ProgressView(value: stage.overall)
                     .frame(maxWidth: 420)
             }
         }

@@ -95,12 +95,10 @@ private func makeCall(
     )
 
     #expect(call.displayTitle == "Релиз 0.6 — синк")
-    #expect(call.titleSource == "из календаря")
 }
 
 @Test func withoutAnEventTheTitleStillComesFromTheTranscript() {
     let call = makeCall(kind: "dual", appName: "Zoom", previewText: "Окей, тогда я начну. Первое — про bare metal.")
 
     #expect(call.displayTitle == "Первое — про bare metal")
-    #expect(call.titleSource == "по теме разговора")
 }

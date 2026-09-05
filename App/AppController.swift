@@ -287,6 +287,15 @@ final class AppController {
         }
     }
 
+    /// the ⌘R menu command: one key starts a recording or stops the running one
+    func toggleRecording() {
+        if isRecording {
+            stopActiveRecording()
+        } else {
+            startCallRecording()
+        }
+    }
+
     func togglePause() {
         guard let capture = activeDualCapture else {
             return

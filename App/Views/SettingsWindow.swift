@@ -66,6 +66,17 @@ struct SettingsWindow: View {
         .onChange(of: controller.requestedSettingsSection) { _, _ in
             consumeRequestedSection()
         }
+        // TabView builds every pane up front, so each pane's refresh runs only when it is shown
+        .onChange(of: section, initial: true) { _, section in
+            switch section {
+            case .processing:
+                controller.refreshSummaryModels()
+            case .integrations:
+                controller.webhooks.refresh()
+            default:
+                break
+            }
+        }
     }
 
     @ViewBuilder
@@ -94,15 +105,13 @@ struct SettingsWindow: View {
     }
 }
 
-// MARK: - Основные
+// MARK: - General
 
 private struct GeneralPane: View {
     let controller: AppController
 
     @State private var loginItemStatus = SMAppService.mainApp.status
     @State private var loginItemError: String?
-    /// mirrors Sparkle's setting: the updater is not observable, so the switch needs its own state
-    @State private var installsAutomatically = true
 
     private var updater: AppUpdater {
         controller.updater
@@ -119,10 +128,10 @@ private struct GeneralPane: View {
 
             Section("Обновления") {
                 if updater.isAvailable {
-                    Toggle("Устанавливать обновления автоматически", isOn: $installsAutomatically)
-                        .onChange(of: installsAutomatically) { _, value in
-                            updater.installsAutomatically = value
-                        }
+                    Toggle("Устанавливать обновления автоматически", isOn: Binding(
+                        get: { updater.installsAutomatically },
+                        set: { updater.installsAutomatically = $0 }
+                    ))
                     LabeledContent("Версия", value: updater.version)
                     LabeledContent("Последняя проверка", value: lastCheckNote)
                     HStack {
@@ -139,9 +148,6 @@ private struct GeneralPane: View {
             }
         }
         .formStyle(.grouped)
-        .onAppear {
-            installsAutomatically = updater.installsAutomatically
-        }
     }
 
     private var lastCheckNote: String {
@@ -180,7 +186,7 @@ private struct GeneralPane: View {
     }
 }
 
-// MARK: - Запись
+// MARK: - Recording
 
 private struct RecordingPane: View {
     let controller: AppController
@@ -271,7 +277,7 @@ private struct RecordingPane: View {
     }
 }
 
-// MARK: - Обработка
+// MARK: - Processing
 
 private struct ProcessingPane: View {
     let controller: AppController
@@ -358,9 +364,6 @@ private struct ProcessingPane: View {
             }
         }
         .formStyle(.grouped)
-        .onAppear {
-            controller.refreshSummaryModels()
-        }
     }
 
     /// the stored model always appears, even one the server no longer lists, so the picker never silently changes it
@@ -372,7 +375,7 @@ private struct ProcessingPane: View {
     }
 }
 
-// MARK: - Хранение
+// MARK: - Storage
 
 private struct StoragePane: View {
     let controller: AppController
@@ -449,7 +452,7 @@ private struct StoragePane: View {
     }
 }
 
-// MARK: - Интеграции
+// MARK: - Integrations
 
 private struct IntegrationsPane: View {
     let controller: AppController
@@ -514,7 +517,7 @@ private struct IntegrationsPane: View {
                     Button(webhooks.isTesting ? "Отправка…" : "Отправить тест") {
                         webhooks.sendTest()
                     }
-                    .disabled(webhooks.isTesting || !settings.webhookEnabled)
+                    .disabled(webhooks.isTesting)
                 }
             } header: {
                 Text("Вебхук")
@@ -534,9 +537,6 @@ private struct IntegrationsPane: View {
             }
         }
         .formStyle(.grouped)
-        .onAppear {
-            webhooks.refresh()
-        }
     }
 
     private var accessLine: String {

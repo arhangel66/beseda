@@ -81,11 +81,6 @@ struct StoredCallSummary: Identifiable, Hashable {
         eventTitle?.isEmpty == false
     }
 
-    /// the badge next to the name: where the name came from
-    var titleSource: String {
-        isFromCalendar ? "из календаря" : "по теме разговора"
-    }
-
     var displayTitle: String {
         if let eventTitle, !eventTitle.isEmpty {
             return eventTitle

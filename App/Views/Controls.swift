@@ -68,27 +68,6 @@ struct LevelMeter: View {
     }
 }
 
-/// The bar under a running job. The width is a measured share, never a guess, so the
-/// bar is allowed to stand still when the step it draws is standing still.
-struct ProgressTrack: View {
-    let value: Double
-    var tint: Color = Color.accentColor
-
-    var body: some View {
-        GeometryReader { geometry in
-            ZStack(alignment: .leading) {
-                Capsule().fill(tint.opacity(0.22))
-                Capsule()
-                    .fill(tint)
-                    .frame(width: geometry.size.width * min(max(value, 0), 1))
-            }
-        }
-        .frame(height: 4)
-        .animation(.easeOut(duration: 0.3), value: value)
-    }
-}
-
-/// A SettingsLink that also tells the Settings window which section to open on.
 struct SettingsSectionLink<Label: View>: View {
     let section: String
     let controller: AppController

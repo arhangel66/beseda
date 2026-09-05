@@ -21,7 +21,7 @@ struct ConversationsWindow: View {
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
                 if let detail = controller.selectedCallDetail {
-                    if controller.settings.calendarEnabled {
+                    if controller.settings.calendarEnabled, controller.calendarService.isAuthorized {
                         LinkEventButton(controller: controller, summary: detail.summary)
                     }
                     if controller.settings.webhookEnabled || !controller.webhooks.selected.isEmpty {
@@ -29,7 +29,7 @@ struct ConversationsWindow: View {
                     }
                     CopyTranscriptButton(controller: controller)
                 }
-                recordingItem
+                RecordingToolbarButton(controller: controller)
             }
         }
         .frame(minWidth: 880, minHeight: 560)
@@ -47,9 +47,14 @@ struct ConversationsWindow: View {
         }
     }
 
-    /// the one place in the window that says what the recorder is doing right now
-    @ViewBuilder
-    private var recordingItem: some View {
+}
+
+/// The one place in the window that says what the recorder is doing. Its own view, so the
+/// 10 Hz timer behind `elapsedRecordingSeconds` re-renders this button and not the window.
+private struct RecordingToolbarButton: View {
+    let controller: AppController
+
+    var body: some View {
         if controller.isRecording {
             Button {
                 controller.stopActiveRecording()

@@ -75,7 +75,6 @@ struct OnboardingWindow: View {
             .padding(.bottom, 24)
         }
         .frame(width: 640, height: 520)
-        .foregroundStyle(Color.primary)
         .onAppear {
             permissions.refresh()
         }

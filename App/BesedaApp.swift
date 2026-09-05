@@ -33,6 +33,7 @@ struct BesedaApp: App {
                 // the label is the one view that exists from launch, so first-run work starts here
                 if !controller.settings.onboardingDone {
                     openWindow(id: "onboarding")
+                    NSApplication.shared.activate(ignoringOtherApps: true)
                 }
                 if ProcessInfo.processInfo.environment["BESEDA_PREVIEW_POPOVER"] != nil {
                     openWindow(id: "popover-preview")
@@ -55,30 +56,23 @@ struct BesedaApp: App {
                     }
                 }
             }
+            // the menu items do not read app state: a commands builder is not guaranteed to
+            // re-evaluate on observation changes, so each action decides at the moment it runs
             CommandGroup(after: .pasteboard) {
                 Button("Скопировать расшифровку") {
                     controller.copyTranscript()
                 }
                 .keyboardShortcut("c", modifiers: [.command, .shift])
-                .disabled(controller.selectedCallDetail == nil)
             }
             CommandMenu("Запись") {
-                if controller.isRecording {
-                    Button("Остановить запись") {
-                        controller.stopActiveRecording()
-                    }
-                    .keyboardShortcut("r", modifiers: .command)
-                    Button(controller.isPaused ? "Продолжить" : "Пауза") {
-                        controller.togglePause()
-                    }
-                    .keyboardShortcut("p", modifiers: [.command, .shift])
-                } else {
-                    Button("Начать запись") {
-                        controller.startCallRecording()
-                    }
-                    .keyboardShortcut("r", modifiers: .command)
-                    .disabled(controller.isBusy)
+                Button("Начать или остановить запись") {
+                    controller.toggleRecording()
                 }
+                .keyboardShortcut("r", modifiers: .command)
+                Button("Пауза или продолжить") {
+                    controller.togglePause()
+                }
+                .keyboardShortcut("p", modifiers: [.command, .shift])
                 Divider()
                 Toggle("Автозапись", isOn: Bindable(controller.settings).autoDetectEnabled)
             }
@@ -86,9 +80,12 @@ struct BesedaApp: App {
 
         Window("Добро пожаловать в Beseda", id: "onboarding") {
             OnboardingWindow(controller: controller) {
-                controller.settings.onboardingDone = true
                 dismissWindow(id: "onboarding")
                 showConversations()
+            }
+            // closing the window counts as finishing, as dismissing the old sheet did
+            .onDisappear {
+                controller.settings.onboardingDone = true
             }
         }
         .windowResizability(.contentSize)
