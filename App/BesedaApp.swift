@@ -5,6 +5,7 @@ import SwiftUI
 struct BesedaApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @Environment(\.openWindow) private var openWindow
+    @Environment(\.dismissWindow) private var dismissWindow
 
     private var controller: AppController {
         appDelegate.controller
@@ -13,11 +14,6 @@ struct BesedaApp: App {
     var body: some Scene {
         Window("Разговоры", id: "conversations") {
             ConversationsWindow(controller: controller)
-                .sheet(isPresented: Bindable(controller.settings).showOnboarding) {
-                    OnboardingWindow(controller: controller) {
-                        controller.settings.onboardingDone = true
-                    }
-                }
                 .onAppear {
                     controller.showMainWindow = { showConversations() }
                 }
@@ -34,6 +30,10 @@ struct BesedaApp: App {
                 }
             }
             .onAppear {
+                // the label is the one view that exists from launch, so first-run work starts here
+                if !controller.settings.onboardingDone {
+                    openWindow(id: "onboarding")
+                }
                 if ProcessInfo.processInfo.environment["BESEDA_PREVIEW_POPOVER"] != nil {
                     openWindow(id: "popover-preview")
                 }
@@ -55,7 +55,43 @@ struct BesedaApp: App {
                     }
                 }
             }
+            CommandGroup(after: .pasteboard) {
+                Button("Скопировать расшифровку") {
+                    controller.copyTranscript()
+                }
+                .keyboardShortcut("c", modifiers: [.command, .shift])
+                .disabled(controller.selectedCallDetail == nil)
+            }
+            CommandMenu("Запись") {
+                if controller.isRecording {
+                    Button("Остановить запись") {
+                        controller.stopActiveRecording()
+                    }
+                    .keyboardShortcut("r", modifiers: .command)
+                    Button(controller.isPaused ? "Продолжить" : "Пауза") {
+                        controller.togglePause()
+                    }
+                    .keyboardShortcut("p", modifiers: [.command, .shift])
+                } else {
+                    Button("Начать запись") {
+                        controller.startCallRecording()
+                    }
+                    .keyboardShortcut("r", modifiers: .command)
+                    .disabled(controller.isBusy)
+                }
+                Divider()
+                Toggle("Автозапись", isOn: Bindable(controller.settings).autoDetectEnabled)
+            }
         }
+
+        Window("Добро пожаловать в Beseda", id: "onboarding") {
+            OnboardingWindow(controller: controller) {
+                controller.settings.onboardingDone = true
+                dismissWindow(id: "onboarding")
+                showConversations()
+            }
+        }
+        .windowResizability(.contentSize)
 
         // screenshots of the menu-bar window without clicking the status item;
         // opened at launch when BESEDA_PREVIEW_POPOVER is set

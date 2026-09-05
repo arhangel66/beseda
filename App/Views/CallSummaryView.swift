@@ -34,7 +34,7 @@ struct CallSummaryView: View {
 
     private var empty: some View {
         VStack(spacing: 10) {
-            Button("Сделать саммари", systemImage: "sparkles", action: onGenerate)
+            Button("Составить итоги", systemImage: "sparkles", action: onGenerate)
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
 
@@ -52,9 +52,9 @@ struct CallSummaryView: View {
             ProgressView()
                 .controlSize(.small)
 
-            runningLine("Читаю расшифровку")
+            runningLine("Модель читает расшифровку")
 
-            Button("Сделать саммари", systemImage: "sparkles", action: onGenerate)
+            Button("Составить итоги", systemImage: "sparkles", action: onGenerate)
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
                 .disabled(true)
@@ -91,10 +91,10 @@ struct CallSummaryView: View {
                 HStack(spacing: 8) {
                     ProgressView()
                         .controlSize(.small)
-                    runningLine("Считаю заново")
+                    runningLine("Итоги составляются заново")
                 }
             } else {
-                Button("Заново", action: onGenerate)
+                Button("Составить заново", action: onGenerate)
                     .controlSize(.small)
             }
         }
@@ -117,7 +117,7 @@ struct CallSummaryView: View {
                 .padding(.top, 1)
 
             VStack(alignment: .leading, spacing: 8) {
-                Text("Саммари не получилось")
+                Text("Итоги не получились")
                     .font(.body.weight(.semibold))
 
                 Text(message)
@@ -176,7 +176,7 @@ struct CallSummaryView: View {
     .padding(24)
 }
 
-#Preview("Считаю") {
+#Preview("В работе") {
     CallSummaryView(
         text: nil,
         isRunning: true,

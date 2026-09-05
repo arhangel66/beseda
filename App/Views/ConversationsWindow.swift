@@ -58,7 +58,6 @@ struct ConversationsWindow: View {
                     .monospacedDigit()
                     .foregroundStyle(.red)
             }
-            .keyboardShortcut("r", modifiers: .command)
             .help(controller.isPaused ? "Пауза. Остановить запись (⌘R)" : "Идёт запись. Остановить (⌘R)")
         } else {
             Button {
@@ -66,7 +65,6 @@ struct ConversationsWindow: View {
             } label: {
                 Label("Записать", systemImage: "record.circle")
             }
-            .keyboardShortcut("r", modifiers: .command)
             .disabled(controller.isBusy)
             .help(controller.isBusy ? "Дождитесь конца расшифровки" : "Начать запись (⌘R)")
         }

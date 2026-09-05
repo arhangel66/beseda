@@ -218,12 +218,6 @@ final class AppSettings {
         defaults.object(forKey: key) == nil ? fallback : defaults.bool(forKey: key)
     }
 
-    /// bound to the onboarding sheet: dismissing it is the same as finishing it
-    var showOnboarding: Bool {
-        get { !onboardingDone }
-        set { onboardingDone = !newValue }
-    }
-
     var retentionRules: RetentionRules {
         RetentionRules(rawAudio: rawAudioRetention, normalizedAudio: normalizedAudioRetention)
     }

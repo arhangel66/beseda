@@ -281,7 +281,7 @@ private struct PermissionRow: View {
             case .checking:
                 HStack(spacing: 8) {
                     ProgressView().controlSize(.small)
-                    Text("Проверяю")
+                    Text("Проверка…")
                         .font(.callout)
                         .foregroundStyle(.tertiary)
                 }

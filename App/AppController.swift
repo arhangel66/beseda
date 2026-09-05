@@ -98,7 +98,7 @@ final class AppController {
     /// when the current summary request started, so the view can count seconds
     var summaryStartedAt: Date?
     var isStartingLocalModelServer = false
-    /// Settings → Саммари: server status, its models, and the last «Проверить» result
+    /// Settings → Обработка: server status, its models, and the last «Проверить» result
     var summaryServerStatus: String?
     /// true only when discovery ran and found no running server — never set for a manual server URL
     var isServerDown = false
@@ -808,7 +808,7 @@ final class AppController {
             }
 
             processingCallID = callID
-            beginStage("Готовлю запись", 1, of: 5)
+            beginStage("Подготовка записи", 1, of: 5)
             async let microphoneNormalized = AudioNormalizer.normalize(
                 inputURL: microphoneRawURL,
                 outputURL: microphoneNormalizedURL
@@ -820,12 +820,12 @@ final class AppController {
             let normalizedURLs = try await (microphoneNormalized, systemNormalized)
             appendLog("Normalized dual audio")
 
-            beginStage("Запускаю распознавание", 2, of: 5)
+            beginStage("Запуск распознавания", 2, of: 5)
             let ready = try await transcriber.start()
             workerDescription = "\(ready.model) \(ready.version)"
             appendLog("ASR ready: \(ready.model) \(ready.version)")
 
-            beginStage("Расшифровываю ваш голос", 3, of: 5)
+            beginStage("Расшифровка вашего голоса", 3, of: 5)
             updateCallIndex {
                 try persistCall(
                     id: callID,
@@ -858,7 +858,7 @@ final class AppController {
                 )
             }
             appendLog("Transcribing system audio")
-            beginStage("Расшифровываю собеседников", 4, of: 5)
+            beginStage("Расшифровка собеседников", 4, of: 5)
             let systemTranscription = try await transcriber.transcribe(audioURL: normalizedURLs.1)
             try writeASRTranscription(systemTranscription, to: systemASRJSONURL)
             updateCallIndex {
@@ -998,11 +998,11 @@ final class AppController {
                     )
                 }
 
-                beginStage("Запускаю распознавание", 1, of: 2)
+                beginStage("Запуск распознавания", 1, of: 2)
                 let ready = try await transcriber.start()
                 workerDescription = "\(ready.model) \(ready.version)"
 
-                beginStage("Расшифровываю запись", 2, of: 2)
+                beginStage("Расшифровка записи", 2, of: 2)
                 let transcription = try await transcriber.transcribe(audioURL: normalizedURL)
                 try writeASRTranscription(transcription, to: asrJSONURL)
                 updateCallIndex {
@@ -1080,11 +1080,11 @@ final class AppController {
                     )
                 }
 
-                beginStage("Запускаю распознавание", 1, of: 4)
+                beginStage("Запуск распознавания", 1, of: 4)
                 let ready = try await transcriber.start()
                 workerDescription = "\(ready.model) \(ready.version)"
 
-                beginStage("Расшифровываю ваш голос", 2, of: 4)
+                beginStage("Расшифровка вашего голоса", 2, of: 4)
                 let micTranscription = try await transcriber.transcribe(audioURL: micNormalized)
                 try writeASRTranscription(micTranscription, to: micASRJSON)
                 updateCallIndex {
@@ -1103,7 +1103,7 @@ final class AppController {
                     )
                 }
 
-                beginStage("Расшифровываю собеседников", 3, of: 4)
+                beginStage("Расшифровка собеседников", 3, of: 4)
                 let systemTranscription = try await transcriber.transcribe(audioURL: systemNormalized)
                 try writeASRTranscription(systemTranscription, to: systemASRJSON)
                 updateCallIndex {
@@ -1244,9 +1244,9 @@ final class AppController {
             let started = Date()
             // the first run downloads and compiles the models: the longest wait of them all,
             // and the one that reports nothing, so at least it says its own name
-            beginStage("Готовлю разбор голосов", step, of: total)
+            beginStage("Подготовка разбора голосов", step, of: total)
             try await diarizer.prepareModels()
-            beginStage("Различаю, кто говорит", step, of: total)
+            beginStage("Разбор голосов", step, of: total)
             let timeline = try await diarizer.timeline(for: audioURL) { [weak self] fraction in
                 Task { @MainActor in
                     self?.advanceStage(to: fraction)

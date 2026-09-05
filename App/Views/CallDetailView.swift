@@ -14,9 +14,9 @@ enum CallDetailTab: String, CaseIterable, Identifiable {
         case .transcript:
             "Расшифровка"
         case .summary:
-            "Саммари"
+            "Итоги"
         case .info:
-            "Инфо"
+            "Сведения"
         }
     }
 }

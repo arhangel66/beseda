@@ -52,8 +52,8 @@ existing bindings and controller calls stay, tests green before push.
 - [ ] Check: dark mode, Increase Contrast, custom accent colour (screen busy; pending)
 
 ## Step 6. Shortcuts and copy
-- [ ] `Commands`: ⌘R record, ⇧⌘C copy transcript, ⌘F search, Space/←/→ in the player
-- [ ] One neutral voice: «Идёт запись», «Итоги», «Сведения», «строка меню»; no persona
-- [ ] Webhook placeholder `https://example.com/webhook`; no «Podushka» in UI text
-- [ ] Onboarding in its own window instead of a sheet
-- [ ] Check: keyboard only walkthrough, long titles at minimum width
+- [x] `Commands`: ⌘R record, ⇧⌘P pause, ⇧⌘C copy transcript, Space in the player; ⌘F and ←/→ need `searchFocused` (macOS 15) — deferred
+- [x] One neutral voice: «Идёт запись», «Итоги», «Сведения», «строка меню»; no persona
+- [x] Webhook placeholder `https://example.com/webhook`; the `X-Podushka-Secret` header name stays because the receiving server expects it
+- [x] Onboarding in its own window instead of a sheet
+- [ ] Check: keyboard only walkthrough, long titles at minimum width (screen busy; pending)

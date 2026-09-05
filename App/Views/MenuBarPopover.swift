@@ -32,7 +32,7 @@ struct MenuBarPopover: View {
             HStack(spacing: 8) {
                 ProgressView(value: fraction ?? 0)
                     .frame(width: 90)
-                Text("Скачиваю \(controller.runtime.model.title)")
+                Text("Скачивается \(controller.runtime.model.title)")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 Spacer(minLength: 0)
@@ -134,7 +134,7 @@ struct MenuBarPopover: View {
                 return "Нет доступа к микрофону"
             }
             return controller.settings.autoDetectEnabled
-                ? "Автозапись включена, жду звонка"
+                ? "Автозапись включена, ожидание звонка"
                 : "Автозапись выключена"
         }
     }

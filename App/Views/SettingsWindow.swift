@@ -293,7 +293,7 @@ private struct ProcessingPane: View {
             }
 
             Section {
-                LabeledContent("Сервер", value: controller.summaryServerStatus ?? "проверяю…")
+                LabeledContent("Сервер", value: controller.summaryServerStatus ?? "проверка…")
                 Picker("Модель", selection: Bindable(settings).summaryModel) {
                     Text("Автоматически").tag("")
                     ForEach(modelOptions, id: \.self) { model in
@@ -307,7 +307,7 @@ private struct ProcessingPane: View {
                     }
                     Spacer()
                     if LocalModelSupport.isInstalled, controller.isServerDown {
-                        Button(controller.isStartingLocalModelServer ? "Запускаю…" : "Запустить LM Studio") {
+                        Button(controller.isStartingLocalModelServer ? "Запуск…" : "Запустить LM Studio") {
                             controller.startLocalModelServer()
                         }
                         .disabled(controller.isStartingLocalModelServer)
@@ -315,7 +315,7 @@ private struct ProcessingPane: View {
                     Button("Обновить список") {
                         controller.refreshSummaryModels()
                     }
-                    Button(controller.isCheckingSummary ? "Проверяю…" : "Проверить") {
+                    Button(controller.isCheckingSummary ? "Проверка…" : "Проверить") {
                         controller.checkSummaryConnection()
                     }
                     .disabled(controller.isCheckingSummary)
@@ -511,7 +511,7 @@ private struct IntegrationsPane: View {
                     Text(webhooks.testResult ?? "Пробный запрос сервис должен пропустить.")
                         .foregroundStyle(.secondary)
                     Spacer()
-                    Button(webhooks.isTesting ? "Отправляю…" : "Отправить тест") {
+                    Button(webhooks.isTesting ? "Отправка…" : "Отправить тест") {
                         webhooks.sendTest()
                     }
                     .disabled(webhooks.isTesting || !settings.webhookEnabled)
