@@ -12,7 +12,7 @@ is published in the same public repository that serves releases and the update f
 | SwiftPM | product/target `Podushka`, tests `PodushkaTests` | `Beseda`, `BesedaTests` |
 | Data | `~/Library/Application Support/Podushka` | `…/Beseda`, moved once on first launch (calls, index, log, downloaded models) |
 | Settings | `UserDefaults` of the old bundle id, keys `podushka.*` | new bundle id, keys `beseda.*`, copied once from the old domain |
-| Scripts | `build_podushka_app.sh`, `package_podushka.sh`, `release_podushka.sh` | `build_app.sh`, `package_app.sh`, `release.sh`; `pkill -x Beseda`, `~/Applications/Beseda.app` |
+| Scripts | `build_podushka_app.sh`, `package_podushka.sh`, `release_podushka.sh` | `build_app.sh`, `package_app.sh`, `release.sh`; `pkill -x Beseda`, `/Applications/Beseda.app` |
 | Texts | "Podushka" in onboarding, settings hints, notifications, log lines, transcript headers | "Beseda" |
 | Docs | README, AGENT.md, install.md, release.md, roadmap, auto-update plan | renamed; older plan documents stay as history |
 

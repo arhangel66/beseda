@@ -11,7 +11,7 @@ swift build --package-path "$ROOT" --product Beseda
 
 BIN_DIR="$(swift build --package-path "$ROOT" --show-bin-path)"
 APP_DIR="$ROOT/.build/Beseda.app"
-INSTALL_DIR="$HOME/Applications/Beseda.app"
+INSTALL_DIR="/Applications/Beseda.app"
 
 "$ROOT/scripts/lib/bundle_app.sh" "$BIN_DIR" "$APP_DIR"
 codesign -dv --verbose=2 "$APP_DIR"
@@ -19,7 +19,7 @@ codesign -dv --verbose=2 "$APP_DIR"
 # never leave a second bundle with the same CFBundleIdentifier on disk:
 # LaunchServices and SMAppService could resolve to the stale .build copy
 rm -rf "$INSTALL_DIR"
-mkdir -p "$HOME/Applications"
+
 mv "$APP_DIR" "$INSTALL_DIR"
 
 # the script killed a possibly running instance at the start; leave it running again

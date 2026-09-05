@@ -22,7 +22,7 @@ details and `docs/release.md` for publishing.
 ## Building from source
 
 ```bash
-./scripts/build_app.sh          # debug build into ~/Applications/Beseda.app
+./scripts/build_app.sh          # debug build into /Applications/Beseda.app
 swift test
 ```
 
