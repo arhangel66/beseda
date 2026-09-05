@@ -35,20 +35,16 @@ ZIP="$DIST/Beseda-$VERSION.zip"
 ditto -c -k --keepParent "$APP_DIR" "$ZIP"
 rm -rf "$APP_DIR"
 
-# signs the zip with the EdDSA key from the keychain
+# signs the zip with the EdDSA key from the keychain; the feed lives at the repo root
+# so its URL never changes
 "$SPARKLE_BIN/generate_appcast" \
     --download-url-prefix "https://github.com/$REPO/releases/download/$TAG/" \
-    -o "$DIST/appcast.xml" "$DIST"
+    -o "$ROOT/appcast.xml" "$DIST"
 
+git -C "$ROOT" add appcast.xml
+git -C "$ROOT" commit -q -m "Beseda $VERSION"
 git -C "$ROOT" tag -a "$TAG" -m "Beseda $VERSION"
-git -C "$ROOT" push origin main "$TAG"
+git -C "$ROOT" push -q origin main "$TAG"
 gh release create "$TAG" "$ZIP" --repo "$REPO" --title "Beseda $VERSION" --notes "Beseda $VERSION"
-
-# the feed lives at the repo root so its URL never changes
-CURRENT_SHA="$(gh api "repos/$REPO/contents/appcast.xml" --jq .sha 2> /dev/null || true)"
-gh api -X PUT "repos/$REPO/contents/appcast.xml" \
-    -f message="appcast: $TAG" \
-    -f content="$(base64 < "$DIST/appcast.xml")" \
-    ${CURRENT_SHA:+-f sha="$CURRENT_SHA"} > /dev/null
 
 echo "published $TAG: https://github.com/$REPO/releases/tag/$TAG"

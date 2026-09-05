@@ -7,9 +7,10 @@
    forces a check.
 
 The script makes a release build, signs the zip with the EdDSA key from this Mac's
-keychain, publishes it as a GitHub release in `arhangel66/beseda` and rewrites
-`appcast.xml` at that repo's root. It refuses to run when the tag already exists or the working tree has uncommitted
-changes, and it pushes `main` with the tag `v<version>` so every release matches a commit.
+keychain, rewrites `appcast.xml` at the repo root, commits it, tags the commit
+`v<version>`, pushes `main` with the tag and publishes the zip as a GitHub release in
+`arhangel66/beseda`. It refuses to run when the tag already exists or the working tree
+has uncommitted changes, so every release matches a commit.
 
 The dev loop (`scripts/build_app.sh`, `scripts/package_app.sh`) never
 carries the Sparkle keys, so a dev build does not update itself. Only a release build
