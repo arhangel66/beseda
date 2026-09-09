@@ -28,26 +28,32 @@ private struct Harness {
     let directory: URL
     let suiteName: String
 
-    init(status: Int, enabled: Bool = true) throws {
+    init(
+        status: Int,
+        enabled: Bool = true,
+        url: String = "https://kushetka.example/api/webhooks/krisp",
+        durationSec: Double? = 2400.1,
+        segments: [StoredTranscriptSegment] = [
+            StoredTranscriptSegment(speaker: "me", startSec: 1, endSec: 31, text: "Привет.", orderIndex: 0),
+            StoredTranscriptSegment(speaker: "them", startSec: 40, endSec: 70, text: "Привет.", orderIndex: 1)
+        ]
+    ) throws {
         directory = FileManager.default.temporaryDirectory
             .appendingPathComponent("beseda-webhook-service-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         suiteName = "beseda-test-\(UUID().uuidString)"
         settings = AppSettings(defaults: UserDefaults(suiteName: suiteName)!)
         settings.webhookEnabled = enabled
-        settings.webhookURL = "https://kushetka.example/api/webhooks/krisp"
+        settings.webhookURL = url
         settings.webhookSecret = "s3cret"
 
         store = CallStore(dbURL: directory.appendingPathComponent("calls.sqlite"))
         try store.prepare()
         try store.upsertCall(
-            id: "20260830-101500", kind: "dual", startedAt: Date(), endedAt: nil, durationSec: 180,
+            id: "20260830-101500", kind: "dual", startedAt: Date(), endedAt: nil, durationSec: durationSec,
             status: "ready", transcriptURL: nil, audioDirectoryURL: directory, error: nil, appName: "Zoom"
         )
-        try store.replaceSegments(callID: "20260830-101500", segments: [
-            StoredTranscriptSegment(speaker: "me", startSec: 1, endSec: 2, text: "Привет.", orderIndex: 0),
-            StoredTranscriptSegment(speaker: "them", startSec: 3, endSec: 4, text: "Привет.", orderIndex: 1)
-        ])
+        try store.replaceSegments(callID: "20260830-101500", segments: segments)
 
         let transport = SpyTransport(status: status)
         self.transport = transport
@@ -83,7 +89,7 @@ private struct Harness {
 }
 
 @MainActor
-@Test func aReadyCallIsDeliveredThroughTheSender() async throws {
+@Test func justOverFortyMinutesWithExactlyThirtySecondsPerSideIsDelivered() async throws {
     let harness = try Harness(status: 200)
     defer { harness.tearDown() }
 
@@ -103,6 +109,90 @@ private struct Harness {
 @MainActor
 @Test func nothingIsQueuedWhileTheWebhookIsOff() async throws {
     let harness = try Harness(status: 200, enabled: false)
+    defer { harness.tearDown() }
+
+    harness.service.enqueue(callID: "20260830-101500")
+
+    #expect(try harness.store.fetchWebhookDeliveries(callID: "20260830-101500").isEmpty)
+    #expect(await harness.transport.bodies.isEmpty)
+}
+
+@MainActor
+@Test func exactlyFortyMinutesIsNotAutomaticallyQueued() async throws {
+    let harness = try Harness(status: 200, durationSec: 2400)
+    defer { harness.tearDown() }
+
+    harness.service.enqueue(callID: "20260830-101500")
+
+    #expect(try harness.store.fetchWebhookDeliveries(callID: "20260830-101500").isEmpty)
+    #expect(await harness.transport.bodies.isEmpty)
+}
+
+@MainActor
+@Test func lessThanThirtySecondsFromMeIsNotAutomaticallyQueued() async throws {
+    let harness = try Harness(status: 200, segments: [
+        StoredTranscriptSegment(speaker: "me", startSec: 1, endSec: 30.999, text: "Привет.", orderIndex: 0),
+        StoredTranscriptSegment(speaker: "them", startSec: 40, endSec: 70, text: "Привет.", orderIndex: 1)
+    ])
+    defer { harness.tearDown() }
+
+    harness.service.enqueue(callID: "20260830-101500")
+
+    #expect(try harness.store.fetchWebhookDeliveries(callID: "20260830-101500").isEmpty)
+    #expect(await harness.transport.bodies.isEmpty)
+}
+
+@MainActor
+@Test func lessThanThirtySecondsFromRemoteIsNotAutomaticallyQueued() async throws {
+    let harness = try Harness(status: 200, segments: [
+        StoredTranscriptSegment(speaker: "me", startSec: 1, endSec: 31, text: "Привет.", orderIndex: 0),
+        StoredTranscriptSegment(speaker: "them", startSec: 40, endSec: 69.999, text: "Привет.", orderIndex: 1)
+    ])
+    defer { harness.tearDown() }
+
+    harness.service.enqueue(callID: "20260830-101500")
+
+    #expect(try harness.store.fetchWebhookDeliveries(callID: "20260830-101500").isEmpty)
+    #expect(await harness.transport.bodies.isEmpty)
+}
+
+@MainActor
+@Test func remoteSpeechMustReachThirtySecondsForOneParticipant() async throws {
+    let harness = try Harness(status: 200, segments: [
+        StoredTranscriptSegment(speaker: "me", startSec: 1, endSec: 31, text: "Привет.", orderIndex: 0),
+        StoredTranscriptSegment(speaker: "them-1", startSec: 40, endSec: 55, text: "Один.", orderIndex: 1),
+        StoredTranscriptSegment(speaker: "them-2", startSec: 60, endSec: 75, text: "Два.", orderIndex: 2)
+    ])
+    defer { harness.tearDown() }
+
+    harness.service.enqueue(callID: "20260830-101500")
+
+    #expect(try harness.store.fetchWebhookDeliveries(callID: "20260830-101500").isEmpty)
+    #expect(await harness.transport.bodies.isEmpty)
+}
+
+@MainActor
+@Test func overlappingAndInvalidSegmentsDoNotInflateRecognizedSpeech() async throws {
+    let harness = try Harness(status: 200, segments: [
+        StoredTranscriptSegment(speaker: "me", startSec: 0, endSec: 20, text: "Первая.", orderIndex: 0),
+        StoredTranscriptSegment(speaker: "me", startSec: 10, endSec: 30, text: "Вторая.", orderIndex: 1),
+        StoredTranscriptSegment(speaker: "me", startSec: 30, endSec: 90, text: "   ", orderIndex: 2),
+        StoredTranscriptSegment(speaker: "me", startSec: 100, endSec: nil, text: "Нет конца.", orderIndex: 3),
+        StoredTranscriptSegment(speaker: "me", startSec: 110, endSec: 109, text: "Назад.", orderIndex: 4),
+        StoredTranscriptSegment(speaker: "them-1", startSec: 40, endSec: 70, text: "Ответ.", orderIndex: 5)
+    ])
+    defer { harness.tearDown() }
+
+    harness.service.enqueue(callID: "20260830-101500")
+
+    let rows = try await harness.settledRows()
+    #expect(rows.map(\.state) == ["delivered"])
+    #expect(await harness.transport.bodies.count == 1)
+}
+
+@MainActor
+@Test func aBrokenURLStillQueuesNothing() async throws {
+    let harness = try Harness(status: 200, url: "not a URL")
     defer { harness.tearDown() }
 
     harness.service.enqueue(callID: "20260830-101500")
@@ -140,23 +230,25 @@ private struct Harness {
 }
 
 @MainActor
-@Test func aManualSendAddsOneMoreAttempt() async throws {
-    let harness = try Harness(status: 200)
+@Test func aManualSendBypassesTheAutomaticFilter() async throws {
+    let harness = try Harness(status: 200, durationSec: 60, segments: [
+        StoredTranscriptSegment(speaker: "me", startSec: 1, endSec: 2, text: "Заметка.", orderIndex: 0)
+    ])
     defer { harness.tearDown() }
     harness.service.enqueue(callID: "20260830-101500")
-    _ = try await harness.settledRows()
+    #expect(try harness.store.fetchWebhookDeliveries(callID: "20260830-101500").isEmpty)
 
     harness.service.sendNow(callID: "20260830-101500")
 
     var rows: [StoredWebhookDelivery] = []
     for _ in 0..<200 {
         rows = try harness.store.fetchWebhookDeliveries(callID: "20260830-101500")
-        if rows.count == 2, rows.allSatisfy(\.isFinished) {
+        if rows.count == 1, rows.allSatisfy(\.isFinished) {
             break
         }
         try await Task.sleep(for: .milliseconds(10))
     }
-    #expect(rows.map(\.attempt) == [2, 1])
-    #expect(rows.map(\.state) == ["delivered", "delivered"])
-    #expect(await harness.transport.bodies.count == 2)
+    #expect(rows.map(\.attempt) == [1])
+    #expect(rows.map(\.state) == ["delivered"])
+    #expect(await harness.transport.bodies.count == 1)
 }

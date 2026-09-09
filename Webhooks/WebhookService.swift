@@ -7,6 +7,8 @@ import Foundation
 @Observable
 final class WebhookService {
     static let tickInterval: TimeInterval = 60
+    nonisolated static let minimumAutomaticCallDuration: TimeInterval = 2400
+    nonisolated static let minimumAutomaticSpeechDuration: TimeInterval = 30
 
     /// attempt N failed → wait this long before attempt N+1; nil ends the chain
     nonisolated static func retryDelay(afterAttempt attempt: Int) -> TimeInterval? {
@@ -67,6 +69,20 @@ final class WebhookService {
     func enqueue(callID: String) {
         guard settings.webhookEnabled, WebhookSender.endpoint(from: settings.webhookURL) != nil else {
             log("Webhook off, skipped \(callID)")
+            return
+        }
+        do {
+            guard let call = try store.fetchCall(id: callID) else {
+                log("Webhook skipped \(callID): call not in the index")
+                return
+            }
+            let segments = try store.fetchSegments(callID: callID)
+            guard Self.qualifiesForAutomaticSend(call: call, segments: segments) else {
+                log("Webhook automatic send skipped \(callID): call does not meet duration and speech requirements")
+                return
+            }
+        } catch {
+            log("Webhook automatic send check failed for \(callID): \(error.localizedDescription)")
             return
         }
         queue(callID: callID, nextRetryAt: Date())
@@ -240,6 +256,60 @@ final class WebhookService {
         if outcome.isRetryable {
             scheduleRetry(after: row)
         }
+    }
+
+    nonisolated static func qualifiesForAutomaticSend(
+        call: StoredCallSummary,
+        segments: [StoredTranscriptSegment]
+    ) -> Bool {
+        guard let duration = call.durationSec,
+              duration.isFinite,
+              duration > minimumAutomaticCallDuration else {
+            return false
+        }
+
+        let segmentsBySpeaker = Dictionary(grouping: segments) { $0.speaker }
+        guard recognizedSpeechDuration(in: segmentsBySpeaker[TranscriptChannel.microphone.speakerID] ?? [])
+                >= minimumAutomaticSpeechDuration else {
+            return false
+        }
+
+        return segmentsBySpeaker.contains { speaker, speakerSegments in
+            speaker != TranscriptChannel.microphone.speakerID
+                && recognizedSpeechDuration(in: speakerSegments) >= minimumAutomaticSpeechDuration
+        }
+    }
+
+    private nonisolated static func recognizedSpeechDuration(
+        in segments: [StoredTranscriptSegment]
+    ) -> TimeInterval {
+        let intervals = segments.compactMap { segment -> (start: Double, end: Double)? in
+            guard !segment.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+                  segment.startSec.isFinite,
+                  let end = segment.endSec,
+                  end.isFinite,
+                  end > segment.startSec else {
+                return nil
+            }
+            return (segment.startSec, end)
+        }
+        .sorted { lhs, rhs in
+            lhs.start == rhs.start ? lhs.end < rhs.end : lhs.start < rhs.start
+        }
+
+        guard var current = intervals.first else {
+            return 0
+        }
+        var duration: TimeInterval = 0
+        for interval in intervals.dropFirst() {
+            if interval.start <= current.end {
+                current.end = max(current.end, interval.end)
+            } else {
+                duration += current.end - current.start
+                current = interval
+            }
+        }
+        return duration + current.end - current.start
     }
 }
 
