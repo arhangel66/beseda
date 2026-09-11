@@ -11,6 +11,8 @@ struct SpeechModel: Identifiable, Hashable, Sendable {
     let filename: String
     let downloadURL: URL
     let sha256: String
+    /// nil lets multilingual models detect the source language automatically.
+    let transcriptionLanguage: String?
     /// nil when the runtime windows long audio itself; otherwise the window the model was
     /// trained on, past which it silently drops speech and has to be fed in pieces
     let maxUtteranceSec: Double?
@@ -26,6 +28,7 @@ struct SpeechModel: Identifiable, Hashable, Sendable {
         filename: "parakeet-tdt-0.6b-v3-Q4_K_M.gguf",
         downloadURL: URL(string: "https://huggingface.co/handy-computer/parakeet-tdt-0.6b-v3-gguf/resolve/85ac09ea12fc4b1112fa76810059364bc6adc9de/parakeet-tdt-0.6b-v3-Q4_K_M.gguf")!,
         sha256: "b68557be1e3c40207fd7c4bd9d63f1d3316b963f15325bfb0cc16a8bb0ffd181",
+        transcriptionLanguage: nil,
         maxUtteranceSec: nil
     )
 
@@ -38,6 +41,7 @@ struct SpeechModel: Identifiable, Hashable, Sendable {
         filename: "gigaam-v3-e2e-rnnt-Q8_0.gguf",
         downloadURL: URL(string: "https://huggingface.co/handy-computer/gigaam-v3-e2e-rnnt-gguf/resolve/f719d70812344f4d0fb8c11c0887b190501a7465/gigaam-v3-e2e-rnnt-Q8_0.gguf")!,
         sha256: "78d63b47723b7f8d78c6113a6ef983b5a86e2a86f6c273e1f5cb6967b1c4467a",
+        transcriptionLanguage: "ru",
         maxUtteranceSec: 25
     )
 

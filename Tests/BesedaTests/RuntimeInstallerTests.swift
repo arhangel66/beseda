@@ -47,6 +47,7 @@ private struct Harness {
             filename: "test-model.gguf",
             downloadURL: URL(string: "https://example.invalid/test-model.gguf")!,
             sha256: SHA256.hash(data: payload).map { String(format: "%02x", $0) }.joined(),
+            transcriptionLanguage: nil,
             maxUtteranceSec: nil
         )
     }

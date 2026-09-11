@@ -26,6 +26,11 @@ import Testing
     #expect(SpeechModel.default.id == SpeechModel.parakeetV3.id)
 }
 
+@Test func transcriptionLanguageMatchesModelCapabilities() {
+    #expect(SpeechModel.parakeetV3.transcriptionLanguage == nil)
+    #expect(SpeechModel.gigaamV3.transcriptionLanguage == "ru")
+}
+
 @Test func namedFindsCatalogueEntries() {
     #expect(SpeechModel.named("gigaam-v3-e2e-rnnt")?.title == "GigaAM v3")
     #expect(SpeechModel.named("whisper-large") == nil)

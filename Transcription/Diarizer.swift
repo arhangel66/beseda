@@ -3,7 +3,9 @@ import Foundation
 
 /// wraps FluidAudio so the rest of the app only ever sees plain speaker intervals
 final class Diarizer: @unchecked Sendable {
-    private let manager = OfflineDiarizerManager(config: OfflineDiarizerConfig())
+    static let config = OfflineDiarizerConfig(clusteringThreshold: 0.70)
+
+    private let manager = OfflineDiarizerManager(config: config)
     private var modelsReady = false
 
     /// Downloads and compiles the CoreML models on the first call. Separate from `timeline`
