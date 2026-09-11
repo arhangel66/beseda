@@ -54,6 +54,9 @@ final class AppSettings {
     private let copyFormatKey = "beseda.copyFormat"
     private let calendarEnabledKey = "beseda.calendarEnabled"
     private let calendarIdentifiersKey = "beseda.calendarIdentifiers"
+    private let summaryProviderKey = "beseda.summaryProvider"
+    private let openRouterAPIKeyKey = "beseda.openRouterAPIKey"
+    private let openRouterModelKey = "beseda.openRouterModel"
     private let summaryServerURLKey = "beseda.summaryServerURL"
     private let summaryModelKey = "beseda.summaryModel"
     private let summaryPromptKey = "beseda.summaryPrompt"
@@ -123,6 +126,25 @@ final class AppSettings {
         }
     }
 
+    var summaryProvider: SummaryProvider {
+        didSet {
+            defaults.set(summaryProvider.rawValue, forKey: summaryProviderKey)
+        }
+    }
+
+    var openRouterAPIKey: String {
+        didSet {
+            defaults.set(openRouterAPIKey, forKey: openRouterAPIKeyKey)
+        }
+    }
+
+    /// "" means `OpenRouter.defaultModel`
+    var openRouterModel: String {
+        didSet {
+            defaults.set(openRouterModel, forKey: openRouterModelKey)
+        }
+    }
+
     /// "" means automatic: discover the running LM Studio server via `lms`
     var summaryServerURL: String {
         didSet {
@@ -137,7 +159,7 @@ final class AppSettings {
         }
     }
 
-    /// "" means automatic: `LocalModelProvider.defaultPrompt`
+    /// "" means automatic: `ChatCompletionsProvider.defaultPrompt`
     var summaryPrompt: String {
         didSet {
             defaults.set(summaryPrompt, forKey: summaryPromptKey)
@@ -194,6 +216,10 @@ final class AppSettings {
         self.calendarEnabled = defaults.bool(forKey: calendarEnabledKey)
         self.calendarIdentifiers = (defaults.array(forKey: calendarIdentifiersKey) as? [String])
             .map(Set.init) ?? []
+        self.summaryProvider = defaults.string(forKey: summaryProviderKey)
+            .flatMap(SummaryProvider.init(rawValue:)) ?? .builtIn
+        self.openRouterAPIKey = defaults.string(forKey: openRouterAPIKeyKey) ?? ""
+        self.openRouterModel = defaults.string(forKey: openRouterModelKey) ?? ""
         self.summaryServerURL = defaults.string(forKey: summaryServerURLKey) ?? ""
         self.summaryModel = defaults.string(forKey: summaryModelKey) ?? ""
         self.summaryPrompt = defaults.string(forKey: summaryPromptKey) ?? ""

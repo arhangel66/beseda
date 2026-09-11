@@ -13,3 +13,14 @@ import Testing
 
     #expect(try LocalModelSupport.parseLoaded(json) == ["qwen/qwen3.8-27b"])
 }
+
+@Test func aStoppedDiscoveredServerUsesTheTypedRecoveryError() {
+    do {
+        _ = try LocalModelSupport.resolvedBaseURL(serverURL: "", discovered: nil)
+        Issue.record("expected serverDown")
+    } catch SummarizationError.serverDown(let message) {
+        #expect(message == "LM Studio не запущен")
+    } catch {
+        Issue.record("unexpected error: \(error)")
+    }
+}

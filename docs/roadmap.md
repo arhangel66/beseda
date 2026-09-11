@@ -86,9 +86,17 @@ Mac app next to Notes and System Settings, and the four keyboard paths work.
 - Onboarding can finish after hearing the microphone only
   (`App/Views/OnboardingWindow.swift`): require both sources or show a limited mode.
 
+## 6. Summary provider picker
+
+Plan: `docs/summary-provider-plan.md`, built 2026-09-06: OpenRouter with a key, the
+built-in Gemma 4 E4B behind a downloaded `llama-server`, LM Studio as before. The
+quality experiment behind the choice is `docs/summary-model-choice-plan.md`.
+
+Done when: a summary comes out of each of the three providers on this Mac, and the
+built-in one leaves no `llama-server` process behind after ten idle minutes.
+
 ## Deferred
 
-- Built-in summaries instead of LM Studio: separate experiment on quality, memory, speed.
 - Splitting `AppController` (~1700 lines): do it inside items 2 and 3 where the code is
   touched anyway, not as its own project.
 - Developer ID, notarisation, Keychain for the webhook secret: only if the app leaves

@@ -25,6 +25,28 @@ import Testing
 }
 
 @MainActor
+@Test func theSummaryProviderDefaultsToTheBuiltInModelAndRoundTripsThroughUserDefaults() {
+    let suiteName = "beseda-test-\(UUID().uuidString)"
+    let defaults = UserDefaults(suiteName: suiteName)!
+    defer { defaults.removePersistentDomain(forName: suiteName) }
+
+    let settings = AppSettings(defaults: defaults)
+    #expect(settings.summaryProvider == .builtIn)
+    #expect(SummaryProvider.allCases == [.openRouter, .builtIn, .lmStudio])
+    #expect(settings.openRouterAPIKey == "")
+    #expect(settings.openRouterModel == "")
+
+    settings.summaryProvider = .openRouter
+    settings.openRouterAPIKey = "sk-or-v1-secret"
+    settings.openRouterModel = "google/gemini-3.8-flash"
+
+    let reloaded = AppSettings(defaults: defaults)
+    #expect(reloaded.summaryProvider == .openRouter)
+    #expect(reloaded.openRouterAPIKey == "sk-or-v1-secret")
+    #expect(reloaded.openRouterModel == "google/gemini-3.8-flash")
+}
+
+@MainActor
 @Test func theWebhookSettingsDefaultToOffAndRoundTripThroughUserDefaults() {
     let suiteName = "beseda-test-\(UUID().uuidString)"
     let defaults = UserDefaults(suiteName: suiteName)!

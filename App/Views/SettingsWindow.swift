@@ -236,7 +236,9 @@ private struct RecordingPane: View {
     /// what leaves this Mac under the settings as they are now
     private var processingNote: String {
         var sinks: [String] = []
-        if let host = remoteSummaryHost {
+        if settings.summaryProvider == .openRouter {
+            sinks.append("расшифровка уходит в OpenRouter")
+        } else if let host = remoteSummaryHost {
             sinks.append("расшифровка уходит на сервер итогов \(host)")
         }
         if settings.webhookEnabled {
@@ -249,7 +251,8 @@ private struct RecordingPane: View {
     }
 
     private var remoteSummaryHost: String? {
-        guard let host = URL(string: settings.summaryServerURL)?.host,
+        guard settings.summaryProvider == .lmStudio,
+              let host = URL(string: settings.summaryServerURL)?.host,
               !["localhost", "127.0.0.1", "::1"].contains(host) else {
             return nil
         }
@@ -283,6 +286,7 @@ private struct ProcessingPane: View {
     let controller: AppController
 
     @State private var isAdvancedOpen = false
+    @State private var isKeyShown = false
 
     private var settings: AppSettings {
         controller.settings
@@ -299,35 +303,37 @@ private struct ProcessingPane: View {
             }
 
             Section {
-                LabeledContent("Сервер", value: controller.summaryServerStatus ?? "проверка…")
-                Picker("Модель", selection: Bindable(settings).summaryModel) {
-                    Text("Автоматически").tag("")
-                    ForEach(modelOptions, id: \.self) { model in
-                        Text(model).tag(model)
+                Picker("Кто пишет итоги", selection: Bindable(settings).summaryProvider) {
+                    ForEach(SummaryProvider.allCases) { provider in
+                        Text(provider.title).tag(provider)
                     }
                 }
+                .pickerStyle(.segmented)
+
+                switch settings.summaryProvider {
+                case .openRouter:
+                    openRouterRows
+                case .builtIn:
+                    BundledSummaryRow(installer: controller.bundledSummary)
+                case .lmStudio:
+                    lmStudioRows
+                }
+
                 HStack {
                     if let summaryCheckResult = controller.summaryCheckResult {
                         Text(summaryCheckResult)
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
-                    if LocalModelSupport.isInstalled, controller.isServerDown {
-                        Button(controller.isStartingLocalModelServer ? "Запуск…" : "Запустить LM Studio") {
-                            controller.startLocalModelServer()
-                        }
-                        .disabled(controller.isStartingLocalModelServer)
-                    }
-                    Button("Обновить список") {
-                        controller.refreshSummaryModels()
-                    }
                     Button(controller.isCheckingSummary ? "Проверка…" : "Проверить") {
                         controller.checkSummaryConnection()
                     }
                     .disabled(controller.isCheckingSummary)
                 }
                 DisclosureGroup("Дополнительно", isExpanded: $isAdvancedOpen) {
-                    TextField("Адрес сервера", text: Bindable(settings).summaryServerURL, prompt: Text("автоматически (lms server status)"))
+                    if settings.summaryProvider == .lmStudio {
+                        TextField("Адрес сервера", text: Bindable(settings).summaryServerURL, prompt: Text("автоматически (lms server status)"))
+                    }
                     VStack(alignment: .leading, spacing: 6) {
                         HStack {
                             Text("Инструкция модели")
@@ -343,7 +349,7 @@ private struct ProcessingPane: View {
                             .frame(minHeight: 120)
                             .overlay(alignment: .topLeading) {
                                 if settings.summaryPrompt.isEmpty {
-                                    Text(LocalModelProvider.defaultPrompt)
+                                    Text(ChatCompletionsProvider.defaultPrompt)
                                         .foregroundStyle(.tertiary)
                                         .padding(.top, 8)
                                         .padding(.leading, 5)
@@ -358,12 +364,66 @@ private struct ProcessingPane: View {
             } header: {
                 Text("Итоги")
             } footer: {
-                if !LocalModelSupport.isInstalled {
-                    Text(LocalModelSupport.manualInstructions)
-                }
+                Text(providerNote)
             }
         }
         .formStyle(.grouped)
+        .onChange(of: settings.summaryProvider) {
+            controller.refreshSummaryModels()
+        }
+    }
+
+    @ViewBuilder
+    private var openRouterRows: some View {
+        HStack {
+            if isKeyShown {
+                TextField("Ключ", text: Bindable(settings).openRouterAPIKey)
+            } else {
+                SecureField("Ключ", text: Bindable(settings).openRouterAPIKey)
+            }
+            Button(isKeyShown ? "Скрыть" : "Показать") {
+                isKeyShown.toggle()
+            }
+            .controlSize(.small)
+        }
+        TextField("Модель", text: Bindable(settings).openRouterModel, prompt: Text(OpenRouter.defaultModel))
+    }
+
+    @ViewBuilder
+    private var lmStudioRows: some View {
+        LabeledContent("Сервер", value: controller.summaryServerStatus ?? "проверка…")
+        Picker("Модель", selection: Bindable(settings).summaryModel) {
+            Text("Автоматически").tag("")
+            ForEach(modelOptions, id: \.self) { model in
+                Text(model).tag(model)
+            }
+        }
+        HStack {
+            Spacer()
+            if LocalModelSupport.isInstalled, controller.isServerDown {
+                Button(controller.isStartingLocalModelServer ? "Запуск…" : "Запустить LM Studio") {
+                    controller.startLocalModelServer()
+                }
+                .disabled(controller.isStartingLocalModelServer)
+            }
+            Button("Обновить список") {
+                controller.refreshSummaryModels()
+            }
+        }
+    }
+
+    /// what this provider costs the user: money, memory, or another app to keep running
+    private var providerNote: String {
+        switch settings.summaryProvider {
+        case .openRouter:
+            "Ключ создаётся на openrouter.ai, платный по факту. Расшифровка уходит туда, звук остаётся здесь. Час разговора на gemini-flash обходится в несколько центов."
+        case .builtIn:
+            "Модель работает на этом Mac, без интернета и без ключей. Запускается на время итогов и занимает около 5 ГБ памяти, потом выгружается."
+        case .lmStudio:
+            LocalModelSupport.isInstalled
+                ? "Итоги пишет модель, загруженная в LM Studio. Приложение должно быть запущено с включённым Local Server."
+                : LocalModelSupport.manualInstructions
+        }
     }
 
     /// the stored model always appears, even one the server no longer lists, so the picker never silently changes it
@@ -372,6 +432,66 @@ private struct ProcessingPane: View {
             return controller.summaryModels
         }
         return [settings.summaryModel] + controller.summaryModels
+    }
+}
+
+/// The built-in model as one row: what it is on the left, and the only action it has on the right.
+private struct BundledSummaryRow: View {
+    let installer: BundledSummaryInstaller
+
+    var body: some View {
+        LabeledContent {
+            control
+        } label: {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("\(BundledSummary.current.title) · \(BundledSummary.current.modelBytes.byteSizeDescription)")
+                Text(BundledSummary.current.subtitle)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var control: some View {
+        if let stage = installer.stage {
+            HStack(spacing: 8) {
+                if let fraction = installer.fraction {
+                    Text("\(stage.title) \(Int(fraction * 100))%")
+                        .foregroundStyle(.secondary)
+                        .monospacedDigit()
+                    ProgressView(value: fraction)
+                        .frame(width: 90)
+                } else {
+                    Text(stage.title)
+                        .foregroundStyle(.secondary)
+                    ProgressView()
+                        .controlSize(.small)
+                }
+            }
+        } else if let failure = installer.failure {
+            HStack(spacing: 8) {
+                Text(failure)
+                    .foregroundStyle(Color.red)
+                    .lineLimit(1)
+                    .help(failure)
+                Button("Повторить") {
+                    installer.install()
+                }
+            }
+        } else if installer.isReady {
+            HStack(spacing: 8) {
+                Text("Скачана")
+                    .foregroundStyle(.secondary)
+                Button("Удалить") {
+                    try? installer.remove()
+                }
+            }
+        } else {
+            Button("Скачать") {
+                installer.install()
+            }
+        }
     }
 }
 

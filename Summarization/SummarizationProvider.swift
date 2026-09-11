@@ -6,15 +6,25 @@ protocol SummarizationProvider: Sendable {
     func summarize(text: String) async throws -> String
 }
 
+/// The cases the error card offers a different way out of; everything else is `unavailable`.
 enum SummarizationError: LocalizedError {
     case emptyTranscript
+    /// the endpoint did not answer at all: LM Studio not started, llama-server not up
+    case serverDown(String)
+    /// the key was refused or has no credit left
+    case unauthorized(String)
+    /// the built-in model or its runtime is not downloaded yet
+    case modelMissing
+
     case unavailable(String)
 
     var errorDescription: String? {
         switch self {
         case .emptyTranscript:
             "В этом разговоре нечего пересказывать: расшифровка пустая."
-        case .unavailable(let message):
+        case .modelMissing:
+            "Встроенная модель ещё не скачана."
+        case .serverDown(let message), .unauthorized(let message), .unavailable(let message):
             message
         }
     }
@@ -32,7 +42,7 @@ struct MockSummarizationProvider: SummarizationProvider {
         try await Task.sleep(for: Self.thinkingDuration)
 
         if failsOnPurpose {
-            throw SummarizationError.unavailable("LM Studio не отвечает на localhost:1235")
+            throw SummarizationError.serverDown("LM Studio на localhost:1235 не отвечает")
         }
 
         return Self.sample

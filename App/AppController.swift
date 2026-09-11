@@ -5,6 +5,7 @@ import Observation
 /// what the retry button in the summary error card should do about it
 enum SummaryRecovery: Equatable {
     case startServer
+    case downloadModel
     case openSettings
 }
 
@@ -130,6 +131,8 @@ final class AppController {
     @ObservationIgnored let settings = AppSettings()
     @ObservationIgnored let webhooks: WebhookService
     @ObservationIgnored let runtime: RuntimeInstaller
+    @ObservationIgnored let bundledSummary: BundledSummaryInstaller
+    @ObservationIgnored private let llamaServer = LlamaServer(paths: AppPaths.current)
     @ObservationIgnored let updater = AppUpdater()
     @ObservationIgnored private var activeTask: Task<Void, Never>?
     @ObservationIgnored private var activeDualCapture: DualCapture?
@@ -145,13 +148,22 @@ final class AppController {
     /// an auto-started recording shorter than this is a misfire — a voice message or dictation, not a call
     private static let minimumAutoRecordingDuration: TimeInterval = 10
 
+    /// ≈100k tokens at 3 chars/token, under the context of any model worth sending a call to
+    private static let cloudCharacterBudget = 300_000
+    /// half that: the built-in model is served with a 64k context and needs room for the answer
+    private static let builtInCharacterBudget = 150_000
+    /// a local model chews through a long call for minutes; the cloud answers in under one
+    private static let localTimeout: TimeInterval = 900
+
     deinit {
         transcriber.stop()
     }
 
-    /// called on the way out: the speech model must be freed before the process exits
+    /// called on the way out: the speech model must be freed before the process exits, and the
+    /// summary server is a child process that would otherwise outlive the app
     func shutdown() {
         transcriber.shutdown()
+        llamaServer.stop()
     }
 
     var menuBarSystemImage: String {
@@ -207,6 +219,11 @@ final class AppController {
         runtime = RuntimeInstaller(paths: AppPaths.current, model: selectedModel) {
             _ = try await transcriber.start()
         }
+        let llamaServer = llamaServer
+        bundledSummary = BundledSummaryInstaller(paths: AppPaths.current) {
+            _ = try await llamaServer.ensureRunning()
+            llamaServer.stop()
+        }
         transcriber.diagnosticsHandler = { [weak self] message in
             Task { @MainActor in
                 self?.appendLog(message)
@@ -224,6 +241,12 @@ final class AppController {
             self?.appendLog(message)
         }
         runtime.log = { [weak self] message in
+            self?.appendLog(message)
+        }
+        bundledSummary.log = { [weak self] message in
+            self?.appendLog(message)
+        }
+        llamaServer.log = { [weak self] message in
             self?.appendLog(message)
         }
         updater.start { [unowned self] in self.isRecording }
@@ -1364,6 +1387,12 @@ final class AppController {
             guard let self else {
                 return
             }
+            guard self.settings.summaryProvider == .lmStudio else {
+                self.isServerDown = false
+                self.summaryServerStatus = nil
+                self.summaryModels = []
+                return
+            }
             let serverURL = self.settings.summaryServerURL
             guard serverURL.isEmpty else {
                 self.isServerDown = false
@@ -1415,17 +1444,10 @@ final class AppController {
                 return
             }
             defer { self.isCheckingSummary = false }
+            defer { self.llamaServer.noteIdle() }
             let startedAt = Date()
             do {
-                let connection = try await LocalModelSupport.resolve(
-                    serverURL: self.settings.summaryServerURL,
-                    model: self.settings.summaryModel
-                )
-                let provider = LocalModelProvider(
-                    baseURL: connection.baseURL,
-                    model: connection.model,
-                    prompt: self.settings.summaryPrompt.isEmpty ? LocalModelProvider.defaultPrompt : self.settings.summaryPrompt
-                )
+                let provider = try await self.makeSummaryProvider().provider
                 _ = try await provider.summarize(text: "Скажи «готово»")
                 let elapsed = Date().timeIntervalSince(startedAt)
                 self.summaryCheckResult = "Ответила за \(String(format: "%.1f", elapsed)) с"
@@ -1440,17 +1462,11 @@ final class AppController {
             summarizingCallID = nil
             summaryStartedAt = nil
         }
+        defer { llamaServer.noteIdle() }
         do {
-            let connection = try await LocalModelSupport.resolve(
-                serverURL: settings.summaryServerURL,
-                model: settings.summaryModel
-            )
-            let provider = LocalModelProvider(
-                baseURL: connection.baseURL,
-                model: connection.model,
-                prompt: settings.summaryPrompt.isEmpty ? LocalModelProvider.defaultPrompt : settings.summaryPrompt
-            )
-            let text = try await SummarizationService(provider: provider).summarize(detail)
+            let (provider, characterBudget) = try await makeSummaryProvider()
+            let text = try await SummarizationService(provider: provider, characterBudget: characterBudget)
+                .summarize(detail)
             try callStore.setSummary(callID: detail.id, text: text)
             // the summary lives on the call row, which loadCallDetail takes as given: re-read it
             // or the text is stored and never shown. The guard keeps a slow summary from
@@ -1462,23 +1478,75 @@ final class AppController {
             appendLog("Summary failed: \(error.localizedDescription)")
             if selectedCallDetail?.id == detail.id {
                 summaryError = error.localizedDescription
-                summaryRecovery = Self.summaryRecovery(for: error)
+                summaryRecovery = Self.recovery(
+                    for: error,
+                    provider: settings.summaryProvider,
+                    isLMStudioInstalled: LocalModelSupport.isInstalled
+                )
             }
         }
     }
 
     /// an empty transcript has nothing to do with settings, so only «Повторить» stays for it;
-    /// "server down" errors offer to start LM Studio when it is installed, everything else sends to Settings
-    private static func summaryRecovery(for error: Error) -> SummaryRecovery? {
+    /// a silent LM Studio offers to start it, a missing model offers to download it,
+    /// everything else sends to Settings
+    nonisolated static func recovery(for error: Error, provider: SummaryProvider, isLMStudioInstalled: Bool) -> SummaryRecovery? {
         guard let summarizationError = error as? SummarizationError else {
             return .openSettings
         }
         switch summarizationError {
         case .emptyTranscript:
             return nil
-        case .unavailable(let message):
-            let isServerDown = message.hasPrefix("LM Studio не запущен") || message.hasPrefix("LM Studio не отвечает на")
-            return isServerDown && LocalModelSupport.isInstalled ? .startServer : .openSettings
+        case .modelMissing:
+            return .downloadModel
+        case .serverDown:
+            let canStart = provider == .lmStudio && isLMStudioInstalled
+            return canStart ? .startServer : .openSettings
+        case .unauthorized, .unavailable:
+            return .openSettings
+        }
+    }
+
+    /// The provider the settings point at, and how much transcript it can be given: the built-in
+    /// model has a 64k context, the other two take the whole call.
+    private func makeSummaryProvider() async throws -> (provider: ChatCompletionsProvider, characterBudget: Int) {
+        let prompt = settings.summaryPrompt.isEmpty ? ChatCompletionsProvider.defaultPrompt : settings.summaryPrompt
+        switch settings.summaryProvider {
+        case .openRouter:
+            guard !settings.openRouterAPIKey.isEmpty else {
+                throw SummarizationError.unauthorized("Ключ OpenRouter не введён")
+            }
+            let provider = ChatCompletionsProvider(
+                baseURL: OpenRouter.baseURL,
+                model: settings.openRouterModel.isEmpty ? OpenRouter.defaultModel : settings.openRouterModel,
+                prompt: prompt,
+                apiKey: settings.openRouterAPIKey,
+                serviceName: "OpenRouter"
+            )
+            return (provider, Self.cloudCharacterBudget)
+        case .builtIn:
+            let baseURL = try await llamaServer.ensureRunning()
+            let provider = ChatCompletionsProvider(
+                baseURL: baseURL,
+                model: BundledSummary.current.modelID,
+                prompt: prompt,
+                serviceName: "Встроенная модель",
+                timeout: Self.localTimeout
+            )
+            return (provider, Self.builtInCharacterBudget)
+        case .lmStudio:
+            let connection = try await LocalModelSupport.resolve(
+                serverURL: settings.summaryServerURL,
+                model: settings.summaryModel
+            )
+            let provider = ChatCompletionsProvider(
+                baseURL: connection.baseURL,
+                model: connection.model,
+                prompt: prompt,
+                serviceName: "LM Studio на \(Self.hostAndPort(connection.baseURL))",
+                timeout: Self.localTimeout
+            )
+            return (provider, Self.cloudCharacterBudget)
         }
     }
 

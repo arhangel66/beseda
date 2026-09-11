@@ -149,6 +149,14 @@ struct CallSummaryView: View {
         case .startServer:
             Button("Запустить LM Studio", action: onRecover)
                 .buttonStyle(.borderedProminent)
+        case .downloadModel:
+            // the download lives in Settings with its progress bar; a second one here would be a lie
+            if let controller {
+                SettingsSectionLink(section: "processing", controller: controller) {
+                    Text("Скачать модель")
+                }
+                .buttonStyle(.borderedProminent)
+            }
         case .openSettings:
             if let controller {
                 SettingsSectionLink(section: "processing", controller: controller) {
