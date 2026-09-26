@@ -49,6 +49,13 @@ capture.
 ## Settings and permissions
 
 `AppSettings` stores every setting in `UserDefaults` under `beseda.*` keys, each written in `didSet`.
+The two secrets, `openRouterAPIKey` and `webhookSecret`, go to the login Keychain instead (`App/Keychain.swift`,
+generic password, service = bundle id, account = the same `beseda.*` key). At launch a secret still in
+`UserDefaults` is copied to the Keychain, read back, and only then removed from defaults; if the Keychain
+refuses, the value stays in defaults and keeps working, and the move is retried at the next launch or edit.
+Items are readable by later builds without a prompt as long as they are signed with the same Apple
+Development identity: the designated requirement is the bundle id plus the certificate's CN, which survives
+certificate renewal (`scripts/lib/bundle_app.sh`).
 `PermissionsModel` (`App/PermissionChecks.swift`) checks the microphone (`AVAudioApplication`) and
 system audio by actually opening a `SystemAudioTap` for a second, since macOS grants it silently per app;
 a denied permission opens the matching Privacy pane. Paths live in `AppPaths`.

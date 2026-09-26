@@ -44,6 +44,7 @@ enum RetentionRule: String, CaseIterable, Identifiable, Sendable {
 @Observable
 final class AppSettings {
     private let defaults: UserDefaults
+    private let keychain: Keychain
     private let autoDetectKey = "beseda.autoDetectEnabled"
     private let enabledCallAppsKey = "beseda.enabledCallApps"
     private let rawRetentionKey = "beseda.rawAudioRetention"
@@ -147,7 +148,7 @@ final class AppSettings {
 
     var openRouterAPIKey: String {
         didSet {
-            defaults.set(openRouterAPIKey, forKey: openRouterAPIKeyKey)
+            storeSecret(openRouterAPIKey, key: openRouterAPIKeyKey)
         }
     }
 
@@ -224,10 +225,9 @@ final class AppSettings {
         }
     }
 
-    /// plain text in UserDefaults like every other setting; Keychain is a follow-up
     var webhookSecret: String {
         didSet {
-            defaults.set(webhookSecret, forKey: webhookSecretKey)
+            storeSecret(webhookSecret, key: webhookSecretKey)
         }
     }
 
@@ -242,11 +242,12 @@ final class AppSettings {
         SpeechModel.named(speechModelID) ?? .default
     }
 
-    init(defaults: UserDefaults = .standard) {
+    init(defaults: UserDefaults = .standard, keychain: Keychain = Keychain()) {
         if defaults === UserDefaults.standard, let legacy = UserDefaults(suiteName: "app.podushka.Podushka") {
             AppSettings.importLegacyValues(from: legacy, into: defaults)
         }
         self.defaults = defaults
+        self.keychain = keychain
         self.autoDetectEnabled = AppSettings.bool(defaults, autoDetectKey, otherwise: false)
         self.enabledCallApps = (defaults.array(forKey: enabledCallAppsKey) as? [String])
             .map(Set.init) ?? AppSettings.defaultEnabledCallApps
@@ -265,7 +266,7 @@ final class AppSettings {
             .map(Set.init) ?? []
         self.summaryProvider = defaults.string(forKey: summaryProviderKey)
             .flatMap(SummaryProvider.init(rawValue:)) ?? .builtIn
-        self.openRouterAPIKey = defaults.string(forKey: openRouterAPIKeyKey) ?? ""
+        self.openRouterAPIKey = AppSettings.secret(openRouterAPIKeyKey, defaults: defaults, keychain: keychain)
         self.openRouterModel = defaults.string(forKey: openRouterModelKey) ?? ""
         self.summaryServerURL = defaults.string(forKey: summaryServerURLKey) ?? ""
         self.summaryModel = defaults.string(forKey: summaryModelKey) ?? ""
@@ -278,8 +279,28 @@ final class AppSettings {
         self.webhookEnabled = defaults.bool(forKey: webhookEnabledKey)
         self.exportFolder = defaults.string(forKey: exportFolderKey) ?? ""
         self.webhookURL = defaults.string(forKey: webhookURLKey) ?? ""
-        self.webhookSecret = defaults.string(forKey: webhookSecretKey) ?? ""
+        self.webhookSecret = AppSettings.secret(webhookSecretKey, defaults: defaults, keychain: keychain)
         self.speechModelID = defaults.string(forKey: speechModelKey) ?? SpeechModel.default.id
+    }
+
+    /// a secret still in UserDefaults (a release before the Keychain, or a failed write) moves to the
+    /// Keychain here; if the Keychain refuses, it stays in defaults and keeps working from there
+    private static func secret(_ key: String, defaults: UserDefaults, keychain: Keychain) -> String {
+        guard let stored = defaults.string(forKey: key) else {
+            return keychain.read(account: key) ?? ""
+        }
+        if keychain.save(stored, account: key) {
+            defaults.removeObject(forKey: key)
+        }
+        return stored
+    }
+
+    private func storeSecret(_ value: String, key: String) {
+        if keychain.save(value, account: key) {
+            defaults.removeObject(forKey: key)
+        } else {
+            defaults.set(value, forKey: key)
+        }
     }
 
     /// the settings written while the app was called Podushka; a value already set under

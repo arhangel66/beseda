@@ -102,9 +102,9 @@ final class WebhookSender: Sendable {
         request.timeoutInterval = timeout
         request.httpBody = body
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        // kushetka compares the whole Authorization value with the secret, so no scheme prefix
-        request.setValue(secret, forHTTPHeaderField: "Authorization")
-        request.setValue(secret, forHTTPHeaderField: "X-Podushka-Secret")
+        if !secret.isEmpty {
+            request.setValue("Bearer \(secret)", forHTTPHeaderField: "Authorization")
+        }
         request.setValue(event, forHTTPHeaderField: "X-Podushka-Event")
         request.setValue(deliveryID, forHTTPHeaderField: "X-Podushka-Delivery")
         request.setValue("Beseda", forHTTPHeaderField: "User-Agent")
@@ -125,13 +125,26 @@ final class WebhookSender: Sendable {
     }
 
     static func endpoint(from string: String) -> URL? {
+        try? checkedEndpoint(from: string).get()
+    }
+
+    /// https anywhere; plain http only to this Mac, where nothing crosses the network
+    static func checkedEndpoint(from string: String) -> Result<URL, EndpointRefusal> {
         guard let url = URL(string: string.trimmingCharacters(in: .whitespacesAndNewlines)),
               let scheme = url.scheme?.lowercased(), scheme == "http" || scheme == "https",
               let host = url.host, !host.isEmpty else {
-            return nil
+            return .failure(.notURL)
         }
-        return url
+        if scheme == "http" && !["localhost", "127.0.0.1", "::1"].contains(host.lowercased()) {
+            return .failure(.plainHTTP)
+        }
+        return .success(url)
     }
+}
+
+enum EndpointRefusal: String, Error {
+    case notURL = "Адрес не похож на URL"
+    case plainHTTP = "Нужен https: по http секрет и расшифровка идут открытым текстом (http — только для localhost)"
 }
 
 private struct ActionResponse: Decodable {

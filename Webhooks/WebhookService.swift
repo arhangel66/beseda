@@ -112,8 +112,12 @@ final class WebhookService {
         guard !isTesting else {
             return
         }
-        guard let url = WebhookSender.endpoint(from: settings.webhookURL) else {
-            testResult = "Адрес не похож на URL"
+        let url: URL
+        switch WebhookSender.checkedEndpoint(from: settings.webhookURL) {
+        case .success(let checked):
+            url = checked
+        case .failure(let refusal):
+            testResult = refusal.rawValue
             return
         }
         isTesting = true

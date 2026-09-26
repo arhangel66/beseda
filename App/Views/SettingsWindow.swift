@@ -661,6 +661,10 @@ private struct IntegrationsPane: View {
             Section {
                 Toggle("Отправлять расшифровку на свой сервис", isOn: Bindable(settings).webhookEnabled)
                 TextField("Адрес", text: Bindable(settings).webhookURL, prompt: Text("https://example.com/webhook"))
+                if settings.webhookEnabled, case .failure(.plainHTTP) = WebhookSender.checkedEndpoint(from: settings.webhookURL) {
+                    Text("Не отправляется. \(EndpointRefusal.plainHTTP.rawValue)")
+                        .foregroundStyle(.red)
+                }
                 SecretField(title: "Секрет", text: Bindable(settings).webhookSecret)
                 HStack {
                     Text(webhooks.testResult ?? "Сервис должен принять пробный запрос.")
@@ -674,7 +678,7 @@ private struct IntegrationsPane: View {
             } header: {
                 Text("Свой сервис")
             } footer: {
-                Text("После каждой готовой расшифровки Beseda отправляет на этот адрес POST-запрос: текст, участники, итоги и время звонка. Секрет передаётся в заголовках Authorization и X-Podushka-Secret.")
+                Text("После каждой готовой расшифровки Beseda отправляет на этот адрес POST-запрос: текст, участники, итоги и время звонка. Секрет передаётся в заголовке Authorization: Bearer; адрес — только https (http — лишь для localhost).")
             }
 
             Section("Журнал доставок") {
