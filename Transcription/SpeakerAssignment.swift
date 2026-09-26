@@ -14,69 +14,43 @@ struct SpeakerTurn: Hashable {
 }
 
 enum SpeakerAssignment {
-    /// slack around a segmentation boundary, calibrated in step 8 of the diarization plan
-    static let nearestWindowSec = 0.4
-
     static func remoteTurns(segments: [TranscriptSegment], timeline: [SpeakerInterval]) -> [SpeakerTurn] {
-        // an empty timeline means diarization gave nothing; the caller keeps its single-speaker path
-        guard let firstSpeaker = timeline.sorted(by: { $0.start < $1.start }).first?.speaker else {
+        // the diarizer's own segments are the turns: per-word labels were twice as wrong (DER 0.262 vs 0.130,
+        // docs/decisions/speaker-accuracy.md). Each sentence goes onto the segment it overlaps most.
+        let intervals = timeline.sorted { $0.start < $1.start }
+        guard !intervals.isEmpty else {
+            // diarization gave nothing; the caller keeps its single-speaker path
             return []
         }
-
-        var turns: [SpeakerTurn] = []
-        var previousSpeaker: String?
+        var texts = [[String]](repeating: [], count: intervals.count)
+        var outside: [SpeakerTurn] = []
         for segment in segments {
-            // a sentence always opens a line: merging across them would turn a four-minute
-            // monologue into one paragraph and leave nothing to click for seeking
-            var isOpen = false
-            for word in words(in: segment) {
-                let speaker = speaker(for: word, in: timeline) ?? previousSpeaker ?? firstSpeaker
-                if isOpen, let last = turns.last, last.speaker == speaker {
-                    turns[turns.count - 1] = SpeakerTurn(
-                        speaker: speaker,
-                        start: last.start,
-                        end: word.end,
-                        text: "\(last.text) \(word.text)"
-                    )
-                } else {
-                    turns.append(SpeakerTurn(speaker: speaker, start: word.start, end: word.end, text: word.text))
-                    isOpen = true
-                }
-                previousSpeaker = speaker
+            let overlaps = intervals.map { min($0.end, segment.end) - max($0.start, segment.start) }
+            let best = overlaps.indices.max { overlaps[$0] < overlaps[$1] }!
+            if overlaps[best] > 0 {
+                texts[best].append(segment.text)
+            } else {
+                // no diarizer speech under the words: keep them, as the nearest segment's speaker
+                let nearest = intervals.min {
+                    gap($0, segment) < gap($1, segment)
+                }!
+                outside.append(SpeakerTurn(speaker: nearest.speaker, start: segment.start, end: segment.end, text: segment.text))
             }
         }
-        return relabelled(turns)
+        // a diarizer segment with no words under it has nothing to show in the transcript
+        let turns = intervals.indices.compactMap { index in
+            texts[index].isEmpty ? nil : SpeakerTurn(
+                speaker: intervals[index].speaker,
+                start: intervals[index].start,
+                end: intervals[index].end,
+                text: texts[index].joined(separator: " ")
+            )
+        }
+        return relabelled((turns + outside).sorted { $0.start < $1.start })
     }
 
-    private static func words(in segment: TranscriptSegment) -> [TranscriptWord] {
-        // transcripts recorded before step 2 carry no words; the whole segment acts as one
-        segment.words ?? [TranscriptWord(start: segment.start, end: segment.end, text: segment.text)]
-    }
-
-    private static func speaker(for word: TranscriptWord, in timeline: [SpeakerInterval]) -> String? {
-        var bestSpeaker: String?
-        var bestOverlap = 0.0
-        for interval in timeline {
-            let overlap = min(word.end, interval.end) - max(word.start, interval.start)
-            if overlap > bestOverlap {
-                bestSpeaker = interval.speaker
-                bestOverlap = overlap
-            }
-        }
-        if let bestSpeaker {
-            return bestSpeaker
-        }
-
-        var nearestSpeaker: String?
-        var nearestGap = nearestWindowSec
-        for interval in timeline {
-            let gap = max(interval.start - word.end, word.start - interval.end, 0)
-            if gap < nearestGap {
-                nearestSpeaker = interval.speaker
-                nearestGap = gap
-            }
-        }
-        return nearestSpeaker
+    private static func gap(_ interval: SpeakerInterval, _ segment: TranscriptSegment) -> Double {
+        min(abs(interval.start - segment.end), abs(segment.start - interval.end))
     }
 
     private static func relabelled(_ turns: [SpeakerTurn]) -> [SpeakerTurn] {
