@@ -1000,6 +1000,15 @@ final class AppController {
         cleanupAudioIfNeeded(files: audio)
         status = .completed
         webhooks.enqueue(callID: callID)
+        if settings.autoProcessCalls {
+            do {
+                if let call = try callStore.fetchCall(id: callID) {
+                    startProcessing(try makeCallDetail(call), as: nil)
+                }
+            } catch {
+                appendLog("Auto processing of \(callID) failed: \(error.localizedDescription)")
+            }
+        }
     }
 
     private func beginStage(_ title: String, _ index: Int, of total: Int) {
@@ -1075,8 +1084,17 @@ final class AppController {
 
     /// «Заново» goes through here as well: the fresh text overwrites the old one, and a
     /// failed retry leaves the previous summary in place instead of an empty pane.
-    func generateSummary() {
-        guard let detail = selectedCallDetail, summarizingCallID == nil else {
+    /// A given `type` skips the classifier — the call screen's type picker reruns through it.
+    func generateSummary(as type: CallType? = nil) {
+        guard let detail = selectedCallDetail else {
+            return
+        }
+        startProcessing(detail, as: type)
+    }
+
+    private func startProcessing(_ detail: StoredCallDetail, as type: CallType?) {
+        guard summarizingCallID == nil else {
+            appendLog("Processing of \(detail.id) skipped: another call is being processed")
             return
         }
         summaryError = nil
@@ -1084,7 +1102,7 @@ final class AppController {
         summarizingCallID = detail.id
         summaryStartedAt = Date()
         Task { [weak self] in
-            await self?.runSummary(for: detail)
+            await self?.runSummary(for: detail, as: type)
         }
     }
 
@@ -1183,7 +1201,7 @@ final class AppController {
         }
     }
 
-    private func runSummary(for detail: StoredCallDetail) async {
+    private func runSummary(for detail: StoredCallDetail, as chosenType: CallType?) async {
         defer {
             summarizingCallID = nil
             summaryStartedAt = nil
@@ -1191,9 +1209,21 @@ final class AppController {
         defer { llamaServer.noteIdle() }
         do {
             let (provider, characterBudget) = try await makeSummaryProvider()
-            let text = try await SummarizationService(provider: provider, characterBudget: characterBudget)
-                .summarize(detail)
+            let (type, text) = try await SummarizationService.process(
+                detail,
+                types: settings.callTypes,
+                chosen: chosenType,
+                characterBudget: characterBudget,
+                provider: { prompt in
+                    var typed = provider
+                    typed.prompt = prompt
+                    return typed
+                },
+                log: { [weak self] in self?.appendLog($0) }
+            )
+            appendLog("Processed \(detail.id) as «\(type.name)»")
             try callStore.setSummary(callID: detail.id, text: text)
+            try callStore.setCallType(callID: detail.id, name: type.name)
             // the summary lives on the call row, which loadCallDetail takes as given: re-read it
             // or the text is stored and never shown. The guard keeps a slow summary from
             // dragging the user back to the call they left.
@@ -1236,7 +1266,7 @@ final class AppController {
     /// The provider the settings point at, and how much transcript it can be given: the built-in
     /// model has a 64k context, the other two take the whole call.
     private func makeSummaryProvider() async throws -> (provider: ChatCompletionsProvider, characterBudget: Int) {
-        let prompt = settings.summaryPrompt.isEmpty ? ChatCompletionsProvider.defaultPrompt : settings.summaryPrompt
+        let prompt = settings.callTypes[0].prompt
         switch settings.summaryProvider {
         case .openRouter:
             guard !settings.openRouterAPIKey.isEmpty else {
@@ -1280,22 +1310,24 @@ final class AppController {
         do {
             // switching calls used to stall; the number keeps a future slowdown from being a feeling
             let startedAt = Date()
-            let segments = try callStore.fetchSegments(callID: call.id)
-            let markdownText = try readMarkdownIfAvailable(for: call)
-            let jobStats = try callStore.fetchJobStats(callID: call.id)
-            appendLog("Loaded \(segments.count) lines of \(call.id) in \(Int(Date().timeIntervalSince(startedAt) * 1000)) ms")
-            selectedCallDetail = StoredCallDetail(
-                summary: call,
-                segments: segments,
-                speakerNames: try callStore.fetchSpeakerNames(callID: call.id),
-                markdownText: markdownText,
-                jobStats: jobStats
-            )
+            let detail = try makeCallDetail(call)
+            appendLog("Loaded \(detail.segments.count) lines of \(call.id) in \(Int(Date().timeIntervalSince(startedAt) * 1000)) ms")
+            selectedCallDetail = detail
             webhooks.showCall(id: call.id)
         } catch {
             callBrowserError = error.localizedDescription
             appendLog("Call detail failed: \(error.localizedDescription)")
         }
+    }
+
+    private func makeCallDetail(_ call: StoredCallSummary) throws -> StoredCallDetail {
+        StoredCallDetail(
+            summary: call,
+            segments: try callStore.fetchSegments(callID: call.id),
+            speakerNames: try callStore.fetchSpeakerNames(callID: call.id),
+            markdownText: try readMarkdownIfAvailable(for: call),
+            jobStats: try callStore.fetchJobStats(callID: call.id)
+        )
     }
 
     private func readMarkdownIfAvailable(for call: StoredCallSummary) throws -> String? {

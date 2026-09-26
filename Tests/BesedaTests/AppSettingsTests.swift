@@ -12,16 +12,19 @@ import Testing
     let settings = AppSettings(defaults: defaults)
     #expect(settings.summaryServerURL == "")
     #expect(settings.summaryModel == "")
-    #expect(settings.summaryPrompt == "")
+    #expect(settings.callTypes.map(\.prompt) == [ChatCompletionsProvider.defaultPrompt])
+    #expect(settings.autoProcessCalls == false)
 
     settings.summaryServerURL = "http://localhost:1235/v1"
     settings.summaryModel = "google/gemma-4-26b-a4b-qat"
-    settings.summaryPrompt = "свой промпт"
+    settings.callTypes.append(CallType(name: "Дейли", description: "рабочая встреча", prompt: "свой промпт"))
+    settings.autoProcessCalls = true
 
     let reloaded = AppSettings(defaults: defaults)
     #expect(reloaded.summaryServerURL == "http://localhost:1235/v1")
     #expect(reloaded.summaryModel == "google/gemma-4-26b-a4b-qat")
-    #expect(reloaded.summaryPrompt == "свой промпт")
+    #expect(reloaded.callTypes == settings.callTypes)
+    #expect(reloaded.autoProcessCalls)
 }
 
 @MainActor
@@ -86,4 +89,16 @@ import Testing
 
     #expect(settings.onboardingDone)
     #expect(settings.webhookURL == "http://new")
+}
+
+@MainActor
+@Test func anEditedSummaryPromptBecomesTheFirstCallTypesPrompt() {
+    let suiteName = "beseda-test-\(UUID().uuidString)"
+    let defaults = UserDefaults(suiteName: suiteName)!
+    defer { defaults.removePersistentDomain(forName: suiteName) }
+    defaults.set("старый свой промпт", forKey: "beseda.summaryPrompt")
+
+    let settings = AppSettings(defaults: defaults)
+
+    #expect(settings.callTypes.map(\.prompt) == ["старый свой промпт"])
 }

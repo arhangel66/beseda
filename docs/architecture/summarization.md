@@ -7,7 +7,22 @@ description: How a call summary is produced through one chat-completions request
 
 ## How it works
 
-A summary is written on request («Итоги» tab, `AppController.generateSummary`), never automatically.
+A summary is written on request («Итоги» tab, `AppController.generateSummary`), or right after
+`finishCall` marks a call ready when `AppSettings.autoProcessCalls` is on (off by default).
+
+**Call types.** `AppSettings.callTypes` (`[CallType]`, JSON under `beseda.callTypes`) — name, description
+for the classifier, prompt; never empty. The default is one type whose prompt is the old
+`beseda.summaryPrompt` if it was edited, else `ChatCompletionsProvider.defaultPrompt`. No example types are
+seeded: a second type would switch the classifier on for someone who changed nothing.
+`SummarizationService.process` picks the type and then summarizes with its prompt:
+- a type given by the caller (`generateSummary(as:)`, for a picker on the call screen) is used as is;
+- one type is used without asking the model;
+- with two or more, the same provider gets `classifierPrompt` (names + descriptions) and the first
+  8000 chars of the clean transcript, and `pickType` matches the answer case-insensitively by
+  containment, longest name first. An unknown answer falls back to the first type and is logged.
+  Decision: [call-type classifier](../decisions/call-type-classifier.md).
+
+The chosen type's name is stored on the call (`callStore.setCallType`, column `calls.call_type`).
 
 1. `SummarizationService.summarize` renders the stored call as clean dialogue with renamed speakers
    (`TranscriptCopy.render(.clean)`). An empty render throws `emptyTranscript`. Text over the character
@@ -26,7 +41,7 @@ A summary is written on request («Итоги» tab, `AppController.generateSumm
 3. The text is stored on the call row (`callStore.setSummary`). Errors map to `SummarizationError`; the
    error card offers a recovery (`SummaryRecovery`), e.g. starting LM Studio with `lms server start`.
 
-The prompt (`ChatCompletionsProvider.defaultPrompt`, overridable in settings) asks for four Russian
+The default prompt (`ChatCompletionsProvider.defaultPrompt`, the starting prompt of every type) asks for four Russian
 sections with bold names only.
 
 ## Built-in runtime install
