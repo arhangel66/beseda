@@ -8,8 +8,10 @@ import Foundation
 
 let evalRoot = URL(fileURLWithPath: #filePath)
     .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
-let audioDirectory = evalRoot.appendingPathComponent("data/audio")
-let outputRoot = evalRoot.appendingPathComponent("diarization/hyp-system")
+// BESEDA-82: AUDIO_DIR / OUTPUT_DIR point it at call copies instead of the eval set
+let environment = ProcessInfo.processInfo.environment
+let audioDirectory = environment["AUDIO_DIR"].map { URL(fileURLWithPath: $0) } ?? evalRoot.appendingPathComponent("data/audio")
+let outputRoot = environment["OUTPUT_DIR"].map { URL(fileURLWithPath: $0) } ?? evalRoot.appendingPathComponent("diarization/hyp-system")
 
 struct Turn: Encodable {
     let start: Double

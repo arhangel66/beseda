@@ -104,18 +104,27 @@ func diarizerVariants(of url: URL) async throws -> [(String, [SpeakerInterval])]
 struct DumpedSegment: Encodable { let start: Float, end: Float, speaker: String, quality: Float, embedding: [Float] }
 struct Dump: Encodable {
     let system: [DumpedSegment]
+    let system80: [DumpedSegment]
     let mic: [DumpedSegment]
     let ownSpeech: [[Double]]
     let systemDb: [Float]
     let micDb: [Float]
 }
 
-func dumpedSegments(_ url: URL) async throws -> [DumpedSegment] {
+func dumpedSegments(_ url: URL, thresholds: [Float] = [0.7]) async throws -> [[DumpedSegment]] {
+    // embeddings once, one clustering per threshold (BESEDA-82 adds 0.80)
     let manager = OfflineDiarizerManager(config: OfflineDiarizerConfig(clusteringThreshold: 0.7))
     try await manager.prepareModels()
-    return try manager.cluster(try await manager.prepare(audio: try AudioConverter().resampleAudioFile(url))).segments.map {
-        DumpedSegment(start: $0.startTimeSeconds, end: $0.endTimeSeconds, speaker: $0.speakerId, quality: $0.qualityScore, embedding: $0.embedding)
+    let prepared = try await manager.prepare(audio: try AudioConverter().resampleAudioFile(url))
+    var clustered: [[DumpedSegment]] = []
+    for threshold in thresholds {
+        let clusterer = OfflineDiarizerManager(config: OfflineDiarizerConfig(clusteringThreshold: Double(threshold)))
+        try await clusterer.prepareModels()
+        clustered.append(try clusterer.cluster(prepared).segments.map {
+            DumpedSegment(start: $0.startTimeSeconds, end: $0.endTimeSeconds, speaker: $0.speakerId, quality: $0.qualityScore, embedding: $0.embedding)
+        })
     }
+    return clustered
 }
 
 func decibels(_ samples: [Float]) -> [Float] {
@@ -126,7 +135,8 @@ if CommandLine.arguments.count > 2, CommandLine.arguments[2] == "dump" {
     let input = URL(fileURLWithPath: CommandLine.arguments[1])
     let dump: Dump
     if input.pathExtension == "wav" {
-        dump = Dump(system: try await dumpedSegments(input), mic: [], ownSpeech: [], systemDb: decibels(try readSamples(at: input)), micDb: [])
+        let system = try await dumpedSegments(input, thresholds: [0.7, 0.8])
+        dump = Dump(system: system[0], system80: system[1], mic: [], ownSpeech: [], systemDb: decibels(try readSamples(at: input)), micDb: [])
     } else {
         let systemURL = input.appendingPathComponent("them.asr.wav"), micURL = input.appendingPathComponent("me.asr.wav")
         let system = try readSamples(at: systemURL), mic = try readSamples(at: micURL)
@@ -136,8 +146,9 @@ if CommandLine.arguments.count > 2, CommandLine.arguments[2] == "dump" {
             if let last = runs.last, last[1] == Double(frame) / 50 { runs[runs.count - 1][1] = Double(frame + 1) / 50 }
             else { runs.append([Double(frame) / 50, Double(frame + 1) / 50]) }
         }
+        let clustered = try await dumpedSegments(systemURL, thresholds: [0.7, 0.8])
         dump = Dump(
-            system: try await dumpedSegments(systemURL), mic: try await dumpedSegments(micURL),
+            system: clustered[0], system80: clustered[1], mic: try await dumpedSegments(micURL)[0],
             ownSpeech: runs, systemDb: decibels(system), micDb: decibels(mic)
         )
     }

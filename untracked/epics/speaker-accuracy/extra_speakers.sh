@@ -1,6 +1,6 @@
 #!/bin/sh
 # BESEDA-79: diarizer segments + embeddings + levels of the 1:1 calls and the 20260923-130021 daily (copies,
-# one call at a time), and of the benchmark system channels -> hyp/extra/*.json; ../extra_speakers.py reads them.
+# one call at a time), and of the benchmark system channels (BESEDA-82: also t0.80 as `system80`) -> hyp/extra/*.json; ../extra_speakers.py reads them.
 set -eu
 cd "$(dirname "$0")"
 STORE="$HOME/Library/Application Support/Beseda"
