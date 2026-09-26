@@ -28,8 +28,17 @@ the vendored Swift wrapper in `Vendor/TranscribeCpp`). No audio leaves the machi
   `SentenceBuilder` groups words into sentence segments (punctuation or a long pause).
 - **Diarization** — only the system channel is diarized. `Diarizer` wraps FluidAudio's
   `OfflineDiarizerManager` (clustering threshold 0.70); its CoreML models download and compile on first
-  use. `SpeakerAssignment.remoteTurns` maps words onto the speaker timeline and yields `them-1`,
-  `them-2`… turns. Diarization failure is logged and skipped: the transcript falls back to one `them`.
+  use. `SpeakerAssignment.remoteTurns` takes the diarizer's own segments as the turns (`them-1`,
+  `them-2`…, with the segment's times): each sentence goes onto the segment it overlaps most, a sentence
+  outside diarizer speech keeps its times and takes the nearest segment's speaker, a segment with no words
+  is dropped. Per-word labels, the earlier rule, were twice as wrong ([speaker accuracy](../decisions/speaker-accuracy.md)).
+  Diarization failure is logged and skipped: the transcript falls back to one `them`.
+- **Echo gate** — remote speech leaking from the speakers into the mic would be transcribed again as
+  `me`. `EchoGate` finds the delay (FFT cross-correlation, 0–500 ms) and gain of the system channel
+  inside the mic; a 20 ms mic frame is own speech only when its energy beats the predicted echo by 6 dB
+  and the noise floor ×10 (gaps up to 200 ms bridged). Each mic sentence is cut to its longest own-speech
+  run (≥ 0.3 s, text kept whole) or dropped. Only the transcript is gated: `me.asr.json` keeps everything.
+  One delay and one gain: a real room's smeared echo will get through more often.
 - **Merge** — `DualTranscriptResult.speakerSegments` interleaves `me` segments with the remote turns by
   start time. `TranscriptMerger.writeDualTranscript` writes `transcript.md` with a `## Dialogue` block
   and a `## Channels` block (per-channel text and segments). `SpeakerNaming` turns keys into display
@@ -38,7 +47,7 @@ the vendored Swift wrapper in `Vendor/TranscribeCpp`). No audio leaves the machi
 ## Main files
 
 `Transcription/LocalTranscriber.swift`, `SpeechModel.swift`, `UtteranceSplitter.swift`,
-`WordAssembler.swift`, `SentenceBuilder.swift`, `Diarizer.swift`, `SpeakerAssignment.swift`,
+`WordAssembler.swift`, `SentenceBuilder.swift`, `EchoGate.swift`, `Diarizer.swift`, `SpeakerAssignment.swift`,
 `SpeakerNaming.swift`, `TranscriptMerger.swift`, `TranscriptModels.swift`; `Runtime/RuntimeInstaller.swift`;
 the pipeline order is in `AppController.transcribeDualCall`.
 

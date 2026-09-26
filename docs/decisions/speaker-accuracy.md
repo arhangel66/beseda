@@ -24,7 +24,8 @@ sources:
 
 # Speaker accuracy, local
 
-**Status: proposed.** Part of the table is measured, the rest waits for the benchmark rerun
+**Status: proposed; the two no-model fixes (echo gate, diarizer timeline) are implemented** in the app
+(BESEDA-45, see [ASR](../architecture/asr.md)), not rescored through the app pipeline yet. Part of the table is measured, the rest waits for the benchmark rerun
 (`untracked/epics/speaker-accuracy/run_all.sh`); the Mac was overloaded when this was written.
 Everything stays local, the benchmark included. Direction E in [development directions](development-directions.md).
 
@@ -143,6 +144,13 @@ ASR, system channel (`asr/results.md`):[^asr]
 2. **Model choices wait for the benchmark**: FluidAudio 0.17.4 t=0.5 adds a little (0.282 → 0.264);
    Sortformer / LS-EEND / other thresholds and all ASR engines are open until `run_all.sh` fills the rows.
    The ASR target is the mixed calls (WER 0.39–0.45 vs 0.10–0.13 Russian).
+
+**Implemented (BESEDA-45):** both fixes as measured, with two differences: text-less pieces are dropped
+instead of shown as empty lines (diarizer segments with no words under them, and the shorter own-speech runs
+of a mic sentence — its text goes on the longest run, as in the prototype), and the echo delay is found by
+8 s blocks instead of one whole-file FFT, to keep memory flat on long calls. Dropping the text-less diarizer
+segments leaves that speech unlabelled, so the app's real DER is probably above 0.130 (likely still well under 0.262). Not rescored:
+the eval audio is not built in the checkout and scoring the app pipeline means a full ASR run.
 
 Cost of 1: no models, no size, ~1 ms per audio second for the gate. Not done: no cloud engine, no Python
 runtime in the app, no app change before Mikhail approves the direction.

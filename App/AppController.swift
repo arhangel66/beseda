@@ -864,7 +864,7 @@ final class AppController {
 
         beginStage("Расшифровка вашего голоса", total - 2, of: total)
         appendLog("Transcribing microphone")
-        let microphone = try await transcribeChannel(
+        let microphoneWithEcho = try await transcribeChannel(
             .microphone, callID, in: sessionDir,
             audioURL: sessionDir.appendingPathComponent(DualFiles.microphoneASR),
             rawAudioURL: sessionDir.appendingPathComponent(DualFiles.microphoneRaw),
@@ -878,6 +878,7 @@ final class AppController {
             rawAudioURL: sessionDir.appendingPathComponent(DualFiles.systemRaw),
             asrJSONURL: sessionDir.appendingPathComponent("them.asr.json")
         )
+        let microphone = try echoGated(microphoneWithEcho, system: systemAudio)
         let remoteTurns = await diarizedTurns(
             audioURL: systemAudio.normalizedAudioURL,
             segments: systemAudio.segments,
@@ -902,6 +903,29 @@ final class AppController {
             persist: persist
         )
         appendLog("Wrote dual transcript to \(transcriptURL.path)")
+    }
+
+    /// the mic transcript without the remote side it picked up from the speakers; me.asr.json keeps it all
+    private func echoGated(_ microphone: TranscriptResult, system: TranscriptResult) throws -> TranscriptResult {
+        let segments = EchoGate.ownSpeechSegments(
+            microphone.segments,
+            mic: try LocalTranscriber.readSamples(at: microphone.normalizedAudioURL),
+            system: try LocalTranscriber.readSamples(at: system.normalizedAudioURL)
+        )
+        appendLog("Echo gate kept \(segments.count) of \(microphone.segments.count) microphone sentences")
+        return TranscriptResult(
+            id: microphone.id,
+            createdAt: microphone.createdAt,
+            sessionDirectory: microphone.sessionDirectory,
+            rawAudioURL: microphone.rawAudioURL,
+            normalizedAudioURL: microphone.normalizedAudioURL,
+            markdownURL: microphone.markdownURL,
+            text: segments.map(\.text).joined(separator: " "),
+            segments: segments,
+            audioDurationSec: microphone.audioDurationSec,
+            wallTimeSec: microphone.wallTimeSec,
+            realTimeFactor: microphone.realTimeFactor
+        )
     }
 
     private func startTranscriber(stage: Int, of total: Int) async throws {
