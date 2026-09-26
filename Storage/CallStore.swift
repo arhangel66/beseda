@@ -142,7 +142,7 @@ struct StoredCallSummary: Identifiable, Hashable {
     /// a call left in one of these states by a crash still has to read as Russian
     private static let statusLabels = [
         "recording": "записываю",
-        "normalizing": "готовплю запись",
+        "normalizing": "готовлю запись",
         "transcribing": "расшифровываю"
     ]
 
