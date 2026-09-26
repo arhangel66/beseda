@@ -76,15 +76,10 @@ final class AppController {
     }
 
     var status: Status = .idle
-    var workerDescription = "ASR worker not started"
-    var lastTranscript: TranscriptResult?
-    var lastDualTranscript: DualTranscriptResult?
-    var lastError: String?
     var recentCalls: [StoredCallSummary] = []
     var callBrowserCalls: [StoredCallSummary] = []
     var selectedCallDetail: StoredCallDetail?
     var callBrowserError: String?
-    var logMessages: [String] = []
     var elapsedRecordingSeconds: TimeInterval = 0
     var isPaused = false
     var microphoneLevel: Double = 0
@@ -145,6 +140,7 @@ final class AppController {
     /// set by the app scene: a notification callback has no `openWindow` environment value
     @ObservationIgnored var showMainWindow: (() -> Void)?
 
+    private static let maximumRecordingDuration: TimeInterval = 4 * 60 * 60
     /// an auto-started recording shorter than this is a misfire — a voice message or dictation, not a call
     private static let minimumAutoRecordingDuration: TimeInterval = 10
 
@@ -199,14 +195,6 @@ final class AppController {
 
     var callsDirectory: URL {
         AppPaths.current.callsDirectory
-    }
-
-    var latestMarkdownURL: URL? {
-        lastDualTranscript?.markdownURL ?? lastTranscript?.markdownURL
-    }
-
-    var latestTranscriptText: String? {
-        lastDualTranscript?.text ?? lastTranscript?.text
     }
 
     init() {
@@ -292,10 +280,7 @@ final class AppController {
         capture.stop()
     }
 
-    func startCallRecording(
-        maxDuration: TimeInterval = 4 * 60 * 60,
-        autoStartedApp: String? = nil
-    ) {
+    func startCallRecording(autoStartedApp: String? = nil) {
         guard !status.isBusy else {
             return
         }
@@ -303,7 +288,6 @@ final class AppController {
         let silenceStop: TimeInterval? = settings.stopOnSilence ? 60 : nil
         activeTask = Task { [weak self] in
             await self?.runDualRecording(
-                maxDuration: maxDuration,
                 autoStopSilenceDuration: silenceStop,
                 autoStartedApp: autoStartedApp
             )
@@ -391,7 +375,7 @@ final class AppController {
                 return
             }
             if !calendarService.isAuthorized {
-                _ = await calendarService.requestAccess()
+                await calendarService.requestAccess()
             }
             refreshCalendar()
         }
@@ -637,15 +621,6 @@ final class AppController {
         startCallRecording(autoStartedApp: detection.appName)
     }
 
-    func restartWorker() {
-        transcriber.stop()
-        workerDescription = "ASR worker stopped"
-        appendLog("ASR worker stopped")
-        if !status.isBusy {
-            status = .idle
-        }
-    }
-
     func quit() {
         transcriber.stop()
         NSApplication.shared.terminate(nil)
@@ -656,25 +631,8 @@ final class AppController {
             try fileManager.createDirectory(at: callsDirectory, withIntermediateDirectories: true)
             NSWorkspace.shared.open(callsDirectory)
         } catch {
-            lastError = error.localizedDescription
             status = .failed(error.localizedDescription)
         }
-    }
-
-    func openCall(_ call: StoredCallSummary) {
-        if let transcriptURL = call.transcriptURL, fileManager.fileExists(atPath: transcriptURL.path) {
-            NSWorkspace.shared.open(transcriptURL)
-            return
-        }
-        NSWorkspace.shared.open(call.audioDirectoryURL)
-    }
-
-    func revealCall(_ call: StoredCallSummary) {
-        if let transcriptURL = call.transcriptURL, fileManager.fileExists(atPath: transcriptURL.path) {
-            NSWorkspace.shared.activateFileViewerSelecting([transcriptURL])
-            return
-        }
-        NSWorkspace.shared.activateFileViewerSelecting([call.audioDirectoryURL])
     }
 
     func refreshRecentCalls() {
@@ -751,43 +709,16 @@ final class AppController {
         }
     }
 
-    private func runDualRecording(
-        maxDuration: TimeInterval,
-        autoStopSilenceDuration: TimeInterval?,
-        autoStartedApp: String? = nil
-    ) async {
+    private func runDualRecording(autoStopSilenceDuration: TimeInterval?, autoStartedApp: String?) async {
         defer { processingCallID = nil }
         let callID = Date.fileStamp
         let sessionDir = callsDirectory.appendingPathComponent(callID, isDirectory: true)
-        let microphoneRawURL = sessionDir.appendingPathComponent("me.raw.wav")
-        let systemRawURL = sessionDir.appendingPathComponent("them.raw.wav")
-        let microphoneNormalizedURL = sessionDir.appendingPathComponent("me.asr.wav")
-        let systemNormalizedURL = sessionDir.appendingPathComponent("them.asr.wav")
-        let microphoneASRJSONURL = sessionDir.appendingPathComponent("me.asr.json")
-        let systemASRJSONURL = sessionDir.appendingPathComponent("them.asr.json")
-        let transcriptURL = sessionDir.appendingPathComponent("transcript.md")
         let startedAt = Date()
 
         do {
-            lastError = nil
-            lastTranscript = nil
-            lastDualTranscript = nil
             cancelRequested = false
             try fileManager.createDirectory(at: sessionDir, withIntermediateDirectories: true)
-            updateCallIndex {
-                try persistCall(
-                    id: callID,
-                    kind: "dual",
-                    startedAt: startedAt,
-                    endedAt: nil,
-                    durationSec: nil,
-                    status: "recording",
-                    transcriptURL: nil,
-                    audioDirectoryURL: sessionDir,
-                    error: nil,
-                    appName: autoStartedApp
-                )
-            }
+            saveCall(callID, kind: "dual", in: sessionDir, startedAt: startedAt, status: "recording", appName: autoStartedApp)
 
             if let autoStartedApp {
                 status = .autoRecording(autoStartedApp)
@@ -795,7 +726,7 @@ final class AppController {
             } else if autoStopSilenceDuration != nil {
                 status = .callRecording
             } else {
-                status = .recording(maxDuration)
+                status = .recording(Self.maximumRecordingDuration)
             }
             if let autoStopSilenceDuration {
                 appendLog("Recording microphone and system audio to \(sessionDir.path); auto-stop after \(Int(autoStopSilenceDuration))s silence")
@@ -811,7 +742,7 @@ final class AppController {
             }
             startLiveTicker()
             let captureOutput = try await capture.record(
-                duration: maxDuration,
+                duration: Self.maximumRecordingDuration,
                 sessionDirectory: sessionDir,
                 autoStopSilenceDuration: autoStopSilenceDuration
             )
@@ -825,173 +756,40 @@ final class AppController {
                 discardCall(id: callID, sessionDirectory: sessionDir, durationSec: captureOutput.durationSec)
                 return
             }
-            updateCallIndex {
-                try persistCall(
-                    id: callID,
-                    kind: "dual",
-                    startedAt: captureOutput.startedAt,
-                    endedAt: captureOutput.endedAt,
-                    durationSec: captureOutput.durationSec,
-                    status: "normalizing",
-                    transcriptURL: nil,
-                    audioDirectoryURL: sessionDir,
-                    error: nil
+            let persist = { [unowned self] (status: String, transcriptURL: URL?) in
+                saveCall(
+                    callID, kind: "dual", in: sessionDir,
+                    startedAt: captureOutput.startedAt, endedAt: captureOutput.endedAt,
+                    durationSec: captureOutput.durationSec, status: status, transcriptURL: transcriptURL
                 )
             }
+            persist("normalizing", nil)
 
             processingCallID = callID
             beginStage("Подготовка записи", 1, of: 5)
             async let microphoneNormalized = AudioNormalizer.normalize(
-                inputURL: microphoneRawURL,
-                outputURL: microphoneNormalizedURL
+                inputURL: sessionDir.appendingPathComponent(DualFiles.microphoneRaw),
+                outputURL: sessionDir.appendingPathComponent(DualFiles.microphoneASR)
             )
             async let systemNormalized = AudioNormalizer.normalize(
-                inputURL: systemRawURL,
-                outputURL: systemNormalizedURL
+                inputURL: sessionDir.appendingPathComponent(DualFiles.systemRaw),
+                outputURL: sessionDir.appendingPathComponent(DualFiles.systemASR)
             )
-            let normalizedURLs = try await (microphoneNormalized, systemNormalized)
+            _ = try await (microphoneNormalized, systemNormalized)
             appendLog("Normalized dual audio")
 
-            beginStage("Запуск распознавания", 2, of: 5)
-            let ready = try await transcriber.start()
-            workerDescription = "\(ready.model) \(ready.version)"
-            appendLog("ASR ready: \(ready.model) \(ready.version)")
-
-            beginStage("Расшифровка вашего голоса", 3, of: 5)
-            updateCallIndex {
-                try persistCall(
-                    id: callID,
-                    kind: "dual",
-                    startedAt: captureOutput.startedAt,
-                    endedAt: captureOutput.endedAt,
-                    durationSec: captureOutput.durationSec,
-                    status: "transcribing",
-                    transcriptURL: nil,
-                    audioDirectoryURL: sessionDir,
-                    error: nil
-                )
-            }
-            appendLog("Transcribing microphone")
-            let microphoneTranscription = try await transcriber.transcribe(audioURL: normalizedURLs.0)
-            try writeASRTranscription(microphoneTranscription, to: microphoneASRJSONURL)
-            updateCallIndex {
-                try callStore.upsertTranscriptJob(
-                    id: microphoneTranscription.id,
-                    callID: callID,
-                    speaker: TranscriptChannel.microphone.speakerID,
-                    status: "ready",
-                    audioURL: normalizedURLs.0,
-                    asrJSONURL: microphoneASRJSONURL,
-                    audioDurationSec: microphoneTranscription.audioDurationSec,
-                    wallTimeSec: microphoneTranscription.wallTimeSec,
-                    realTimeFactor: microphoneTranscription.realTimeFactor,
-                    model: settings.speechModelID,
-                    error: nil
-                )
-            }
-            appendLog("Transcribing system audio")
-            beginStage("Расшифровка собеседников", 4, of: 5)
-            let systemTranscription = try await transcriber.transcribe(audioURL: normalizedURLs.1)
-            try writeASRTranscription(systemTranscription, to: systemASRJSONURL)
-            updateCallIndex {
-                try callStore.upsertTranscriptJob(
-                    id: systemTranscription.id,
-                    callID: callID,
-                    speaker: TranscriptChannel.systemAudio.speakerID,
-                    status: "ready",
-                    audioURL: normalizedURLs.1,
-                    asrJSONURL: systemASRJSONURL,
-                    audioDurationSec: systemTranscription.audioDurationSec,
-                    wallTimeSec: systemTranscription.wallTimeSec,
-                    realTimeFactor: systemTranscription.realTimeFactor,
-                    model: settings.speechModelID,
-                    error: nil
-                )
-            }
-
-            let remoteTurns = await diarizedTurns(
-                audioURL: normalizedURLs.1,
-                segments: systemTranscription.segments,
-                step: 5,
-                of: 5
-            )
-
-            let createdAt = Date()
-            let microphoneResult = makeTranscriptResult(
-                transcription: microphoneTranscription,
-                createdAt: createdAt,
-                sessionDirectory: sessionDir,
-                rawAudioURL: microphoneRawURL,
-                normalizedAudioURL: normalizedURLs.0,
-                markdownURL: transcriptURL
-            )
-            let systemResult = makeTranscriptResult(
-                transcription: systemTranscription,
-                createdAt: createdAt,
-                sessionDirectory: sessionDir,
-                rawAudioURL: systemRawURL,
-                normalizedAudioURL: normalizedURLs.1,
-                markdownURL: transcriptURL
-            )
-            let dualResult = DualTranscriptResult(
-                id: UUID().uuidString,
-                createdAt: createdAt,
-                sessionDirectory: sessionDir,
-                markdownURL: transcriptURL,
-                microphone: microphoneResult,
-                systemAudio: systemResult,
-                remoteTurns: remoteTurns
-            )
-
-            try TranscriptMerger.writeDualTranscript(dualResult, to: transcriptURL)
-            updateCallIndex {
-                try callStore.replaceSegments(callID: callID, segments: storedSegments(for: dualResult))
-                try persistCall(
-                    id: callID,
-                    kind: "dual",
-                    startedAt: captureOutput.startedAt,
-                    endedAt: captureOutput.endedAt,
-                    durationSec: captureOutput.durationSec,
-                    status: "ready",
-                    transcriptURL: transcriptURL,
-                    audioDirectoryURL: sessionDir,
-                    error: nil
-                )
-            }
-            cleanupAudioIfNeeded(
-                in: sessionDir,
-                files: [
-                    microphoneRawURL,
-                    systemRawURL,
-                    normalizedURLs.0,
-                    normalizedURLs.1
-                ]
-            )
-            lastDualTranscript = dualResult
+            try await transcribeDualCall(callID, in: sessionDir, stages: 5, persist: persist)
             lastReadyCallID = callID
-            status = .completed
-            webhooks.enqueue(callID: callID)
             if settings.notifyWhenReady {
                 notifier.transcriptReady(callDescription: autoStartedApp.map { "Звонок · \($0)" } ?? "Разговор записан")
             }
-            appendLog("Wrote dual transcript to \(transcriptURL.path)")
         } catch {
             callDetector.recordingEnded()
-            lastError = error.localizedDescription
             status = .failed(error.localizedDescription)
-            updateCallIndex {
-                try persistCall(
-                    id: callID,
-                    kind: "dual",
-                    startedAt: startedAt,
-                    endedAt: Date(),
-                    durationSec: Date().timeIntervalSince(startedAt),
-                    status: "failed",
-                    transcriptURL: nil,
-                    audioDirectoryURL: sessionDir,
-                    error: error.localizedDescription
-                )
-            }
+            saveCall(
+                callID, kind: "dual", in: sessionDir, startedAt: startedAt, endedAt: Date(),
+                durationSec: Date().timeIntervalSince(startedAt), status: "failed", error: error.localizedDescription
+            )
             appendLog("Failed: \(error.localizedDescription)")
         }
     }
@@ -1001,239 +799,191 @@ final class AppController {
         processingCallID = summary.id
         let callID = summary.id
         let sessionDir = summary.audioDirectoryURL
-        let transcriptURL = sessionDir.appendingPathComponent("transcript.md")
-        let parsedStartedAt = parseISO8601(summary.startedAt) ?? Date()
-        let parsedEndedAt = summary.endedAt.flatMap(parseISO8601)
+        let startedAt = parseISO8601(summary.startedAt) ?? Date()
+        let endedAt = summary.endedAt.flatMap(parseISO8601)
+        let persist = { [unowned self] (status: String, transcriptURL: URL?) in
+            saveCall(
+                callID, kind: summary.kind, in: sessionDir, startedAt: startedAt, endedAt: endedAt,
+                durationSec: summary.durationSec, status: status, transcriptURL: transcriptURL
+            )
+        }
 
         appendLog("Retrying call \(callID)")
-        lastError = nil
 
         do {
             switch summary.kind {
             case "mic":
                 let normalizedURL = sessionDir.appendingPathComponent("mic.16k-mono.wav")
-                try requireFile(at: normalizedURL)
-                let asrJSONURL = sessionDir.appendingPathComponent("mic.asr.json")
                 let rawURL = sessionDir.appendingPathComponent("mic.raw.wav")
-
-                updateCallIndex {
-                    try persistCall(
-                        id: callID,
-                        kind: "mic",
-                        startedAt: parsedStartedAt,
-                        endedAt: parsedEndedAt,
-                        durationSec: summary.durationSec,
-                        status: "transcribing",
-                        transcriptURL: nil,
-                        audioDirectoryURL: sessionDir,
-                        error: nil
-                    )
-                }
-
-                beginStage("Запуск распознавания", 1, of: 2)
-                let ready = try await transcriber.start()
-                workerDescription = "\(ready.model) \(ready.version)"
+                try requireFile(at: normalizedURL)
+                try await startTranscriber(stage: 1, of: 2)
+                persist("transcribing", nil)
 
                 beginStage("Расшифровка записи", 2, of: 2)
-                let transcription = try await transcriber.transcribe(audioURL: normalizedURL)
-                try writeASRTranscription(transcription, to: asrJSONURL)
-                updateCallIndex {
-                    try callStore.upsertTranscriptJob(
-                        id: transcription.id,
-                        callID: callID,
-                        speaker: TranscriptChannel.microphone.speakerID,
-                        status: "ready",
-                        audioURL: normalizedURL,
-                        asrJSONURL: asrJSONURL,
-                        audioDurationSec: transcription.audioDurationSec,
-                        wallTimeSec: transcription.wallTimeSec,
-                        realTimeFactor: transcription.realTimeFactor,
-                        model: settings.speechModelID,
-                        error: nil
-                    )
-                }
-
-                let result = TranscriptResult(
-                    id: transcription.id,
-                    createdAt: Date(),
-                    sessionDirectory: sessionDir,
-                    rawAudioURL: rawURL,
-                    normalizedAudioURL: normalizedURL,
-                    markdownURL: transcriptURL,
-                    text: transcription.text,
-                    segments: transcription.segments,
-                    audioDurationSec: transcription.audioDurationSec,
-                    wallTimeSec: transcription.wallTimeSec,
-                    realTimeFactor: transcription.realTimeFactor
+                let result = try await transcribeChannel(
+                    .microphone, callID, in: sessionDir,
+                    audioURL: normalizedURL, rawAudioURL: rawURL,
+                    asrJSONURL: sessionDir.appendingPathComponent("mic.asr.json")
                 )
+                let transcriptURL = sessionDir.appendingPathComponent(DualFiles.transcript)
                 try TranscriptMerger.writeMicrophoneTranscript(result, to: transcriptURL)
-                updateCallIndex {
-                    try callStore.replaceSegments(callID: callID, segments: storedSegments(for: result))
-                    try persistCall(
-                        id: callID,
-                        kind: "mic",
-                        startedAt: parsedStartedAt,
-                        endedAt: parsedEndedAt,
-                        durationSec: summary.durationSec,
-                        status: "ready",
-                        transcriptURL: transcriptURL,
-                        audioDirectoryURL: sessionDir,
-                        error: nil
-                    )
+                let segments = result.segments.map {
+                    SpeakerTranscriptSegment(speaker: TranscriptChannel.microphone.speakerID, segment: $0)
                 }
-                cleanupAudioIfNeeded(in: sessionDir, files: [rawURL, normalizedURL])
-                lastTranscript = result
-                lastDualTranscript = nil
-                status = .completed
-                webhooks.enqueue(callID: callID)
-                appendLog("Retry succeeded for \(callID)")
+                finishCall(callID, in: sessionDir, segments: segments, audio: [rawURL, normalizedURL], persist: persist)
 
             case "dual":
-                let micNormalized = sessionDir.appendingPathComponent("me.asr.wav")
-                let systemNormalized = sessionDir.appendingPathComponent("them.asr.wav")
-                try requireFile(at: micNormalized)
-                try requireFile(at: systemNormalized)
-                let micRaw = sessionDir.appendingPathComponent("me.raw.wav")
-                let systemRaw = sessionDir.appendingPathComponent("them.raw.wav")
-                let micASRJSON = sessionDir.appendingPathComponent("me.asr.json")
-                let systemASRJSON = sessionDir.appendingPathComponent("them.asr.json")
-
-                updateCallIndex {
-                    try persistCall(
-                        id: callID,
-                        kind: "dual",
-                        startedAt: parsedStartedAt,
-                        endedAt: parsedEndedAt,
-                        durationSec: summary.durationSec,
-                        status: "transcribing",
-                        transcriptURL: nil,
-                        audioDirectoryURL: sessionDir,
-                        error: nil
-                    )
-                }
-
-                beginStage("Запуск распознавания", 1, of: 4)
-                let ready = try await transcriber.start()
-                workerDescription = "\(ready.model) \(ready.version)"
-
-                beginStage("Расшифровка вашего голоса", 2, of: 4)
-                let micTranscription = try await transcriber.transcribe(audioURL: micNormalized)
-                try writeASRTranscription(micTranscription, to: micASRJSON)
-                updateCallIndex {
-                    try callStore.upsertTranscriptJob(
-                        id: micTranscription.id,
-                        callID: callID,
-                        speaker: TranscriptChannel.microphone.speakerID,
-                        status: "ready",
-                        audioURL: micNormalized,
-                        asrJSONURL: micASRJSON,
-                        audioDurationSec: micTranscription.audioDurationSec,
-                        wallTimeSec: micTranscription.wallTimeSec,
-                        realTimeFactor: micTranscription.realTimeFactor,
-                        model: settings.speechModelID,
-                        error: nil
-                    )
-                }
-
-                beginStage("Расшифровка собеседников", 3, of: 4)
-                let systemTranscription = try await transcriber.transcribe(audioURL: systemNormalized)
-                try writeASRTranscription(systemTranscription, to: systemASRJSON)
-                updateCallIndex {
-                    try callStore.upsertTranscriptJob(
-                        id: systemTranscription.id,
-                        callID: callID,
-                        speaker: TranscriptChannel.systemAudio.speakerID,
-                        status: "ready",
-                        audioURL: systemNormalized,
-                        asrJSONURL: systemASRJSON,
-                        audioDurationSec: systemTranscription.audioDurationSec,
-                        wallTimeSec: systemTranscription.wallTimeSec,
-                        realTimeFactor: systemTranscription.realTimeFactor,
-                        model: settings.speechModelID,
-                        error: nil
-                    )
-                }
-
-                let remoteTurns = await diarizedTurns(
-                    audioURL: systemNormalized,
-                    segments: systemTranscription.segments,
-                    step: 4,
-                    of: 4
-                )
-
-                let createdAt = Date()
-                let micResult = makeTranscriptResult(
-                    transcription: micTranscription,
-                    createdAt: createdAt,
-                    sessionDirectory: sessionDir,
-                    rawAudioURL: micRaw,
-                    normalizedAudioURL: micNormalized,
-                    markdownURL: transcriptURL
-                )
-                let systemResult = makeTranscriptResult(
-                    transcription: systemTranscription,
-                    createdAt: createdAt,
-                    sessionDirectory: sessionDir,
-                    rawAudioURL: systemRaw,
-                    normalizedAudioURL: systemNormalized,
-                    markdownURL: transcriptURL
-                )
-                let dualResult = DualTranscriptResult(
-                    id: UUID().uuidString,
-                    createdAt: createdAt,
-                    sessionDirectory: sessionDir,
-                    markdownURL: transcriptURL,
-                    microphone: micResult,
-                    systemAudio: systemResult,
-                    remoteTurns: remoteTurns
-                )
-
-                try TranscriptMerger.writeDualTranscript(dualResult, to: transcriptURL)
-                updateCallIndex {
-                    try callStore.replaceSegments(callID: callID, segments: storedSegments(for: dualResult))
-                    try persistCall(
-                        id: callID,
-                        kind: "dual",
-                        startedAt: parsedStartedAt,
-                        endedAt: parsedEndedAt,
-                        durationSec: summary.durationSec,
-                        status: "ready",
-                        transcriptURL: transcriptURL,
-                        audioDirectoryURL: sessionDir,
-                        error: nil
-                    )
-                }
-                cleanupAudioIfNeeded(
-                    in: sessionDir,
-                    files: [micRaw, systemRaw, micNormalized, systemNormalized]
-                )
-                lastDualTranscript = dualResult
-                lastTranscript = nil
-                status = .completed
-                webhooks.enqueue(callID: callID)
-                appendLog("Retry succeeded for \(callID)")
+                try requireFile(at: sessionDir.appendingPathComponent(DualFiles.microphoneASR))
+                try requireFile(at: sessionDir.appendingPathComponent(DualFiles.systemASR))
+                try await transcribeDualCall(callID, in: sessionDir, stages: 4, persist: persist)
 
             default:
                 throw BesedaError.processFailed("Unsupported call kind: \(summary.kind)")
             }
+            appendLog("Retry succeeded for \(callID)")
         } catch {
-            lastError = error.localizedDescription
             status = .failed(error.localizedDescription)
-            updateCallIndex {
-                try persistCall(
-                    id: callID,
-                    kind: summary.kind,
-                    startedAt: parsedStartedAt,
-                    endedAt: parsedEndedAt ?? Date(),
-                    durationSec: summary.durationSec,
-                    status: "failed",
-                    transcriptURL: nil,
-                    audioDirectoryURL: sessionDir,
-                    error: error.localizedDescription
-                )
-            }
+            saveCall(
+                callID, kind: summary.kind, in: sessionDir, startedAt: startedAt, endedAt: endedAt ?? Date(),
+                durationSec: summary.durationSec, status: "failed", error: error.localizedDescription
+            )
             appendLog("Retry failed: \(error.localizedDescription)")
         }
+    }
+
+    /// the file names inside a dual call's folder; the audio sweep and old calls rely on them
+    private enum DualFiles {
+        static let microphoneRaw = "me.raw.wav"
+        static let systemRaw = "them.raw.wav"
+        static let microphoneASR = "me.asr.wav"
+        static let systemASR = "them.asr.wav"
+        static let transcript = "transcript.md"
+    }
+
+    /// normalized me/them audio of a call: the last four stages of the pipeline, ASR start to diarization
+    private func transcribeDualCall(
+        _ callID: String,
+        in sessionDir: URL,
+        stages total: Int,
+        persist: (_ status: String, _ transcriptURL: URL?) -> Void
+    ) async throws {
+        try await startTranscriber(stage: total - 3, of: total)
+        persist("transcribing", nil)
+
+        beginStage("Расшифровка вашего голоса", total - 2, of: total)
+        appendLog("Transcribing microphone")
+        let microphone = try await transcribeChannel(
+            .microphone, callID, in: sessionDir,
+            audioURL: sessionDir.appendingPathComponent(DualFiles.microphoneASR),
+            rawAudioURL: sessionDir.appendingPathComponent(DualFiles.microphoneRaw),
+            asrJSONURL: sessionDir.appendingPathComponent("me.asr.json")
+        )
+        beginStage("Расшифровка собеседников", total - 1, of: total)
+        appendLog("Transcribing system audio")
+        let systemAudio = try await transcribeChannel(
+            .systemAudio, callID, in: sessionDir,
+            audioURL: sessionDir.appendingPathComponent(DualFiles.systemASR),
+            rawAudioURL: sessionDir.appendingPathComponent(DualFiles.systemRaw),
+            asrJSONURL: sessionDir.appendingPathComponent("them.asr.json")
+        )
+        let remoteTurns = await diarizedTurns(
+            audioURL: systemAudio.normalizedAudioURL,
+            segments: systemAudio.segments,
+            step: total,
+            of: total
+        )
+
+        let transcriptURL = sessionDir.appendingPathComponent(DualFiles.transcript)
+        let dualResult = DualTranscriptResult(
+            id: UUID().uuidString,
+            createdAt: Date(),
+            sessionDirectory: sessionDir,
+            markdownURL: transcriptURL,
+            microphone: microphone,
+            systemAudio: systemAudio,
+            remoteTurns: remoteTurns
+        )
+        try TranscriptMerger.writeDualTranscript(dualResult, to: transcriptURL)
+        finishCall(
+            callID, in: sessionDir, segments: dualResult.speakerSegments,
+            audio: [microphone.rawAudioURL, systemAudio.rawAudioURL, microphone.normalizedAudioURL, systemAudio.normalizedAudioURL],
+            persist: persist
+        )
+        appendLog("Wrote dual transcript to \(transcriptURL.path)")
+    }
+
+    private func startTranscriber(stage: Int, of total: Int) async throws {
+        beginStage("Запуск распознавания", stage, of: total)
+        let ready = try await transcriber.start()
+        appendLog("ASR ready: \(ready.model) \(ready.version)")
+    }
+
+    /// one channel through ASR: its asr.json lands next to the audio and its job row in the index
+    private func transcribeChannel(
+        _ channel: TranscriptChannel,
+        _ callID: String,
+        in sessionDir: URL,
+        audioURL: URL,
+        rawAudioURL: URL,
+        asrJSONURL: URL
+    ) async throws -> TranscriptResult {
+        let transcription = try await transcriber.transcribe(audioURL: audioURL)
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        try encoder.encode(transcription).write(to: asrJSONURL)
+        updateCallIndex {
+            try callStore.upsertTranscriptJob(
+                id: transcription.id,
+                callID: callID,
+                speaker: channel.speakerID,
+                status: "ready",
+                audioURL: audioURL,
+                asrJSONURL: asrJSONURL,
+                audioDurationSec: transcription.audioDurationSec,
+                wallTimeSec: transcription.wallTimeSec,
+                realTimeFactor: transcription.realTimeFactor,
+                model: settings.speechModelID,
+                error: nil
+            )
+        }
+        return TranscriptResult(
+            id: transcription.id,
+            createdAt: Date(),
+            sessionDirectory: sessionDir,
+            rawAudioURL: rawAudioURL,
+            normalizedAudioURL: audioURL,
+            markdownURL: sessionDir.appendingPathComponent(DualFiles.transcript),
+            text: transcription.text,
+            segments: transcription.segments,
+            audioDurationSec: transcription.audioDurationSec,
+            wallTimeSec: transcription.wallTimeSec,
+            realTimeFactor: transcription.realTimeFactor
+        )
+    }
+
+    /// a written transcript: index its lines, mark the call ready, drop audio the rules say goes now
+    private func finishCall(
+        _ callID: String,
+        in sessionDir: URL,
+        segments: [SpeakerTranscriptSegment],
+        audio: [URL],
+        persist: (_ status: String, _ transcriptURL: URL?) -> Void
+    ) {
+        updateCallIndex {
+            try callStore.replaceSegments(callID: callID, segments: segments.enumerated().map { index, line in
+                StoredTranscriptSegment(
+                    speaker: line.speaker,
+                    startSec: line.segment.start,
+                    endSec: line.segment.end,
+                    text: line.segment.text,
+                    orderIndex: index
+                )
+            })
+        }
+        persist("ready", sessionDir.appendingPathComponent(DualFiles.transcript))
+        cleanupAudioIfNeeded(files: audio)
+        status = .completed
+        webhooks.enqueue(callID: callID)
     }
 
     private func beginStage(_ title: String, _ index: Int, of total: Int) {
@@ -1292,36 +1042,6 @@ final class AppController {
             appendLog("Diarization skipped: \(error.localizedDescription)")
             return []
         }
-    }
-
-    private func makeTranscriptResult(
-        transcription: ASRTranscription,
-        createdAt: Date,
-        sessionDirectory: URL,
-        rawAudioURL: URL,
-        normalizedAudioURL: URL,
-        markdownURL: URL
-    ) -> TranscriptResult {
-        TranscriptResult(
-            id: transcription.id,
-            createdAt: createdAt,
-            sessionDirectory: sessionDirectory,
-            rawAudioURL: rawAudioURL,
-            normalizedAudioURL: normalizedAudioURL,
-            markdownURL: markdownURL,
-            text: transcription.text,
-            segments: transcription.segments,
-            audioDurationSec: transcription.audioDurationSec,
-            wallTimeSec: transcription.wallTimeSec,
-            realTimeFactor: transcription.realTimeFactor
-        )
-    }
-
-    private func writeASRTranscription(_ transcription: ASRTranscription, to url: URL) throws {
-        try fileManager.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-        try encoder.encode(transcription).write(to: url)
     }
 
     /// an empty name drops the rename and puts the speaker back to its default
@@ -1580,54 +1300,32 @@ final class AppController {
         return try String(contentsOf: transcriptURL, encoding: .utf8)
     }
 
-    private func storedSegments(for result: TranscriptResult) -> [StoredTranscriptSegment] {
-        result.segments.enumerated().map { index, segment in
-            StoredTranscriptSegment(
-                speaker: TranscriptChannel.microphone.speakerID,
-                startSec: segment.start,
-                endSec: segment.end,
-                text: segment.text,
-                orderIndex: index
-            )
-        }
-    }
-
-    private func storedSegments(for result: DualTranscriptResult) -> [StoredTranscriptSegment] {
-        result.speakerSegments.enumerated().map { index, item in
-            StoredTranscriptSegment(
-                speaker: item.speaker,
-                startSec: item.segment.start,
-                endSec: item.segment.end,
-                text: item.segment.text,
-                orderIndex: index
-            )
-        }
-    }
-
-    private func persistCall(
-        id: String,
+    private func saveCall(
+        _ id: String,
         kind: String,
+        in sessionDir: URL,
         startedAt: Date,
-        endedAt: Date?,
-        durationSec: Double?,
+        endedAt: Date? = nil,
+        durationSec: Double? = nil,
         status: String,
-        transcriptURL: URL?,
-        audioDirectoryURL: URL,
-        error: String?,
+        transcriptURL: URL? = nil,
+        error: String? = nil,
         appName: String? = nil
-    ) throws {
-        try callStore.upsertCall(
-            id: id,
-            kind: kind,
-            startedAt: startedAt,
-            endedAt: endedAt,
-            durationSec: durationSec,
-            status: status,
-            transcriptURL: transcriptURL,
-            audioDirectoryURL: audioDirectoryURL,
-            error: error,
-            appName: appName
-        )
+    ) {
+        updateCallIndex {
+            try callStore.upsertCall(
+                id: id,
+                kind: kind,
+                startedAt: startedAt,
+                endedAt: endedAt,
+                durationSec: durationSec,
+                status: status,
+                transcriptURL: transcriptURL,
+                audioDirectoryURL: sessionDir,
+                error: error,
+                appName: appName
+            )
+        }
     }
 
     private func discardCall(id: String, sessionDirectory: URL, durationSec: TimeInterval) {
@@ -1644,7 +1342,7 @@ final class AppController {
     }
 
     /// removes only what the rules say goes immediately; anything with a deadline waits for the sweep
-    private func cleanupAudioIfNeeded(in sessionDirectory: URL, files: [URL]) {
+    private func cleanupAudioIfNeeded(files: [URL]) {
         let rules = settings.retentionRules
         for url in files {
             guard fileManager.fileExists(atPath: url.path),
@@ -1733,10 +1431,6 @@ final class AppController {
         guard !cleaned.isEmpty else {
             return
         }
-        logMessages.append("[\(Date.logStamp)] \(cleaned)")
-        if logMessages.count > 80 {
-            logMessages.removeFirst(logMessages.count - 80)
-        }
         writeLogLine(cleaned)
     }
 
@@ -1766,12 +1460,6 @@ private extension Date {
     static var fileStamp: String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyyMMdd-HHmmss"
-        return formatter.string(from: Date())
-    }
-
-    static var logStamp: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm:ss"
         return formatter.string(from: Date())
     }
 }
