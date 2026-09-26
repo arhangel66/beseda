@@ -7,11 +7,13 @@ enum AudioCaptureError: LocalizedError {
     case permissionDenied(String)
     case noFrames(String)
     case fileFull(String)
+    case writerBehind(String)
     case audioStatus(String, OSStatus)
 
     var errorDescription: String? {
         switch self {
-        case .unsupportedFormat(let message), .permissionDenied(let message), .noFrames(let message), .fileFull(let message):
+        case .unsupportedFormat(let message), .permissionDenied(let message), .noFrames(let message), .fileFull(let message),
+             .writerBehind(let message):
             message
         case .audioStatus(let operation, let status):
             "Ошибка звука: \(operation), OSStatus \(status) (\(CoreAudioStatus.fourCC(status)))"

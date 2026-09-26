@@ -42,8 +42,31 @@ track.
 ## Data flow
 
 In: microphone buffers (Float32) and tap buffers (Float32 or Int16 PCM, interleaved or not), both
-converted to Float32 by `PCMFloatRecorder` and written to the raw WAV as they arrive (`AVAudioFile.write`
-per buffer; the level checks pass no file and write nothing).
+converted to Float32 by `PCMFloatRecorder` (the level checks pass no file and write nothing).
+
+The audio callback does no allocation, locking or disk I/O. It only copies the samples, interleaved, into a
+ring preallocated at start (4 s of audio) whose two counters are lock-free atomics — `OSAtomicAdd64Barrier`,
+because `Synchronization.Atomic` needs macOS 15. One writer thread per recorder polls the ring every 10 ms,
+de-interleaves into a preallocated `AVAudioPCMBuffer`, feeds the level tracker and calls `AVAudioFile.write`
+in pieces of at most 4096 frames: AudioFile keeps back the tail of a longer write, and a crash would lose it.
+`finish()` waits for the writer to drain the ring, then closes the file. The WAV is byte-identical to the
+old write-in-the-callback path (`buffersThroughTheCallbackPathLandOnDiskAsTheOldPathWroteThem`).
+
+If the writer falls behind and the ring is full, the callback drops the buffer and counts the frames
+(`droppedFrameCount`); the writer turns that into `AudioCaptureError.writerBehind`, which goes through the
+write-error path below and stops the recording with «Запись не успевала на диск»
+(`aWriterThatCannotKeepUpStopsTheRecordingVisibly`).
+
+Callback time, 1000 stereo 480-frame buffers at real pace, every core spinning plus a thread writing and
+`fsync`-ing 8 MB blocks (`callbackTimeUnderCPUAndDiskLoad`, `BESEDA_CALLBACK_LOAD=1`, release build, M2 Max,
+three runs; the test thread is not real-time, so the maximum is mostly the scheduler):
+
+| | p50 | p99 | max |
+|---|---|---|---|
+| before: write in the callback | 78–125 µs | 1.6–11.8 ms | 25–54 ms |
+| after: ring buffer | 3–4.5 µs | 27–122 µs | 0.6–4 ms |
+
+A 480-frame buffer lasts 10 ms, so the old path overran it at p99 and at the maximum.
 
 Out, into the call folder (see [storage](storage.md)): `me.raw.wav`, `them.raw.wav` at the device
 rate and channel count, and `session.json` (start/end, duration, stop reason, file metadata).
@@ -60,7 +83,8 @@ recording; the 4 GB text is picked by the `AudioCaptureError.fileFull` case) and
 
 ## Constraints
 
-- **A crash keeps the audio.** Every buffer reaches the raw file as it arrives, but AudioFile fills in
+- **A crash keeps the audio.** Every buffer reaches the raw file within ~10 ms of arriving (what is
+  still in the ring is lost), but AudioFile fills in
   the WAV header sizes only at close, so a killed call leaves `me.raw.wav` / `them.raw.wav` whose header
   says zero frames (and no `session.json`). On the next launch `CallStore.failInterruptedCalls` marks
   the row failed and returns its folder, a folder under `calls/` with raw audio but no row gets a failed

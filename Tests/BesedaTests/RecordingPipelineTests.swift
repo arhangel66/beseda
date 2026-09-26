@@ -60,8 +60,10 @@ import Testing
     )
 
     try recorder.append(pcmBuffer: buffer)
+    recorder.waitUntilWritten()
     #expect(recorder.writeError == nil)
-    #expect(throws: AudioCaptureError.self) { try recorder.append(pcmBuffer: buffer) }
+    try recorder.append(pcmBuffer: buffer)
+    recorder.waitUntilWritten()
 
     let writeError = try #require(recorder.writeError)
     #expect(recorder.droppedBufferCount == 1)

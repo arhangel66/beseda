@@ -21,6 +21,7 @@ import Testing
     for _ in 0..<5 {
         try recorder!.append(pcmBuffer: buffer)
     }
+    recorder!.waitUntilWritten()
     // copy while the recorder is still open: the bytes a crash mid-call leaves on disk
     let crashed = directory.appendingPathComponent("crashed.raw.wav")
     try FileManager.default.copyItem(at: url, to: crashed)

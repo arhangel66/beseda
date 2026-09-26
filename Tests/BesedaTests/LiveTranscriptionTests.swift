@@ -20,6 +20,8 @@ private func recordingInProgress(seconds: Int, at url: URL) throws -> PCMFloatRe
     let recorder = try PCMFloatRecorder(url: url, sampleRate: 48_000, channelCount: 2, activityTracker: nil)
     for _ in 0..<seconds {
         try recorder.append(pcmBuffer: buffer)
+        // faster than real time: without waiting the 4 s ring would overflow
+        recorder.waitUntilWritten()
     }
     return recorder
 }
