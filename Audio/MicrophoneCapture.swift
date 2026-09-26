@@ -20,22 +20,16 @@ enum AudioCaptureError: LocalizedError {
 
 final class MicrophoneCapture: @unchecked Sendable {
     private let engine = AVAudioEngine()
-    private let activityTracker: AudioActivityTracker?
+    private let activityTracker: AudioActivityTracker
     private var recorder: PCMFloatRecorder?
 
-    init(activityTracker: AudioActivityTracker? = nil) {
+    init(activityTracker: AudioActivityTracker) {
         self.activityTracker = activityTracker
     }
 
     var isPaused: Bool {
         get { recorder?.isPaused ?? false }
         set { recorder?.isPaused = newValue }
-    }
-
-    func record(duration: TimeInterval, outputURL: URL) async throws -> AudioFileMetadata {
-        try await start(expectedDuration: duration)
-        try await Task.sleep(for: .seconds(duration))
-        return try stopAndWrite(to: outputURL)
     }
 
     func start(expectedDuration: TimeInterval) async throws {

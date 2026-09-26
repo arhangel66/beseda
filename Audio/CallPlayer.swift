@@ -129,7 +129,7 @@ final class CallPlayer {
     }
 
     /// raw audio first, the normalized copies when the sweep already took the originals
-    static func audioURLs(in directory: URL) -> [URL] {
+    private static func audioURLs(in directory: URL) -> [URL] {
         let candidates = [
             ["me.raw.wav", "them.raw.wav"],
             ["me.asr.wav", "them.asr.wav"],

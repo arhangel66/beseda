@@ -22,19 +22,13 @@ final class PCMFloatRecorder: @unchecked Sendable {
         sampleRate: Double,
         channelCount: Int,
         expectedDuration: TimeInterval,
-        activityTracker: AudioActivityTracker? = nil
+        activityTracker: AudioActivityTracker?
     ) {
         self.sampleRate = sampleRate
         self.channelCount = channelCount
         self.activityTracker = activityTracker
         let reserveDuration = min(expectedDuration, 120)
         samples.reserveCapacity(Int(sampleRate * reserveDuration) * channelCount)
-    }
-
-    var frameCount: Int {
-        lock.withLock {
-            samples.count / channelCount
-        }
     }
 
     /// while paused both channels drop their buffers, so the two files stay aligned

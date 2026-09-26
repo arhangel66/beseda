@@ -92,93 +92,21 @@ private final class InputFeed: @unchecked Sendable {
 }
 
 enum ProcessRunner {
+    /// for tools that report their result on stderr
     @discardableResult
     static func run(executableURL: URL, arguments: [String], currentDirectoryURL: URL?) async throws -> String {
-        try await withCheckedThrowingContinuation { continuation in
-            let process = Process()
-            let stdout = Pipe()
-            let stderr = Pipe()
-
-            process.executableURL = executableURL
-            process.arguments = arguments
-            process.currentDirectoryURL = currentDirectoryURL
-            process.standardOutput = stdout
-            process.standardError = stderr
-
-            process.terminationHandler = { process in
-                let stdoutText = String(
-                    data: stdout.fileHandleForReading.readDataToEndOfFile(),
-                    encoding: .utf8
-                ) ?? ""
-                let stderrText = String(
-                    data: stderr.fileHandleForReading.readDataToEndOfFile(),
-                    encoding: .utf8
-                ) ?? ""
-
-                if process.terminationStatus == 0 {
-                    continuation.resume(returning: stderrText.trimmingCharacters(in: .whitespacesAndNewlines))
-                } else {
-                    let detail = stderrText.isEmpty ? stdoutText : stderrText
-                    continuation.resume(
-                        throwing: BesedaError.processFailed(
-                            "\(executableURL.lastPathComponent) exited with \(process.terminationStatus): \(detail)"
-                        )
-                    )
-                }
-            }
-
-            do {
-                try process.run()
-            } catch {
-                continuation.resume(throwing: error)
-            }
-        }
+        try await execute(executableURL: executableURL, arguments: arguments, currentDirectoryURL: currentDirectoryURL).stderr
     }
 
-    /// a long-running tool whose output the UI follows live; the exit status is the result
-    static func stream(
-        executableURL: URL,
-        arguments: [String],
-        environment: [String: String],
-        onStdoutLine: @escaping @Sendable (String) -> Void,
-        onStderr: @escaping @Sendable (String) -> Void
-    ) async throws -> Int32 {
-        let process = Process()
-        let stdout = Pipe()
-        let stderr = Pipe()
-        process.executableURL = executableURL
-        process.arguments = arguments
-        process.environment = environment
-        process.standardOutput = stdout
-        process.standardError = stderr
-
-        let lines = LineSplitter(onLine: onStdoutLine)
-        stdout.fileHandleForReading.readabilityHandler = { handle in
-            lines.feed(handle.availableData)
-        }
-        stderr.fileHandleForReading.readabilityHandler = { handle in
-            if let text = String(data: handle.availableData, encoding: .utf8), !text.isEmpty {
-                onStderr(text)
-            }
-        }
-        try process.run()
-        return await withCheckedContinuation { continuation in
-            process.terminationHandler = { process in
-                stdout.fileHandleForReading.readabilityHandler = nil
-                stderr.fileHandleForReading.readabilityHandler = nil
-                lines.feed(stdout.fileHandleForReading.readDataToEndOfFile())
-                lines.flush()
-                if let text = String(data: stderr.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8), !text.isEmpty {
-                    onStderr(text)
-                }
-                continuation.resume(returning: process.terminationStatus)
-            }
-        }
-    }
-
-    /// same shape as `run`, but for tools that write their result to stdout instead of stderr
+    /// for tools that write their result to stdout
     @discardableResult
     static func output(executableURL: URL, arguments: [String], currentDirectoryURL: URL?) async throws -> String {
+        try await execute(executableURL: executableURL, arguments: arguments, currentDirectoryURL: currentDirectoryURL).stdout
+    }
+
+    private static func execute(
+        executableURL: URL, arguments: [String], currentDirectoryURL: URL?
+    ) async throws -> (stdout: String, stderr: String) {
         try await withCheckedThrowingContinuation { continuation in
             let process = Process()
             let stdout = Pipe()
@@ -191,17 +119,14 @@ enum ProcessRunner {
             process.standardError = stderr
 
             process.terminationHandler = { process in
-                let stdoutText = String(
-                    data: stdout.fileHandleForReading.readDataToEndOfFile(),
-                    encoding: .utf8
-                ) ?? ""
-                let stderrText = String(
-                    data: stderr.fileHandleForReading.readDataToEndOfFile(),
-                    encoding: .utf8
-                ) ?? ""
+                let stdoutText = String(data: stdout.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
+                let stderrText = String(data: stderr.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
 
                 if process.terminationStatus == 0 {
-                    continuation.resume(returning: stdoutText.trimmingCharacters(in: .whitespacesAndNewlines))
+                    continuation.resume(returning: (
+                        stdoutText.trimmingCharacters(in: .whitespacesAndNewlines),
+                        stderrText.trimmingCharacters(in: .whitespacesAndNewlines)
+                    ))
                 } else {
                     let detail = stderrText.isEmpty ? stdoutText : stderrText
                     continuation.resume(
@@ -217,41 +142,6 @@ enum ProcessRunner {
             } catch {
                 continuation.resume(throwing: error)
             }
-        }
-    }
-}
-
-/// Turns a byte stream into whole lines; the pipe hands over arbitrary chunks.
-private final class LineSplitter: @unchecked Sendable {
-    private let onLine: @Sendable (String) -> Void
-    private var buffer = Data()
-    private let lock = NSLock()
-
-    init(onLine: @escaping @Sendable (String) -> Void) {
-        self.onLine = onLine
-    }
-
-    func feed(_ data: Data) {
-        lock.lock()
-        buffer.append(data)
-        var lines: [String] = []
-        while let newline = buffer.firstIndex(of: 0x0A) {
-            if let line = String(data: buffer[buffer.startIndex..<newline], encoding: .utf8), !line.isEmpty {
-                lines.append(line)
-            }
-            buffer.removeSubrange(buffer.startIndex...newline)
-        }
-        lock.unlock()
-        lines.forEach(onLine)
-    }
-
-    func flush() {
-        lock.lock()
-        let rest = String(data: buffer, encoding: .utf8) ?? ""
-        buffer.removeAll()
-        lock.unlock()
-        if !rest.isEmpty {
-            onLine(rest)
         }
     }
 }

@@ -9,10 +9,6 @@ enum DualCaptureStopReason: String, Codable, Hashable {
 struct DualCaptureOutput {
     let startedAt: Date
     let endedAt: Date
-    let sessionDirectory: URL
-    let microphoneRawURL: URL
-    let systemRawURL: URL
-    let metadataURL: URL
     let microphone: AudioFileMetadata
     let system: AudioFileMetadata
     let stopReason: DualCaptureStopReason
@@ -160,15 +156,11 @@ final class DualCapture: @unchecked Sendable {
             let output = DualCaptureOutput(
                 startedAt: startedAt,
                 endedAt: endedAt,
-                sessionDirectory: sessionDirectory,
-                microphoneRawURL: microphoneRawURL,
-                systemRawURL: systemRawURL,
-                metadataURL: metadataURL,
                 microphone: microphoneMetadata,
                 system: systemMetadata,
                 stopReason: resolvedStopReason
             )
-            try writeMetadata(for: output)
+            try writeMetadata(for: output, to: metadataURL)
             return output
         } catch {
             silenceTask?.cancel()
@@ -189,7 +181,7 @@ final class DualCapture: @unchecked Sendable {
         }
     }
 
-    private func writeMetadata(for output: DualCaptureOutput) throws {
+    private func writeMetadata(for output: DualCaptureOutput, to url: URL) throws {
         let metadata = DualCaptureMetadata(
             startedAt: output.startedAt.iso8601WithFractions,
             endedAt: output.endedAt.iso8601WithFractions,
@@ -200,6 +192,6 @@ final class DualCapture: @unchecked Sendable {
         )
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-        try encoder.encode(metadata).write(to: output.metadataURL)
+        try encoder.encode(metadata).write(to: url)
     }
 }

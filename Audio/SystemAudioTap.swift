@@ -42,7 +42,7 @@ final class SystemAudioTap: @unchecked Sendable {
     }
 
     func start(expectedDuration: TimeInterval) throws {
-        let excludedProcesses = translateCurrentProcessToAudioObject().map { [$0] } ?? []
+        let excludedProcesses = currentProcessAudioObject().map { [$0] } ?? []
         let description = CATapDescription(stereoGlobalTapButExcludeProcesses: excludedProcesses)
         description.name = "Beseda System Audio"
         description.isPrivate = true
@@ -127,12 +127,11 @@ final class SystemAudioTap: @unchecked Sendable {
 
     private func getStringProperty(
         _ objectID: AudioObjectID,
-        selector: AudioObjectPropertySelector,
-        scope: AudioObjectPropertyScope = kAudioObjectPropertyScopeGlobal
+        selector: AudioObjectPropertySelector
     ) throws -> String {
         var address = AudioObjectPropertyAddress(
             mSelector: selector,
-            mScope: scope,
+            mScope: kAudioObjectPropertyScopeGlobal,
             mElement: kAudioObjectPropertyElementMain
         )
         var value: Unmanaged<CFString>?
@@ -159,7 +158,21 @@ final class SystemAudioTap: @unchecked Sendable {
         return tapFormat
     }
 
-    private func translateCurrentProcessToAudioObject() -> AudioObjectID? {
-        CoreAudioProcessResolver.processObjectID(for: getpid())
+    private func currentProcessAudioObject() -> AudioObjectID? {
+        var address = AudioObjectPropertyAddress(
+            mSelector: kAudioHardwarePropertyTranslatePIDToProcessObject,
+            mScope: kAudioObjectPropertyScopeGlobal,
+            mElement: kAudioObjectPropertyElementMain
+        )
+        var pid = getpid()
+        var objectID = AudioObjectID(kAudioObjectUnknown)
+        var size = UInt32(MemoryLayout<AudioObjectID>.size)
+        let status = AudioObjectGetPropertyData(
+            AudioObjectID(kAudioObjectSystemObject), &address, UInt32(MemoryLayout<pid_t>.size), &pid, &size, &objectID
+        )
+        guard status == noErr, objectID != kAudioObjectUnknown else {
+            return nil
+        }
+        return objectID
     }
 }
