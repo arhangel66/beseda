@@ -63,9 +63,11 @@ recording; the 4 GB text is picked by the `AudioCaptureError.fileFull` case) and
 - **A crash keeps the audio.** Every buffer reaches the raw file as it arrives, but AudioFile fills in
   the WAV header sizes only at close, so a killed call leaves `me.raw.wav` / `them.raw.wav` whose header
   says zero frames (and no `session.json`). On the next launch `CallStore.failInterruptedCalls` marks
-  the row failed and returns its folder, and `PCMFloatRecorder.repairWAVHeader` rewrites the sizes from
-  the file length. The call stays in the archive; its retry normalizes the raw files first when the
-  `asr.wav` files are missing.
+  the row failed and returns its folder, a folder under `calls/` with raw audio but no row gets a failed
+  row (see [Storage](storage.md)), and for both `PCMFloatRecorder.repairWAVHeader` rewrites the sizes from
+  the file length and `AVAudioFile` must open the result. A missing channel, a file that is not RIFF/WAVE or
+  has no `data` chunk is logged and appended to the call's `error`, which the failed-call card shows. The
+  call stays in the archive; its retry normalizes the raw files first when the `asr.wav` files are missing.
 - **4 GB per raw file.** A WAV header cannot count past 4 GiB, so `PCMFloatRecorder` refuses to grow the
   data past `wavDataLimit` (4·10⁹ bytes, ~2 h 53 min of a 48 kHz stereo Float32 tap) and the recording
   stops there cleanly through the write-error path. Lifting it (RF64/CAF or rolling files) was declined:

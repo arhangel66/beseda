@@ -66,7 +66,7 @@ private let endpoint = URL(string: "https://kushetka.example/api/webhooks/krisp"
     #expect(request.httpMethod == "POST")
     #expect(request.timeoutInterval == 150)
     #expect(request.value(forHTTPHeaderField: "Content-Type") == "application/json")
-    #expect(request.value(forHTTPHeaderField: "Authorization") == "Bearer s3cret")
+    #expect(request.value(forHTTPHeaderField: "Authorization") == "s3cret")
     #expect(request.value(forHTTPHeaderField: "X-Podushka-Secret") == nil)
     #expect(request.value(forHTTPHeaderField: "X-Podushka-Event") == "transcript_created")
     #expect(request.value(forHTTPHeaderField: "X-Podushka-Delivery") == "d-1")

@@ -290,7 +290,7 @@ final class CallStore {
     typealias Migration = (OpaquePointer) throws -> Void
 
     var migrations: [Migration] {
-        [createSchemaV1]
+        [createSchemaV1, addProcessingPending]
     }
 
     func prepare() throws {
@@ -442,6 +442,11 @@ final class CallStore {
             """)
     }
 
+    /// version 2: a call waiting for auto-processing, so a quit does not drop the job
+    private func addProcessingPending(_ db: OpaquePointer) throws {
+        try execute(db, "ALTER TABLE calls ADD COLUMN processing_pending INTEGER NOT NULL DEFAULT 0")
+    }
+
     /// audio folders of the calls it marked failed
     func failInterruptedCalls(reason: String) throws -> [String] {
         // a call left mid-flight belongs to a process that is gone, so the row can never move
@@ -570,6 +575,26 @@ final class CallStore {
                 """,
                 id, kind, startedAt.iso8601WithFractions, endedAt?.iso8601WithFractions, durationSec, status,
                 transcriptURL?.path, audioDirectoryURL.path, error, appName, now, now)
+        }
+    }
+
+    func setError(callID: String, error: String) throws {
+        try database { db in
+            try run(db, "UPDATE calls SET error = ?, updated_at = ? WHERE id = ?", error, Date().iso8601WithFractions, callID)
+        }
+    }
+
+    func setProcessingPending(callID: String, _ pending: Bool) throws {
+        try database { db in
+            try run(db, "UPDATE calls SET processing_pending = ? WHERE id = ?", pending, callID)
+        }
+    }
+
+    /// auto-processing jobs the last run queued and never finished, oldest call first
+    func fetchProcessingPendingCallIDs() throws -> [String] {
+        try database { db in
+            try query(db, "SELECT id FROM calls WHERE processing_pending = 1 ORDER BY started_at") { columnString($0, 0) }
+                .compactMap { $0 }
         }
     }
 

@@ -84,6 +84,9 @@ Effort is S (hours), M (days), or L (weeks). Priority is P0 (blocks safe sale or
    (`App/AppController.swift:257-265`). A crash or index failure in that gap leaves audio forever invisible.
    Reconcile every folder under `calls/` at launch, validate both WAV headers and lengths, reconstruct a
    failed row from `session.json` or file times, and expose a recovery error instead of silently continuing.
+   Fixed in BESEDA-100: launch gives every orphan folder under `calls/` a failed, retryable row; both raw WAVs
+   are repaired and opened, a failure is logged and written into the call's error; an unavailable index is
+   shown in the status line. `AppController` takes its paths by injection, so this is tested end to end.
 
 9. **Disk I/O and allocations run on real-time audio callbacks — P0, M.** Both capture callbacks call
    `PCMFloatRecorder.append` directly (`Audio/MicrophoneCapture.swift:55-59`,
@@ -120,6 +123,8 @@ Effort is S (hours), M (days), or L (weeks). Priority is P0 (blocks safe sale or
     memory-only (`docs/architecture/summarization.md:12-13`). A user who closes the app after a call can have
     auto-processing silently never happen, with no pending state on restart. Persist a processing state on
     the call and resume it idempotently; manual jobs can remain in memory.
+    Fixed in BESEDA-100: migration 2 adds `calls.processing_pending`, set before an auto job is queued and
+    cleared when it ends; launch re-queues the marked calls once. Back-to-back calls queue in order.
 
 ## Speaker separation
 
