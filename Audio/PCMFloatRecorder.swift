@@ -75,10 +75,10 @@ final class PCMFloatRecorder: @unchecked Sendable {
             return
         }
         guard pcmBuffer.format.commonFormat == .pcmFormatFloat32 else {
-            throw AudioCaptureError.unsupportedFormat("Microphone buffer is not Float32 PCM: \(pcmBuffer.format)")
+            throw AudioCaptureError.unsupportedFormat("Микрофон отдаёт звук не в Float32 PCM: \(pcmBuffer.format)")
         }
         guard let channelData = pcmBuffer.floatChannelData else {
-            throw AudioCaptureError.unsupportedFormat("Microphone buffer has no Float32 channel data")
+            throw AudioCaptureError.unsupportedFormat("В звуке микрофона нет данных Float32")
         }
 
         let frames = Int(pcmBuffer.frameLength)
@@ -101,7 +101,7 @@ final class PCMFloatRecorder: @unchecked Sendable {
             return
         }
         guard format.mFormatID == kAudioFormatLinearPCM else {
-            throw AudioCaptureError.unsupportedFormat("System tap format is not linear PCM: \(format)")
+            throw AudioCaptureError.unsupportedFormat("Системный звук пришёл не в линейном PCM: \(format)")
         }
 
         let flags = format.mFormatFlags
@@ -111,10 +111,10 @@ final class PCMFloatRecorder: @unchecked Sendable {
         let bitsPerChannel = Int(format.mBitsPerChannel)
 
         guard isFloat || isSignedInteger else {
-            throw AudioCaptureError.unsupportedFormat("System tap PCM format is neither float nor signed integer: \(format)")
+            throw AudioCaptureError.unsupportedFormat("Системный звук пришёл в неподдерживаемом формате PCM: \(format)")
         }
         guard bitsPerChannel == 32 || bitsPerChannel == 16 else {
-            throw AudioCaptureError.unsupportedFormat("Unsupported system tap bit depth: \(bitsPerChannel)")
+            throw AudioCaptureError.unsupportedFormat("Неподдерживаемая разрядность системного звука: \(bitsPerChannel)")
         }
 
         let buffers = UnsafeMutableAudioBufferListPointer(UnsafeMutablePointer(mutating: audioBufferList))
@@ -167,7 +167,7 @@ final class PCMFloatRecorder: @unchecked Sendable {
             return frameCount
         }
         guard frames > 0 else {
-            throw AudioCaptureError.noFrames("No frames captured for \(url?.path ?? "a level check")")
+            throw AudioCaptureError.noFrames("Звук не записался: \(url?.path ?? "проверка уровня")")
         }
         return AudioFileMetadata(path: url?.path ?? "", sampleRate: sampleRate, channelCount: channelCount, frameCount: frames)
     }
@@ -191,7 +191,7 @@ final class PCMFloatRecorder: @unchecked Sendable {
             }
             do {
                 guard (frameCount + frames) * channelCount * MemoryLayout<Float>.size <= maximumDataBytes else {
-                    throw AudioCaptureError.fileFull("The recording reached the 4 GB WAV limit")
+                    throw AudioCaptureError.fileFull("Запись достигла предела WAV в 4 ГБ")
                 }
                 try file.write(from: buffer)
             } catch {

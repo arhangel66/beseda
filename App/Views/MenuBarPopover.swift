@@ -182,20 +182,17 @@ struct MenuBarPopover: View {
                 .buttonStyle(.borderedProminent)
                 .keyboardShortcut("r", modifiers: .command)
                 .disabled(controller.isBusy)
-                if controller.isBusy {
-                    Text("после расшифровки")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
+                .help(controller.isBusy ? "Новую запись можно начать после расшифровки" : "")
                 Spacer(minLength: 0)
                 Toggle("Автозапись", isOn: Bindable(controller.settings).autoDetectEnabled)
                     .toggleStyle(.switch)
                     .controlSize(.small)
             }
             if controller.jobStage != nil {
-                Text("Разговор уже сохранён. Окно можно закрыть: расшифровка допишется в фоне.")
+                Text("Разговор сохранён. Меню можно закрыть — расшифровка закончится в фоне.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
     }

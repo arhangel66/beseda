@@ -21,7 +21,7 @@ final class CallNotifier: NSObject, @preconcurrency UNUserNotificationCenterDele
                 actions: [
                     UNNotificationAction(
                         identifier: Self.cancelActionID,
-                        title: "Cancel and delete",
+                        title: "Отменить и удалить",
                         options: [.destructive]
                     )
                 ],
@@ -42,15 +42,15 @@ final class CallNotifier: NSObject, @preconcurrency UNUserNotificationCenterDele
 
     func autoRecordingStarted(appName: String) {
         let content = UNMutableNotificationContent()
-        content.title = "Recording your \(appName) call"
-        content.body = "Beseda started on its own."
+        content.title = "Идёт запись звонка в \(appName)"
+        content.body = "Beseda включила запись сама."
         content.categoryIdentifier = Self.autoRecordingCategory
         post(content)
     }
 
     func transcriptReady(callDescription: String) {
         let content = UNMutableNotificationContent()
-        content.title = "Transcript ready"
+        content.title = "Расшифровка готова"
         content.body = callDescription
         post(content)
     }

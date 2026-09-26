@@ -49,6 +49,8 @@ struct ConversationsWindow: View {
             Button("Удалить", role: .destructive) {
                 controller.deleteCall(call)
             }
+            // the app has no Russian localization, so the system's own button would read «Cancel»
+            Button("Отмена", role: .cancel) {}
         } message: { _ in
             Text("Запись, расшифровка, итоги и копия в папке экспорта удалятся с этого Mac. Вернуть их не получится.")
         }
@@ -59,9 +61,20 @@ struct ConversationsWindow: View {
                 set: { if !$0 { controller.deleteError = nil } }
             )
         ) {
-            Button("OK") {}
+            Button("ОК") {}
         } message: {
             Text(controller.deleteError ?? "")
+        }
+        .alert(
+            "Не удалось прочитать разговоры",
+            isPresented: Binding(
+                get: { controller.callBrowserError != nil },
+                set: { if !$0 { controller.callBrowserError = nil } }
+            )
+        ) {
+            Button("ОК") {}
+        } message: {
+            Text(controller.callBrowserError ?? "")
         }
         .overlay(alignment: .bottom) {
             if let toast = controller.toast {
@@ -74,6 +87,16 @@ struct ConversationsWindow: View {
             controller.refreshCallBrowser(selectFirstIfNeeded: true)
             controller.refreshStorageUsage()
             controller.refreshCalendar()
+            #if DEBUG
+            // screenshots: BESEDA_PREVIEW_CALL opens a call by id, BESEDA_PREVIEW_DELETE asks to delete it
+            let environment = ProcessInfo.processInfo.environment
+            if let id = environment["BESEDA_PREVIEW_CALL"] {
+                controller.selectCall(id: id)
+            }
+            if environment["BESEDA_PREVIEW_DELETE"] != nil {
+                controller.callPendingDeletion = controller.selectedCallDetail?.summary
+            }
+            #endif
         }
     }
 

@@ -103,7 +103,8 @@ private struct SpeechModelCard: View {
                 .controlSize(.small)
             }
         default:
-            if isActive {
+            // the active model may still be missing from disk, and then it needs its download button
+            if isActive && isDownloaded {
                 EmptyView()
             } else {
                 Button(isDownloaded ? "Выбрать" : "Скачать") {

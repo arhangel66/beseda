@@ -206,7 +206,7 @@ private struct RecordingPane: View {
             Section {
                 Toggle("Включать запись при начале звонка", isOn: Bindable(settings).autoDetectEnabled)
             } footer: {
-                Text("Beseda узнаёт звонок по звуку, который издаёт приложение, и пишет микрофон и системный звук.")
+                Text("Beseda узнаёт звонок по звуку из приложения и записывает микрофон и системный звук.")
             }
 
             if settings.autoDetectEnabled {
@@ -231,41 +231,8 @@ private struct RecordingPane: View {
             } footer: {
                 Text("Черновик разговора и ключевые моменты в меню, пока идёт запись. Итоговая расшифровка всё равно делается после звонка.")
             }
-
-            Section {
-                Label(processingNote, systemImage: "lock")
-            }
         }
         .formStyle(.grouped)
-    }
-
-    /// what leaves this Mac under the settings as they are now
-    private var processingNote: String {
-        var sinks: [String] = []
-        if settings.summaryProvider == .openRouter {
-            sinks.append("расшифровка уходит в OpenRouter")
-        } else if let host = remoteSummaryHost {
-            sinks.append("расшифровка уходит на сервер итогов \(host)")
-        }
-        if settings.classifiesWithJev, settings.callTypes.count > 1 {
-            sinks.append("время, длительность и начало расшифровки уходят в Jev через OpenRouter")
-        }
-        if settings.webhookEnabled {
-            sinks.append("расшифровка уходит на вебхук из раздела «Интеграции»")
-        }
-        if sinks.isEmpty {
-            return "Всё обрабатывается на этом Mac. Ни звук, ни текст не уходят в сеть."
-        }
-        return "Звук остаётся на этом Mac, но " + sinks.joined(separator: "; ") + "."
-    }
-
-    private var remoteSummaryHost: String? {
-        guard settings.summaryProvider == .lmStudio,
-              let host = URL(string: settings.summaryServerURL)?.host,
-              !["localhost", "127.0.0.1", "::1"].contains(host) else {
-            return nil
-        }
-        return host
     }
 
     private func bundleIDs(named name: String) -> [String] {
@@ -300,19 +267,33 @@ private struct ProcessingPane: View {
         controller.settings
     }
 
-    /// what text leaves the Mac for OpenRouter; nil when summaries and the call type stay local
-    private var cloudNote: String? {
-        var parts: [String] = []
+    /// what leaves this Mac under the settings as they are now; the one privacy note in Settings
+    private var privacyNote: String {
+        var sinks: [String] = []
         if settings.summaryProvider == .openRouter {
-            parts.append("текст расшифровки — для итогов и ключевых моментов во время звонка")
+            sinks.append("в OpenRouter (openrouter.ai) уходит текст расшифровки — для итогов и ключевых моментов во время звонка")
+        } else if let host = remoteSummaryHost {
+            sinks.append("текст расшифровки уходит на сервер итогов \(host)")
         }
         if settings.classifiesWithJev, settings.callTypes.count > 1 {
-            parts.append("время, длительность и начало расшифровки — чтобы Jev выбрал тип созвона")
+            sinks.append("в OpenRouter уходят время, длительность и начало расшифровки — чтобы Jev выбрал тип звонка")
         }
-        guard !parts.isEmpty else {
+        if settings.webhookEnabled {
+            sinks.append("расшифровка уходит на ваш сервис из раздела «Интеграции»")
+        }
+        if sinks.isEmpty {
+            return "Всё обрабатывается на этом Mac: ни звук, ни текст не уходят в сеть."
+        }
+        return "Звук остаётся на этом Mac, но " + sinks.joined(separator: "; ") + "."
+    }
+
+    private var remoteSummaryHost: String? {
+        guard settings.summaryProvider == .lmStudio,
+              let host = URL(string: settings.summaryServerURL)?.host,
+              !["localhost", "127.0.0.1", "::1"].contains(host) else {
             return nil
         }
-        return "В OpenRouter (openrouter.ai) уходит " + parts.joined(separator: "; ") + ". Звук остаётся на этом Mac."
+        return host
     }
 
     var body: some View {
@@ -322,7 +303,7 @@ private struct ProcessingPane: View {
             } header: {
                 Text("Распознавание речи")
             } footer: {
-                Text("Модели на диске: \(controller.runtime.diskUsage().byteSizeDescription). Модель работает на вашем Mac. Смена модели не трогает уже сделанные расшифровки.")
+                Text("Модели на диске: \(controller.runtime.diskUsage().byteSizeDescription). Модель работает на этом Mac. Смена модели не трогает уже сделанные расшифровки.")
             }
 
             Section {
@@ -333,10 +314,8 @@ private struct ProcessingPane: View {
                 }
                 .pickerStyle(.segmented)
 
-                if let cloudNote {
-                    Label(cloudNote, systemImage: "icloud.and.arrow.up")
-                        .foregroundStyle(.secondary)
-                }
+                Label(privacyNote, systemImage: privacyNote.hasPrefix("Всё") ? "lock" : "icloud.and.arrow.up")
+                    .foregroundStyle(.secondary)
 
                 switch settings.summaryProvider {
                 case .openRouter:
@@ -360,7 +339,7 @@ private struct ProcessingPane: View {
                 }
                 if settings.summaryProvider == .lmStudio {
                     DisclosureGroup("Дополнительно", isExpanded: $isAdvancedOpen) {
-                        TextField("Адрес сервера", text: Bindable(settings).summaryServerURL, prompt: Text("автоматически (lms server status)"))
+                        TextField("Адрес сервера", text: Bindable(settings).summaryServerURL, prompt: Text("определяется сам"))
                     }
                 }
             } header: {
@@ -370,11 +349,11 @@ private struct ProcessingPane: View {
             }
 
             Section {
-                Toggle("Обрабатывать созвоны автоматически", isOn: Bindable(settings).autoProcessCalls)
+                Toggle("Обрабатывать звонки автоматически", isOn: Bindable(settings).autoProcessCalls)
                 ForEach(Bindable(settings).callTypes) { $type in
                     DisclosureGroup {
                         TextField("Название", text: $type.name)
-                        TextField("Когда выбирать", text: $type.description, prompt: Text("для классификатора, одной фразой"))
+                        TextField("Когда выбирать", text: $type.description, prompt: Text("одной фразой, для выбора типа"))
                         TextEditor(text: $type.prompt)
                             .font(.body)
                             .frame(minHeight: 120)
@@ -407,9 +386,9 @@ private struct ProcessingPane: View {
                     SecretField(title: "Ключ OpenRouter", text: Bindable(settings).openRouterAPIKey)
                 }
             } header: {
-                Text("Типы созвонов")
+                Text("Типы звонков")
             } footer: {
-                Text("«\(CallType.otherName)» есть всегда: его инструкция пишет итоги, когда другие типы не подошли или других нет. С двумя и больше типами сначала выбирается тип по времени, длительности и началу разговора. С Jev время созвона, длительность и начало расшифровки уходят в OpenRouter (TypeSafe); без ключа OpenRouter или при сбое Jev тип выбирает модель итогов. Без заголовков `#`: панель показывает только жирный текст и переносы.")
+                Text("«\(CallType.otherName)» есть всегда: его инструкция пишет итоги, когда другие типы не подошли или других нет. Если типов больше одного, сначала выбирается тип — по времени, длительности и началу разговора. Выбирает Jev через OpenRouter, а без ключа OpenRouter или при сбое — модель итогов. Не пишите в инструкциях заголовки с «#»: в итогах видны только жирный текст и переносы строк.")
             }
         }
         .formStyle(.grouped)
@@ -451,7 +430,7 @@ private struct ProcessingPane: View {
     private var providerNote: String {
         switch settings.summaryProvider {
         case .openRouter:
-            "Ключ создаётся на openrouter.ai, платный по факту. Расшифровка уходит туда, звук остаётся здесь. Час разговора на gemini-flash обходится в несколько центов."
+            "Ключ создаётся на openrouter.ai, оплата по факту: час разговора на gemini-flash стоит несколько центов."
         case .builtIn:
             "Модель работает на этом Mac, без интернета и без ключей. Запускается на время итогов и занимает около 5 ГБ памяти, потом выгружается."
         case .lmStudio:
@@ -548,7 +527,7 @@ private struct StoragePane: View {
                     selection: Bindable(settings).rawAudioRetention
                 )
                 retentionPicker(
-                    "Нормализованное аудио",
+                    "Подготовленное аудио",
                     size: controller.storageUsage.normalizedAudioBytes,
                     selection: Bindable(settings).normalizedAudioRetention
                 )
@@ -565,11 +544,11 @@ private struct StoragePane: View {
             } header: {
                 Text("Сколько хранить")
             } footer: {
-                Text("Правила применяются раз в сутки. Исходное аудио — WAV с микрофона и системного звука, нормализованное — промежуточный файл для расшифровки.")
+                Text("Правила применяются раз в сутки. Исходное аудио — WAV с микрофона и системного звука, подготовленное — промежуточный файл для расшифровки.")
             }
 
             Section {
-                LabeledContent("Экспорт") {
+                LabeledContent("Папка экспорта") {
                     Text(settings.exportFolder.isEmpty ? "не выбрана" : settings.exportFolder)
                         .lineLimit(1)
                         .truncationMode(.middle)
@@ -594,7 +573,7 @@ private struct StoragePane: View {
             } header: {
                 Text("Экспорт результатов")
             } footer: {
-                Text("Каждый готовый результат обработки ложится сюда Markdown-файлом: заголовок, дата, тип, результат и расшифровка.")
+                Text("Каждый готовый результат обработки сохраняется сюда файлом Markdown: заголовок, дата, тип, результат и расшифровка.")
             }
 
             Section("Папка") {
@@ -676,7 +655,7 @@ private struct IntegrationsPane: View {
             } header: {
                 Text("Календарь")
             } footer: {
-                Text("\(coverageLine). Берётся событие, которое идёт в момент начала записи, ±5 минут. Запись по-прежнему начинается от звука в звонковом приложении.")
+                Text("\(coverageLine). Берётся событие, которое идёт в момент начала записи, ±5 минут. Запись всё так же включается по звуку звонка.")
             }
 
             Section {
@@ -684,7 +663,7 @@ private struct IntegrationsPane: View {
                 TextField("Адрес", text: Bindable(settings).webhookURL, prompt: Text("https://example.com/webhook"))
                 SecretField(title: "Секрет", text: Bindable(settings).webhookSecret)
                 HStack {
-                    Text(webhooks.testResult ?? "Пробный запрос сервис должен пропустить.")
+                    Text(webhooks.testResult ?? "Сервис должен принять пробный запрос.")
                         .foregroundStyle(.secondary)
                     Spacer()
                     Button(webhooks.isTesting ? "Отправка…" : "Отправить тест") {
@@ -693,9 +672,9 @@ private struct IntegrationsPane: View {
                     .disabled(webhooks.isTesting)
                 }
             } header: {
-                Text("Вебхук")
+                Text("Свой сервис")
             } footer: {
-                Text("POST после каждой готовой расшифровки: текст, участники, итоги и время звонка. Секрет уходит в заголовках Authorization и X-Podushka-Secret.")
+                Text("После каждой готовой расшифровки Beseda отправляет на этот адрес POST-запрос: текст, участники, итоги и время звонка. Секрет передаётся в заголовках Authorization и X-Podushka-Secret.")
             }
 
             Section("Журнал доставок") {
