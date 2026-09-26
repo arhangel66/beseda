@@ -12,7 +12,7 @@ There are two: an outgoing webhook and the macOS calendar. There is no MCP code 
 ### How it works
 
 - **When it fires** — `AppController.finishCall` calls `WebhookService.enqueue(callID:)` after a
-  transcript is indexed. Nothing is written while the webhook is off or the URL is not http(s). The
+  transcript is indexed. Nothing is written while the webhook is off or the URL is refused (see Request). The
   automatic send also requires the call to be longer than 40 min (`minimumAutomaticCallDuration` 2400 s)
   and at least 30 s of recognized speech both from the microphone and from some other speaker
   (overlapping segments are merged before counting). «Отправить»/«Повторить» (`sendNow`) skips these checks.
@@ -22,9 +22,11 @@ There are two: an outgoing webhook and the macOS calendar. There is no MCP code 
 - **Retries** — only `failed` (network error, timeout, 5xx) is retried: after 60 s, 5 min, 30 min, then
   it gives up (four attempts). A 4xx is `rejected` and not retried: the address or the secret is wrong.
 - **Request** (`WebhookSender`) — `POST` with a 150 s timeout (the receiver runs a language model
-  behind a 120 s nginx timeout). Headers: `Authorization: <secret>` (no scheme), `X-Podushka-Secret`,
-  `X-Podushka-Event`, `X-Podushka-Delivery` (the row id), `User-Agent: Beseda`. The response body is kept
-  up to 2048 chars; a 2xx JSON `action` field is stored and shown.
+  behind a 120 s nginx timeout). Headers: `Authorization: Bearer <secret>` (left out when the
+  secret is empty), `X-Podushka-Event`, `X-Podushka-Delivery` (the row id), `User-Agent: Beseda`. The response body is kept
+  up to 2048 chars; a 2xx JSON `action` field is stored and shown. The URL must be https; plain http is
+  accepted only for `localhost`, `127.0.0.1` and `::1`. A saved http address to any other host is not
+  sent to: due rows wait, and Settings shows the reason under the address field and in the test result.
 - **Payload** (`WebhookPayload`, sorted-key JSON) — `event: "transcript_created"`, `meeting`
   {id, name, started_at} and `transcript.text` in the Krisp shape the receiver (kushetka) already accepts,
   plus Beseda's own `call`, `participants` (key, renamed name, `is_me`), `dialogue` lines and `summary`.
@@ -39,9 +41,10 @@ outcome classification), `Webhooks/WebhookPayload.swift`. Settings: `webhookEnab
 
 ### Constraints
 
-- The `X-Podushka-*` header names and the `podushka_test` event are the receiver's contract, kept from
+- The `X-Podushka-Event`/`-Delivery` header names and the `podushka_test` event are the receiver's contract, kept from
   the app's old name.
-- The secret travels in plain headers; use https.
+- The receiver must accept `Authorization: Bearer <secret>`; `X-Podushka-Secret` is no longer sent.
+- The secret is stored in the Keychain, not `UserDefaults` (see [App structure](app-structure.md)).
 
 ## Calendar
 

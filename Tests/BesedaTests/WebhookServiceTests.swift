@@ -42,7 +42,7 @@ private struct Harness {
             .appendingPathComponent("beseda-webhook-service-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         suiteName = "beseda-test-\(UUID().uuidString)"
-        settings = AppSettings(defaults: UserDefaults(suiteName: suiteName)!)
+        settings = AppSettings(defaults: UserDefaults(suiteName: suiteName)!, keychain: Keychain(service: suiteName))
         settings.webhookEnabled = enabled
         settings.webhookURL = url
         settings.webhookSecret = "s3cret"
@@ -65,6 +65,7 @@ private struct Harness {
 
     func tearDown() {
         UserDefaults(suiteName: suiteName)?.removePersistentDomain(forName: suiteName)
+        Keychain(service: suiteName).deleteAll()
         try? FileManager.default.removeItem(at: directory)
     }
 

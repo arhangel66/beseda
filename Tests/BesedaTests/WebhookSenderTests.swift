@@ -66,8 +66,8 @@ private let endpoint = URL(string: "https://kushetka.example/api/webhooks/krisp"
     #expect(request.httpMethod == "POST")
     #expect(request.timeoutInterval == 150)
     #expect(request.value(forHTTPHeaderField: "Content-Type") == "application/json")
-    #expect(request.value(forHTTPHeaderField: "Authorization") == "s3cret")
-    #expect(request.value(forHTTPHeaderField: "X-Podushka-Secret") == "s3cret")
+    #expect(request.value(forHTTPHeaderField: "Authorization") == "Bearer s3cret")
+    #expect(request.value(forHTTPHeaderField: "X-Podushka-Secret") == nil)
     #expect(request.value(forHTTPHeaderField: "X-Podushka-Event") == "transcript_created")
     #expect(request.value(forHTTPHeaderField: "X-Podushka-Delivery") == "d-1")
     #expect(request.value(forHTTPHeaderField: "User-Agent") == "Beseda")
@@ -102,4 +102,12 @@ private let endpoint = URL(string: "https://kushetka.example/api/webhooks/krisp"
     #expect(WebhookSender.endpoint(from: "") == nil)
     #expect(WebhookSender.endpoint(from: "  https://kushetka.example/api/webhooks/krisp \n") == endpoint)
     #expect(WebhookSender.endpoint(from: "http://127.0.0.1:8090/api/webhooks/krisp")?.port == 8090)
+}
+
+@Test func plainHttpIsRefusedExceptToThisMac() {
+    #expect(WebhookSender.endpoint(from: "http://localhost:8090/hook") != nil)
+    #expect(WebhookSender.endpoint(from: "http://[::1]:8090/hook") != nil)
+    #expect(WebhookSender.checkedEndpoint(from: "http://example.com/hook") == .failure(.plainHTTP))
+    #expect(WebhookSender.checkedEndpoint(from: "HTTP://kushetka.example/hook") == .failure(.plainHTTP))
+    #expect(WebhookSender.endpoint(from: "https://example.com/hook") != nil)
 }

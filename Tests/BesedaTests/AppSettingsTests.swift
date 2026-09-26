@@ -7,9 +7,12 @@ import Testing
 @Test func theSummarySettingsDefaultToEmptyAndRoundTripThroughUserDefaults() {
     let suiteName = "beseda-test-\(UUID().uuidString)"
     let defaults = UserDefaults(suiteName: suiteName)!
-    defer { defaults.removePersistentDomain(forName: suiteName) }
+    defer {
+        defaults.removePersistentDomain(forName: suiteName)
+        Keychain(service: suiteName).deleteAll()
+    }
 
-    let settings = AppSettings(defaults: defaults)
+    let settings = AppSettings(defaults: defaults, keychain: Keychain(service: suiteName))
     #expect(settings.summaryServerURL == "")
     #expect(settings.summaryModel == "")
     #expect(settings.callTypes.map(\.prompt) == [ChatCompletionsProvider.defaultPrompt])
@@ -20,7 +23,7 @@ import Testing
     settings.callTypes.append(CallType(name: "Дейли", description: "рабочая встреча", prompt: "свой промпт"))
     settings.autoProcessCalls = true
 
-    let reloaded = AppSettings(defaults: defaults)
+    let reloaded = AppSettings(defaults: defaults, keychain: Keychain(service: suiteName))
     #expect(reloaded.summaryServerURL == "http://localhost:1235/v1")
     #expect(reloaded.summaryModel == "google/gemma-4-26b-a4b-qat")
     #expect(reloaded.callTypes == settings.callTypes)
@@ -31,9 +34,12 @@ import Testing
 @Test func theSummaryProviderDefaultsToTheBuiltInModelAndRoundTripsThroughUserDefaults() {
     let suiteName = "beseda-test-\(UUID().uuidString)"
     let defaults = UserDefaults(suiteName: suiteName)!
-    defer { defaults.removePersistentDomain(forName: suiteName) }
+    defer {
+        defaults.removePersistentDomain(forName: suiteName)
+        Keychain(service: suiteName).deleteAll()
+    }
 
-    let settings = AppSettings(defaults: defaults)
+    let settings = AppSettings(defaults: defaults, keychain: Keychain(service: suiteName))
     #expect(settings.summaryProvider == .builtIn)
     #expect(SummaryProvider.allCases == [.openRouter, .builtIn, .lmStudio])
     #expect(settings.openRouterAPIKey == "")
@@ -43,7 +49,7 @@ import Testing
     settings.openRouterAPIKey = "sk-or-v1-secret"
     settings.openRouterModel = "google/gemini-3.8-flash"
 
-    let reloaded = AppSettings(defaults: defaults)
+    let reloaded = AppSettings(defaults: defaults, keychain: Keychain(service: suiteName))
     #expect(reloaded.summaryProvider == .openRouter)
     #expect(reloaded.openRouterAPIKey == "sk-or-v1-secret")
     #expect(reloaded.openRouterModel == "google/gemini-3.8-flash")
@@ -53,9 +59,12 @@ import Testing
 @Test func theWebhookSettingsDefaultToOffAndRoundTripThroughUserDefaults() {
     let suiteName = "beseda-test-\(UUID().uuidString)"
     let defaults = UserDefaults(suiteName: suiteName)!
-    defer { defaults.removePersistentDomain(forName: suiteName) }
+    defer {
+        defaults.removePersistentDomain(forName: suiteName)
+        Keychain(service: suiteName).deleteAll()
+    }
 
-    let settings = AppSettings(defaults: defaults)
+    let settings = AppSettings(defaults: defaults, keychain: Keychain(service: suiteName))
     #expect(settings.webhookEnabled == false)
     #expect(settings.webhookURL == "")
     #expect(settings.webhookSecret == "")
@@ -64,7 +73,7 @@ import Testing
     settings.webhookURL = "https://kushetka.example/api/webhooks/krisp"
     settings.webhookSecret = "s3cret"
 
-    let reloaded = AppSettings(defaults: defaults)
+    let reloaded = AppSettings(defaults: defaults, keychain: Keychain(service: suiteName))
     #expect(reloaded.webhookEnabled == true)
     #expect(reloaded.webhookURL == "https://kushetka.example/api/webhooks/krisp")
     #expect(reloaded.webhookSecret == "s3cret")
@@ -85,7 +94,7 @@ import Testing
     defaults.set("http://new", forKey: "beseda.webhookURL")
 
     AppSettings.importLegacyValues(from: legacy, into: defaults)
-    let settings = AppSettings(defaults: defaults)
+    let settings = AppSettings(defaults: defaults, keychain: Keychain(service: newSuite))
 
     #expect(settings.onboardingDone)
     #expect(settings.webhookURL == "http://new")
@@ -95,10 +104,13 @@ import Testing
 @Test func anEditedSummaryPromptBecomesTheFirstCallTypesPrompt() {
     let suiteName = "beseda-test-\(UUID().uuidString)"
     let defaults = UserDefaults(suiteName: suiteName)!
-    defer { defaults.removePersistentDomain(forName: suiteName) }
+    defer {
+        defaults.removePersistentDomain(forName: suiteName)
+        Keychain(service: suiteName).deleteAll()
+    }
     defaults.set("старый свой промпт", forKey: "beseda.summaryPrompt")
 
-    let settings = AppSettings(defaults: defaults)
+    let settings = AppSettings(defaults: defaults, keychain: Keychain(service: suiteName))
 
     #expect(settings.callTypes.map(\.prompt) == ["старый свой промпт"])
 }
@@ -107,11 +119,14 @@ import Testing
 @Test func anUnrenamedCallTypeFromBESEDA46BecomesOtherWithItsPrompt() throws {
     let suiteName = "beseda-test-\(UUID().uuidString)"
     let defaults = UserDefaults(suiteName: suiteName)!
-    defer { defaults.removePersistentDomain(forName: suiteName) }
+    defer {
+        defaults.removePersistentDomain(forName: suiteName)
+        Keychain(service: suiteName).deleteAll()
+    }
     let old = CallType(name: "Созвон", description: "любой разговор", prompt: "мой промпт")
     defaults.set(try JSONEncoder().encode([old]), forKey: "beseda.callTypes")
 
-    let settings = AppSettings(defaults: defaults)
+    let settings = AppSettings(defaults: defaults, keychain: Keychain(service: suiteName))
 
     #expect(settings.callTypes.map(\.name) == ["Другое"])
     #expect(settings.callTypes[0].prompt == "мой промпт")
@@ -122,11 +137,14 @@ import Testing
 @Test func aRenamedFirstTypeIsNotMigrated() throws {
     let suiteName = "beseda-test-\(UUID().uuidString)"
     let defaults = UserDefaults(suiteName: suiteName)!
-    defer { defaults.removePersistentDomain(forName: suiteName) }
+    defer {
+        defaults.removePersistentDomain(forName: suiteName)
+        Keychain(service: suiteName).deleteAll()
+    }
     let renamed = CallType(name: "Рабочее", description: "любой разговор", prompt: "p")
     defaults.set(try JSONEncoder().encode([renamed]), forKey: "beseda.callTypes")
 
-    let settings = AppSettings(defaults: defaults)
+    let settings = AppSettings(defaults: defaults, keychain: Keychain(service: suiteName))
 
     #expect(settings.callTypes.map(\.name) == ["Рабочее"])
     #expect(settings.callTypes[0].prompt == "p")
@@ -136,16 +154,19 @@ import Testing
 @Test func storedTypesWithoutTheFlagMakeTheFirstOtherAndItKeepsTheFlagAnywhereInTheList() throws {
     let suiteName = "beseda-test-\(UUID().uuidString)"
     let defaults = UserDefaults(suiteName: suiteName)!
-    defer { defaults.removePersistentDomain(forName: suiteName) }
+    defer {
+        defaults.removePersistentDomain(forName: suiteName)
+        Keychain(service: suiteName).deleteAll()
+    }
     // the JSON a build before the flag wrote: no `isOther` key
     defaults.set(Data("""
         [{"id":"8C1E1A52-6F57-4C3C-9E0B-2B8D5B4E6A11","name":"Другое","description":"","prompt":"общий"},
          {"id":"0B5D2E7A-1C4F-4B8E-8A3D-7E6F5A4B3C22","name":"Дейли","description":"","prompt":"p"}]
         """.utf8), forKey: "beseda.callTypes")
 
-    let settings = AppSettings(defaults: defaults)
+    let settings = AppSettings(defaults: defaults, keychain: Keychain(service: suiteName))
     settings.callTypes.reverse()
-    let reloaded = AppSettings(defaults: defaults)
+    let reloaded = AppSettings(defaults: defaults, keychain: Keychain(service: suiteName))
     reloaded.deleteCallType(id: reloaded.callTypes[1].id)
 
     #expect(reloaded.callTypes.map(\.name) == ["Дейли", "Другое"])
@@ -156,8 +177,11 @@ import Testing
 @Test func otherCannotBeDeletedButOtherTypesCan() {
     let suiteName = "beseda-test-\(UUID().uuidString)"
     let defaults = UserDefaults(suiteName: suiteName)!
-    defer { defaults.removePersistentDomain(forName: suiteName) }
-    let settings = AppSettings(defaults: defaults)
+    defer {
+        defaults.removePersistentDomain(forName: suiteName)
+        Keychain(service: suiteName).deleteAll()
+    }
+    let settings = AppSettings(defaults: defaults, keychain: Keychain(service: suiteName))
     let daily = CallType(name: "Дейли", description: "", prompt: "p")
     settings.callTypes.append(daily)
 
@@ -171,8 +195,11 @@ import Testing
 @Test func jevClassifiesByDefaultOnlyWhenAnOpenRouterKeyIsSet() {
     let suiteName = "beseda-test-\(UUID().uuidString)"
     let defaults = UserDefaults(suiteName: suiteName)!
-    defer { defaults.removePersistentDomain(forName: suiteName) }
-    let settings = AppSettings(defaults: defaults)
+    defer {
+        defaults.removePersistentDomain(forName: suiteName)
+        Keychain(service: suiteName).deleteAll()
+    }
+    let settings = AppSettings(defaults: defaults, keychain: Keychain(service: suiteName))
     let withoutKey = settings.classifiesWithJev
 
     settings.openRouterAPIKey = "sk-or-v1-secret"
@@ -181,5 +208,49 @@ import Testing
 
     #expect(!withoutKey)
     #expect(withKey)
-    #expect(!AppSettings(defaults: defaults).classifiesWithJev)
+    #expect(!AppSettings(defaults: defaults, keychain: Keychain(service: suiteName)).classifiesWithJev)
+}
+
+private final class FailingKeychain: Keychain {
+    override func save(_ value: String, account: String) -> Bool {
+        false
+    }
+}
+
+@MainActor
+@Test func secretsInUserDefaultsMoveToTheKeychainAndLeaveDefaults() {
+    let suiteName = "beseda-test-\(UUID().uuidString)"
+    let defaults = UserDefaults(suiteName: suiteName)!
+    let keychain = Keychain(service: suiteName)
+    defer {
+        defaults.removePersistentDomain(forName: suiteName)
+        keychain.deleteAll()
+    }
+    defaults.set("sk-or-v1-old", forKey: "beseda.openRouterAPIKey")
+    defaults.set("s3cret", forKey: "beseda.webhookSecret")
+
+    let settings = AppSettings(defaults: defaults, keychain: keychain)
+    let relaunched = AppSettings(defaults: defaults, keychain: keychain)
+
+    #expect(settings.openRouterAPIKey == "sk-or-v1-old")
+    #expect(relaunched.webhookSecret == "s3cret")
+    #expect(defaults.object(forKey: "beseda.openRouterAPIKey") == nil)
+    #expect(defaults.object(forKey: "beseda.webhookSecret") == nil)
+    #expect(keychain.read(account: "beseda.openRouterAPIKey") == "sk-or-v1-old")
+    #expect(keychain.read(account: "beseda.webhookSecret") == "s3cret")
+}
+
+@MainActor
+@Test func aFailedKeychainWriteKeepsTheSecretInDefaults() {
+    let suiteName = "beseda-test-\(UUID().uuidString)"
+    let defaults = UserDefaults(suiteName: suiteName)!
+    defer { defaults.removePersistentDomain(forName: suiteName) }
+    defaults.set("sk-or-v1-old", forKey: "beseda.openRouterAPIKey")
+
+    let settings = AppSettings(defaults: defaults, keychain: FailingKeychain(service: suiteName))
+    settings.webhookSecret = "new"
+
+    #expect(settings.openRouterAPIKey == "sk-or-v1-old")
+    #expect(defaults.string(forKey: "beseda.openRouterAPIKey") == "sk-or-v1-old")
+    #expect(defaults.string(forKey: "beseda.webhookSecret") == "new")
 }
