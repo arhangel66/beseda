@@ -40,7 +40,8 @@ Measured on the M2 Max while the Mac was shared and overloaded: the model runs w
 | 4. FluidAudio 0.17.4 t=0.5 + 3 | 0.131 | 0.074 | **0.264** | **0.271** | 0.60 / 0.75 | 0.001 | 0.013 | 46 (diarizer alone) |
 | Sortformer (4 speakers max) | not measured | | | | | | | | |
 | LS-EEND dihard3 / callhome | not measured | | | | | | | | |
-| offline t=0.6 / 0.7 / 0.8, min embedding 0.3 s, known speaker count | not measured | | | | | | | | |
+| offline t=0.6 / 0.7 / 0.8 | measured on 0.15.6, see [../results/threshold-sweep.md](../results/threshold-sweep.md) |
+| min embedding 0.3 s, known speaker count | not measured | | | | | | | | |
 
 Gains against the baseline Parakeet pipeline:
 

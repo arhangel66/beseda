@@ -10,7 +10,7 @@ STORE="$HOME/Library/Application Support/Beseda"
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 cp "$STORE"/calls.sqlite* "$work/"
-(cd baseline && nice -n 19 swift build -c release --product RealCalls -j 2)
+(cd baseline && nice -n 19 swift build -c release --product RealCalls -j 2 2>&1 | tail -1)
 mkdir -p hyp
 out=hyp/real-calls.jsonl
 
