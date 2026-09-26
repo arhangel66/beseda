@@ -21,7 +21,7 @@ warns about the missing excluded paths; the warnings are harmless.
 
 ## Check
 
-`swift test` (from `AGENTS.md`) builds the app and runs every test.
+`swift test --jobs 2` (from `AGENTS.md`) builds the app and runs every test.
 `theInstalledModelTranscribesRealSpeech` is skipped unless the speech model is installed and
 `samples/jfk.wav` is present.
 
@@ -45,7 +45,7 @@ warns about the missing excluded paths; the warnings are harmless.
 3. Run `./scripts/release.sh` on `main`.
 
 The script refuses to run unless it is on `main`, the tag `v<version>` is not published, the tree is clean
-and the notes exist. It runs `swift test`, makes a release build and bundle, zips it into
+and the notes exist. It runs `swift test --jobs 2`, makes a release build and bundle, zips it into
 `dist/v<version>/`, runs Sparkle's `generate_appcast` (signs the zip with the EdDSA key from the login
 keychain, embeds the notes) into `appcast.xml` at the repo root, commits it, tags, pushes `main` with the
 tag, and creates the GitHub release in `arhangel66/beseda` with the zip.

@@ -51,6 +51,11 @@ rate and channel count, and `session.json` (start/end, duration, stop reason, fi
 [live transcription](live-transcription.md) reads the growing raw files; `PCMFloatRecorder` counts buffers it
 failed to write (`droppedBufferCount`) so that loop can back off.
 
+A failed write (disk full, the 4 GB limit below) is not only logged: `PCMFloatRecorder.writeError` keeps
+the first one, the live ticker in `AppController` sees it through `DualCapture.writeError`, stops the
+recording (`stopReason` `writeFailed`), sets `recordingWarning` (shown in the popover until the next
+recording) and posts a «Запись остановлена» notification. What reached the disk is transcribed as usual.
+
 ## Constraints
 
 - **A crash keeps the audio.** Every buffer reaches the raw file as it arrives, but AudioFile fills in
@@ -58,7 +63,11 @@ failed to write (`droppedBufferCount`) so that loop can back off.
   says zero frames (and no `session.json`). On the next launch `CallStore.failInterruptedCalls` marks
   the row failed and returns its folder, and `PCMFloatRecorder.repairWAVHeader` rewrites the sizes from
   the file length. The call stays in the archive; its retry normalizes the raw files first when the
-  `asr.wav` files are missing. A WAV header cannot count past 4 GB (~4 h of a 48 kHz stereo tap).
+  `asr.wav` files are missing.
+- **4 GB per raw file.** A WAV header cannot count past 4 GiB, so `PCMFloatRecorder` refuses to grow the
+  data past `wavDataLimit` (4·10⁹ bytes, ~2 h 53 min of a 48 kHz stereo Float32 tap) and the recording
+  stops there cleanly through the write-error path. Lifting it (RF64/CAF or rolling files) was declined:
+  normalization, crash repair and live transcription all read these WAVs.
 - **macOS 14.2 minimum.** Process taps need 14.2, so the whole package targets it (`Package.swift`,
   `LSMinimumSystemVersion`, the bundle script) and `SystemAudioTap` needs no availability checks.
 - `MicrophoneProcessWatcher` listens to every property of each process object, not to
