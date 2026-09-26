@@ -74,7 +74,7 @@ not "ask before recording".
 ## Stage B: Recording Starts By Itself
 
 - [x] **B1. Spike: pick the call signal.** Done — tool at `spikes/CallDetectSpike/main.swift`,
-      built by `scripts/build_call_detect_spike.sh`, findings in `docs/call-detection-spike.md`.
+      built by `scripts/build_call_detect_spike.sh`, findings in `docs/archive/call-detection-spike.md`.
       No TCC prompt: reading these properties needs no permission, confirmed against `tccd` logs.
       What it changed in our assumptions:
       - `kAudioProcessPropertyIsRunningInput` **never posts notifications**. Listeners register

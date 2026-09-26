@@ -106,7 +106,7 @@ Use `SystemAudioTap` as the preferred capture path on macOS versions where it wo
 
 Objective: prove that the transcription model works well enough before writing macOS audio code.
 
-Deliverable: a documented ASR decision in `docs/asr-bakeoff.md`.
+Deliverable: a documented ASR decision in `docs/archive/asr-bakeoff.md`.
 
 Steps:
 
@@ -156,7 +156,7 @@ Go/no-go:
 
 Objective: decide whether the MVP can avoid BlackHole by using native macOS system audio capture.
 
-Deliverable: `docs/capture-spike.md` with the selected capture path.
+Deliverable: `docs/archive/capture-spike.md` with the selected capture path.
 
 Steps:
 

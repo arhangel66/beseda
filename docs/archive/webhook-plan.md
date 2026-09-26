@@ -49,7 +49,7 @@ New directory `Webhooks/` with three files; `CallStore` gets one table; `AppCont
 
 Each step: RED (test/build fails) → GREEN. Run `swift test` from repo root.
 
-- [x] **0. Plan doc in repo**: copy this plan to `docs/webhook-plan.md` (English, checkboxes), per the house workflow.
+- [x] **0. Plan doc in repo**: copy this plan to `docs/archive/webhook-plan.md` (English, checkboxes), per the house workflow.
 
 - [x] **1. `Package.swift`**: add `"Webhooks"` to `sources` (`Package.swift:43-50`).
 
@@ -116,4 +116,4 @@ Each step: RED (test/build fails) → GREEN. Run `swift test` from repo root.
 - Secret is plaintext in `~/Library/Preferences` and visible when «Показать» is pressed. Keychain later.
 - `next_retry_at <= ?` relies on every timestamp coming from `Date.iso8601WithFractions` (UTC `Z`), which is why it becomes internal and is the only formatter used.
 - Queued rows stay «в очереди» if the user disables the webhook; failing them on disable is a two-line follow-up if it reads badly.
-- `docs/summarization-feature-spec.md` and `implementation_journal.md` are stale (feature shipped, diverged); unrelated, left alone.
+- `docs/archive/summarization-feature-spec.md` and `implementation_journal.md` are stale (feature shipped, diverged); unrelated, left alone.

@@ -208,9 +208,9 @@ Each step: RED (test or build fails) → GREEN. `swift test` from the repo root.
   through `workerDescription`.
 
 - [x] **11. Docs** — README and AGENT.md lose ffmpeg-era Python wording and gain
-  the model catalogue; `docs/asr-bakeoff.md` gets a note pointing here;
-  `docs/install.md` gets the new sizes and the model choice screen;
-  `docs/distribution-plan.md` step 8 gets re-run.
+  the model catalogue; `docs/archive/asr-bakeoff.md` gets a note pointing here;
+  `docs/product/install.md` gets the new sizes and the model choice screen;
+  `docs/archive/distribution-plan.md` step 8 gets re-run.
 
 ## Verification
 

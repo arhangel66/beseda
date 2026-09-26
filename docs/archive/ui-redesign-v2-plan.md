@@ -5,7 +5,7 @@ type: Plan
 
 Source: `untracked/design/prototype-v2.dc.html`, pulled from the claude.ai/design project
 `46818607-492c-452d-84f4-f0136d039a36`, file `Podushka - Интерактивный прототип v2.dc.html`.
-The v1 file stays next to it as `prototype.dc.html`; `docs/ui-redesign-plan.md` describes the
+The v1 file stays next to it as `prototype.dc.html`; `docs/archive/ui-redesign-plan.md` describes the
 round that is already in the app.
 
 Scope agreed with Mikhail: fix the four things that are visibly broken, close the gap to the

@@ -65,7 +65,7 @@ cd python && uv run pytest
 ## 6. Известная связка "уборщик хранилища ↔ статус звонка" — не трогать вслепую
 
 Стоит одной строкой предупредить будущих агентов (в том числе как ссылка на
-`docs/review-claude-sonnet-5/architecture-review.md`, находка #2): `Storage/StorageJanitor.swift`
+`docs/archive/review-claude-sonnet-5/architecture-review.md`, находка #2): `Storage/StorageJanitor.swift`
 принимает решение об удалении файла **только** по имени файла и времени модификации, не зная
 ничего о `calls.status`. Если агент чинит retry-логику или логику ретеншна — эта развязка
 должна быть в голове с самого начала, а не обнаружена через баг-репорт.

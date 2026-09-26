@@ -1,6 +1,6 @@
 ---
 type: Decision Record
-title: Summarization runtime: provider picker, built-in llama-server by default
+title: "Summarization runtime: provider picker, built-in llama-server by default"
 status: accepted
 generated:
   by: agent

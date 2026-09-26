@@ -4,9 +4,9 @@ type: Review
 # Podushka — обзор UI/UX и предложения
 
 Автор: Claude Sonnet 5 (Claude Code). Read-only обзор: код `App/Views/*.swift` +
-`App/DesignSystem.swift` сверен с планами редизайна (`docs/ui-redesign-plan.md`,
-`docs/ui-redesign-v2-plan.md`, `docs/summarization-ui-stub-plan.md`) и с описанием UI
-в README.md. `docs/ui-review-kimi.md` намеренно не читался, чтобы не подхватить чужие выводы —
+`App/DesignSystem.swift` сверен с планами редизайна (`docs/archive/ui-redesign-plan.md`,
+`docs/archive/ui-redesign-v2-plan.md`, `docs/archive/summarization-ui-stub-plan.md`) и с описанием UI
+в README.md. `docs/archive/ui-review-kimi.md` намеренно не читался, чтобы не подхватить чужие выводы —
 если хотите, могу отдельно сравнить наши два ревью.
 
 Хорошая новость сразу: гипотеза "редизайн наполовину применён, отсюда визуальная
@@ -35,7 +35,7 @@ type: Review
 1) — это не просто неудобство, а лёгкий privacy-риск.
 
 ### 3. [MED-HIGH] Мок-саммаризатор неотличим от настоящего
-Согласно `docs/summarization-ui-stub-plan.md`, вкладка «Саммари» до сих пор подключена к
+Согласно `docs/archive/summarization-ui-stub-plan.md`, вкладка «Саммари» до сих пор подключена к
 `MockSummarizationProvider`, который возвращает один и тот же типовой текст на русском вне
 зависимости от реального звонка. В `CallSummaryView.swift` нет ни водяного знака, ни пометки
 "демо-данные" — реальный пользователь (например, член семьи, который просто пользуется
@@ -49,7 +49,7 @@ type: Review
 близкие по смыслу размеры расходятся между файлами (11 / 11.5 / 12 / 12.5 для "второстепенного
 пояснительного текста"). Пока ничего не сломано, но любая будущая правка типографики или
 проход по accessibility ("крупный текст") не имеет точки опоры — план редизайна ставил цель
-"никаких хардкодов вне DesignSystem" (`docs/ui-redesign-plan.md:25`), но она была реализована
+"никаких хардкодов вне DesignSystem" (`docs/archive/ui-redesign-plan.md:25`), но она была реализована
 только для цвета, не для шрифта.
 
 ### 5. [LOW-MED] Точечные хардкоды теней мимо Palette

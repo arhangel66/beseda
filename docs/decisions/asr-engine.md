@@ -1,6 +1,6 @@
 ---
 type: Decision Record
-title: ASR engine: transcribe.cpp with Parakeet or GigaAM
+title: "ASR engine: transcribe.cpp with Parakeet or GigaAM"
 status: accepted
 generated:
   by: agent

@@ -3,7 +3,7 @@ type: Plan
 ---
 # Plan: three HIGH findings from the audit
 
-Source: `docs/review-claude-sonnet-5/architecture-review.md`, findings #1, #2, #5.
+Source: `docs/archive/review-claude-sonnet-5/architecture-review.md`, findings #1, #2, #5.
 Baseline before the work: `swift test` 71 tests green, `pytest python/tests` 5 tests green.
 
 Scope: the three cheap, testable HIGH findings. The two audio findings (#3 real-time thread
