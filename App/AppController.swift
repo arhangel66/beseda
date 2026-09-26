@@ -64,6 +64,9 @@ final class AppController {
     var previousCallForSelected: PreviousRelatedCall?
     var previousCallByEventID: [String: PreviousRelatedCall] = [:]
     var callBrowserError: String?
+    /// asked to delete and waiting for the confirmation dialog
+    var callPendingDeletion: StoredCallSummary?
+    var deleteError: String?
     var elapsedRecordingSeconds: TimeInterval = 0
     var isPaused = false
     /// the running recording's live preview, only while the setting is on
@@ -235,6 +238,8 @@ final class AppController {
         default:
             break
         }
+
+        StorageProtection.apply(to: AppPaths.current.dataDirectory)
 
         let freed = PythonRuntimeCleanup.run(AppPaths.current)
         if freed > 0 {
@@ -1442,6 +1447,31 @@ final class AppController {
                 error: error,
                 appName: appName
             )
+        }
+    }
+
+    func canDelete(_ call: StoredCallSummary) -> Bool {
+        !["recording", "normalizing", "transcribing"].contains(call.status) && processingCallID != call.id
+            && summarizingCallID != call.id
+    }
+
+    /// the call with every file it left, its export copy included
+    func deleteCall(_ call: StoredCallSummary) {
+        guard canDelete(call) else {
+            return
+        }
+        do {
+            let exportFolder = settings.exportFolder.isEmpty ? nil : URL(fileURLWithPath: settings.exportFolder)
+            try callStore.deleteCallAndFiles(id: call.id, exportFolder: exportFolder)
+            if selectedCallDetail?.id == call.id {
+                selectCall(id: nil)
+            }
+            refreshRecentCalls()
+            refreshCallBrowser()
+            appendLog("Deleted call \(call.id)")
+        } catch {
+            appendLog("Delete failed: \(error.localizedDescription)")
+            deleteError = error.localizedDescription
         }
     }
 

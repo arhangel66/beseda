@@ -39,6 +39,12 @@ struct CallSidebar: View {
                             stage: controller.processingCallID == call.id ? controller.jobStage : nil
                         )
                         .tag(call.id)
+                        .contextMenu {
+                            Button("Удалить…", role: .destructive) {
+                                controller.callPendingDeletion = call
+                            }
+                            .disabled(!controller.canDelete(call))
+                        }
                     }
                 }
             }

@@ -44,6 +44,12 @@ What the code does today. Settings tabs are named as in the app: Основны�
 - **Export.** With a folder picked under Хранение → Экспорт результатов, every stored result (auto, manual
   or rerun) is written there as Markdown: title, date, type, result, then the clean transcript. The file
   is named by date and title, so a rerun overwrites it (`Storage/CallExport.swift`).
+- **Privacy.** The data folder is owner-only (0700/0600, platform file protection where the volume
+  supports it), tightened on every launch (`StorageProtection` in `Storage/StorageJanitor.swift`).
+  «Удалить» in the conversations toolbar or a sidebar row's context menu, after a confirmation, removes the
+  call's row and transcript, its folder and its export copy (`CallStore.deleteCallAndFiles`); a call being
+  recorded or processed cannot be deleted. Under Обработка, a note says what text goes to OpenRouter when
+  summaries or Jev use it.
 - **Calendar.** With calendar access, a call is named after the matching calendar event from the calendars
   picked under Интеграции (`Calendar/CalendarService.swift`).
 - **Webhook.** A finished transcript is POSTed as JSON to a URL set under Интеграции, with an optional secret
