@@ -3,31 +3,31 @@
     <channel>
         <title>Beseda</title>
         <item>
-            <title>0.3.2</title>
-            <pubDate>Sat, 05 Sep 2026 14:52:34 +0300</pubDate>
-            <sparkle:version>20260905145231</sparkle:version>
-            <sparkle:shortVersionString>0.3.2</sparkle:shortVersionString>
+            <title>0.3.5</title>
+            <pubDate>Fri, 11 Sep 2026 08:21:19 +0400</pubDate>
+            <sparkle:version>20260911082115</sparkle:version>
+            <sparkle:shortVersionString>0.3.5</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>14.2</sparkle:minimumSystemVersion>
             <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
-            <enclosure url="https://github.com/arhangel66/beseda/releases/download/v0.3.2/Beseda-0.3.2.zip" length="15469020" type="application/octet-stream" sparkle:edSignature="3gHa/Fs4nO5qX0iivoU4W+RlaWcVbdIRy0DzNTwo0aSKVoTGP9ZkaVA5gGMnr+sDVilZjVP4b3mns6ffSkzZAQ=="/>
+            <enclosure url="https://github.com/arhangel66/beseda/releases/download/v0.3.5/Beseda-0.3.5.zip" length="15397541" type="application/octet-stream" sparkle:edSignature="YwyM7VMCsKIIvNIGbs0OGdLPOwCSkk07k8ODweSOGVLHDMOpN31Udm0vFoA9Zfn+sYkuvyE2OPN3ZR7HlWYDCw=="/>
         </item>
         <item>
-            <title>0.3.1</title>
-            <pubDate>Sat, 05 Sep 2026 13:49:44 +0300</pubDate>
-            <sparkle:version>20260905134942</sparkle:version>
-            <sparkle:shortVersionString>0.3.1</sparkle:shortVersionString>
+            <title>0.3.4</title>
+            <pubDate>Fri, 11 Sep 2026 07:46:53 +0400</pubDate>
+            <sparkle:version>20260911074648</sparkle:version>
+            <sparkle:shortVersionString>0.3.4</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>14.2</sparkle:minimumSystemVersion>
             <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
-            <enclosure url="https://github.com/arhangel66/beseda/releases/download/v0.3.1/Beseda-0.3.1.zip" length="15463261" type="application/octet-stream" sparkle:edSignature="+4ebqVTyAxxfoTxrWzsZZ4Qr9BW7Mdt3QDgdMT+Y6eGnhnM6lrTdR6QWt9y2ESVR/HwvbH8yhi+ogLLNeGcIDg=="/>
+            <enclosure url="https://github.com/arhangel66/beseda/releases/download/v0.3.4/Beseda-0.3.4.zip" length="15345884" type="application/octet-stream" sparkle:edSignature="fWLOBCeqk2D/DlnXmykRDole9SnlTUqNgS9acwNc7Ihyyc6GD1nQW769lXtw7Gz/terryGVmvSjE8BfgPzzIBQ=="/>
         </item>
         <item>
-            <title>0.3.0</title>
-            <pubDate>Sat, 05 Sep 2026 13:49:01 +0300</pubDate>
-            <sparkle:version>20260905134859</sparkle:version>
-            <sparkle:shortVersionString>0.3.0</sparkle:shortVersionString>
+            <title>0.3.3</title>
+            <pubDate>Fri, 11 Sep 2026 06:40:04 +0400</pubDate>
+            <sparkle:version>20260911064000</sparkle:version>
+            <sparkle:shortVersionString>0.3.3</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>14.2</sparkle:minimumSystemVersion>
             <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
-            <enclosure url="https://github.com/arhangel66/beseda/releases/download/v0.3.0/Beseda-0.3.0.zip" length="15463262" type="application/octet-stream" sparkle:edSignature="96ZpSBl95jnTwM84PVS+GzW+V5NaT1zPIlvg/HaaDUugrsbQAaLMyj8T5iibmVdIxJAzubhztNVR1nrj2DnCCA=="/>
+            <enclosure url="https://github.com/arhangel66/beseda/releases/download/v0.3.3/Beseda-0.3.3.zip" length="15345101" type="application/octet-stream" sparkle:edSignature="E3y7ISRNdzi/IbkFs8IUGQzcpXsXFXlHFGmWmlFuF4IRoe6U6+REI9dcsnkGhiMBZ5p+SVA57sdE/8Iyv6QoBQ=="/>
         </item>
     </channel>
 </rss>

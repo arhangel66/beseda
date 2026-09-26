@@ -37,7 +37,11 @@ The first task writes the check here — the one command that builds and tests t
 green from then on.
 
 ```
+swift test
 ```
+
+It builds the app and runs every test. `theInstalledModelTranscribesRealSpeech` is skipped unless the
+speech model is installed in Application Support and `samples/jfk.wav` (gitignored) is in the checkout.
 
 ## Kit
 
