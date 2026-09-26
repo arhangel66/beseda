@@ -24,7 +24,7 @@ Decided 2026-09-05 (Mikhail): the first. Auto-update goes out now; the numbering
 
 ## 1. Auto-update via Sparkle
 
-Plan: `docs/auto-update-plan.md`.
+Plan: `docs/archive/auto-update-plan.md`.
 
 Done when: a new version published from Mikhail's Mac installs itself on the second
 Mac within about an hour while the app keeps running, with no dialog, no «Open Anyway»
@@ -91,9 +91,9 @@ Mac app next to Notes and System Settings, and the four keyboard paths work.
 
 ## 6. Summary provider picker
 
-Plan: `docs/summary-provider-plan.md`, built 2026-09-06: OpenRouter with a key, the
+Plan: `docs/archive/summary-provider-plan.md`, built 2026-09-06: OpenRouter with a key, the
 built-in Gemma 4 E4B behind a downloaded `llama-server`, LM Studio as before. The
-quality experiment behind the choice is `docs/summary-model-choice-plan.md`.
+quality experiment behind the choice is `docs/archive/summary-model-choice-plan.md`.
 
 Done when: a summary comes out of each of the three providers on this Mac, and the
 built-in one leaves no `llama-server` process behind after ten idle minutes.

@@ -135,7 +135,7 @@ Each step: RED (build, test or check fails) → GREEN, `swift test` from the rep
   version line. Check: the button brings Sparkle's "You're up to date" panel to the
   front against a feed with no newer entry.
 
-- [x] **5. `scripts/release.sh`** — as designed; `docs/release.md` with the
+- [x] **5. `scripts/release.sh`** — as designed; `docs/architecture/build-release.md` with the
   three-line how-to (bump `VERSION`, run the script, done). Check: run it for 0.2.1,
   `dist/appcast.xml` validates with `xmllint`, the release page shows the zip, the raw
   appcast URL serves the new entry.

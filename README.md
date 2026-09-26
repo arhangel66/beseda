@@ -73,7 +73,7 @@ from a card list, in onboarding and later under Настройки → Хран�
 | model | languages | size |
 | --- | --- | ---: |
 | Parakeet v3 (default) | 25 | 485 MB |
-| GigaAM v3 (Sber) | Russian | 261 MB |
+| GigaAM v3 (Sber) | Russian | 274 MB |
 
 The file lands in `~/Library/Application Support/Beseda/runtime/models` and is
 checked against a pinned sha256 before it is used. Speech recognition itself is

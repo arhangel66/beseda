@@ -6,7 +6,7 @@ type: Experiment Report
 Date: 2026-05-10
 
 > Superseded on 2026-09-05. The engine moved from `parakeet-mlx` to transcribe.cpp
-> and the model became a user choice; see `docs/speech-model-choice-plan.md`.
+> and the model became a user choice; see `docs/archive/speech-model-choice-plan.md`.
 
 ## Decision
 

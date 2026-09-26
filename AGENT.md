@@ -18,7 +18,7 @@
 
 ### Речевой движок (ASR)
 *   **Library:** [transcribe.cpp](https://github.com/handy-computer/transcribe.cpp) (ggml + Metal), слинкована в приложение через `Vendor/TranscribeCpp` и xcframework из релиза v0.2.3.
-*   **Модели:** GGUF, каталог в `Transcription/SpeechModel.swift` — Parakeet v3 (25 языков, 485 МБ) и GigaAM v3 от Сбера (только русский, 261 МБ). Скачиваются в `~/Library/Application Support/Beseda/runtime/models` и сверяются по sha256.
+*   **Модели:** GGUF, каталог в `Transcription/SpeechModel.swift` — Parakeet v3 (25 языков, 485 МБ) и GigaAM v3 от Сбера (только русский, 274 МБ). Скачиваются в `~/Library/Application Support/Beseda/runtime/models` и сверяются по sha256.
 *   **Task:** Speech-to-Text в том же процессе; отдельного воркера и Python больше нет.
 
 ---

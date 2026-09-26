@@ -213,7 +213,7 @@ Python-сторона (`python/tests/test_asr_worker.py`): покрыт толь
 - `ping`, `sentence_to_segment` (дефолт/округление уверенности, фильтрация пустого текста);
 - `probe_duration_sec`/`normalize_audio`/`require_file`/разбор CLI-аргументов (`main`,
   `--self-test`, `--normalize-only`) — все они шеллятся в `ffmpeg`/`ffprobe` и не тестируются
-  автоматически, только вручную (см. `docs/asr-bakeoff.md`).
+  автоматически, только вручную (см. `docs/archive/asr-bakeoff.md`).
 
 **Рекомендация по приоритету новых тестов** (наибольшая отдача за наименьшее усилие):
 1. Регрессионный тест на находку #5 (python) — не-dict JSON на stdin не должен убивать воркер.

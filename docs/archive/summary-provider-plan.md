@@ -3,7 +3,7 @@ type: Plan
 ---
 # Summary provider picker
 
-Date: 2026-09-06. Follows `docs/summary-model-choice-plan.md`.
+Date: 2026-09-06. Follows `docs/archive/summary-model-choice-plan.md`.
 
 ## Context
 
@@ -40,7 +40,7 @@ Facts that shape the design:
 - `AppController.summaryRecovery(for:)` decides the recovery button by matching the
   Russian error text against «LM Studio не запущен». That has to become typed errors.
 - The current `defaultPrompt` makes small models write everything in bold
-  (`docs/summary-model-choice-plan.md`, «Prompt finding»). The reworded prompt ships
+  (`docs/archive/summary-model-choice-plan.md`, «Prompt finding»). The reworded prompt ships
   with this change.
 
 ## Design
@@ -194,8 +194,8 @@ Every step ends with `swift build` and `swift test` green.
       Check: the 87-minute call from the experiment gets a four-section summary in
       ≈3 min; the E4B output for it matches the shape recorded in
       `untracked/scripts/summary-bench/out/E4B-Q4_0-prompt2/`.
-- [ ] **8. Docs.** `docs/roadmap.md` deferred entry → done pointer; `docs/install.md`
-      mentions the picker; `docs/summarization-local-model-plan.md` gets a one-line
+- [ ] **8. Docs.** `docs/archive/roadmap.md` deferred entry → done pointer; `docs/product/install.md`
+      mentions the picker; `docs/archive/summarization-local-model-plan.md` gets a one-line
       «superseded by» header.
 
 ## Decisions
@@ -215,4 +215,4 @@ Every step ends with `swift build` and `swift test` green.
 
 Keychain for the key, streaming output, automatic summary after transcription, a
 model picker for the built-in provider (one model, pinned), Intel Macs (the runtime
-is arm64 only; README and `docs/install.md` already require Apple Silicon).
+is arm64 only; README and `docs/product/install.md` already require Apple Silicon).

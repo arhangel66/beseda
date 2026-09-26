@@ -4,7 +4,7 @@ type: Review
 # UI review — third pass (designer's eye)
 
 Reviewer: Kimi, 2026-08-29. Method: read `untracked/design/prototype-v2.dc.html` and
-`docs/ui-redesign-v2-plan.md`, read every view, then measured the running app
+`docs/archive/ui-redesign-v2-plan.md`, read every view, then measured the running app
 (pixel sampling + OCR of `screencapture` output in both appearances — this shell cannot
 click, and the model cannot see, so everything below is verified against geometry and
 colour, not vibes).

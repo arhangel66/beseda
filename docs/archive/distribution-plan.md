@@ -119,7 +119,7 @@ into `Contents/Resources/python`, downloads the pinned uv release archive for
 the script), places `uv` in `Contents/MacOS`, signs with `--deep` as now. Version comes
 from a `VERSION` file into `CFBundleShortVersionString`; `CFBundleVersion` is a build
 counter. New `scripts/package_podushka.sh` produces `dist/Podushka-<version>.zip` via
-`ditto -c -k --keepParent` (preserves the signature). `docs/install.md` is the
+`ditto -c -k --keepParent` (preserves the signature). `docs/product/install.md` is the
 recipient's page: copy to `/Applications`, first open via System Settings → Privacy &
 Security → «Open Anyway», then follow the onboarding.
 
@@ -172,7 +172,7 @@ Each step: RED (test or build fails) → GREEN, `swift test` from the repo root,
   `LSMinimumSystemVersion` makes macOS itself refuse older systems with its own dialog.)
 
 - [x] **7. Build script and packaging** — bundle python sources and pinned uv, `VERSION`
-  file, `package_podushka.sh`, `docs/install.md`. Verify: `codesign --verify --strict
+  file, `package_podushka.sh`, `docs/product/install.md`. Verify: `codesign --verify --strict
   --deep`, `spctl -a -t exec -vv` prints the expected "rejected (no notarisation)" line
   and nothing worse.
 
@@ -180,7 +180,7 @@ Each step: RED (test or build fails) → GREEN, `swift test` from the repo root,
   «Python и библиотеки» stage showed a spinner with no percentage for minutes, so the
   step looked stuck and got skipped. That stage no longer exists: the engine is linked
   into the binary and the only download is one model file with real byte progress. See
-  `docs/speech-model-choice-plan.md`. Worth one more pass on a fresh account.
+  `docs/archive/speech-model-choice-plan.md`. Worth one more pass on a fresh account.
 
 - [ ] **9. Built-in summaries (separable)** — deferred, and the plan below is stale:
   it assumed a Python runtime that no longer exists. Whatever replaces LM Studio will
@@ -188,7 +188,7 @@ Each step: RED (test or build fails) → GREEN, `swift test` from the repo root,
   `mlx-lm` behind `uv`.
 
 - [x] **10. Docs** — README (install path, data folder, what leaves the Mac), AGENT.md tree
-  (`Runtime/`, `docs/install.md`), remove ffmpeg and `untracked/calls` mentions.
+  (`Runtime/`, `docs/product/install.md`), remove ffmpeg and `untracked/calls` mentions.
 
 ## Verification
 
