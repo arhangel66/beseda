@@ -11,13 +11,6 @@ struct StoredTranscriptSegment: Identifiable, Hashable {
     var id: String {
         "\(orderIndex)-\(speaker)"
     }
-
-    var timeRangeDescription: String {
-        guard let endSec else {
-            return startSec.mmss
-        }
-        return "\(startSec.mmss)-\(endSec.mmss)"
-    }
 }
 
 struct StoredCallSummary: Identifiable, Hashable {
@@ -41,10 +34,6 @@ struct StoredCallSummary: Identifiable, Hashable {
     let eventID: String?
     /// set when the event was chosen by hand: the matcher never touches such a call again
     let eventPinned: Bool
-
-    var canRetry: Bool {
-        status == "failed"
-    }
 
     var isFailed: Bool {
         status == "failed"
@@ -279,175 +268,146 @@ final class CallStore {
     }
 
     func prepare() throws {
-        try queue.sync {
-            try withDatabase { db in
-                try execute(db, "PRAGMA foreign_keys = ON")
-                try execute(db, "PRAGMA journal_mode = WAL")
-                try execute(db, """
-                    CREATE TABLE IF NOT EXISTS calls (
-                        id TEXT PRIMARY KEY,
-                        kind TEXT NOT NULL,
-                        started_at TEXT NOT NULL,
-                        ended_at TEXT,
-                        duration_sec REAL,
-                        status TEXT NOT NULL,
-                        transcript_path TEXT,
-                        audio_dir TEXT NOT NULL,
-                        error TEXT,
-                        app_name TEXT,
-                        summary_text TEXT,
-                        created_at TEXT NOT NULL,
-                        updated_at TEXT NOT NULL
-                    )
-                    """)
-                if try !columnExists(db, table: "calls", column: "app_name") {
-                    try execute(db, "ALTER TABLE calls ADD COLUMN app_name TEXT")
-                }
-                if try !columnExists(db, table: "calls", column: "event_title") {
-                    try execute(db, "ALTER TABLE calls ADD COLUMN event_title TEXT")
-                }
-                if try !columnExists(db, table: "calls", column: "event_id") {
-                    try execute(db, "ALTER TABLE calls ADD COLUMN event_id TEXT")
-                }
-                if try !columnExists(db, table: "calls", column: "event_pinned") {
-                    try execute(db, "ALTER TABLE calls ADD COLUMN event_pinned INTEGER NOT NULL DEFAULT 0")
-                }
-                if try !columnExists(db, table: "calls", column: "summary_text") {
-                    try execute(db, "ALTER TABLE calls ADD COLUMN summary_text TEXT")
-                }
-                if try columnExists(db, table: "calls", column: "keep_audio") {
-                    // retention rules replaced the per-call flag, and nothing reads the column now
-                    try execute(db, "ALTER TABLE calls DROP COLUMN keep_audio")
-                }
-                try execute(db, """
-                    CREATE TABLE IF NOT EXISTS transcript_segments (
-                        id TEXT PRIMARY KEY,
-                        call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE,
-                        speaker TEXT NOT NULL,
-                        start_sec REAL NOT NULL,
-                        end_sec REAL,
-                        text TEXT NOT NULL,
-                        order_idx INTEGER NOT NULL
-                    )
-                    """)
-                try execute(db, """
-                    CREATE INDEX IF NOT EXISTS idx_transcript_segments_call_order
-                    ON transcript_segments(call_id, order_idx)
-                    """)
-                try execute(db, """
-                    CREATE TABLE IF NOT EXISTS transcript_jobs (
-                        id TEXT PRIMARY KEY,
-                        call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE,
-                        speaker TEXT NOT NULL,
-                        status TEXT NOT NULL,
-                        audio_path TEXT NOT NULL,
-                        asr_json_path TEXT,
-                        audio_duration_sec REAL,
-                        wall_time_sec REAL,
-                        real_time_factor REAL,
-                        model TEXT,
-                        error TEXT,
-                        created_at TEXT NOT NULL,
-                        updated_at TEXT NOT NULL
-                    )
-                    """)
-                if try !columnExists(db, table: "transcript_jobs", column: "model") {
-                    try execute(db, "ALTER TABLE transcript_jobs ADD COLUMN model TEXT")
-                }
-                try execute(db, """
-                    CREATE INDEX IF NOT EXISTS idx_transcript_jobs_call
-                    ON transcript_jobs(call_id, speaker)
-                    """)
-                // only renames live here: a speaker left with its default name stores nothing
-                try execute(db, """
-                    CREATE TABLE IF NOT EXISTS call_speakers (
-                        call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE,
-                        speaker_key TEXT NOT NULL,
-                        display_name TEXT NOT NULL,
-                        PRIMARY KEY (call_id, speaker_key)
-                    )
-                    """)
-                try execute(db, """
-                    CREATE TABLE IF NOT EXISTS webhook_deliveries (
-                        id TEXT PRIMARY KEY,
-                        call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE,
-                        call_title TEXT NOT NULL,
-                        attempt INTEGER NOT NULL,
-                        event TEXT NOT NULL,
-                        url TEXT NOT NULL,
-                        state TEXT NOT NULL,
-                        http_status INTEGER,
-                        response_action TEXT,
-                        response_body TEXT,
-                        error TEXT,
-                        created_at TEXT NOT NULL,
-                        sent_at TEXT,
-                        finished_at TEXT,
-                        next_retry_at TEXT
-                    )
-                    """)
-                try execute(db, """
-                    CREATE INDEX IF NOT EXISTS idx_webhook_deliveries_call
-                    ON webhook_deliveries(call_id, attempt)
-                    """)
-                try execute(db, """
-                    CREATE INDEX IF NOT EXISTS idx_webhook_deliveries_due
-                    ON webhook_deliveries(state, next_retry_at)
-                    """)
+        try database { db in
+            try execute(db, "PRAGMA foreign_keys = ON")
+            try execute(db, "PRAGMA journal_mode = WAL")
+            try execute(db, """
+                CREATE TABLE IF NOT EXISTS calls (
+                    id TEXT PRIMARY KEY,
+                    kind TEXT NOT NULL,
+                    started_at TEXT NOT NULL,
+                    ended_at TEXT,
+                    duration_sec REAL,
+                    status TEXT NOT NULL,
+                    transcript_path TEXT,
+                    audio_dir TEXT NOT NULL,
+                    error TEXT,
+                    app_name TEXT,
+                    summary_text TEXT,
+                    created_at TEXT NOT NULL,
+                    updated_at TEXT NOT NULL
+                )
+                """)
+            let callColumns = try columns(db, table: "calls")
+            for (column, type) in [
+                ("app_name", "TEXT"),
+                ("event_title", "TEXT"),
+                ("event_id", "TEXT"),
+                ("event_pinned", "INTEGER NOT NULL DEFAULT 0"),
+                ("summary_text", "TEXT")
+            ] where !callColumns.contains(column) {
+                try execute(db, "ALTER TABLE calls ADD COLUMN \(column) \(type)")
             }
+            if callColumns.contains("keep_audio") {
+                // retention rules replaced the per-call flag, and nothing reads the column now
+                try execute(db, "ALTER TABLE calls DROP COLUMN keep_audio")
+            }
+            try execute(db, """
+                CREATE TABLE IF NOT EXISTS transcript_segments (
+                    id TEXT PRIMARY KEY,
+                    call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE,
+                    speaker TEXT NOT NULL,
+                    start_sec REAL NOT NULL,
+                    end_sec REAL,
+                    text TEXT NOT NULL,
+                    order_idx INTEGER NOT NULL
+                )
+                """)
+            try execute(db, """
+                CREATE INDEX IF NOT EXISTS idx_transcript_segments_call_order
+                ON transcript_segments(call_id, order_idx)
+                """)
+            try execute(db, """
+                CREATE TABLE IF NOT EXISTS transcript_jobs (
+                    id TEXT PRIMARY KEY,
+                    call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE,
+                    speaker TEXT NOT NULL,
+                    status TEXT NOT NULL,
+                    audio_path TEXT NOT NULL,
+                    asr_json_path TEXT,
+                    audio_duration_sec REAL,
+                    wall_time_sec REAL,
+                    real_time_factor REAL,
+                    model TEXT,
+                    error TEXT,
+                    created_at TEXT NOT NULL,
+                    updated_at TEXT NOT NULL
+                )
+                """)
+            if try !columns(db, table: "transcript_jobs").contains("model") {
+                try execute(db, "ALTER TABLE transcript_jobs ADD COLUMN model TEXT")
+            }
+            try execute(db, """
+                CREATE INDEX IF NOT EXISTS idx_transcript_jobs_call
+                ON transcript_jobs(call_id, speaker)
+                """)
+            // only renames live here: a speaker left with its default name stores nothing
+            try execute(db, """
+                CREATE TABLE IF NOT EXISTS call_speakers (
+                    call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE,
+                    speaker_key TEXT NOT NULL,
+                    display_name TEXT NOT NULL,
+                    PRIMARY KEY (call_id, speaker_key)
+                )
+                """)
+            try execute(db, """
+                CREATE TABLE IF NOT EXISTS webhook_deliveries (
+                    id TEXT PRIMARY KEY,
+                    call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE,
+                    call_title TEXT NOT NULL,
+                    attempt INTEGER NOT NULL,
+                    event TEXT NOT NULL,
+                    url TEXT NOT NULL,
+                    state TEXT NOT NULL,
+                    http_status INTEGER,
+                    response_action TEXT,
+                    response_body TEXT,
+                    error TEXT,
+                    created_at TEXT NOT NULL,
+                    sent_at TEXT,
+                    finished_at TEXT,
+                    next_retry_at TEXT
+                )
+                """)
+            try execute(db, """
+                CREATE INDEX IF NOT EXISTS idx_webhook_deliveries_call
+                ON webhook_deliveries(call_id, attempt)
+                """)
+            try execute(db, """
+                CREATE INDEX IF NOT EXISTS idx_webhook_deliveries_due
+                ON webhook_deliveries(state, next_retry_at)
+                """)
         }
     }
 
     func failInterruptedCalls(reason: String) throws -> Int {
         // a call left mid-flight belongs to a process that is gone: the audio was only
         // buffered in memory, so the row can never move forward on its own
-        try queue.sync {
-            try withDatabase { db in
-                let sql = """
-                    UPDATE calls
-                    SET status = 'failed', error = ?, updated_at = ?
-                    WHERE status IN ('recording', 'normalizing', 'transcribing')
-                    """
-                return try withStatement(db, sql) { statement in
-                    try bind(statement, 1, reason)
-                    try bind(statement, 2, Date().iso8601WithFractions)
-                    try stepDone(statement, db)
-                    return Int(sqlite3_changes(db))
-                }
-            }
+        try database { db in
+            try run(db, """
+                UPDATE calls
+                SET status = 'failed', error = ?, updated_at = ?
+                WHERE status IN ('recording', 'normalizing', 'transcribing')
+                """, reason, Date().iso8601WithFractions)
+            return Int(sqlite3_changes(db))
         }
     }
 
     /// call folders the janitor must leave alone: a running job reads that audio, a failed one retries from it
     func protectedAudioDirectories() throws -> Set<String> {
-        try queue.sync {
-            try withDatabase { db in
-                let sql = """
-                    SELECT audio_dir FROM calls
-                    WHERE status IN ('recording', 'normalizing', 'transcribing', 'failed')
-                    """
-                return try withStatement(db, sql) { statement in
-                    var directories: Set<String> = []
-                    while sqlite3_step(statement) == SQLITE_ROW {
-                        if let path = columnString(statement, 0), !path.isEmpty {
-                            directories.insert(path)
-                        }
-                    }
-                    return directories
-                }
-            }
+        try database { db in
+            let paths = try query(db, """
+                SELECT audio_dir FROM calls
+                WHERE status IN ('recording', 'normalizing', 'transcribing', 'failed')
+                """) { columnString($0, 0) }
+            return Set(paths.compactMap { $0 }.filter { !$0.isEmpty })
         }
     }
 
     func deleteCall(id: String) throws {
-        try queue.sync {
-            try withDatabase { db in
-                try execute(db, "PRAGMA foreign_keys = ON")
-                try withStatement(db, "DELETE FROM calls WHERE id = ?") { statement in
-                    try bind(statement, 1, id)
-                    try stepDone(statement, db)
-                }
-            }
+        try database { db in
+            try execute(db, "PRAGMA foreign_keys = ON")
+            try run(db, "DELETE FROM calls WHERE id = ?", id)
         }
     }
 
@@ -463,84 +423,50 @@ final class CallStore {
         error: String?,
         appName: String?
     ) throws {
-        try queue.sync {
-            try withDatabase { db in
-                let sql = """
-                    INSERT INTO calls (
-                        id, kind, started_at, ended_at, duration_sec, status,
-                        transcript_path, audio_dir, error, app_name, created_at, updated_at
-                    )
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    ON CONFLICT(id) DO UPDATE SET
-                        kind = excluded.kind,
-                        started_at = excluded.started_at,
-                        ended_at = excluded.ended_at,
-                        duration_sec = excluded.duration_sec,
-                        status = excluded.status,
-                        transcript_path = excluded.transcript_path,
-                        audio_dir = excluded.audio_dir,
-                        error = excluded.error,
-                        app_name = COALESCE(excluded.app_name, calls.app_name),
-                        updated_at = excluded.updated_at
-                    """
-                let now = Date().iso8601WithFractions
-                try withStatement(db, sql) { statement in
-                    try bind(statement, 1, id)
-                    try bind(statement, 2, kind)
-                    try bind(statement, 3, startedAt.iso8601WithFractions)
-                    try bind(statement, 4, endedAt?.iso8601WithFractions)
-                    try bind(statement, 5, durationSec)
-                    try bind(statement, 6, status)
-                    try bind(statement, 7, transcriptURL?.path)
-                    try bind(statement, 8, audioDirectoryURL.path)
-                    try bind(statement, 9, error)
-                    try bind(statement, 10, appName)
-                    try bind(statement, 11, now)
-                    try bind(statement, 12, now)
-                    try stepDone(statement, db)
-                }
-            }
+        let now = Date().iso8601WithFractions
+        try database { db in
+            try run(db, """
+                INSERT INTO calls (
+                    id, kind, started_at, ended_at, duration_sec, status,
+                    transcript_path, audio_dir, error, app_name, created_at, updated_at
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(id) DO UPDATE SET
+                    kind = excluded.kind,
+                    started_at = excluded.started_at,
+                    ended_at = excluded.ended_at,
+                    duration_sec = excluded.duration_sec,
+                    status = excluded.status,
+                    transcript_path = excluded.transcript_path,
+                    audio_dir = excluded.audio_dir,
+                    error = excluded.error,
+                    app_name = COALESCE(excluded.app_name, calls.app_name),
+                    updated_at = excluded.updated_at
+                """,
+                id, kind, startedAt.iso8601WithFractions, endedAt?.iso8601WithFractions, durationSec, status,
+                transcriptURL?.path, audioDirectoryURL.path, error, appName, now, now)
         }
     }
 
     func replaceSegments(callID: String, segments: [StoredTranscriptSegment]) throws {
-        try queue.sync {
-            try withDatabase { db in
-                try execute(db, "BEGIN IMMEDIATE TRANSACTION")
-                do {
-                    try withStatement(db, "DELETE FROM transcript_segments WHERE call_id = ?") { statement in
-                        try bind(statement, 1, callID)
-                        try stepDone(statement, db)
-                    }
-                    // a retry renumbers the speakers, so names pinned to the old keys are gone
-                    try withStatement(db, "DELETE FROM call_speakers WHERE call_id = ?") { statement in
-                        try bind(statement, 1, callID)
-                        try stepDone(statement, db)
-                    }
-
-                    let insertSQL = """
-                        INSERT INTO transcript_segments (
-                            id, call_id, speaker, start_sec, end_sec, text, order_idx
-                        )
+        try database { db in
+            try execute(db, "BEGIN IMMEDIATE TRANSACTION")
+            do {
+                try run(db, "DELETE FROM transcript_segments WHERE call_id = ?", callID)
+                // a retry renumbers the speakers, so names pinned to the old keys are gone
+                try run(db, "DELETE FROM call_speakers WHERE call_id = ?", callID)
+                for segment in segments {
+                    try run(db, """
+                        INSERT INTO transcript_segments (id, call_id, speaker, start_sec, end_sec, text, order_idx)
                         VALUES (?, ?, ?, ?, ?, ?, ?)
-                        """
-                    for segment in segments {
-                        try withStatement(db, insertSQL) { statement in
-                            try bind(statement, 1, "\(callID)-\(segment.orderIndex)")
-                            try bind(statement, 2, callID)
-                            try bind(statement, 3, segment.speaker)
-                            try bind(statement, 4, segment.startSec)
-                            try bind(statement, 5, segment.endSec)
-                            try bind(statement, 6, segment.text)
-                            try bind(statement, 7, Int64(segment.orderIndex))
-                            try stepDone(statement, db)
-                        }
-                    }
-                    try execute(db, "COMMIT")
-                } catch {
-                    try? execute(db, "ROLLBACK")
-                    throw error
+                        """,
+                        "\(callID)-\(segment.orderIndex)", callID, segment.speaker,
+                        segment.startSec, segment.endSec, segment.text, segment.orderIndex)
                 }
+                try execute(db, "COMMIT")
+            } catch {
+                try? execute(db, "ROLLBACK")
+                throw error
             }
         }
     }
@@ -558,118 +484,54 @@ final class CallStore {
         model: String?,
         error: String?
     ) throws {
-        try queue.sync {
-            try withDatabase { db in
-                let sql = """
-                    INSERT INTO transcript_jobs (
-                        id, call_id, speaker, status, audio_path, asr_json_path,
-                        audio_duration_sec, wall_time_sec, real_time_factor,
-                        model, error, created_at, updated_at
-                    )
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    ON CONFLICT(id) DO UPDATE SET
-                        call_id = excluded.call_id,
-                        speaker = excluded.speaker,
-                        status = excluded.status,
-                        audio_path = excluded.audio_path,
-                        asr_json_path = excluded.asr_json_path,
-                        audio_duration_sec = excluded.audio_duration_sec,
-                        wall_time_sec = excluded.wall_time_sec,
-                        real_time_factor = excluded.real_time_factor,
-                        model = excluded.model,
-                        error = excluded.error,
-                        updated_at = excluded.updated_at
-                    """
-                let now = Date().iso8601WithFractions
-                try withStatement(db, sql) { statement in
-                    try bind(statement, 1, id)
-                    try bind(statement, 2, callID)
-                    try bind(statement, 3, speaker)
-                    try bind(statement, 4, status)
-                    try bind(statement, 5, audioURL.path)
-                    try bind(statement, 6, asrJSONURL?.path)
-                    try bind(statement, 7, audioDurationSec)
-                    try bind(statement, 8, wallTimeSec)
-                    try bind(statement, 9, realTimeFactor)
-                    try bind(statement, 10, model)
-                    try bind(statement, 11, error)
-                    try bind(statement, 12, now)
-                    try bind(statement, 13, now)
-                    try stepDone(statement, db)
-                }
-            }
+        let now = Date().iso8601WithFractions
+        try database { db in
+            try run(db, """
+                INSERT INTO transcript_jobs (
+                    id, call_id, speaker, status, audio_path, asr_json_path,
+                    audio_duration_sec, wall_time_sec, real_time_factor,
+                    model, error, created_at, updated_at
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(id) DO UPDATE SET
+                    call_id = excluded.call_id,
+                    speaker = excluded.speaker,
+                    status = excluded.status,
+                    audio_path = excluded.audio_path,
+                    asr_json_path = excluded.asr_json_path,
+                    audio_duration_sec = excluded.audio_duration_sec,
+                    wall_time_sec = excluded.wall_time_sec,
+                    real_time_factor = excluded.real_time_factor,
+                    model = excluded.model,
+                    error = excluded.error,
+                    updated_at = excluded.updated_at
+                """,
+                id, callID, speaker, status, audioURL.path, asrJSONURL?.path,
+                audioDurationSec, wallTimeSec, realTimeFactor, model, error, now, now)
         }
     }
 
-    func fetchRecentCalls(limit: Int = 10) throws -> [StoredCallSummary] {
-        try fetchCalls(limit: limit)
-    }
-
     func fetchCalls(limit: Int = 200) throws -> [StoredCallSummary] {
-        try queue.sync {
-            try withDatabase { db in
-                let sql = """
-                    SELECT c.id, c.kind, c.started_at, c.ended_at, c.duration_sec, c.status,
-                           c.transcript_path, c.audio_dir, c.error, c.app_name, c.summary_text,
-                           (SELECT group_concat(text, '. ') FROM
-                             (SELECT text FROM transcript_segments
-                               WHERE call_id = c.id ORDER BY order_idx LIMIT 5)),
-                           c.event_title, c.event_id, c.event_pinned
-                    FROM calls c
-                    ORDER BY c.started_at DESC
-                    LIMIT ?
-                    """
-                return try withStatement(db, sql) { statement in
-                    try bind(statement, 1, Int64(limit))
-
-                    var calls: [StoredCallSummary] = []
-                    while true {
-                        let status = sqlite3_step(statement)
-                        if status == SQLITE_DONE {
-                            break
-                        }
-                        guard status == SQLITE_ROW else {
-                            throw CallStoreError.sqlite(String(cString: sqlite3_errmsg(db)))
-                        }
-
-                        calls.append(makeSummary(statement))
-                    }
-                    return calls
-                }
-            }
+        try database { db in
+            try query(db, "\(Self.callSelect) ORDER BY c.started_at DESC LIMIT ?", limit, row: makeSummary)
         }
     }
 
     func fetchCall(id: String) throws -> StoredCallSummary? {
-        try queue.sync {
-            try withDatabase { db in
-                let sql = """
-                    SELECT c.id, c.kind, c.started_at, c.ended_at, c.duration_sec, c.status,
-                           c.transcript_path, c.audio_dir, c.error, c.app_name, c.summary_text,
-                           (SELECT group_concat(text, '. ') FROM
-                             (SELECT text FROM transcript_segments
-                               WHERE call_id = c.id ORDER BY order_idx LIMIT 5)),
-                           c.event_title, c.event_id, c.event_pinned
-                    FROM calls c
-                    WHERE c.id = ?
-                    LIMIT 1
-                    """
-                return try withStatement(db, sql) { statement in
-                    try bind(statement, 1, id)
-
-                    let status = sqlite3_step(statement)
-                    if status == SQLITE_DONE {
-                        return nil
-                    }
-                    guard status == SQLITE_ROW else {
-                        throw CallStoreError.sqlite(String(cString: sqlite3_errmsg(db)))
-                    }
-
-                    return makeSummary(statement)
-                }
-            }
+        try database { db in
+            try query(db, "\(Self.callSelect) WHERE c.id = ? LIMIT 1", id, row: makeSummary).first
         }
     }
+
+    private static let callSelect = """
+        SELECT c.id, c.kind, c.started_at, c.ended_at, c.duration_sec, c.status,
+               c.transcript_path, c.audio_dir, c.error, c.app_name, c.summary_text,
+               (SELECT group_concat(text, '. ') FROM
+                 (SELECT text FROM transcript_segments
+                   WHERE call_id = c.id ORDER BY order_idx LIMIT 5)),
+               c.event_title, c.event_id, c.event_pinned
+        FROM calls c
+        """
 
     private func makeSummary(_ statement: OpaquePointer) -> StoredCallSummary {
         StoredCallSummary(
@@ -693,41 +555,20 @@ final class CallStore {
 
     /// nil title clears the link, so "Без события" is stored rather than left to the matcher
     func setEvent(callID: String, title: String?, eventID: String?, pinned: Bool) throws {
-        try queue.sync {
-            try withDatabase { db in
-                let sql = """
-                    UPDATE calls
-                    SET event_title = ?, event_id = ?, event_pinned = ?, updated_at = ?
-                    WHERE id = ?
-                    """
-                try withStatement(db, sql) { statement in
-                    try bind(statement, 1, title)
-                    try bind(statement, 2, eventID)
-                    try bind(statement, 3, Int64(pinned ? 1 : 0))
-                    try bind(statement, 4, Date().iso8601WithFractions)
-                    try bind(statement, 5, callID)
-                    try stepDone(statement, db)
-                }
-            }
+        try database { db in
+            try run(db, """
+                UPDATE calls
+                SET event_title = ?, event_id = ?, event_pinned = ?, updated_at = ?
+                WHERE id = ?
+                """, title, eventID, pinned, Date().iso8601WithFractions, callID)
         }
     }
 
     /// nil wipes the stored summary, so a failed regeneration does not leave the old text behind
     func setSummary(callID: String, text: String?) throws {
-        try queue.sync {
-            try withDatabase { db in
-                let sql = """
-                    UPDATE calls
-                    SET summary_text = ?, updated_at = ?
-                    WHERE id = ?
-                    """
-                try withStatement(db, sql) { statement in
-                    try bind(statement, 1, text)
-                    try bind(statement, 2, Date().iso8601WithFractions)
-                    try bind(statement, 3, callID)
-                    try stepDone(statement, db)
-                }
-            }
+        try database { db in
+            try run(db, "UPDATE calls SET summary_text = ?, updated_at = ? WHERE id = ?",
+                    text, Date().iso8601WithFractions, callID)
         }
     }
 
@@ -742,40 +583,22 @@ final class CallStore {
         url: String,
         nextRetryAt: Date
     ) throws {
-        try queue.sync {
-            try withDatabase { db in
-                let sql = """
-                    INSERT INTO webhook_deliveries
-                        (id, call_id, call_title, attempt, event, url, state, created_at, next_retry_at)
-                    VALUES (?, ?, ?, ?, ?, ?, 'queued', ?, ?)
-                    """
-                try withStatement(db, sql) { statement in
-                    try bind(statement, 1, id)
-                    try bind(statement, 2, callID)
-                    try bind(statement, 3, callTitle)
-                    try bind(statement, 4, Int64(attempt))
-                    try bind(statement, 5, event)
-                    try bind(statement, 6, url)
-                    try bind(statement, 7, Date().iso8601WithFractions)
-                    try bind(statement, 8, nextRetryAt.iso8601WithFractions)
-                    try stepDone(statement, db)
-                }
-            }
+        try database { db in
+            try run(db, """
+                INSERT INTO webhook_deliveries
+                    (id, call_id, call_title, attempt, event, url, state, created_at, next_retry_at)
+                VALUES (?, ?, ?, ?, ?, ?, 'queued', ?, ?)
+                """,
+                id, callID, callTitle, attempt, event, url,
+                Date().iso8601WithFractions, nextRetryAt.iso8601WithFractions)
         }
     }
 
     /// the url is written again here: the user may have fixed the address since the row was queued
     func markWebhookSending(id: String, url: String) throws {
-        try queue.sync {
-            try withDatabase { db in
-                let sql = "UPDATE webhook_deliveries SET state = 'sending', sent_at = ?, url = ? WHERE id = ?"
-                try withStatement(db, sql) { statement in
-                    try bind(statement, 1, Date().iso8601WithFractions)
-                    try bind(statement, 2, url)
-                    try bind(statement, 3, id)
-                    try stepDone(statement, db)
-                }
-            }
+        try database { db in
+            try run(db, "UPDATE webhook_deliveries SET state = 'sending', sent_at = ?, url = ? WHERE id = ?",
+                    Date().iso8601WithFractions, url, id)
         }
     }
 
@@ -787,353 +610,194 @@ final class CallStore {
         responseBody: String?,
         error: String?
     ) throws {
-        try queue.sync {
-            try withDatabase { db in
-                let sql = """
-                    UPDATE webhook_deliveries
-                    SET state = ?, http_status = ?, response_action = ?, response_body = ?, error = ?, finished_at = ?
-                    WHERE id = ?
-                    """
-                try withStatement(db, sql) { statement in
-                    try bind(statement, 1, state)
-                    try bind(statement, 2, httpStatus.map(Int64.init))
-                    try bind(statement, 3, responseAction)
-                    try bind(statement, 4, responseBody)
-                    try bind(statement, 5, error)
-                    try bind(statement, 6, Date().iso8601WithFractions)
-                    try bind(statement, 7, id)
-                    try stepDone(statement, db)
-                }
-            }
+        try database { db in
+            try run(db, """
+                UPDATE webhook_deliveries
+                SET state = ?, http_status = ?, response_action = ?, response_body = ?, error = ?, finished_at = ?
+                WHERE id = ?
+                """, state, httpStatus, responseAction, responseBody, error, Date().iso8601WithFractions, id)
         }
     }
 
     func fetchWebhookDeliveries(callID: String) throws -> [StoredWebhookDelivery] {
-        try queue.sync {
-            try withDatabase { db in
-                let sql = "SELECT \(Self.webhookColumns) FROM webhook_deliveries WHERE call_id = ? ORDER BY attempt DESC"
-                return try withStatement(db, sql) { statement in
-                    try bind(statement, 1, callID)
-                    return try readWebhookDeliveries(statement, db)
-                }
-            }
+        try database { db in
+            try query(db, "\(Self.webhookSelect) WHERE call_id = ? ORDER BY attempt DESC", callID, row: makeWebhookDelivery)
         }
     }
 
     func fetchRecentWebhookDeliveries(limit: Int = 20) throws -> [StoredWebhookDelivery] {
-        try queue.sync {
-            try withDatabase { db in
-                let sql = "SELECT \(Self.webhookColumns) FROM webhook_deliveries ORDER BY created_at DESC LIMIT ?"
-                return try withStatement(db, sql) { statement in
-                    try bind(statement, 1, Int64(limit))
-                    return try readWebhookDeliveries(statement, db)
-                }
-            }
+        try database { db in
+            try query(db, "\(Self.webhookSelect) ORDER BY created_at DESC LIMIT ?", limit, row: makeWebhookDelivery)
         }
     }
 
     func fetchDueWebhookDeliveries(now: Date) throws -> [StoredWebhookDelivery] {
-        try queue.sync {
-            try withDatabase { db in
-                let sql = """
-                    SELECT \(Self.webhookColumns) FROM webhook_deliveries
-                    WHERE state = 'queued' AND next_retry_at <= ?
-                    ORDER BY next_retry_at ASC
-                    """
-                return try withStatement(db, sql) { statement in
-                    try bind(statement, 1, now.iso8601WithFractions)
-                    return try readWebhookDeliveries(statement, db)
-                }
-            }
+        try database { db in
+            try query(db, "\(Self.webhookSelect) WHERE state = 'queued' AND next_retry_at <= ? ORDER BY next_retry_at ASC",
+                      now.iso8601WithFractions, row: makeWebhookDelivery)
         }
     }
 
     func webhookAttemptCount(callID: String) throws -> Int {
-        try queue.sync {
-            try withDatabase { db in
-                try withStatement(db, "SELECT COUNT(*) FROM webhook_deliveries WHERE call_id = ?") { statement in
-                    try bind(statement, 1, callID)
-                    guard sqlite3_step(statement) == SQLITE_ROW else {
-                        throw CallStoreError.sqlite(String(cString: sqlite3_errmsg(db)))
-                    }
-                    return Int(sqlite3_column_int64(statement, 0))
-                }
-            }
+        try database { db in
+            try query(db, "SELECT COUNT(*) FROM webhook_deliveries WHERE call_id = ?", callID) {
+                Int(sqlite3_column_int64($0, 0))
+            }.first ?? 0
         }
     }
 
     /// rows the app was quit in the middle of; returned so the caller can queue the next attempt
     func failInterruptedWebhookDeliveries(reason: String) throws -> [StoredWebhookDelivery] {
-        try queue.sync {
-            try withDatabase { db in
-                let interrupted = try withStatement(
-                    db, "SELECT \(Self.webhookColumns) FROM webhook_deliveries WHERE state = 'sending'"
-                ) { statement in
-                    try readWebhookDeliveries(statement, db)
-                }
-                let sql = "UPDATE webhook_deliveries SET state = 'failed', error = ?, finished_at = ? WHERE state = 'sending'"
-                try withStatement(db, sql) { statement in
-                    try bind(statement, 1, reason)
-                    try bind(statement, 2, Date().iso8601WithFractions)
-                    try stepDone(statement, db)
-                }
-                return interrupted
-            }
+        try database { db in
+            let interrupted = try query(db, "\(Self.webhookSelect) WHERE state = 'sending'", row: makeWebhookDelivery)
+            try run(db, "UPDATE webhook_deliveries SET state = 'failed', error = ?, finished_at = ? WHERE state = 'sending'",
+                    reason, Date().iso8601WithFractions)
+            return interrupted
         }
     }
 
-    private static let webhookColumns = """
-        id, call_id, call_title, attempt, event, url, state, http_status, response_action, response_body, \
-        error, created_at, sent_at, finished_at, next_retry_at
+    private static let webhookSelect = """
+        SELECT id, call_id, call_title, attempt, event, url, state, http_status, response_action, response_body, \
+        error, created_at, sent_at, finished_at, next_retry_at FROM webhook_deliveries
         """
 
-    private func readWebhookDeliveries(_ statement: OpaquePointer, _ db: OpaquePointer) throws -> [StoredWebhookDelivery] {
-        var rows: [StoredWebhookDelivery] = []
-        while true {
-            let status = sqlite3_step(statement)
-            if status == SQLITE_DONE {
-                break
-            }
-            guard status == SQLITE_ROW else {
-                throw CallStoreError.sqlite(String(cString: sqlite3_errmsg(db)))
-            }
-            rows.append(
-                StoredWebhookDelivery(
-                    id: columnString(statement, 0) ?? "",
-                    callID: columnString(statement, 1) ?? "",
-                    callTitle: columnString(statement, 2) ?? "",
-                    attempt: Int(sqlite3_column_int64(statement, 3)),
-                    event: columnString(statement, 4) ?? "",
-                    url: columnString(statement, 5) ?? "",
-                    state: columnString(statement, 6) ?? "",
-                    httpStatus: columnInt(statement, 7),
-                    responseAction: columnString(statement, 8),
-                    responseBody: columnString(statement, 9),
-                    error: columnString(statement, 10),
-                    createdAt: columnString(statement, 11) ?? "",
-                    sentAt: columnString(statement, 12),
-                    finishedAt: columnString(statement, 13),
-                    nextRetryAt: columnString(statement, 14)
-                )
-            )
-        }
-        return rows
+    private func makeWebhookDelivery(_ statement: OpaquePointer) -> StoredWebhookDelivery {
+        StoredWebhookDelivery(
+            id: columnString(statement, 0) ?? "",
+            callID: columnString(statement, 1) ?? "",
+            callTitle: columnString(statement, 2) ?? "",
+            attempt: Int(sqlite3_column_int64(statement, 3)),
+            event: columnString(statement, 4) ?? "",
+            url: columnString(statement, 5) ?? "",
+            state: columnString(statement, 6) ?? "",
+            httpStatus: sqlite3_column_type(statement, 7) == SQLITE_NULL ? nil : Int(sqlite3_column_int64(statement, 7)),
+            responseAction: columnString(statement, 8),
+            responseBody: columnString(statement, 9),
+            error: columnString(statement, 10),
+            createdAt: columnString(statement, 11) ?? "",
+            sentAt: columnString(statement, 12),
+            finishedAt: columnString(statement, 13),
+            nextRetryAt: columnString(statement, 14)
+        )
     }
 
     /// the honest counter under the calendar switch in settings
     func eventCoverage() throws -> (matched: Int, total: Int) {
-        try queue.sync {
-            try withDatabase { db in
-                let sql = "SELECT COUNT(event_title), COUNT(*) FROM calls"
-                return try withStatement(db, sql) { statement in
-                    guard sqlite3_step(statement) == SQLITE_ROW else {
-                        return (matched: 0, total: 0)
-                    }
-                    return (
-                        matched: Int(sqlite3_column_int64(statement, 0)),
-                        total: Int(sqlite3_column_int64(statement, 1))
-                    )
-                }
-            }
+        try database { db in
+            try query(db, "SELECT COUNT(event_title), COUNT(*) FROM calls") {
+                (matched: Int(sqlite3_column_int64($0, 0)), total: Int(sqlite3_column_int64($0, 1)))
+            }.first ?? (matched: 0, total: 0)
         }
     }
 
     func fetchJobStats(callID: String) throws -> StoredJobStats? {
-        try queue.sync {
-            try withDatabase { db in
-                let sql = """
-                    SELECT SUM(wall_time_sec), AVG(real_time_factor), MAX(model)
-                    FROM transcript_jobs
-                    WHERE call_id = ? AND status = 'ready'
-                    """
-                return try withStatement(db, sql) { statement in
-                    try bind(statement, 1, callID)
-                    guard sqlite3_step(statement) == SQLITE_ROW,
-                          let wallTime = columnDouble(statement, 0) else {
-                        return nil
-                    }
-                    return StoredJobStats(
-                        wallTimeSec: wallTime,
-                        realTimeFactor: columnDouble(statement, 1),
-                        model: columnString(statement, 2)
-                    )
+        try database { db in
+            try query(db, """
+                SELECT SUM(wall_time_sec), AVG(real_time_factor), MAX(model)
+                FROM transcript_jobs
+                WHERE call_id = ? AND status = 'ready'
+                """, callID) { statement in
+                columnDouble(statement, 0).map {
+                    StoredJobStats(wallTimeSec: $0, realTimeFactor: columnDouble(statement, 1), model: columnString(statement, 2))
                 }
-            }
+            }.first ?? nil
         }
     }
 
     /// call ids whose transcript contains the query; the sidebar search reaches inside
     /// transcripts without loading every segment of every call
     func searchCallIDs(matching query: String) throws -> Set<String> {
-        try queue.sync {
-            try withDatabase { db in
-                let sql = """
-                    SELECT DISTINCT call_id FROM transcript_segments
-                    WHERE text LIKE ? ESCAPE '\\'
-                    """
-                return try withStatement(db, sql) { statement in
-                    try bind(statement, 1, "%\(query.sqliteLikeEscaped)%")
-
-                    var ids: Set<String> = []
-                    while true {
-                        let status = sqlite3_step(statement)
-                        if status == SQLITE_DONE {
-                            break
-                        }
-                        guard status == SQLITE_ROW else {
-                            throw CallStoreError.sqlite(String(cString: sqlite3_errmsg(db)))
-                        }
-                        if let id = columnString(statement, 0) {
-                            ids.insert(id)
-                        }
-                    }
-                    return ids
-                }
-            }
-        }
-    }
-
-    private func columnExists(_ db: OpaquePointer, table: String, column: String) throws -> Bool {
-        try withStatement(db, "PRAGMA table_info(\(table))") { statement in
-            while true {
-                let status = sqlite3_step(statement)
-                if status == SQLITE_DONE {
-                    return false
-                }
-                guard status == SQLITE_ROW else {
-                    throw CallStoreError.sqlite(String(cString: sqlite3_errmsg(db)))
-                }
-                if columnString(statement, 1) == column {
-                    return true
-                }
-            }
+        let escaped = query
+            .replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "%", with: "\\%")
+            .replacingOccurrences(of: "_", with: "\\_")
+        return try database { db in
+            let ids = try self.query(db, "SELECT DISTINCT call_id FROM transcript_segments WHERE text LIKE ? ESCAPE '\\'",
+                                     "%\(escaped)%") { columnString($0, 0) }
+            return Set(ids.compactMap { $0 })
         }
     }
 
     func setSpeakerName(callID: String, speakerKey: String, displayName: String?) throws {
-        try queue.sync {
-            try withDatabase { db in
-                guard let displayName, !displayName.isEmpty else {
-                    return try withStatement(
-                        db,
-                        "DELETE FROM call_speakers WHERE call_id = ? AND speaker_key = ?"
-                    ) { statement in
-                        try bind(statement, 1, callID)
-                        try bind(statement, 2, speakerKey)
-                        try stepDone(statement, db)
-                    }
-                }
-
-                let sql = """
-                    INSERT INTO call_speakers (call_id, speaker_key, display_name)
-                    VALUES (?, ?, ?)
-                    ON CONFLICT(call_id, speaker_key) DO UPDATE SET display_name = excluded.display_name
-                    """
-                try withStatement(db, sql) { statement in
-                    try bind(statement, 1, callID)
-                    try bind(statement, 2, speakerKey)
-                    try bind(statement, 3, displayName)
-                    try stepDone(statement, db)
-                }
+        try database { db in
+            guard let displayName, !displayName.isEmpty else {
+                return try run(db, "DELETE FROM call_speakers WHERE call_id = ? AND speaker_key = ?", callID, speakerKey)
             }
+            try run(db, """
+                INSERT INTO call_speakers (call_id, speaker_key, display_name)
+                VALUES (?, ?, ?)
+                ON CONFLICT(call_id, speaker_key) DO UPDATE SET display_name = excluded.display_name
+                """, callID, speakerKey, displayName)
         }
     }
 
     func fetchSpeakerNames(callID: String) throws -> [String: String] {
-        try queue.sync {
-            try withDatabase { db in
-                let sql = "SELECT speaker_key, display_name FROM call_speakers WHERE call_id = ?"
-                return try withStatement(db, sql) { statement in
-                    try bind(statement, 1, callID)
-
-                    var names: [String: String] = [:]
-                    while true {
-                        let status = sqlite3_step(statement)
-                        if status == SQLITE_DONE {
-                            break
-                        }
-                        guard status == SQLITE_ROW else {
-                            throw CallStoreError.sqlite(String(cString: sqlite3_errmsg(db)))
-                        }
-                        if let key = columnString(statement, 0), let name = columnString(statement, 1) {
-                            names[key] = name
-                        }
-                    }
-                    return names
-                }
+        try database { db in
+            let pairs = try query(db, "SELECT speaker_key, display_name FROM call_speakers WHERE call_id = ?", callID) {
+                (columnString($0, 0) ?? "", columnString($0, 1) ?? "")
             }
+            return Dictionary(pairs, uniquingKeysWith: { _, last in last })
         }
     }
 
     func fetchSegments(callID: String) throws -> [StoredTranscriptSegment] {
-        try queue.sync {
-            try withDatabase { db in
-                let sql = """
-                    SELECT speaker, start_sec, end_sec, text, order_idx
-                    FROM transcript_segments
-                    WHERE call_id = ?
-                    ORDER BY order_idx ASC
-                    """
-                return try withStatement(db, sql) { statement in
-                    try bind(statement, 1, callID)
-
-                    var segments: [StoredTranscriptSegment] = []
-                    while true {
-                        let status = sqlite3_step(statement)
-                        if status == SQLITE_DONE {
-                            break
-                        }
-                        guard status == SQLITE_ROW else {
-                            throw CallStoreError.sqlite(String(cString: sqlite3_errmsg(db)))
-                        }
-
-                        segments.append(
-                            StoredTranscriptSegment(
-                                speaker: columnString(statement, 0) ?? "",
-                                startSec: columnDouble(statement, 1) ?? 0,
-                                endSec: columnDouble(statement, 2),
-                                text: columnString(statement, 3) ?? "",
-                                orderIndex: Int(sqlite3_column_int64(statement, 4))
-                            )
-                        )
-                    }
-                    return segments
-                }
+        try database { db in
+            try query(db, """
+                SELECT speaker, start_sec, end_sec, text, order_idx
+                FROM transcript_segments
+                WHERE call_id = ?
+                ORDER BY order_idx ASC
+                """, callID) { statement in
+                StoredTranscriptSegment(
+                    speaker: columnString(statement, 0) ?? "",
+                    startSec: columnDouble(statement, 1) ?? 0,
+                    endSec: columnDouble(statement, 2),
+                    text: columnString(statement, 3) ?? "",
+                    orderIndex: Int(sqlite3_column_int64(statement, 4))
+                )
             }
         }
     }
 
-    private func withDatabase<T>(_ body: (OpaquePointer) throws -> T) throws -> T {
-        try FileManager.default.createDirectory(at: dbURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+    // MARK: - SQLite
 
-        var db: OpaquePointer?
-        let flags = SQLITE_OPEN_CREATE | SQLITE_OPEN_READWRITE | SQLITE_OPEN_FULLMUTEX
-        guard sqlite3_open_v2(dbURL.path, &db, flags, nil) == SQLITE_OK, let db else {
-            let message = db.map { String(cString: sqlite3_errmsg($0)) } ?? "Could not open SQLite database"
-            if let db {
+    /// every call opens its own connection on the serial queue, so callers on any thread see one writer
+    private func database<T>(_ body: (OpaquePointer) throws -> T) throws -> T {
+        try queue.sync {
+            try FileManager.default.createDirectory(at: dbURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+            var db: OpaquePointer?
+            let flags = SQLITE_OPEN_CREATE | SQLITE_OPEN_READWRITE | SQLITE_OPEN_FULLMUTEX
+            guard sqlite3_open_v2(dbURL.path, &db, flags, nil) == SQLITE_OK, let db else {
+                let message = db.map { String(cString: sqlite3_errmsg($0)) } ?? "Could not open SQLite database"
+                sqlite3_close(db)
+                throw CallStoreError.sqlite(message)
+            }
+            defer {
                 sqlite3_close(db)
             }
-            throw CallStoreError.sqlite(message)
+            return try body(db)
         }
-
-        defer {
-            sqlite3_close(db)
-        }
-
-        return try body(db)
     }
 
     private func execute(_ db: OpaquePointer, _ sql: String) throws {
         var errorMessage: UnsafeMutablePointer<CChar>?
-        let status = sqlite3_exec(db, sql, nil, nil, &errorMessage)
-        guard status == SQLITE_OK else {
+        guard sqlite3_exec(db, sql, nil, nil, &errorMessage) == SQLITE_OK else {
             let message = errorMessage.map { String(cString: $0) } ?? String(cString: sqlite3_errmsg(db))
             sqlite3_free(errorMessage)
             throw CallStoreError.sqlite(message)
         }
     }
 
-    private func withStatement<T>(_ db: OpaquePointer, _ sql: String, _ body: (OpaquePointer) throws -> T) throws -> T {
+    /// one statement that returns no rows
+    private func run(_ db: OpaquePointer, _ sql: String, _ values: Any?...) throws {
+        _ = try rows(db, sql, values) { _ in () }
+    }
+
+    private func query<T>(_ db: OpaquePointer, _ sql: String, _ values: Any?..., row: (OpaquePointer) throws -> T) throws -> [T] {
+        try rows(db, sql, values, row: row)
+    }
+
+    private func rows<T>(_ db: OpaquePointer, _ sql: String, _ values: [Any?], row: (OpaquePointer) throws -> T) throws -> [T] {
         var statement: OpaquePointer?
         guard sqlite3_prepare_v2(db, sql, -1, &statement, nil) == SQLITE_OK, let statement else {
             throw CallStoreError.sqlite(String(cString: sqlite3_errmsg(db)))
@@ -1141,80 +805,47 @@ final class CallStore {
         defer {
             sqlite3_finalize(statement)
         }
-        return try body(statement)
-    }
-
-    private func stepDone(_ statement: OpaquePointer, _ db: OpaquePointer) throws {
-        guard sqlite3_step(statement) == SQLITE_DONE else {
-            throw CallStoreError.sqlite(String(cString: sqlite3_errmsg(db)))
-        }
-    }
-
-    private func bind(_ statement: OpaquePointer, _ index: Int32, _ value: String?) throws {
-        if let value {
-            let status = sqlite3_bind_text(statement, index, value, -1, sqliteTransient)
+        for (offset, value) in values.enumerated() {
+            let index = Int32(offset + 1)
+            let status = switch value {
+            case nil: sqlite3_bind_null(statement, index)
+            case let text as String: sqlite3_bind_text(statement, index, text, -1, sqliteTransient)
+            case let flag as Bool: sqlite3_bind_int64(statement, index, flag ? 1 : 0)
+            case let number as Int: sqlite3_bind_int64(statement, index, Int64(number))
+            case let number as Double: sqlite3_bind_double(statement, index, number)
+            default: preconditionFailure("CallStore cannot bind \(type(of: value!))")
+            }
             guard status == SQLITE_OK else {
-                throw CallStoreError.sqlite("Could not bind string at index \(index)")
-            }
-        } else {
-            guard sqlite3_bind_null(statement, index) == SQLITE_OK else {
-                throw CallStoreError.sqlite("Could not bind null at index \(index)")
+                throw CallStoreError.sqlite("Could not bind value at index \(index)")
             }
         }
-    }
-
-    private func bind(_ statement: OpaquePointer, _ index: Int32, _ value: Double?) throws {
-        if let value {
-            guard sqlite3_bind_double(statement, index, value) == SQLITE_OK else {
-                throw CallStoreError.sqlite("Could not bind double at index \(index)")
-            }
-        } else {
-            guard sqlite3_bind_null(statement, index) == SQLITE_OK else {
-                throw CallStoreError.sqlite("Could not bind null at index \(index)")
+        var rows: [T] = []
+        while true {
+            switch sqlite3_step(statement) {
+            case SQLITE_ROW:
+                rows.append(try row(statement))
+            case SQLITE_DONE:
+                return rows
+            default:
+                throw CallStoreError.sqlite(String(cString: sqlite3_errmsg(db)))
             }
         }
     }
 
-    private func bind(_ statement: OpaquePointer, _ index: Int32, _ value: Int64) throws {
-        guard sqlite3_bind_int64(statement, index, value) == SQLITE_OK else {
-            throw CallStoreError.sqlite("Could not bind integer at index \(index)")
-        }
-    }
-
-    private func bind(_ statement: OpaquePointer, _ index: Int32, _ value: Int64?) throws {
-        if let value {
-            try bind(statement, index, value)
-        } else {
-            guard sqlite3_bind_null(statement, index) == SQLITE_OK else {
-                throw CallStoreError.sqlite("Could not bind null at index \(index)")
-            }
-        }
-    }
-
-    private func columnString(_ statement: OpaquePointer, _ index: Int32) -> String? {
-        guard sqlite3_column_type(statement, index) != SQLITE_NULL,
-              let pointer = sqlite3_column_text(statement, index) else {
-            return nil
-        }
-        return String(cString: pointer)
-    }
-
-    private func columnDouble(_ statement: OpaquePointer, _ index: Int32) -> Double? {
-        guard sqlite3_column_type(statement, index) != SQLITE_NULL else {
-            return nil
-        }
-        return sqlite3_column_double(statement, index)
-    }
-
-    private func columnInt(_ statement: OpaquePointer, _ index: Int32) -> Int? {
-        guard sqlite3_column_type(statement, index) != SQLITE_NULL else {
-            return nil
-        }
-        return Int(sqlite3_column_int64(statement, index))
+    private func columns(_ db: OpaquePointer, table: String) throws -> Set<String> {
+        Set(try query(db, "PRAGMA table_info(\(table))") { columnString($0, 1) ?? "" })
     }
 }
 
 private let sqliteTransient = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
+
+private func columnString(_ statement: OpaquePointer, _ index: Int32) -> String? {
+    sqlite3_column_text(statement, index).map { String(cString: $0) }
+}
+
+private func columnDouble(_ statement: OpaquePointer, _ index: Int32) -> Double? {
+    sqlite3_column_type(statement, index) == SQLITE_NULL ? nil : sqlite3_column_double(statement, index)
+}
 
 extension Date {
     /// the one timestamp format in the index; webhook retry times are compared as these strings
@@ -1222,20 +853,5 @@ extension Date {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         return formatter.string(from: self)
-    }
-}
-
-private extension String {
-    var sqliteLikeEscaped: String {
-        replacingOccurrences(of: "\\", with: "\\\\")
-            .replacingOccurrences(of: "%", with: "\\%")
-            .replacingOccurrences(of: "_", with: "\\_")
-    }
-}
-
-private extension Double {
-    var mmss: String {
-        let totalSeconds = Int(self.rounded())
-        return String(format: "%02d:%02d", totalSeconds / 60, totalSeconds % 60)
     }
 }
