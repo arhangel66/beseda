@@ -58,7 +58,7 @@
 ### Ключевые компоненты для изучения:
 *   **`App/AppController.swift`**: Сердце приложения, связывающее аудио и UI.
 *   **`Transcription/LocalTranscriber.swift`**: Реализация логики распознавания.
-*   **`untracked/calls.sqlite`**: Основная база данных с историей вызовов.
+*   **`~/Library/Application Support/Beseda/calls.sqlite`**: Основная база данных с историей вызовов (см. `docs/architecture/storage.md`).
 *   **`docs/index.md`**: Документация о продукте, архитектуре и решениях.
 
 ### Команды запуска:
