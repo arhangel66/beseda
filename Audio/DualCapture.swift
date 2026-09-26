@@ -36,7 +36,7 @@ final class DualCapture: @unchecked Sendable {
     private var _microphoneTracker: AudioActivityTracker?
     private var _systemTracker: AudioActivityTracker?
     private var _microphone: MicrophoneCapture?
-    private var _systemTap: AnyObject?
+    private var _systemTap: SystemAudioTap?
     private var _paused = false
 
     private var sleepTask: Task<Void, Error>? {
@@ -73,9 +73,7 @@ final class DualCapture: @unchecked Sendable {
             return (_microphone, _systemTap, [_microphoneTracker, _systemTracker].compactMap { $0 })
         }
         microphone?.isPaused = paused
-        if #available(macOS 14.2, *), let tap = tap as? SystemAudioTap {
-            tap.isPaused = paused
-        }
+        tap?.isPaused = paused
         if !paused {
             trackers.forEach { $0.resetActivity() }
         }
@@ -86,10 +84,6 @@ final class DualCapture: @unchecked Sendable {
         sessionDirectory: URL,
         autoStopSilenceDuration: TimeInterval? = nil
     ) async throws -> DualCaptureOutput {
-        guard #available(macOS 14.2, *) else {
-            throw AudioCaptureError.unsupportedFormat("Native system audio capture requires macOS 14.2 or newer")
-        }
-
         let microphoneRawURL = sessionDirectory.appendingPathComponent("me.raw.wav")
         let systemRawURL = sessionDirectory.appendingPathComponent("them.raw.wav")
         let metadataURL = sessionDirectory.appendingPathComponent("session.json")

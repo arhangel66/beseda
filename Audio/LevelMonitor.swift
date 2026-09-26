@@ -13,7 +13,7 @@ final class LevelMonitor {
     private(set) var failure: String?
 
     @ObservationIgnored private var microphone: MicrophoneCapture?
-    @ObservationIgnored private var tap: AnyObject?
+    @ObservationIgnored private var tap: SystemAudioTap?
     @ObservationIgnored private var microphoneTracker = AudioActivityTracker()
     @ObservationIgnored private var systemTracker = AudioActivityTracker()
     @ObservationIgnored private var ticker: Timer?
@@ -33,15 +33,13 @@ final class LevelMonitor {
         let microphone = MicrophoneCapture(activityTracker: microphoneTracker)
         self.microphone = microphone
 
-        if #available(macOS 14.2, *) {
-            let tap = SystemAudioTap(activityTracker: systemTracker)
-            do {
-                try tap.start()
-                self.tap = tap
-            } catch {
-                tap.cleanup()
-                failure = error.localizedDescription
-            }
+        let tap = SystemAudioTap(activityTracker: systemTracker)
+        do {
+            try tap.start()
+            self.tap = tap
+        } catch {
+            tap.cleanup()
+            failure = error.localizedDescription
         }
 
         Task {
@@ -67,9 +65,7 @@ final class LevelMonitor {
         ticker = nil
         microphone?.stopDiscarding()
         microphone = nil
-        if #available(macOS 14.2, *), let tap = tap as? SystemAudioTap {
-            tap.cleanup()
-        }
+        tap?.cleanup()
         tap = nil
         isRunning = false
         microphoneLevel = 0

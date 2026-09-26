@@ -41,7 +41,7 @@ cp "$ROOT/.build/artifacts/sparkle/Sparkle/LICENSE" "$APP_DIR/Contents/Resources
 # actool turns the Icon Composer source into both the macOS 26 icon (Assets.car) and the
 # plain AppIcon.icns older systems fall back to
 xcrun actool "$ROOT/Resources/AppIcon.icon" --compile "$APP_DIR/Contents/Resources" \
-    --platform macosx --minimum-deployment-target 14.0 --app-icon AppIcon \
+    --platform macosx --minimum-deployment-target 14.2 --app-icon AppIcon \
     --output-partial-info-plist "$ROOT/.build/appicon-partial.plist" > /dev/null
 
 IDENTITY="$(security find-identity -v -p codesigning | sed -n 's/.*"\(Apple Development: .*\)"/\1/p' | head -n 1)"

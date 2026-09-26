@@ -57,11 +57,8 @@ rate and channel count, and `session.json` (start/end, duration, stop reason, fi
   the row failed and returns its folder, and `PCMFloatRecorder.repairWAVHeader` rewrites the sizes from
   the file length. The call stays in the archive; its retry normalizes the raw files first when the
   `asr.wav` files are missing. A WAV header cannot count past 4 GB (~4 h of a 48 kHz stereo tap).
-- **macOS 14.2 for system audio.** The package targets macOS 14, but process taps need 14.2, so
-  `SystemAudioTap` is `@available(macOS 14.2, *)`. `DualCapture.record` throws below 14.2, and
-  `DualCapture` / `LevelMonitor` keep the tap as `AnyObject?` (`_systemTap`, `tap`) and cast it back
-  with `if #available(macOS 14.2, *), let tap = ... as? SystemAudioTap` — a stored property cannot have
-  a type that is only available on a newer OS.
+- **macOS 14.2 minimum.** Process taps need 14.2, so the whole package targets it (`Package.swift`,
+  `LSMinimumSystemVersion`, the bundle script) and `SystemAudioTap` needs no availability checks.
 - `MicrophoneProcessWatcher` listens to every property of each process object, not to
   `IsRunningInput`: on macOS 26.2 coreaudiod never posts that change (see the comment in
   `CallDetector.swift`).

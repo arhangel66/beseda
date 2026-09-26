@@ -23,7 +23,6 @@ enum CoreAudioStatus {
     }
 }
 
-@available(macOS 14.2, *)
 final class SystemAudioTap: @unchecked Sendable {
     private let activityTracker: AudioActivityTracker?
     private var tapID = AudioObjectID(kAudioObjectUnknown)
