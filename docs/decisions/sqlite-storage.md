@@ -14,8 +14,9 @@ generated:
 ## Context
 The [MVP phase plan](../archive/mvp-phase-plan.md) asked for a "small SQLite call index" and local-only storage
 under Application Support, not `~/Documents`, because Documents "may be synced by iCloud". It sketched the
-`calls`, `transcript_jobs` and `transcript_segments` tables. Why SQLite, and why no wrapper library, is not
-recorded.
+`calls`, `transcript_jobs` and `transcript_segments` tables.
+Rationale: incidental — how it was first built; open to change if a refactor improves quality or
+load (Mikhail, 2026-09-26). See [refactor for quality and load](refactor-for-quality-and-load.md).
 
 ## Decision
 `Storage/CallStore.swift` talks to `calls.sqlite` through `import SQLite3` (the C API shipped with macOS), with no
