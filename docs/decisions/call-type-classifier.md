@@ -1,8 +1,8 @@
 ---
 type: Decision Record
 title: Call-type classifier
-description: Which classifier picks the call type in phase 2 — the "JEV" Mikhail named is TypeSafe Jev on OpenRouter; local llama-server stays the default.
-status: proposed
+description: Which classifier picks the call type — TypeSafe Jev on OpenRouter by default when a key is set, the summary model otherwise.
+status: accepted
 tags: [classification, summarization, privacy]
 generated:
   by: agent
@@ -18,7 +18,7 @@ sources:
 
 # Call-type classifier
 
-**Status: proposed** (2026-09-26). For phase 2 of [development directions](development-directions.md):
+**Status: accepted** (2026-09-26, implemented in BESEDA-57). For phase 2 of [development directions](development-directions.md):
 classify a finished transcript into a user-defined type, then run that type's prompt.
 
 ## What "JEV" is
@@ -44,7 +44,15 @@ and `typesafe/jev-router` (released 2026-09-25, routes a request to a model and 
   parameters, ONNX exports and a C engine (GLiClass.c). Runs locally and fast, but would add a new runtime
   to the app; not worth it while llama-server already does the job.
 
-## Recommendation
+## Decision
+Mikhail decided on 2026-09-26: **Jev is the default whenever an OpenRouter key is set**; without a key the
+summary model (local by default) classifies. Settings → «Определение типа»: «Jev через OpenRouter (по
+умолчанию, если есть ключ)» / «Локально», with a note that the call's time, duration and transcript
+excerpt leave the Mac when Jev is used. A Jev failure falls back to the summary model and is logged.
+Per-type privacy is impossible: the type is unknown until the classifier has seen the call. How it is
+wired: [summarization](../architecture/summarization.md).
+
+## Original recommendation (superseded on the default)
 1. **Default: the bundled llama-server** picks the type from the user's list (first ~2k tokens plus the
    type descriptions). Local, private, no new dependency.
 2. **Opt-in cloud: Jev via OpenRouter**, off by default, with a warning in settings that the transcript

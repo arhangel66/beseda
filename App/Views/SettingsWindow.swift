@@ -241,6 +241,9 @@ private struct RecordingPane: View {
         } else if let host = remoteSummaryHost {
             sinks.append("расшифровка уходит на сервер итогов \(host)")
         }
+        if settings.classifiesWithJev, settings.callTypes.count > 1 {
+            sinks.append("время, длительность и начало расшифровки уходят в Jev через OpenRouter")
+        }
         if settings.webhookEnabled {
             sinks.append("расшифровка уходит на вебхук из раздела «Интеграции»")
         }
@@ -355,9 +358,9 @@ private struct ProcessingPane: View {
                             }
                             Spacer()
                             Button("Удалить тип", role: .destructive) {
-                                settings.callTypes.removeAll { $0.id == type.id }
+                                settings.deleteCallType(id: type.id)
                             }
-                            .disabled(settings.callTypes.count == 1)
+                            .disabled(type.id == settings.callTypes[0].id)
                         }
                         .controlSize(.small)
                     } label: {
@@ -369,10 +372,14 @@ private struct ProcessingPane: View {
                         CallType(name: "Новый тип", description: "", prompt: ChatCompletionsProvider.defaultPrompt)
                     )
                 }
+                Picker("Определение типа", selection: Bindable(settings).classifyLocally) {
+                    Text("Jev через OpenRouter (по умолчанию, если есть ключ)").tag(false)
+                    Text("Локально").tag(true)
+                }
             } header: {
                 Text("Типы созвонов")
             } footer: {
-                Text("С одним типом его инструкция просто пишет итоги. С двумя и больше модель сначала выбирает тип по началу разговора. Без заголовков `#`: панель показывает только жирный текст и переносы.")
+                Text("«\(CallType.otherName)» есть всегда: его инструкция пишет итоги, когда другие типы не подошли или других нет. С двумя и больше типами сначала выбирается тип по времени, длительности и началу разговора. С Jev время созвона, длительность и начало расшифровки уходят в OpenRouter (TypeSafe); без ключа OpenRouter или при сбое Jev тип выбирает модель итогов. Без заголовков `#`: панель показывает только жирный текст и переносы.")
             }
         }
         .formStyle(.grouped)

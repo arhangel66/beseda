@@ -8,6 +8,6 @@
 - [Summarization runtime](summarization-runtime.md) — built-in llama-server by default, OpenRouter or LM Studio by choice.
 - [Native SwiftUI menu-bar app](native-menubar-app.md) — one SwiftPM target, `MenuBarExtra`, system controls.
 - [SQLite call index](sqlite-storage.md) — `calls.sqlite` through the system SQLite3 API.
-- [Call-type classifier](call-type-classifier.md) — bundled llama-server by default, Jev via OpenRouter as opt-in cloud; proposed.
+- [Call-type classifier](call-type-classifier.md) — Jev via OpenRouter by default when a key is set, the summary model otherwise; accepted.
 - [Refactor for quality and load](refactor-for-quality-and-load.md) — which incidental decisions to refactor; proposed.
 - [Ponytail cleanup (BESEDA-4)](ponytail-cleanup.md) — what the cleanup removed; no behaviour changed.

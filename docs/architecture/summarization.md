@@ -11,15 +11,27 @@ A summary is written on request («Итоги» tab, `AppController.generateSumm
 `finishCall` marks a call ready when `AppSettings.autoProcessCalls` is on (off by default).
 
 **Call types.** `AppSettings.callTypes` (`[CallType]`, JSON under `beseda.callTypes`) — name, description
-for the classifier, prompt; never empty. The default is one type whose prompt is the old
-`beseda.summaryPrompt` if it was edited, else `ChatCompletionsProvider.defaultPrompt`. No example types are
-seeded: a second type would switch the classifier on for someone who changed nothing.
+for the classifier, prompt; never empty. `callTypes[0]` is the built-in «Другое» (`CallType.otherName`):
+editable, but `deleteCallType` refuses it; it holds the general prompt and is the fallback. On a fresh
+install it is seeded with the old `beseda.summaryPrompt` if that was edited, else
+`ChatCompletionsProvider.defaultPrompt`. Migration: a first type still named «Созвон» (the BESEDA-46
+default) is renamed «Другое» on load, prompt and id kept.
 `SummarizationService.process` picks the type and then summarizes with its prompt:
 - a type given by the caller (`generateSummary(as:)`, for a picker on the call screen) is used as is;
-- one type is used without asking the model;
-- with two or more, the same provider gets `classifierPrompt` (names + descriptions) and the first
-  8000 chars of the clean transcript, and `pickType` matches the answer case-insensitively by
-  containment, longest name first. An unknown answer falls back to the first type and is logged.
+- with only «Другое», it is used without asking any model;
+- otherwise the classifier gets a `ClassifierContext`: the call's weekday and local time, its duration in
+  minutes and the first 8000 chars (~2k tokens) of the clean transcript, plus type names and descriptions.
+  - **Jev** (`JevClassifier`, when `AppSettings.classifiesWithJev`: an OpenRouter key is set and
+    «Определение типа» is not «Локально»): `POST https://openrouter.ai/api/alpha/decisions`, model
+    `typesafe/jev-1.13`, `state` = started / duration / transcript_opening, one `choice` question
+    `call_type` whose criteria map name → description. The answer's `choice` and its entry in
+    `probabilities` are read; below `jevMinimumProbability` (0.5, untuned) or an unknown name → «Другое».
+    Any Jev error is logged and the summary model classifies instead.
+  - **Summary model**: the same provider gets `classifierPrompt` (names + descriptions, «Другое» when
+    nothing fits) and the context as text; `pickType` matches the answer case-insensitively by
+    containment, longest name first. An unknown answer falls back to «Другое» and is logged.
+  - Privacy is per app, not per type: the type is unknown before classification, so a private type
+    cannot keep its call away from Jev. Settings say what leaves the Mac next to the picker.
   Decision: [call-type classifier](../decisions/call-type-classifier.md).
 
 The chosen type's name is stored on the call (`callStore.setCallType`, column `calls.call_type`).
@@ -64,7 +76,7 @@ shaders and writes a marker. `remove()` deletes only the model.
 
 ## Main files
 
-`Summarization/SummarizationService.swift`, `ChatCompletionsProvider.swift`, `SummaryProvider.swift`
+`Summarization/SummarizationService.swift`, `JevClassifier.swift`, `ChatCompletionsProvider.swift`, `SummaryProvider.swift`
 (provider enum, `BundledSummary` pins), `LlamaServer.swift`, `LocalModelSupport.swift` (`lms`,
 `ProcessRunner`), `BundledSummaryInstaller.swift`; `App/ExecutableResolver.swift`.
 
