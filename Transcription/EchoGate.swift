@@ -6,39 +6,30 @@ import Foundation
 enum EchoGate {
     static let frameSamples = 320 // 20 ms at 16 kHz
     static let maxLagSamples = 8_000 // 500 ms
-    static let minRunFrames = 15 // 0.3 s
     /// mic energy must beat the predicted echo by 6 dB to count as "me"
     static let echoMargin: Float = 4
 
     static func ownSpeechSegments(_ segments: [TranscriptSegment], mic: [Float], system: [Float]) -> [TranscriptSegment] {
-        // each mic sentence cut down to its longest run of own speech; echo-only sentences are dropped.
-        // ASR often glues "me" and echo into one sentence, so a keep/drop per sentence fails.
+        // each mic sentence keeps only its words that touch own speech, bounds from those words;
+        // ASR often glues "me" and echo into one sentence, so a keep/drop per sentence fails
         let own = ownSpeechFrames(mic: mic, system: system)
+        func isOwn(_ word: TranscriptWord) -> Bool {
+            let first = max(Int(word.start * 50), 0)
+            let last = min(max(Int((word.end * 50).rounded(.up)), first + 1), own.count)
+            return first < last && own[first..<last].contains(true)
+        }
         return segments.compactMap { segment in
-            let first = max(Int(segment.start * 50), 0)
-            let last = min(Int((segment.end * 50).rounded(.up)), own.count)
-            var longest: Range<Int>?
-            var runStart: Int?
-            for frame in first...max(first, last) {
-                let isOwn = frame < last && own[frame]
-                if isOwn, runStart == nil {
-                    runStart = frame
-                } else if !isOwn, let start = runStart {
-                    if frame - start >= minRunFrames, frame - start > longest?.count ?? 0 {
-                        longest = start..<frame
-                    }
-                    runStart = nil
-                }
-            }
-            guard let longest else {
+            let words = segment.words ?? [TranscriptWord(start: segment.start, end: segment.end, text: segment.text)]
+            let kept = words.filter(isOwn)
+            guard let first = kept.first, let last = kept.last else {
                 return nil
             }
             return TranscriptSegment(
-                start: Double(longest.lowerBound) / 50,
-                end: Double(longest.upperBound) / 50,
-                text: segment.text,
+                start: first.start,
+                end: last.end,
+                text: kept.map(\.text).joined(separator: " "),
                 confidence: segment.confidence,
-                words: segment.words
+                words: segment.words == nil ? nil : kept
             )
         }
     }

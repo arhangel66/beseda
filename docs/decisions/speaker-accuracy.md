@@ -156,6 +156,18 @@ the eval audio is not built in the checkout and scoring the app pipeline means a
 Cost of 1: no models, no size, ~1 ms per audio second for the gate. Not done: no cloud engine, no Python
 runtime in the app, no app change before Mikhail approves the direction.
 
+## Echo gate on real calls (BESEDA-95)
+
+On the 15 truth calls ([echo-gate-real.md](../../untracked/epics/speaker-accuracy/results/echo-gate-real.md))
+there is no echo: the system channel is 35–69 dB down in the mic and the one-delay model explains none of it
+(Mikhail is on headphones), so the gate works as a mic activity detector. The 57–94 % "own speech" of
+20260925-125945 and 20260921-125925 is a mic floor near digital silence (−80 dB), where any breath beats floor ×10 —
+not a loudspeaker; it never cost transcript words. The real harm was the sentence rule: 364 of 1 583 kept
+sentences had bounds off their words, and a few own words went with dropped sentences. The gate now works by
+word (kept when any of its frames is own; sentence = kept words and their times): 0 bounds off, 0 own words lost,
+echo kept unchanged. "Most frames own" was rejected: it drops up to 38 real words a call. Still unmeasured: real
+loudspeaker echo; if it ever shows up, the fallback stays an AEC (VPIO / WebRTC AEC3), not more gate rules.
+
 ## Extra speakers on real calls (BESEDA-78)
 
 **Mechanism.** Every extra `them` speaker on the 10 one-to-one calls is the interlocutor's own **short

@@ -39,9 +39,11 @@ the vendored Swift wrapper in `Vendor/TranscribeCpp`). No audio leaves the machi
 - **Echo gate** — remote speech leaking from the speakers into the mic would be transcribed again as
   `me`. `EchoGate` finds the delay (FFT cross-correlation, 0–500 ms) and gain of the system channel
   inside the mic; a 20 ms mic frame is own speech only when its energy beats the predicted echo by 6 dB
-  and the noise floor ×10 (gaps up to 200 ms bridged). Each mic sentence is cut to its longest own-speech
-  run (≥ 0.3 s, text kept whole) or dropped. Only the transcript is gated: `me.asr.json` keeps everything.
-  One delay and one gain: a real room's smeared echo will get through more often.
+  and the noise floor ×10 (gaps up to 200 ms bridged). A mic word is kept when any of its frames is own
+  speech; a sentence becomes its kept words with their times, or is dropped. Only the transcript is gated:
+  `me.asr.json` keeps everything. One delay and one gain: a real room's smeared echo will get through more
+  often. On Mikhail's real calls (headphones) there is no echo to remove and the gate keeps every word
+  ([echo gate on real calls](../decisions/speaker-accuracy.md#echo-gate-on-real-calls-beseda-95)).
 - **Merge** — `DualTranscriptResult.speakerSegments` interleaves `me` segments with the remote turns by
   start time. `TranscriptMerger.writeDualTranscript` writes `transcript.md` with a `## Dialogue` block
   and a `## Channels` block (per-channel text and segments). `SpeakerNaming` turns keys into display

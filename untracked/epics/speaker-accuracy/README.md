@@ -18,6 +18,7 @@ measurement uses: a small eval set with reference labels and one scorer. Researc
 | `score_sweep.py` | DER per diarizer threshold/merge variant (BESEDA-69; `real_calls.sh` also counts them per variant) → [results/threshold-sweep.md](results/threshold-sweep.md) |
 | `extra_speakers.sh`, `extra_speakers.py` | BESEDA-79: every extra `them` speaker of the 1:1 calls and the benchmark speakers — segments, levels, embeddings → [results/extra-speaker-cause.md](results/extra-speaker-cause.md) |
 | `short_reply_merge.py` | BESEDA-82: short-reply merge rule variants (segment limit, target, threshold, FluidAudio 0.17.4) on calls and benchmark → [results/short-reply-merge.md](results/short-reply-merge.md) |
+| `echo_gate_real.sh`, `echo_gate_real.py` | BESEDA-95: echo gate before/after on the 15 truth calls (echo level, own share, echo kept, own words lost, sentence bounds) → [results/echo-gate-real.md](results/echo-gate-real.md) |
 | `asr/` | local remote-speech ASR alternatives (Whisper turbo, GigaAM CTC, loudnorm, ru/en routing) vs the baseline engines, WER/CER by language — [asr/README.md](asr/README.md) |
 
 ## What is in the set (28 min, 13 recordings)
