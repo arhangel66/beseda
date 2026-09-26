@@ -286,121 +286,160 @@ final class CallStore {
         self.dbURL = dbURL
     }
 
+    /// one schema version per entry, run in order; append a new one, never edit a released one
+    typealias Migration = (OpaquePointer) throws -> Void
+
+    var migrations: [Migration] {
+        [createSchemaV1]
+    }
+
     func prepare() throws {
+        try prepare(migrations: migrations)
+    }
+
+    /// brings the file to `migrations.count` in `PRAGMA user_version`, backing it up first
+    func prepare(migrations: [Migration]) throws {
+        let fileExisted = FileManager.default.fileExists(atPath: dbURL.path)
         try database { db in
             try execute(db, "PRAGMA foreign_keys = ON")
             try execute(db, "PRAGMA journal_mode = WAL")
-            try execute(db, """
-                CREATE TABLE IF NOT EXISTS calls (
-                    id TEXT PRIMARY KEY,
-                    kind TEXT NOT NULL,
-                    started_at TEXT NOT NULL,
-                    ended_at TEXT,
-                    duration_sec REAL,
-                    status TEXT NOT NULL,
-                    transcript_path TEXT,
-                    audio_dir TEXT NOT NULL,
-                    error TEXT,
-                    app_name TEXT,
-                    summary_text TEXT,
-                    created_at TEXT NOT NULL,
-                    updated_at TEXT NOT NULL
-                )
-                """)
-            let callColumns = try columns(db, table: "calls")
-            for (column, type) in [
-                ("app_name", "TEXT"),
-                ("event_title", "TEXT"),
-                ("event_id", "TEXT"),
-                ("event_pinned", "INTEGER NOT NULL DEFAULT 0"),
-                ("summary_text", "TEXT"),
-                ("call_type", "TEXT"),
-                ("event_series_id", "TEXT"),
-                ("participants", "TEXT"),
-                ("export_path", "TEXT")
-            ] where !callColumns.contains(column) {
-                try execute(db, "ALTER TABLE calls ADD COLUMN \(column) \(type)")
+            let version = try query(db, "PRAGMA user_version") { Int(sqlite3_column_int64($0, 0)) }.first ?? 0
+            guard version < migrations.count else {
+                return
             }
-            if callColumns.contains("keep_audio") {
-                // retention rules replaced the per-call flag, and nothing reads the column now
-                try execute(db, "ALTER TABLE calls DROP COLUMN keep_audio")
+            if fileExisted {
+                // VACUUM INTO writes a consistent copy even with a live WAL, and refuses an existing file
+                let backupURL = backupURL(fromVersion: version)
+                if FileManager.default.fileExists(atPath: backupURL.path) {
+                    try FileManager.default.removeItem(at: backupURL)
+                }
+                try run(db, "VACUUM INTO ?", backupURL.path)
             }
-            try execute(db, """
-                CREATE TABLE IF NOT EXISTS transcript_segments (
-                    id TEXT PRIMARY KEY,
-                    call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE,
-                    speaker TEXT NOT NULL,
-                    start_sec REAL NOT NULL,
-                    end_sec REAL,
-                    text TEXT NOT NULL,
-                    order_idx INTEGER NOT NULL
-                )
-                """)
-            try execute(db, """
-                CREATE INDEX IF NOT EXISTS idx_transcript_segments_call_order
-                ON transcript_segments(call_id, order_idx)
-                """)
-            try execute(db, """
-                CREATE TABLE IF NOT EXISTS transcript_jobs (
-                    id TEXT PRIMARY KEY,
-                    call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE,
-                    speaker TEXT NOT NULL,
-                    status TEXT NOT NULL,
-                    audio_path TEXT NOT NULL,
-                    asr_json_path TEXT,
-                    audio_duration_sec REAL,
-                    wall_time_sec REAL,
-                    real_time_factor REAL,
-                    model TEXT,
-                    error TEXT,
-                    created_at TEXT NOT NULL,
-                    updated_at TEXT NOT NULL
-                )
-                """)
-            if try !columns(db, table: "transcript_jobs").contains("model") {
-                try execute(db, "ALTER TABLE transcript_jobs ADD COLUMN model TEXT")
+            for (index, migrate) in migrations.enumerated().dropFirst(version) {
+                try transaction(db) {
+                    try migrate(db)
+                    try execute(db, "PRAGMA user_version = \(index + 1)")
+                }
             }
-            try execute(db, """
-                CREATE INDEX IF NOT EXISTS idx_transcript_jobs_call
-                ON transcript_jobs(call_id, speaker)
-                """)
-            // only renames live here: a speaker left with its default name stores nothing
-            try execute(db, """
-                CREATE TABLE IF NOT EXISTS call_speakers (
-                    call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE,
-                    speaker_key TEXT NOT NULL,
-                    display_name TEXT NOT NULL,
-                    PRIMARY KEY (call_id, speaker_key)
-                )
-                """)
-            try execute(db, """
-                CREATE TABLE IF NOT EXISTS webhook_deliveries (
-                    id TEXT PRIMARY KEY,
-                    call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE,
-                    call_title TEXT NOT NULL,
-                    attempt INTEGER NOT NULL,
-                    event TEXT NOT NULL,
-                    url TEXT NOT NULL,
-                    state TEXT NOT NULL,
-                    http_status INTEGER,
-                    response_action TEXT,
-                    response_body TEXT,
-                    error TEXT,
-                    created_at TEXT NOT NULL,
-                    sent_at TEXT,
-                    finished_at TEXT,
-                    next_retry_at TEXT
-                )
-                """)
-            try execute(db, """
-                CREATE INDEX IF NOT EXISTS idx_webhook_deliveries_call
-                ON webhook_deliveries(call_id, attempt)
-                """)
-            try execute(db, """
-                CREATE INDEX IF NOT EXISTS idx_webhook_deliveries_due
-                ON webhook_deliveries(state, next_retry_at)
-                """)
         }
+    }
+
+    func backupURL(fromVersion version: Int) -> URL {
+        dbURL.deletingLastPathComponent().appendingPathComponent("\(dbURL.lastPathComponent).v\(version).backup")
+    }
+
+    /// version 1: whatever an unversioned file (0.3.x and older) holds, brought to one shape
+    private func createSchemaV1(_ db: OpaquePointer) throws {
+        try execute(db, """
+            CREATE TABLE IF NOT EXISTS calls (
+                id TEXT PRIMARY KEY,
+                kind TEXT NOT NULL,
+                started_at TEXT NOT NULL,
+                ended_at TEXT,
+                duration_sec REAL,
+                status TEXT NOT NULL,
+                transcript_path TEXT,
+                audio_dir TEXT NOT NULL,
+                error TEXT,
+                app_name TEXT,
+                summary_text TEXT,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            )
+            """)
+        let callColumns = try columns(db, table: "calls")
+        for (column, type) in [
+            ("app_name", "TEXT"),
+            ("event_title", "TEXT"),
+            ("event_id", "TEXT"),
+            ("event_pinned", "INTEGER NOT NULL DEFAULT 0"),
+            ("summary_text", "TEXT"),
+            ("call_type", "TEXT"),
+            ("event_series_id", "TEXT"),
+            ("participants", "TEXT"),
+            ("export_path", "TEXT")
+        ] where !callColumns.contains(column) {
+            try execute(db, "ALTER TABLE calls ADD COLUMN \(column) \(type)")
+        }
+        if callColumns.contains("keep_audio") {
+            // retention rules replaced the per-call flag, and nothing reads the column now
+            try execute(db, "ALTER TABLE calls DROP COLUMN keep_audio")
+        }
+        try execute(db, """
+            CREATE TABLE IF NOT EXISTS transcript_segments (
+                id TEXT PRIMARY KEY,
+                call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE,
+                speaker TEXT NOT NULL,
+                start_sec REAL NOT NULL,
+                end_sec REAL,
+                text TEXT NOT NULL,
+                order_idx INTEGER NOT NULL
+            )
+            """)
+        try execute(db, """
+            CREATE INDEX IF NOT EXISTS idx_transcript_segments_call_order
+            ON transcript_segments(call_id, order_idx)
+            """)
+        try execute(db, """
+            CREATE TABLE IF NOT EXISTS transcript_jobs (
+                id TEXT PRIMARY KEY,
+                call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE,
+                speaker TEXT NOT NULL,
+                status TEXT NOT NULL,
+                audio_path TEXT NOT NULL,
+                asr_json_path TEXT,
+                audio_duration_sec REAL,
+                wall_time_sec REAL,
+                real_time_factor REAL,
+                model TEXT,
+                error TEXT,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            )
+            """)
+        if try !columns(db, table: "transcript_jobs").contains("model") {
+            try execute(db, "ALTER TABLE transcript_jobs ADD COLUMN model TEXT")
+        }
+        try execute(db, """
+            CREATE INDEX IF NOT EXISTS idx_transcript_jobs_call
+            ON transcript_jobs(call_id, speaker)
+            """)
+        // only renames live here: a speaker left with its default name stores nothing
+        try execute(db, """
+            CREATE TABLE IF NOT EXISTS call_speakers (
+                call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE,
+                speaker_key TEXT NOT NULL,
+                display_name TEXT NOT NULL,
+                PRIMARY KEY (call_id, speaker_key)
+            )
+            """)
+        try execute(db, """
+            CREATE TABLE IF NOT EXISTS webhook_deliveries (
+                id TEXT PRIMARY KEY,
+                call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE,
+                call_title TEXT NOT NULL,
+                attempt INTEGER NOT NULL,
+                event TEXT NOT NULL,
+                url TEXT NOT NULL,
+                state TEXT NOT NULL,
+                http_status INTEGER,
+                response_action TEXT,
+                response_body TEXT,
+                error TEXT,
+                created_at TEXT NOT NULL,
+                sent_at TEXT,
+                finished_at TEXT,
+                next_retry_at TEXT
+            )
+            """)
+        try execute(db, """
+            CREATE INDEX IF NOT EXISTS idx_webhook_deliveries_call
+            ON webhook_deliveries(call_id, attempt)
+            """)
+        try execute(db, """
+            CREATE INDEX IF NOT EXISTS idx_webhook_deliveries_due
+            ON webhook_deliveries(state, next_retry_at)
+            """)
     }
 
     /// audio folders of the calls it marked failed
@@ -447,20 +486,54 @@ final class CallStore {
         guard let call = try fetchCall(id: id) else {
             return
         }
-        // files go first: if one cannot be removed, the row stays and the user can try again
+        // the folder moves to the trash first: a failed row delete puts it back, and a trash that
+        // cannot be emptied now is emptied on the next launch, so no row ever points at missing files
+        let fileManager = FileManager.default
+        let trashedFolder = trashURL.appendingPathComponent(UUID().uuidString, isDirectory: true)
+            .appendingPathComponent(id, isDirectory: true)
+        let folder = call.audioDirectoryPath.isEmpty ? nil : call.audioDirectoryURL
+        let folderExists = folder.map { fileManager.fileExists(atPath: $0.path) } ?? false
+        if let folder, folderExists {
+            try fileManager.createDirectory(at: trashedFolder.deletingLastPathComponent(), withIntermediateDirectories: true)
+            try fileManager.moveItem(at: folder, to: trashedFolder)
+        }
         // the stored path finds a copy written under an older title; the current name covers
         // copies written before the path was stored
-        var urls = [
+        let looseFiles = [
             call.transcriptURL, exportFolder?.appendingPathComponent(CallExport.fileName(call)),
             try exportPath(callID: id).map { URL(fileURLWithPath: $0) }
         ]
-        if !call.audioDirectoryPath.isEmpty {
-            urls.append(call.audioDirectoryURL)
+        do {
+            try deleteCall(id: id)
+        } catch {
+            if let folder, folderExists {
+                try? fileManager.moveItem(at: trashedFolder, to: folder)
+            }
+            throw error
         }
-        for url in urls.compactMap({ $0 }) where FileManager.default.fileExists(atPath: url.path) {
-            try FileManager.default.removeItem(at: url)
+        for url in looseFiles.compactMap({ $0 }) where fileManager.fileExists(atPath: url.path) {
+            try fileManager.removeItem(at: url)
         }
-        try deleteCall(id: id)
+        try emptyTrash()
+    }
+
+    /// call folders a deletion moved aside and could not remove
+    var trashURL: URL {
+        dbURL.deletingLastPathComponent().appendingPathComponent("trash", isDirectory: true)
+    }
+
+    /// trash/<uuid>/<call id>; a folder whose row is still there (a restore that failed) is kept
+    func emptyTrash() throws {
+        let fileManager = FileManager.default
+        guard fileManager.fileExists(atPath: trashURL.path) else {
+            return
+        }
+        for batch in try fileManager.contentsOfDirectory(at: trashURL, includingPropertiesForKeys: nil) {
+            let callIDs = try fileManager.contentsOfDirectory(atPath: batch.path)
+            if try callIDs.allSatisfy({ try fetchCall(id: $0) == nil }) {
+                try fileManager.removeItem(at: batch)
+            }
+        }
     }
 
     func upsertCall(
@@ -502,24 +575,37 @@ final class CallStore {
 
     func replaceSegments(callID: String, segments: [StoredTranscriptSegment]) throws {
         try database { db in
-            try execute(db, "BEGIN IMMEDIATE TRANSACTION")
-            do {
-                try run(db, "DELETE FROM transcript_segments WHERE call_id = ?", callID)
-                // a retry renumbers the speakers, so names pinned to the old keys are gone
-                try run(db, "DELETE FROM call_speakers WHERE call_id = ?", callID)
-                for segment in segments {
-                    try run(db, """
-                        INSERT INTO transcript_segments (id, call_id, speaker, start_sec, end_sec, text, order_idx)
-                        VALUES (?, ?, ?, ?, ?, ?, ?)
-                        """,
-                        "\(callID)-\(segment.orderIndex)", callID, segment.speaker,
-                        segment.startSec, segment.endSec, segment.text, segment.orderIndex)
-                }
-                try execute(db, "COMMIT")
-            } catch {
-                try? execute(db, "ROLLBACK")
-                throw error
+            try transaction(db) {
+                try writeSegments(db, callID: callID, segments: segments)
             }
+        }
+    }
+
+    /// the transcript's lines and the ready status land together or not at all
+    func markReady(callID: String, transcriptURL: URL, segments: [StoredTranscriptSegment]) throws {
+        try database { db in
+            try transaction(db) {
+                try writeSegments(db, callID: callID, segments: segments)
+                try run(db, "UPDATE calls SET status = 'ready', transcript_path = ?, error = NULL, updated_at = ? WHERE id = ?",
+                        transcriptURL.path, Date().iso8601WithFractions, callID)
+                guard sqlite3_changes(db) == 1 else {
+                    throw CallStoreError.sqlite("No call \(callID) to mark ready")
+                }
+            }
+        }
+    }
+
+    private func writeSegments(_ db: OpaquePointer, callID: String, segments: [StoredTranscriptSegment]) throws {
+        try run(db, "DELETE FROM transcript_segments WHERE call_id = ?", callID)
+        // a retry renumbers the speakers, so names pinned to the old keys are gone
+        try run(db, "DELETE FROM call_speakers WHERE call_id = ?", callID)
+        for segment in segments {
+            try run(db, """
+                INSERT INTO transcript_segments (id, call_id, speaker, start_sec, end_sec, text, order_idx)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                """,
+                "\(callID)-\(segment.orderIndex)", callID, segment.speaker,
+                segment.startSec, segment.endSec, segment.text, segment.orderIndex)
         }
     }
 
@@ -882,6 +968,17 @@ final class CallStore {
                 sqlite3_close(db)
             }
             return try body(db)
+        }
+    }
+
+    private func transaction(_ db: OpaquePointer, _ body: () throws -> Void) throws {
+        try execute(db, "BEGIN IMMEDIATE TRANSACTION")
+        do {
+            try body()
+            try execute(db, "COMMIT")
+        } catch {
+            try? execute(db, "ROLLBACK")
+            throw error
         }
     }
 

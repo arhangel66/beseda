@@ -270,6 +270,11 @@ final class AppController {
         } catch {
             appendLog("Call index unavailable: \(error.localizedDescription)")
         }
+        do {
+            try callStore.emptyTrash()
+        } catch {
+            appendLog("Could not empty the deleted calls' trash: \(error.localizedDescription)")
+        }
 
 
         startDailySweep()
@@ -733,7 +738,7 @@ final class AppController {
             cancelRequested = false
             recordingWarning = nil
             try fileManager.createDirectory(at: sessionDir, withIntermediateDirectories: true)
-            saveCall(callID, kind: "dual", in: sessionDir, startedAt: startedAt, status: "recording", appName: autoStartedApp)
+            try saveCall(callID, kind: "dual", in: sessionDir, startedAt: startedAt, status: "recording", appName: autoStartedApp)
 
             if let autoStartedApp {
                 status = .autoRecording(autoStartedApp)
@@ -782,14 +787,14 @@ final class AppController {
                 discardCall(id: callID, sessionDirectory: sessionDir, durationSec: captureOutput.durationSec)
                 return
             }
-            let persist = { [unowned self] (status: String, transcriptURL: URL?) in
-                saveCall(
+            let persist = { [unowned self] (status: String, transcriptURL: URL?) throws in
+                try saveCall(
                     callID, kind: "dual", in: sessionDir,
                     startedAt: captureOutput.startedAt, endedAt: captureOutput.endedAt,
                     durationSec: captureOutput.durationSec, status: status, transcriptURL: transcriptURL
                 )
             }
-            persist("normalizing", nil)
+            try persist("normalizing", nil)
 
             processingCallID = callID
             beginStage("Подготовка записи", 1, of: 5)
@@ -812,10 +817,15 @@ final class AppController {
         } catch {
             callDetector.recordingEnded()
             status = .failed(error.localizedDescription)
-            saveCall(
-                callID, kind: "dual", in: sessionDir, startedAt: startedAt, endedAt: Date(),
-                durationSec: Date().timeIntervalSince(startedAt), status: "failed", error: error.localizedDescription
-            )
+            // the index may be what failed; a row left mid-flight is marked failed on the next launch
+            do {
+                try saveCall(
+                    callID, kind: "dual", in: sessionDir, startedAt: startedAt, endedAt: Date(),
+                    durationSec: Date().timeIntervalSince(startedAt), status: "failed", error: error.localizedDescription
+                )
+            } catch let indexError {
+                appendLog("Call index failed: \(indexError.localizedDescription)")
+            }
             appendLog("Failed: \(error.localizedDescription)")
         }
     }
@@ -860,8 +870,8 @@ final class AppController {
         let sessionDir = summary.audioDirectoryURL
         let startedAt = summary.startedDate ?? Date()
         let endedAt = summary.endedAt.flatMap(CallFormatting.parseISO8601)
-        let persist = { [unowned self] (status: String, transcriptURL: URL?) in
-            saveCall(
+        let persist = { [unowned self] (status: String, transcriptURL: URL?) throws in
+            try saveCall(
                 callID, kind: summary.kind, in: sessionDir, startedAt: startedAt, endedAt: endedAt,
                 durationSec: summary.durationSec, status: status, transcriptURL: transcriptURL
             )
@@ -876,7 +886,7 @@ final class AppController {
                 let rawURL = sessionDir.appendingPathComponent("mic.raw.wav")
                 try requireFile(at: normalizedURL)
                 try await startTranscriber(stage: 1, of: 2)
-                persist("transcribing", nil)
+                try persist("transcribing", nil)
 
                 beginStage("Расшифровка записи", 2, of: 2)
                 let result = try await transcribeChannel(
@@ -889,7 +899,7 @@ final class AppController {
                 let segments = result.segments.map {
                     SpeakerTranscriptSegment(speaker: TranscriptChannel.microphone.speakerID, segment: $0)
                 }
-                finishCall(callID, in: sessionDir, segments: segments, audio: [rawURL, normalizedURL], persist: persist)
+                try finishCall(callID, in: sessionDir, segments: segments, audio: [rawURL, normalizedURL])
 
             case "dual":
                 // a call cut off by a crash has only the raw files, streamed to disk while it recorded
@@ -908,10 +918,15 @@ final class AppController {
             appendLog("Retry succeeded for \(callID)")
         } catch {
             status = .failed(error.localizedDescription)
-            saveCall(
-                callID, kind: summary.kind, in: sessionDir, startedAt: startedAt, endedAt: endedAt ?? Date(),
-                durationSec: summary.durationSec, status: "failed", error: error.localizedDescription
-            )
+            // the index may be what failed; a row left mid-flight is marked failed on the next launch
+            do {
+                try saveCall(
+                    callID, kind: summary.kind, in: sessionDir, startedAt: startedAt, endedAt: endedAt ?? Date(),
+                    durationSec: summary.durationSec, status: "failed", error: error.localizedDescription
+                )
+            } catch let indexError {
+                appendLog("Call index failed: \(indexError.localizedDescription)")
+            }
             appendLog("Retry failed: \(error.localizedDescription)")
         }
     }
@@ -930,10 +945,10 @@ final class AppController {
         _ callID: String,
         in sessionDir: URL,
         stages total: Int,
-        persist: (_ status: String, _ transcriptURL: URL?) -> Void
+        persist: (_ status: String, _ transcriptURL: URL?) throws -> Void
     ) async throws {
         try await startTranscriber(stage: total - 3, of: total)
-        persist("transcribing", nil)
+        try persist("transcribing", nil)
 
         beginStage("Расшифровка вашего голоса", total - 2, of: total)
         appendLog("Transcribing microphone")
@@ -970,10 +985,9 @@ final class AppController {
             remoteTurns: remoteTurns
         )
         try TranscriptMerger.writeDualTranscript(dualResult, to: transcriptURL)
-        finishCall(
+        try finishCall(
             callID, in: sessionDir, segments: dualResult.speakerSegments,
-            audio: [microphone.rawAudioURL, systemAudio.rawAudioURL, microphone.normalizedAudioURL, systemAudio.normalizedAudioURL],
-            persist: persist
+            audio: [microphone.rawAudioURL, systemAudio.rawAudioURL, microphone.normalizedAudioURL, systemAudio.normalizedAudioURL]
         )
         appendLog("Wrote dual transcript to \(transcriptURL.path)")
     }
@@ -1020,21 +1034,19 @@ final class AppController {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         try encoder.encode(transcription).write(to: asrJSONURL)
-        updateCallIndex {
-            try callStore.upsertTranscriptJob(
-                id: transcription.id,
-                callID: callID,
-                speaker: channel.speakerID,
-                status: "ready",
-                audioURL: audioURL,
-                asrJSONURL: asrJSONURL,
-                audioDurationSec: transcription.audioDurationSec,
-                wallTimeSec: transcription.wallTimeSec,
-                realTimeFactor: transcription.realTimeFactor,
-                model: settings.speechModelID,
-                error: nil
-            )
-        }
+        try callStore.upsertTranscriptJob(
+            id: transcription.id,
+            callID: callID,
+            speaker: channel.speakerID,
+            status: "ready",
+            audioURL: audioURL,
+            asrJSONURL: asrJSONURL,
+            audioDurationSec: transcription.audioDurationSec,
+            wallTimeSec: transcription.wallTimeSec,
+            realTimeFactor: transcription.realTimeFactor,
+            model: settings.speechModelID,
+            error: nil
+        )
         return TranscriptResult(
             id: transcription.id,
             createdAt: Date(),
@@ -1055,11 +1067,13 @@ final class AppController {
         _ callID: String,
         in sessionDir: URL,
         segments: [SpeakerTranscriptSegment],
-        audio: [URL],
-        persist: (_ status: String, _ transcriptURL: URL?) -> Void
-    ) {
-        updateCallIndex {
-            try callStore.replaceSegments(callID: callID, segments: segments.enumerated().map { index, line in
+        audio: [URL]
+    ) throws {
+        // a failed write throws before the audio goes or the webhook fires: the call stays retryable
+        try callStore.markReady(
+            callID: callID,
+            transcriptURL: sessionDir.appendingPathComponent(DualFiles.transcript),
+            segments: segments.enumerated().map { index, line in
                 StoredTranscriptSegment(
                     speaker: line.speaker,
                     startSec: line.segment.start,
@@ -1067,9 +1081,9 @@ final class AppController {
                     text: line.segment.text,
                     orderIndex: index
                 )
-            })
-        }
-        persist("ready", sessionDir.appendingPathComponent(DualFiles.transcript))
+            }
+        )
+        refreshRecentCalls()
         cleanupAudioIfNeeded(files: audio)
         status = .completed
         webhooks.enqueue(callID: callID)
@@ -1476,21 +1490,20 @@ final class AppController {
         transcriptURL: URL? = nil,
         error: String? = nil,
         appName: String? = nil
-    ) {
-        updateCallIndex {
-            try callStore.upsertCall(
-                id: id,
-                kind: kind,
-                startedAt: startedAt,
-                endedAt: endedAt,
-                durationSec: durationSec,
-                status: status,
-                transcriptURL: transcriptURL,
-                audioDirectoryURL: sessionDir,
-                error: error,
-                appName: appName
-            )
-        }
+    ) throws {
+        try callStore.upsertCall(
+            id: id,
+            kind: kind,
+            startedAt: startedAt,
+            endedAt: endedAt,
+            durationSec: durationSec,
+            status: status,
+            transcriptURL: transcriptURL,
+            audioDirectoryURL: sessionDir,
+            error: error,
+            appName: appName
+        )
+        refreshRecentCalls()
     }
 
     func canDelete(_ call: StoredCallSummary) -> Bool {
@@ -1550,15 +1563,6 @@ final class AppController {
             }
         }
         refreshStorageUsage()
-    }
-
-    private func updateCallIndex(_ operation: () throws -> Void) {
-        do {
-            try operation()
-            refreshRecentCalls()
-        } catch {
-            appendLog("Call index failed: \(error.localizedDescription)")
-        }
     }
 
     private func refreshTranscriptMatches() {

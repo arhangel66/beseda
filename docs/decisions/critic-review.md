@@ -75,6 +75,8 @@ Effort is S (hours), M (days), or L (weeks). Priority is P0 (blocks safe sale or
    Disk-full or SQLite corruption can leave a “completed” call with no searchable transcript, or an orphan
    folder absent from the UI. Make storage mutations throwing, commit segments and ready status in one
    transaction, and only clean audio or send webhooks after that transaction succeeds.
+   Fixed in BESEDA-89: pipeline index writes throw into the job's error status; `markReady` commits segments
+   and `ready` in one transaction before audio cleanup, webhooks and auto-processing.
 
 8. **Crash recovery only handles calls that already reached SQLite — P0, M.** Recording creates a directory
    before the non-throwing index write (`App/AppController.swift:735-736`); startup repairs only folders
@@ -96,6 +98,8 @@ Effort is S (hours), M (days), or L (weeks). Priority is P0 (blocks safe sale or
     SQLite row. If the final database operation fails, retry cannot restore the files and the archive keeps a
     broken call. Atomically rename files to an app-owned trash location, delete the row in a transaction,
     then remove trash; restore the rename if the transaction fails.
+    Fixed in BESEDA-89: the folder is renamed into `trash/`, the row deleted, then files removed; a failed
+    row delete restores the folder, leftover trash is emptied at launch.
 
 11. **Long calls are repeatedly loaded whole into memory — P1, M.** `LocalTranscriber.readSamples` allocates
     an array for the entire normalized file (`Transcription/LocalTranscriber.swift:188-202`), and
@@ -109,6 +113,8 @@ Effort is S (hours), M (days), or L (weeks). Priority is P0 (blocks safe sale or
     drops a column in place. A crash half-way leaves a schema that no declared version can diagnose or roll
     back. Use `PRAGMA user_version`, one transaction per migration, a pre-migration SQLite backup, and tests
     from every released schema.
+    Fixed in BESEDA-89: `PRAGMA user_version` migrations, one transaction each, `VACUUM INTO` backup before
+    migrating; tests migrate the 0.3.x schema and roll back a failing migration.
 
 13. **Automatic processing jobs disappear on quit — P1, M.** The architecture explicitly says the queue is
     memory-only (`docs/architecture/summarization.md:12-13`). A user who closes the app after a call can have
