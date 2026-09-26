@@ -57,7 +57,6 @@ enum PythonRuntimeCleanup {
     private static let items = ["venv", "python", "cache", "models/hub"]
 
     /// the bytes freed; zero when there was nothing left from the old engine
-    @discardableResult
     static func run(_ paths: AppPaths) -> Int64 {
         let fileManager = FileManager.default
         var freed: Int64 = 0

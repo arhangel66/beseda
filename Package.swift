@@ -60,7 +60,6 @@ let package = Package(
                 "samples",
                 "scripts",
                 "skills-lock.json",
-                "spikes",
                 "untracked"
             ],
             sources: [

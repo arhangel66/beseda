@@ -134,13 +134,7 @@ struct CallSummaryView: View {
                 }
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 14)
-        .background(Color.red.opacity(0.09), in: .rect(cornerRadius: Metrics.cardCorner))
-        .overlay {
-            RoundedRectangle(cornerRadius: Metrics.cardCorner)
-                .strokeBorder(Color.red.opacity(0.3), lineWidth: 0.5)
-        }
+        .bannerCard(Color.red)
     }
 
     @ViewBuilder
@@ -169,6 +163,24 @@ struct CallSummaryView: View {
         }
     }
 }
+
+/// No `#` headers on purpose: the pane renders inline markdown only and would show them as hashes.
+private let sampleSummary = """
+    **О чём говорили**
+    Обсудили готовность релиза 0.6 и то, что осталось закрыть до выката.
+
+    **Главное**
+    — Расшифровка двух каналов работает, осталась разметка говорящих.
+    — Договорились не тянуть саммаризацию в релиз, если она не успеет к пятнице.
+    — Ира просила заранее прислать заметки по хранению аудио.
+
+    **Что делать**
+    — Миша: собрать сборку и прогнать на живом звонке, до четверга.
+    — Ира: проверить, как ведут себя старые записи после обновления базы.
+
+    **Открытые вопросы**
+    — Не решили, чистить ли сырое аудио сразу после расшифровки.
+    """
 
 #Preview("Пусто") {
     CallSummaryView(
@@ -200,7 +212,7 @@ struct CallSummaryView: View {
 
 #Preview("Готово") {
     CallSummaryView(
-        text: MockSummarizationProvider.sample,
+        text: sampleSummary,
         isRunning: false,
         error: nil,
         startedAt: nil,

@@ -21,10 +21,6 @@ final class PermissionsModel {
     private(set) var microphone: PermissionState = .idle
     private(set) var systemAudio: PermissionState = .idle
 
-    var allGranted: Bool {
-        microphone.isGranted && systemAudio.isGranted
-    }
-
     func refresh() {
         microphone = Self.microphoneState()
         if systemAudio == .granted {
@@ -35,7 +31,7 @@ final class PermissionsModel {
 
     func requestMicrophone() async {
         if case .denied = Self.microphoneState() {
-            openPrivacySettings(pane: "Privacy_Microphone")
+            Self.openPrivacySettings(pane: "Privacy_Microphone")
             microphone = Self.microphoneState()
             return
         }
@@ -69,7 +65,7 @@ final class PermissionsModel {
 
         if let result {
             systemAudio = .denied(result)
-            openPrivacySettings(pane: "Privacy_Microphone")
+            Self.openPrivacySettings(pane: "Privacy_Microphone")
         } else {
             systemAudio = .granted
         }
@@ -86,7 +82,7 @@ final class PermissionsModel {
         }
     }
 
-    private func openPrivacySettings(pane: String) {
+    static func openPrivacySettings(pane: String) {
         guard let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?\(pane)") else {
             return
         }

@@ -36,7 +36,6 @@ enum ExecutableResolver {
 enum BesedaError: LocalizedError {
     case executableNotFound(String)
     case processFailed(String)
-    case invalidWorkerResponse(String)
     case runtimeMissing
 
     /// the banner matches on this text to offer the install button
@@ -49,8 +48,6 @@ enum BesedaError: LocalizedError {
         case .runtimeMissing:
             Self.runtimeMissingMessage
         case .processFailed(let message):
-            message
-        case .invalidWorkerResponse(let message):
             message
         }
     }

@@ -54,9 +54,21 @@ struct SpeakerStyle {
 }
 
 enum Metrics {
-    static let windowCorner: CGFloat = 12
     static let cardCorner: CGFloat = 10
     static let rowCorner: CGFloat = 8
+}
+
+extension View {
+    /// the tinted card behind the progress and failure banners
+    func bannerCard(_ tint: Color) -> some View {
+        padding(.horizontal, 16)
+            .padding(.vertical, 14)
+            .background(tint.opacity(0.09), in: .rect(cornerRadius: Metrics.cardCorner))
+            .overlay {
+                RoundedRectangle(cornerRadius: Metrics.cardCorner)
+                    .strokeBorder(tint.opacity(0.3), lineWidth: 0.5)
+            }
+    }
 }
 
 extension Color {
