@@ -1,0 +1,46 @@
+{
+  "sources": {
+    "voxconverse": {
+      "licence": "CC BY 4.0",
+      "audio_zip": "https://www.robots.ox.ac.uk/~vgg/data/voxconverse/data/voxconverse_dev_wav.zip",
+      "rttm": "https://raw.githubusercontent.com/joonson/voxconverse/24bf60be297701cd7e4ef18550c6d390c1b87365/dev/{id}.rttm"
+    },
+    "ami": {
+      "licence": "CC BY 4.0",
+      "audio": "https://groups.inf.ed.ac.uk/ami/AMICorpusMirror/amicorpus/{id}/audio/{id}.Mix-Headset.wav",
+      "rttm": "https://raw.githubusercontent.com/pyannote/AMI-diarization-setup/67c2d539286e89f68952d5dcf83912bd9f01dfae/only_words/rttms/test/{id}.rttm"
+    },
+    "fleurs": {
+      "licence": "CC BY 4.0",
+      "revision": "70bb2e84b976b7e960aa89f1c648e09c59f894dd",
+      "audio": "https://huggingface.co/datasets/google/fleurs/resolve/70bb2e84b976b7e960aa89f1c648e09c59f894dd/data/{lang}/audio/dev.tar.gz",
+      "tsv": "https://huggingface.co/datasets/google/fleurs/resolve/70bb2e84b976b7e960aa89f1c648e09c59f894dd/data/{lang}/dev.tsv",
+      "sha256": {
+        "ru_ru/dev.tar.gz": "4dc533cd0f312f749bd6d0fe968f3183288d938e07ed97dc141d9f10570457f9",
+        "en_us/dev.tar.gz": "2658fda72f199e12676ecac9415094667a4e14e149b146e568ea00b2a2f0954c"
+      }
+    }
+  },
+  "real": [
+    {"id": "vox_azisu", "source": "voxconverse", "source_id": "azisu", "start": 0, "duration": 194, "source_sha256": "9498b7fa8e3539078b70b6be53f1d103091eb4153a10e4b843ee7153350b913e"},
+    {"id": "vox_asxwr", "source": "voxconverse", "source_id": "asxwr", "start": 0, "duration": 238, "source_sha256": "d2e83acb899135b7e33a4488f5b72e3ac27af69ba515c3d35adc254b517f5e76"},
+    {"id": "vox_gzvkx", "source": "voxconverse", "source_id": "gzvkx", "start": 0, "duration": 225, "source_sha256": "4b750648cda107baa6db183789646befd5c8e2f5b7077687697ca69dc3488c8c"},
+    {"id": "ami_ES2004a", "source": "ami", "source_id": "ES2004a", "start": 60, "duration": 360, "source_sha256": "3e2560b19bee6952c7c7ce041b0f1ea8a7ea9468044c4eea79d2a2c67e24ab0f"},
+    {"id": "ami_IS1009a", "source": "ami", "source_id": "IS1009a", "start": 60, "duration": 360, "source_sha256": "6eb5a0ede0d9e72794f976ce7bea5b78133eae969f99b4c5418b43c2468d25b1"}
+  ],
+  "synthetic": {
+    "seed": 20260926,
+    "codec": "libopus 20 kbps, 100-7000 Hz band, white noise at -50 dBFS",
+    "echo": {"gain_db": -20, "delay_ms": 60},
+    "calls": [
+      {"id": "call_ru_2spk", "remote": ["ru_ru", "ru_ru"], "me": "ru_ru"},
+      {"id": "call_ru_3spk_a", "remote": ["ru_ru", "ru_ru", "ru_ru"], "me": "ru_ru"},
+      {"id": "call_ru_3spk_b", "remote": ["ru_ru", "ru_ru", "ru_ru"], "me": "ru_ru"},
+      {"id": "call_ru_4spk", "remote": ["ru_ru", "ru_ru", "ru_ru", "ru_ru"], "me": "ru_ru"},
+      {"id": "call_mix_2spk", "remote": ["ru_ru", "en_us"], "me": "ru_ru"},
+      {"id": "call_mix_3spk", "remote": ["ru_ru", "en_us", "ru_ru"], "me": "ru_ru"},
+      {"id": "call_mix_4spk", "remote": ["en_us", "ru_ru", "en_us", "ru_ru"], "me": "ru_ru"},
+      {"id": "call_en_me_ru_3spk", "remote": ["ru_ru", "ru_ru", "en_us"], "me": "en_us"}
+    ]
+  }
+}

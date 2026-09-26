@@ -1,0 +1,138 @@
+{
+ "summary": {
+  "real (VoxConverse+AMI)": {
+   "files": 5,
+   "der": 0.0,
+   "der_no_overlap": 0.0,
+   "speaker_count_error": 0.0,
+   "wer": null,
+   "cer": null,
+   "me_them_error": null,
+   "bleed_duplicate_word_rate": null,
+   "x_realtime": null
+  },
+  "synthetic calls (FLEURS)": {
+   "files": 8,
+   "der": 0.0,
+   "der_no_overlap": 0.0,
+   "speaker_count_error": 0.0,
+   "wer": 0.0,
+   "cer": 0.0,
+   "me_them_error": 0.0,
+   "bleed_duplicate_word_rate": 0.0,
+   "x_realtime": null
+  },
+  "all": {
+   "files": 13,
+   "der": 0.0,
+   "der_no_overlap": 0.0,
+   "speaker_count_error": 0.0,
+   "wer": 0.0,
+   "cer": 0.0,
+   "me_them_error": 0.0,
+   "bleed_duplicate_word_rate": 0.0,
+   "x_realtime": null
+  }
+ },
+ "files": [
+  {
+   "file": "ami_ES2004a",
+   "der": 0.0,
+   "der_no_overlap": 0.0,
+   "ref_speakers": 4,
+   "hyp_speakers": 4
+  },
+  {
+   "file": "ami_IS1009a",
+   "der": 0.0,
+   "der_no_overlap": 0.0,
+   "ref_speakers": 4,
+   "hyp_speakers": 4
+  },
+  {
+   "file": "call_en_me_ru_3spk",
+   "der": 0.0,
+   "der_no_overlap": 0.0,
+   "ref_speakers": 4,
+   "hyp_speakers": 4,
+   "wer": 0.0
+  },
+  {
+   "file": "call_mix_2spk",
+   "der": 0.0,
+   "der_no_overlap": 0.0,
+   "ref_speakers": 3,
+   "hyp_speakers": 3,
+   "wer": 0.0
+  },
+  {
+   "file": "call_mix_3spk",
+   "der": 0.0,
+   "der_no_overlap": 0.0,
+   "ref_speakers": 4,
+   "hyp_speakers": 4,
+   "wer": 0.0
+  },
+  {
+   "file": "call_mix_4spk",
+   "der": 0.0,
+   "der_no_overlap": 0.0,
+   "ref_speakers": 5,
+   "hyp_speakers": 5,
+   "wer": 0.0
+  },
+  {
+   "file": "call_ru_2spk",
+   "der": 0.0,
+   "der_no_overlap": 0.0,
+   "ref_speakers": 3,
+   "hyp_speakers": 3,
+   "wer": 0.0
+  },
+  {
+   "file": "call_ru_3spk_a",
+   "der": 0.0,
+   "der_no_overlap": 0.0,
+   "ref_speakers": 4,
+   "hyp_speakers": 4,
+   "wer": 0.0
+  },
+  {
+   "file": "call_ru_3spk_b",
+   "der": 0.0,
+   "der_no_overlap": 0.0,
+   "ref_speakers": 4,
+   "hyp_speakers": 4,
+   "wer": 0.0
+  },
+  {
+   "file": "call_ru_4spk",
+   "der": 0.0,
+   "der_no_overlap": 0.0,
+   "ref_speakers": 5,
+   "hyp_speakers": 5,
+   "wer": 0.0
+  },
+  {
+   "file": "vox_asxwr",
+   "der": 0.0,
+   "der_no_overlap": 0.0,
+   "ref_speakers": 3,
+   "hyp_speakers": 3
+  },
+  {
+   "file": "vox_azisu",
+   "der": 0.0,
+   "der_no_overlap": 0.0,
+   "ref_speakers": 4,
+   "hyp_speakers": 4
+  },
+  {
+   "file": "vox_gzvkx",
+   "der": 0.0,
+   "der_no_overlap": 0.0,
+   "ref_speakers": 6,
+   "hyp_speakers": 6
+  }
+ ]
+}

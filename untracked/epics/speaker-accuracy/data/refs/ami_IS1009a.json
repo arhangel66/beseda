@@ -1,0 +1,520 @@
+{
+ "duration": 360,
+ "sources": [
+  "https://raw.githubusercontent.com/pyannote/AMI-diarization-setup/67c2d539286e89f68952d5dcf83912bd9f01dfae/only_words/rttms/test/IS1009a.rttm"
+ ],
+ "segments": [
+  {
+   "start": 0,
+   "end": 0.85,
+   "speaker": "FIE088",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 1.54,
+   "end": 2.57,
+   "speaker": "FIO089",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 2.0,
+   "end": 7.29,
+   "speaker": "FIE088",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 6.63,
+   "end": 20.83,
+   "speaker": "FIO087",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 16.08,
+   "end": 16.43,
+   "speaker": "FIE088",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 21.04,
+   "end": 22.05,
+   "speaker": "FIE088",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 23.39,
+   "end": 26.94,
+   "speaker": "FIO089",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 27.49,
+   "end": 28.59,
+   "speaker": "FIE088",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 28.82,
+   "end": 29.69,
+   "speaker": "FIO089",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 30.21,
+   "end": 30.52,
+   "speaker": "FIE088",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 31.31,
+   "end": 47.4,
+   "speaker": "FIO084",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 47.88,
+   "end": 58.17,
+   "speaker": "FIE088",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 58.76,
+   "end": 59.05,
+   "speaker": "FIO089",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 59.38,
+   "end": 59.91,
+   "speaker": "FIE088",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 62.4,
+   "end": 72.39,
+   "speaker": "FIE088",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 71.13,
+   "end": 71.49,
+   "speaker": "FIO089",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 72.87,
+   "end": 86.77,
+   "speaker": "FIE088",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 85.55,
+   "end": 85.79,
+   "speaker": "FIO089",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 89.44,
+   "end": 102.32,
+   "speaker": "FIE088",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 99.51,
+   "end": 99.78,
+   "speaker": "FIO089",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 105.19,
+   "end": 106.99,
+   "speaker": "FIE088",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 128.06,
+   "end": 128.34,
+   "speaker": "FIO089",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 135.04,
+   "end": 135.27,
+   "speaker": "FIE088",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 135.56,
+   "end": 135.82,
+   "speaker": "FIO089",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 136.38,
+   "end": 142.4,
+   "speaker": "FIE088",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 143.78,
+   "end": 158.2,
+   "speaker": "FIE088",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 159.44,
+   "end": 162.12,
+   "speaker": "FIE088",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 160.46,
+   "end": 161.49,
+   "speaker": "FIO089",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 162.76,
+   "end": 166.45,
+   "speaker": "FIO089",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 165.98,
+   "end": 167.27,
+   "speaker": "FIE088",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 176.11,
+   "end": 178.38,
+   "speaker": "FIO089",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 181.01,
+   "end": 182.5,
+   "speaker": "FIO089",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 183.94,
+   "end": 185.45,
+   "speaker": "FIE088",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 188.32,
+   "end": 191.04,
+   "speaker": "FIO089",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 191.8,
+   "end": 192.7,
+   "speaker": "FIE088",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 192.79,
+   "end": 194.69,
+   "speaker": "FIO089",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 195.24,
+   "end": 197.74,
+   "speaker": "FIE088",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 200.02,
+   "end": 212.52,
+   "speaker": "FIE088",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 214.68,
+   "end": 215.95,
+   "speaker": "FIE088",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 216.23,
+   "end": 218.89,
+   "speaker": "FIO089",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 217.59,
+   "end": 219.86,
+   "speaker": "FIE088",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 220.08,
+   "end": 225.51,
+   "speaker": "FIO089",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 228.1,
+   "end": 231.15,
+   "speaker": "FIE088",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 230.06,
+   "end": 237.75,
+   "speaker": "FIO089",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 248.92,
+   "end": 250.65,
+   "speaker": "FIE088",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 251.19,
+   "end": 258.45,
+   "speaker": "FIO089",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 257.63,
+   "end": 258.04,
+   "speaker": "FIE088",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 260.53,
+   "end": 267.5,
+   "speaker": "FIE088",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 262.23,
+   "end": 265.08,
+   "speaker": "FIO087",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 268.77,
+   "end": 272.82,
+   "speaker": "FIO089",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 269.04,
+   "end": 269.27,
+   "speaker": "FIE088",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 270.22,
+   "end": 271.53,
+   "speaker": "FIE088",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 271.58,
+   "end": 273.36,
+   "speaker": "FIO087",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 273.57,
+   "end": 275.49,
+   "speaker": "FIE088",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 276.02,
+   "end": 276.43,
+   "speaker": "FIO089",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 277.47,
+   "end": 279.63,
+   "speaker": "FIO087",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 287.67,
+   "end": 288.31,
+   "speaker": "FIO084",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 287.99,
+   "end": 289.78,
+   "speaker": "FIO087",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 295.86,
+   "end": 298.95,
+   "speaker": "FIO087",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 297.32,
+   "end": 298.06,
+   "speaker": "FIO089",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 298.58,
+   "end": 300.45,
+   "speaker": "FIE088",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 299.99,
+   "end": 304.82,
+   "speaker": "FIO089",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 307.25,
+   "end": 315.93,
+   "speaker": "FIE088",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 317.25,
+   "end": 326.09,
+   "speaker": "FIE088",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 317.48,
+   "end": 317.93,
+   "speaker": "FIO089",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 326.53,
+   "end": 327.02,
+   "speaker": "FIO089",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 327.4,
+   "end": 333.64,
+   "speaker": "FIE088",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 335.23,
+   "end": 338.51,
+   "speaker": "FIO089",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 338.76,
+   "end": 339.29,
+   "speaker": "FIE088",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 340.24,
+   "end": 340.93,
+   "speaker": "FIO089",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 342.86,
+   "end": 346.48,
+   "speaker": "FIO089",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 343.81,
+   "end": 352.67,
+   "speaker": "FIE088",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 359.16,
+   "end": 360,
+   "speaker": "FIE088",
+   "channel": "system",
+   "text": ""
+  }
+ ],
+ "processing_seconds": null
+}

@@ -1,0 +1,75 @@
+{
+ "duration": 28.77,
+ "sources": [
+  "fleurs/ru_ru/dev/15021754782293800767.wav",
+  "fleurs/ru_ru/dev/10479628937192443242.wav",
+  "fleurs/en_us/dev/5289667221250125947.wav",
+  "fleurs/en_us/dev/15042872786142327227.wav"
+ ],
+ "segments": [
+  {
+   "start": 1.21,
+   "end": 4.83,
+   "speaker": "spk3",
+   "channel": "system",
+   "text": "christmas is one of the most important holidays of christianity"
+  },
+  {
+   "start": 5.44,
+   "end": 7.94,
+   "speaker": "spk1",
+   "channel": "system",
+   "text": "испанцы начали период колонизации"
+  },
+  {
+   "start": 7.7,
+   "end": 11.42,
+   "speaker": "spk3",
+   "channel": "system",
+   "text": "and is celebrated as the birthday of jesus"
+  },
+  {
+   "start": 12.18,
+   "end": 14.0,
+   "speaker": "spk2",
+   "channel": "system",
+   "text": "как только вы выйдете из течения"
+  },
+  {
+   "start": 14.89,
+   "end": 18.81,
+   "speaker": "me",
+   "channel": "mic",
+   "text": "since students are often the most critical audience"
+  },
+  {
+   "start": 18.36,
+   "end": 19.9,
+   "speaker": "spk2",
+   "channel": "system",
+   "text": "плыть обратно будет не труднее"
+  },
+  {
+   "start": 20.7,
+   "end": 25.24,
+   "speaker": "me",
+   "channel": "mic",
+   "text": "the blog writer begins to strive to improve writing to avoid criticism"
+  },
+  {
+   "start": 25.72,
+   "end": 27.98,
+   "speaker": "spk1",
+   "channel": "system",
+   "text": "который длился три столетия"
+  },
+  {
+   "start": 27.67,
+   "end": 28.27,
+   "speaker": "spk2",
+   "channel": "system",
+   "text": "чем обычно"
+  }
+ ],
+ "processing_seconds": null
+}
