@@ -1,5 +1,7 @@
 # Plan: the real provider (LM Studio) with a settings section
 
+Superseded by `docs/summary-provider-plan.md`: LM Studio is now one of three providers.
+
 Goal of this stage: the button from the previous stage calls the model that is already on
 this machine, and the summary is about the actual call. The user can see which server and
 model are used, pick another model, edit the prompt, and check the connection — all from a

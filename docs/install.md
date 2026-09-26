@@ -26,8 +26,10 @@ What you need: a Mac with Apple Silicon (M1 or newer), macOS 14.2 or newer, abou
 Everything the app creates lives in `~/Library/Application Support/Beseda`. To
 uninstall, drag the app to the Trash and delete that folder.
 
-Summaries need LM Studio with its local server turned on (Настройки → Саммари);
-without it every other feature works.
+Summaries are written by one of three providers, picked in Настройки → Обработка →
+Итоги: the built-in Gemma 4 E4B, which the app downloads once (4,6 GB) and runs on
+this Mac; OpenRouter with your own key; or a model loaded in LM Studio. Recording and
+transcription work whatever you pick.
 
 ## Updating
 
