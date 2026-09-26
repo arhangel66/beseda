@@ -161,3 +161,37 @@ private func recordingInProgress(seconds: Int, at url: URL) throws -> PCMFloatRe
     _ = try me.finish()
     _ = try them.finish()
 }
+
+@Test func liveLoopLogsOnceAndStopsWhenTheSpeechModelIsMissing() async throws {
+    let directory = FileManager.default.temporaryDirectory.appendingPathComponent("beseda-live-\(UUID().uuidString)")
+    defer { try? FileManager.default.removeItem(at: directory) }
+    let me = try recordingInProgress(seconds: 60, at: directory.appendingPathComponent("me.raw.wav"))
+    let them = try recordingInProgress(seconds: 60, at: directory.appendingPathComponent("them.raw.wav"))
+    let logs = LockedLog()
+    let loop = LiveTranscriptionLoop(
+        microphoneURL: directory.appendingPathComponent("me.raw.wav"),
+        systemURL: directory.appendingPathComponent("them.raw.wav"),
+        transcribe: { _ in throw BesedaError.runtimeMissing },
+        droppedBuffers: { 0 },
+        isPaused: { false },
+        log: { logs.append($0) },
+        update: { _, _ in }
+    )
+
+    await loop.run()
+
+    #expect(logs.messages.count == 1)
+    _ = try me.finish()
+    _ = try them.finish()
+}
+
+private final class LockedLog: @unchecked Sendable {
+    private let lock = NSLock()
+    private var stored: [String] = []
+
+    var messages: [String] { lock.withLock { stored } }
+
+    func append(_ message: String) {
+        lock.withLock { stored.append(message) }
+    }
+}
