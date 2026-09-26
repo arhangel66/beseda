@@ -1,3 +1,5 @@
+> Historical: `spikes/CaptureSpike` and its build script are deleted; the capture path now lives in `Audio/`.
+
 # System Audio Capture Spike
 
 Date: 2026-05-10

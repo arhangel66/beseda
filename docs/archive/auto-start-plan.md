@@ -1,3 +1,5 @@
+> Historical: the `spikes/` tools and spike build scripts named here are deleted.
+
 # Auto-Start Plan
 
 Goal: stop touching the app by hand. Podushka runs from login, notices a call by itself,
