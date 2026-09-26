@@ -107,7 +107,7 @@ Ordered phases; each line is its definition of done. What needs no new UI and pr
    loses at most seconds; `Package.swift` and the 14.2 `#available` branches collapse to macOS 14.2.
 1. **Speaker fixes.** Echo gate on the mic and the diarizer timeline ship in the app; the
    speaker-accuracy numbers hold on a real echoed call.
-2. **Processing pipeline.** User-defined call types; a local classifier picks one; that type's prompt runs;
+2. **Processing pipeline.** User-defined call types; a local classifier picks one ([which classifier](call-type-classifier.md)); that type's prompt runs;
    the post-call screen shows what ran; results export as Markdown to one chosen folder.
 3. **"Before the meeting" block.** For a call with a related previous call, the block shows where it
    stopped and what was agreed.
