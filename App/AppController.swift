@@ -1155,6 +1155,28 @@ final class AppController {
         }
     }
 
+    /// the diarizer's extra remote speaker folded into the real one; `me` never takes part
+    func mergeSpeaker(_ speaker: String, into target: String) {
+        guard let detail = selectedCallDetail,
+              SpeakerNaming.remoteIndex(of: speaker) != nil,
+              SpeakerNaming.remoteIndex(of: target) != nil else {
+            return
+        }
+        do {
+            try callStore.mergeSpeaker(callID: detail.id, speakerKey: speaker, into: target)
+            let segments = try callStore.fetchSegments(callID: detail.id)
+            if let transcriptURL = detail.summary.transcriptURL {
+                try TranscriptMerger.rewriteDialogue(
+                    in: transcriptURL, segments: segments, names: try callStore.fetchSpeakerNames(callID: detail.id)
+                )
+            }
+            loadCallDetail(detail.summary)
+        } catch {
+            callBrowserError = error.localizedDescription
+            appendLog("Merge failed: \(error.localizedDescription)")
+        }
+    }
+
     /// «Заново» goes through here as well: the fresh text overwrites the old one, and a
     /// failed retry leaves the previous summary in place instead of an empty pane.
     /// A given `type` skips the classifier — the call screen's type picker reruns through it.

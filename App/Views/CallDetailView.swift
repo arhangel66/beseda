@@ -450,6 +450,7 @@ private struct TranscriptLines: View {
                 .frame(maxWidth: 680, alignment: .leading)
         } else {
             let active = activeIndex
+            let remoteSpeakers = remoteSpeakers
             LazyVStack(alignment: .leading, spacing: 4) {
                 ForEach(Array(detail.segments.enumerated()), id: \.element.id) { index, segment in
                     TranscriptLine(
@@ -460,7 +461,11 @@ private struct TranscriptLines: View {
                         showsSpeaker: index == 0 || detail.segments[index - 1].speaker != segment.speaker,
                         isActive: index == active,
                         onSeek: { player.seek(to: segment.startSec) },
-                        onRename: { startRenaming(segment.speaker) }
+                        onRename: { startRenaming(segment.speaker) },
+                        mergeTargets: SpeakerNaming.remoteIndex(of: segment.speaker) == nil
+                            ? [] : remoteSpeakers.filter { $0 != segment.speaker },
+                        names: detail.speakerNames,
+                        onMerge: { controller.mergeSpeaker(segment.speaker, into: $0) }
                     )
                 }
             }
@@ -479,6 +484,14 @@ private struct TranscriptLines: View {
 private extension TranscriptLines {
     var isRenaming: Binding<Bool> {
         Binding(get: { renamedSpeaker != nil }, set: { if !$0 { renamedSpeaker = nil } })
+    }
+
+    /// the call's remote speaker keys in first-seen order, the choices for «Объединить с»
+    var remoteSpeakers: [String] {
+        var seen = Set<String>()
+        return detail.segments.map(\.speaker).filter {
+            SpeakerNaming.remoteIndex(of: $0) != nil && seen.insert($0).inserted
+        }
     }
 
     func startRenaming(_ speaker: String) {
@@ -505,6 +518,9 @@ private struct TranscriptLine: View {
     let isActive: Bool
     let onSeek: () -> Void
     let onRename: () -> Void
+    let mergeTargets: [String]
+    let names: [String: String]
+    let onMerge: (String) -> Void
 
     private var style: SpeakerStyle {
         .of(speaker: segment.speaker)
@@ -552,6 +568,13 @@ private struct TranscriptLine: View {
         .contextMenu {
             Button("Перейти к \(CallFormatting.mmss(segment.startSec))", action: onSeek)
             Button("Переименовать участника…", action: onRename)
+            if !mergeTargets.isEmpty {
+                Menu("Объединить с") {
+                    ForEach(mergeTargets, id: \.self) { target in
+                        Button(SpeakerNaming.name(for: target, overrides: names)) { onMerge(target) }
+                    }
+                }
+            }
         }
     }
 
