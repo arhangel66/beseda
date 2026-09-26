@@ -1,3 +1,6 @@
+---
+type: Plan
+---
 # Speech model choice
 
 Date: 2026-09-05

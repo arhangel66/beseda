@@ -1,3 +1,6 @@
+---
+type: Plan
+---
 # Plan: three HIGH findings from the audit
 
 Source: `docs/review-claude-sonnet-5/architecture-review.md`, findings #1, #2, #5.

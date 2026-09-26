@@ -1,3 +1,6 @@
+---
+type: Spike Report
+---
 > Historical: `spikes/CaptureSpike` and its build script are deleted; the capture path now lives in `Audio/`.
 
 # System Audio Capture Spike

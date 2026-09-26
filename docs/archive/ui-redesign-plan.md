@@ -1,3 +1,6 @@
+---
+type: Plan
+---
 # UI redesign from the Claude Design prototype
 
 Source: `untracked/design/prototype.dc.html` (imported from claude.ai/design project

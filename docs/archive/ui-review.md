@@ -1,3 +1,6 @@
+---
+type: Review
+---
 # UI review: from home-made to native
 
 Two independent reviews of the SwiftUI interface, 2026-09-05: Kimi (k3-256k, code only)

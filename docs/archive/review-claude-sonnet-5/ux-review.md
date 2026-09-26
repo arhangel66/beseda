@@ -1,3 +1,6 @@
+---
+type: Review
+---
 # Podushka — обзор UI/UX и предложения
 
 Автор: Claude Sonnet 5 (Claude Code). Read-only обзор: код `App/Views/*.swift` +

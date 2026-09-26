@@ -1,3 +1,6 @@
+---
+type: Plan
+---
 # Plan: the real provider (LM Studio) with a settings section
 
 Superseded by `docs/summary-provider-plan.md`: LM Studio is now one of three providers.

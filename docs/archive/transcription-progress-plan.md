@@ -1,3 +1,6 @@
+---
+type: Plan
+---
 # Showing what happens while a transcript is being made
 
 ## Problem

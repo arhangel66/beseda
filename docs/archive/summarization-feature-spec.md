@@ -1,3 +1,6 @@
+---
+type: Specification
+---
 # Feature Specification: Conversation Summarization
 
 ## Overview
