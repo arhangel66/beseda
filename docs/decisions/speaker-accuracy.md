@@ -164,32 +164,39 @@ embeddings are too short and distorted to join the main cluster. Longest diarize
 extras, ≥ 10 s on 9 of 10 main speakers. Not echo of Mikhail (cosine to his voice ≤ 0.15), not music or
 notifications.[^cause]
 
-**Rule (implemented, BESEDA-84).** After FluidAudio clusters at 0.70 (unchanged), a `them` speaker whose longest
-diarizer segment is under 6 s is merged: each of its segments takes the speaker of the nearest-in-time
-segment of a kept speaker (one with a segment ≥ 6 s). If none has a segment ≥ 6 s, the one with the most
-seconds is kept. Sentence assignment then runs as before. See [ASR](../architecture/asr.md).
+**6 s merge dropped (BESEDA-93).** BESEDA-84 merged every `them` speaker whose longest segment was under 6 s.
+It fixed 9 of 10 one-to-one calls, but it is a fitted deletion rule: a real participant who only gives short
+replies is erased on any call (critic review, finding 14), and 7 s already erased a real colleague on a daily.
+Diarization of every call is back to plain t0.70 + sentence assignment.
 
-| | now (t0.70) | merge < 6 s |
-|---|---|---|
-| real calls, total speaker-count error (15 calls) | 20 | 4 |
-| 1:1 calls exact (of 10) | 0 | 9 |
-| benchmark DER real (VoxConverse + AMI) | 0.119 | 0.118 |
-| benchmark real people glued | 0 | 0 |
+**Rule (implemented, BESEDA-93).** Only a call known to be 1:1 gets one remote speaker: every `them-N` of its
+stored segments becomes `them-1`. `CallStore` applies it whenever segments are written and whenever an event is
+linked, so an event matched after diarization relabels too. Signals the app has:
 
-The app path gives the same counts on all 15 calls as the prototype.[^merge] The remaining errors: one 1:1
-call keeps an extra with a 6.2 s turn; 20260924-130017 shows 2 of 4 because the diarizer already put two
-people inside the other two before any merge; one daily shows 5 of 4.
+- calendar event with exactly one attendee besides Mikhail (`calls.participants`) — **used**;
+- a 1:1 call type — **not there**: the defaults hold only «Другое», Mikhail's own list only adds «Дейли»;
+  types are user-defined names with no "1:1" meaning, so a later type change relabels nothing;
+- inferred participant count (BESEDA-70) — **not in the app**: it lives only in the research truth file.
 
-- **Why 6 s, not 7 s:** at 7 s daily 20260925-125945 loses a real person (a colleague whose longest turn is
-  6.6 s). 6.5 s scores one better but sits between two turns (6.2 and 6.6 s) — fitted, not chosen.
-- **Threshold 0.80 rejected:** alone it barely helps (|Δ| 20 → 16, no 1:1 fixed) and undercounts a daily
-  (4 → 3); with the merge it adds nothing (|Δ| 4–5).
-- **FluidAudio 0.17.4 rejected:** same models, identical counts and DER; no reason to bump.
-- Merge target by closest mean embedding gives identical counts; nearest in time is simpler. Adding a cosine
-  floor to the rule loses 1:1 calls fast.
+Unlinking the event or switching to a group event does not split the speakers back (re-transcribe to undo).
+
+| | t0.70 | 6 s merge (dropped) | this rule |
+|---|---|---|---|
+| real calls, total speaker-count error (15 calls) | 20 | 4 | 20 |
+| 1:1 calls exact (of 10) | 0 | 9 | 0 |
+| benchmark DER real (VoxConverse + AMI) | 0.119 | 0.118 | 0.119 |
+| benchmark speaker-count error real | 0.60 | 0.80 | 0.60 |
+
+The rule fires on none of the 15 stored calls: none of them has a calendar event linked, so today it equals
+t0.70. With a linked two-person event it would give 10 of 10 one-to-one calls exact and leave the dailies as
+they are. The benchmark has no call metadata, so it equals t0.70 by construction.[^oneToOne]
+
+**Caveat (critic finding 15).** The real counts are inferred from transcript text by an LLM, not hand-labelled,
+and counts cannot show a merge and a split that cancel out.
 
 [^cause]: [results/extra-speaker-cause.md](../../untracked/epics/speaker-accuracy/results/extra-speaker-cause.md)
 [^merge]: [results/short-reply-merge.md](../../untracked/epics/speaker-accuracy/results/short-reply-merge.md), [results/app-merge.md](../../untracked/epics/speaker-accuracy/results/app-merge.md)
+[^oneToOne]: [results/one-to-one-forced.md](../../untracked/epics/speaker-accuracy/results/one-to-one-forced.md)
 [^harness]: [untracked/epics/speaker-accuracy/README.md](../../untracked/epics/speaker-accuracy/README.md)
 [^baseline]: [baseline/README.md](../../untracked/epics/speaker-accuracy/baseline/README.md), `results/baseline-*.md`
 [^diarization]: [diarization/README.md](../../untracked/epics/speaker-accuracy/diarization/README.md), `diarization/results.md`

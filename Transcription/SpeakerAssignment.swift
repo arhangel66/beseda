@@ -17,7 +17,7 @@ enum SpeakerAssignment {
     static func remoteTurns(segments: [TranscriptSegment], timeline: [SpeakerInterval]) -> [SpeakerTurn] {
         // speakers come from the diarizer's own segments: per-word labels were twice as wrong (DER 0.262 vs 0.130,
         // docs/decisions/speaker-accuracy.md). Each sentence stays its own line, so clicking it seeks there.
-        let intervals = mergingShortReplies(timeline.sorted { $0.start < $1.start })
+        let intervals = timeline.sorted { $0.start < $1.start }
         guard !intervals.isEmpty else {
             // diarization gave nothing; the caller keeps its single-speaker path
             return []
@@ -36,34 +36,6 @@ enum SpeakerAssignment {
 
     private static func gap(_ interval: SpeakerInterval, _ segment: TranscriptSegment) -> Double {
         min(abs(interval.start - segment.end), abs(segment.start - interval.end))
-    }
-
-    private static func mergingShortReplies(_ intervals: [SpeakerInterval]) -> [SpeakerInterval] {
-        // speakers with no segment of 6 s or more: on real calls they are someone's short replies split off
-        // (docs/decisions/speaker-accuracy.md); each segment goes to the nearest-in-time kept speaker
-        let bySpeaker = Dictionary(grouping: intervals, by: \.speaker)
-        var kept = Set(bySpeaker.filter { $0.value.contains { $0.end - $0.start >= 6 } }.keys)
-        if kept.isEmpty, let biggest = bySpeaker.max(by: { seconds($0.value) < seconds($1.value) }) {
-            kept = [biggest.key]
-        }
-        let keptIntervals = intervals.filter { kept.contains($0.speaker) }
-        return intervals.map { interval in
-            guard !kept.contains(interval.speaker) else {
-                return interval
-            }
-            let nearest = keptIntervals.min {
-                distance($0, interval) < distance($1, interval)
-            }!
-            return SpeakerInterval(speaker: nearest.speaker, start: interval.start, end: interval.end)
-        }
-    }
-
-    private static func seconds(_ intervals: [SpeakerInterval]) -> Double {
-        intervals.reduce(0) { $0 + $1.end - $1.start }
-    }
-
-    private static func distance(_ a: SpeakerInterval, _ b: SpeakerInterval) -> Double {
-        max(a.start - b.end, b.start - a.end, 0)
     }
 
     private static func relabelled(_ turns: [SpeakerTurn]) -> [SpeakerTurn] {
