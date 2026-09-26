@@ -44,6 +44,15 @@ folder is moved here once by `LegacyDataMigration`.
   progress or failed (`protectedAudioDirectories`) are skipped so a retry still has its audio. It runs
   daily, on the settings button, and `cleanupAudioIfNeeded` applies the rules when a call finishes.
 
+- **Protection** — `StorageProtection.apply` runs at launch: it sets the process umask to 077, so every
+  later file and folder is owner-only, and walks the data folder once, dropping group/other bits (owner
+  bits kept, so built binaries stay executable) and setting `completeUntilFirstUserAuthentication` file
+  protection where the volume supports it.
+- **Deletion** — `CallStore.deleteCallAndFiles` removes the transcript file, the call folder and the
+  export copy named by `CallExport.fileName` first, then the row; segments, jobs, speakers and webhook
+  deliveries go by `ON DELETE CASCADE`. `deleteCall` turns on `secure_delete` and truncates the WAL, so
+  deleted text is not left in free pages. An export copy written under an older title is not found.
+
 ## Main files
 
 `Storage/CallStore.swift` (schema, queries, `StoredCallSummary` and friends), `Storage/StorageJanitor.swift`,

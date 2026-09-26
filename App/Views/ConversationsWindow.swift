@@ -28,11 +28,41 @@ struct ConversationsWindow: View {
                         SendToWebhookButton(controller: controller, detail: detail)
                     }
                     CopyTranscriptButton(controller: controller)
+                    Button("Удалить", systemImage: "trash") {
+                        controller.callPendingDeletion = detail.summary
+                    }
+                    .disabled(!controller.canDelete(detail.summary))
+                    .help("Удалить разговор со всеми файлами")
                 }
                 RecordingToolbarButton(controller: controller)
             }
         }
         .frame(minWidth: 880, minHeight: 560)
+        .confirmationDialog(
+            "Удалить «\(controller.callPendingDeletion?.displayTitle ?? "")»?",
+            isPresented: Binding(
+                get: { controller.callPendingDeletion != nil },
+                set: { if !$0 { controller.callPendingDeletion = nil } }
+            ),
+            presenting: controller.callPendingDeletion
+        ) { call in
+            Button("Удалить", role: .destructive) {
+                controller.deleteCall(call)
+            }
+        } message: { _ in
+            Text("Запись, расшифровка, итоги и копия в папке экспорта удалятся с этого Mac. Вернуть их не получится.")
+        }
+        .alert(
+            "Не удалось удалить разговор",
+            isPresented: Binding(
+                get: { controller.deleteError != nil },
+                set: { if !$0 { controller.deleteError = nil } }
+            )
+        ) {
+            Button("OK") {}
+        } message: {
+            Text(controller.deleteError ?? "")
+        }
         .overlay(alignment: .bottom) {
             if let toast = controller.toast {
                 ToastOverlay(text: toast)

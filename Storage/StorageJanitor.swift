@@ -149,3 +149,25 @@ extension Int64 {
             .replacingOccurrences(of: "byte", with: "Б")
     }
 }
+
+/// Keeps the data folder private: owner-only permissions and the platform's file protection.
+enum StorageProtection {
+    /// everything under the folder, for files from older installs; umask covers what is created later
+    static func apply(to directory: URL) {
+        umask(0o077)
+        let fileManager = FileManager.default
+        try? fileManager.createDirectory(at: directory, withIntermediateDirectories: true)
+        let items = [directory] + (fileManager.enumerator(at: directory, includingPropertiesForKeys: nil)?
+            .compactMap { $0 as? URL } ?? [])
+        for url in items {
+            // keeps the owner's bits, so the built llama-server stays executable
+            if let mode = (try? fileManager.attributesOfItem(atPath: url.path))?[.posixPermissions] as? Int {
+                try? fileManager.setAttributes([.posixPermissions: mode & 0o700], ofItemAtPath: url.path)
+            }
+            // not every volume supports it; permissions alone still hold there
+            try? fileManager.setAttributes(
+                [.protectionKey: FileProtectionType.completeUntilFirstUserAuthentication], ofItemAtPath: url.path
+            )
+        }
+    }
+}

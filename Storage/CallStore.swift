@@ -421,8 +421,27 @@ final class CallStore {
     func deleteCall(id: String) throws {
         try database { db in
             try execute(db, "PRAGMA foreign_keys = ON")
+            // overwrite the freed pages and fold the WAL back, so no transcript text stays in the file
+            try execute(db, "PRAGMA secure_delete = ON")
             try run(db, "DELETE FROM calls WHERE id = ?", id)
+            try execute(db, "PRAGMA wal_checkpoint(TRUNCATE)")
         }
+    }
+
+    /// the row with its transcript, the call folder and the Markdown copy in the export folder
+    func deleteCallAndFiles(id: String, exportFolder: URL?) throws {
+        guard let call = try fetchCall(id: id) else {
+            return
+        }
+        // files go first: if one cannot be removed, the row stays and the user can try again
+        var urls = [call.transcriptURL, exportFolder?.appendingPathComponent(CallExport.fileName(call))]
+        if !call.audioDirectoryPath.isEmpty {
+            urls.append(call.audioDirectoryURL)
+        }
+        for url in urls.compactMap({ $0 }) where FileManager.default.fileExists(atPath: url.path) {
+            try FileManager.default.removeItem(at: url)
+        }
+        try deleteCall(id: id)
     }
 
     func upsertCall(

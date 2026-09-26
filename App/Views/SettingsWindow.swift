@@ -300,6 +300,21 @@ private struct ProcessingPane: View {
         controller.settings
     }
 
+    /// what text leaves the Mac for OpenRouter; nil when summaries and the call type stay local
+    private var cloudNote: String? {
+        var parts: [String] = []
+        if settings.summaryProvider == .openRouter {
+            parts.append("текст расшифровки — для итогов и ключевых моментов во время звонка")
+        }
+        if settings.classifiesWithJev, settings.callTypes.count > 1 {
+            parts.append("время, длительность и начало расшифровки — чтобы Jev выбрал тип созвона")
+        }
+        guard !parts.isEmpty else {
+            return nil
+        }
+        return "В OpenRouter (openrouter.ai) уходит " + parts.joined(separator: "; ") + ". Звук остаётся на этом Mac."
+    }
+
     var body: some View {
         Form {
             Section {
@@ -317,6 +332,11 @@ private struct ProcessingPane: View {
                     }
                 }
                 .pickerStyle(.segmented)
+
+                if let cloudNote {
+                    Label(cloudNote, systemImage: "icloud.and.arrow.up")
+                        .foregroundStyle(.secondary)
+                }
 
                 switch settings.summaryProvider {
                 case .openRouter:
