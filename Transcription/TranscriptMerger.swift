@@ -19,14 +19,7 @@ enum TranscriptMerger {
         lines.append("")
         lines.append("## Segments")
         lines.append("")
-
-        if result.segments.isEmpty {
-            lines.append("_No segments returned._")
-        } else {
-            for segment in result.segments {
-                lines.append("- `\(segment.timeRangeDescription)` \(segment.text)")
-            }
-        }
+        appendSegments(of: result, to: &lines)
 
         try lines.joined(separator: "\n").write(to: url, atomically: true, encoding: .utf8)
     }
@@ -99,15 +92,16 @@ enum TranscriptMerger {
         lines.append("")
         lines.append("### Segments")
         lines.append("")
-
-        if result.segments.isEmpty {
-            lines.append("_No segments returned._")
-        } else {
-            for segment in result.segments {
-                lines.append("- `\(segment.timeRangeDescription)` \(segment.text)")
-            }
-        }
+        appendSegments(of: result, to: &lines)
 
         lines.append("")
+    }
+
+    private static func appendSegments(of result: TranscriptResult, to lines: inout [String]) {
+        guard !result.segments.isEmpty else {
+            lines.append("_No segments returned._")
+            return
+        }
+        lines += result.segments.map { "- `\($0.timeRangeDescription)` \($0.text)" }
     }
 }
