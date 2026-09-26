@@ -65,6 +65,7 @@ final class AppSettings {
     private let legacySummaryPromptKey = "beseda.summaryPrompt"
     private let callTypesKey = "beseda.callTypes"
     private let classifyLocallyKey = "beseda.classifyLocally"
+    private let localOnlyKey = "beseda.localOnly"
     private let autoProcessCallsKey = "beseda.autoProcessCalls"
     private let exportFolderKey = "beseda.exportFolder"
     private let webhookEnabledKey = "beseda.webhookEnabled"
@@ -195,8 +196,38 @@ final class AppSettings {
         callTypes.removeAll { $0.id == id }
     }
 
+    /// «Только локально»: nothing leaves the Mac whatever else is set; off by default (Mikhail, 2026-09-26)
+    var localOnly: Bool {
+        didSet {
+            defaults.set(localOnly, forKey: localOnlyKey)
+        }
+    }
+
     var classifiesWithJev: Bool {
-        !classifyLocally && !openRouterAPIKey.isEmpty
+        !localOnly && !classifyLocally && !openRouterAPIKey.isEmpty
+    }
+
+    /// the provider that actually writes summaries and live key points: under `localOnly` one that
+    /// would send the text off the Mac is replaced by the built-in model
+    var effectiveSummaryProvider: SummaryProvider {
+        guard localOnly, summaryProvider == .openRouter || remoteSummaryHost != nil else {
+            return summaryProvider
+        }
+        return .builtIn
+    }
+
+    /// the LM Studio server's host when it is set by hand to another machine
+    var remoteSummaryHost: String? {
+        guard summaryProvider == .lmStudio,
+              let host = URL(string: summaryServerURL)?.host,
+              !["localhost", "127.0.0.1", "::1"].contains(host) else {
+            return nil
+        }
+        return host
+    }
+
+    var sendsWebhooks: Bool {
+        webhookEnabled && !localOnly
     }
 
     /// off: a call is processed only from «Итоги»
@@ -275,6 +306,7 @@ final class AppSettings {
             .flatMap { $0.isEmpty ? nil : AppSettings.migratingStoredCallTypes($0) }
             ?? [AppSettings.defaultCallType(legacyPrompt: defaults.string(forKey: legacySummaryPromptKey))]
         self.classifyLocally = defaults.bool(forKey: classifyLocallyKey)
+        self.localOnly = defaults.bool(forKey: localOnlyKey)
         self.autoProcessCalls = defaults.bool(forKey: autoProcessCallsKey)
         self.webhookEnabled = defaults.bool(forKey: webhookEnabledKey)
         self.exportFolder = defaults.string(forKey: exportFolderKey) ?? ""

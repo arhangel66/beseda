@@ -254,3 +254,33 @@ private final class FailingKeychain: Keychain {
     #expect(defaults.string(forKey: "beseda.openRouterAPIKey") == "sk-or-v1-old")
     #expect(defaults.string(forKey: "beseda.webhookSecret") == "new")
 }
+
+@MainActor
+@Test func localOnlyIsOffByDefaultAndKeepsSummariesJevAndWebhooksOnTheMac() {
+    let suiteName = "beseda-test-\(UUID().uuidString)"
+    let defaults = UserDefaults(suiteName: suiteName)!
+    defer {
+        defaults.removePersistentDomain(forName: suiteName)
+        Keychain(service: suiteName).deleteAll()
+    }
+    let settings = AppSettings(defaults: defaults, keychain: Keychain(service: suiteName))
+    settings.summaryProvider = .openRouter
+    settings.openRouterAPIKey = "sk-or-v1-secret"
+    settings.webhookEnabled = true
+    let isOffByDefault = !settings.localOnly
+    let cloudBefore = (settings.effectiveSummaryProvider, settings.classifiesWithJev, settings.sendsWebhooks)
+
+    settings.localOnly = true
+
+    #expect(isOffByDefault)
+    #expect(cloudBefore == (.openRouter, true, true))
+    #expect(settings.effectiveSummaryProvider == .builtIn)
+    #expect(!settings.classifiesWithJev)
+    #expect(!settings.sendsWebhooks)
+    settings.summaryProvider = .lmStudio
+    settings.summaryServerURL = "http://192.168.1.5:1234"
+    #expect(settings.effectiveSummaryProvider == .builtIn)
+    settings.summaryServerURL = ""
+    #expect(settings.effectiveSummaryProvider == .lmStudio)
+    #expect(AppSettings(defaults: defaults, keychain: Keychain(service: suiteName)).localOnly)
+}

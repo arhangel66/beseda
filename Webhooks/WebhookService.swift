@@ -67,7 +67,7 @@ final class WebhookService {
 
     /// the automatic send after a transcript is ready; writes nothing while the webhook is off
     func enqueue(callID: String) {
-        guard settings.webhookEnabled, WebhookSender.endpoint(from: settings.webhookURL) != nil else {
+        guard settings.sendsWebhooks, WebhookSender.endpoint(from: settings.webhookURL) != nil else {
             log("Webhook off, skipped \(callID)")
             return
         }
@@ -219,7 +219,7 @@ final class WebhookService {
             refresh()
         }
         // switched off or a broken address: the row waits instead of burning an attempt
-        guard settings.webhookEnabled, let url = WebhookSender.endpoint(from: settings.webhookURL) else {
+        guard settings.sendsWebhooks, let url = WebhookSender.endpoint(from: settings.webhookURL) else {
             return
         }
         let outcome: WebhookOutcome

@@ -54,16 +54,26 @@ cp "$NOTES" "$DIST/Beseda-$VERSION.md"
 
 # signs the zip with the EdDSA key from the keychain; the feed lives at the repo root
 # so its URL never changes. --embed-release-notes puts the notes inside the feed,
-# leaving nothing extra to host
+# leaving nothing extra to host. Written into dist first: the repo's feed changes only
+# once the zip it points at is downloadable
+cp "$ROOT/appcast.xml" "$DIST/appcast.xml"
 "$SPARKLE_BIN/generate_appcast" \
     --download-url-prefix "https://github.com/$REPO/releases/download/$TAG/" \
     --embed-release-notes \
-    -o "$ROOT/appcast.xml" "$DIST"
+    -o "$DIST/appcast.xml" "$DIST"
 
+# the zip goes up first, on a tag at the last pushed commit; a failed upload stops here
+# with main and the feed untouched. A rerun after a failure needs the tag deleted
+# (git push origin :$TAG && git tag -d $TAG)
+git -C "$ROOT" tag -a "$TAG" -m "Beseda $VERSION"
+git -C "$ROOT" push -q origin "$TAG"
+gh release create "$TAG" "$ZIP" --repo "$REPO" --verify-tag --title "Beseda $VERSION" --notes-file "$NOTES"
+curl -fsSL -o "$DIST/downloaded.zip" "https://github.com/$REPO/releases/download/$TAG/Beseda-$VERSION.zip"
+cmp "$ZIP" "$DIST/downloaded.zip"
+
+cp "$DIST/appcast.xml" "$ROOT/appcast.xml"
 git -C "$ROOT" add appcast.xml
 git -C "$ROOT" commit -q -m "Beseda $VERSION"
-git -C "$ROOT" tag -a "$TAG" -m "Beseda $VERSION"
-git -C "$ROOT" push -q origin main "$TAG"
-gh release create "$TAG" "$ZIP" --repo "$REPO" --title "Beseda $VERSION" --notes-file "$NOTES"
+git -C "$ROOT" push -q origin main
 
 echo "published $TAG: https://github.com/$REPO/releases/tag/$TAG"

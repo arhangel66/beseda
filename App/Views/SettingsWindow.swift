@@ -270,30 +270,23 @@ private struct ProcessingPane: View {
     /// what leaves this Mac under the settings as they are now; the one privacy note in Settings
     private var privacyNote: String {
         var sinks: [String] = []
-        if settings.summaryProvider == .openRouter {
+        if settings.effectiveSummaryProvider == .openRouter {
             sinks.append("в OpenRouter (openrouter.ai) уходит текст расшифровки — для итогов и ключевых моментов во время звонка")
-        } else if let host = remoteSummaryHost {
+        } else if settings.effectiveSummaryProvider == .lmStudio, let host = settings.remoteSummaryHost {
             sinks.append("текст расшифровки уходит на сервер итогов \(host)")
         }
         if settings.classifiesWithJev, settings.callTypes.count > 1 {
             sinks.append("в OpenRouter уходят время, длительность и начало расшифровки — чтобы Jev выбрал тип звонка")
         }
-        if settings.webhookEnabled {
+        if settings.sendsWebhooks {
             sinks.append("расшифровка уходит на ваш сервис из раздела «Интеграции»")
         }
         if sinks.isEmpty {
-            return "Всё обрабатывается на этом Mac: ни звук, ни текст не уходят в сеть."
+            return settings.effectiveSummaryProvider == settings.summaryProvider
+                ? "Всё обрабатывается на этом Mac: ни звук, ни текст не уходят в сеть."
+                : "Всё обрабатывается на этом Mac: итоги пишет встроенная модель, ни звук, ни текст не уходят в сеть."
         }
         return "Звук остаётся на этом Mac, но " + sinks.joined(separator: "; ") + "."
-    }
-
-    private var remoteSummaryHost: String? {
-        guard settings.summaryProvider == .lmStudio,
-              let host = URL(string: settings.summaryServerURL)?.host,
-              !["localhost", "127.0.0.1", "::1"].contains(host) else {
-            return nil
-        }
-        return host
     }
 
     var body: some View {
@@ -314,6 +307,7 @@ private struct ProcessingPane: View {
                 }
                 .pickerStyle(.segmented)
 
+                Toggle("Только локально", isOn: Bindable(settings).localOnly)
                 Label(privacyNote, systemImage: privacyNote.hasPrefix("Всё") ? "lock" : "icloud.and.arrow.up")
                     .foregroundStyle(.secondary)
 

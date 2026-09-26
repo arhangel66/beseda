@@ -24,7 +24,7 @@ struct ConversationsWindow: View {
                     if controller.settings.calendarEnabled, controller.calendarService.isAuthorized {
                         LinkEventButton(controller: controller, summary: detail.summary)
                     }
-                    if controller.settings.webhookEnabled || !controller.webhooks.selected.isEmpty {
+                    if controller.settings.sendsWebhooks || !controller.webhooks.selected.isEmpty {
                         SendToWebhookButton(controller: controller, detail: detail)
                     }
                     CopyTranscriptButton(controller: controller)

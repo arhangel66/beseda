@@ -30,7 +30,7 @@ produces the transcript.
 - **Key points** — `KeyPointsSchedule`: every 180 s of recorded audio (the clock is the microphone file
   length, so pause stops it), only when the transcript grew, never two rounds at once. `LiveTranscription`
   sends the lines («Я» / «Собеседник») to the summary provider from `makeSummaryProvider` with
-  `keyPointsPrompt`; a failure is logged and the old bullets stay.
+  `keyPointsPrompt`, so under «Только локально» they never leave the Mac either; a failure is logged and the old bullets stay.
 - **Lifecycle** — `AppController.runDualRecording` starts `LiveTranscription` before the capture and
   stops and awaits it (a chunk in flight finishes) before normalization, so `transcribeDualCall` never
   shares the transcriber with it. Pause drops buffers, so the files stop growing and the loop idles.
