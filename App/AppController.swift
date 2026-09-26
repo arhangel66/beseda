@@ -69,6 +69,8 @@ final class AppController {
     var deleteError: String?
     var elapsedRecordingSeconds: TimeInterval = 0
     var isPaused = false
+    /// why the running or last recording lost audio: a failed write stops it, the popover says so
+    var recordingWarning: String?
     /// the running recording's live preview, only while the setting is on
     var liveTranscription: LiveTranscription?
     var microphoneLevel: Double = 0
@@ -118,6 +120,9 @@ final class AppController {
     @ObservationIgnored let bundledSummary: BundledSummaryInstaller
     @ObservationIgnored private let llamaServer = LlamaServer(paths: AppPaths.current)
     @ObservationIgnored let updater = AppUpdater()
+    @ObservationIgnored private lazy var processingQueue = SerialQueue<(StoredCallDetail, CallType?)> { [unowned self] job in
+        await self.runQueuedProcessing(of: job.0, as: job.1)
+    }
     @ObservationIgnored private var activeTask: Task<Void, Never>?
     @ObservationIgnored private var activeDualCapture: DualCapture?
     @ObservationIgnored private var cancelRequested = false
@@ -718,6 +723,7 @@ final class AppController {
 
         do {
             cancelRequested = false
+            recordingWarning = nil
             try fileManager.createDirectory(at: sessionDir, withIntermediateDirectories: true)
             saveCall(callID, kind: "dual", in: sessionDir, startedAt: startedAt, status: "recording", appName: autoStartedApp)
 
@@ -1151,18 +1157,20 @@ final class AppController {
         startProcessing(detail, as: type)
     }
 
+    /// a call that finishes while another is processed waits its turn instead of being dropped
     private func startProcessing(_ detail: StoredCallDetail, as type: CallType?) {
-        guard summarizingCallID == nil else {
-            appendLog("Processing of \(detail.id) skipped: another call is being processed")
-            return
+        if summarizingCallID != nil {
+            appendLog("Processing of \(detail.id) queued: another call is being processed")
         }
+        processingQueue.enqueue((detail, type))
+    }
+
+    private func runQueuedProcessing(of detail: StoredCallDetail, as type: CallType?) async {
         summaryError = nil
         summaryRecovery = nil
         summarizingCallID = detail.id
         summaryStartedAt = Date()
-        Task { [weak self] in
-            await self?.runSummary(for: detail, as: type)
-        }
+        await runSummary(for: detail, as: type)
     }
 
     /// starts LM Studio when it stopped answering, then picks up the summary that failed on it
@@ -1540,8 +1548,25 @@ final class AppController {
                 }
                 self.microphoneLevel = capture.microphoneLevel
                 self.systemAudioLevel = capture.systemAudioLevel
+                if self.recordingWarning == nil, let writeError = capture.writeError {
+                    self.stopRecording(after: writeError, capture: capture)
+                }
             }
         }
+    }
+
+    /// a failed write (disk full, the 4 GB WAV limit) keeps what reached the disk and ends the call there
+    private func stopRecording(after writeError: String, capture: DualCapture) {
+        recordingWarning = Self.recordingWarning(forWriteError: writeError)
+        appendLog("Recording write failed: \(writeError)")
+        notifier.recordingStopped(reason: recordingWarning ?? writeError)
+        capture.stop(reason: .writeFailed)
+    }
+
+    nonisolated static func recordingWarning(forWriteError writeError: String) -> String {
+        writeError.contains("4 GB")
+            ? "Запись остановлена: файл дошёл до предела в 4 ГБ (около 3 часов). Сохранённое будет расшифровано."
+            : "Запись остановлена: не удалось записать звук на диск (\(writeError)). Сохранённое будет расшифровано."
     }
 
     private func stopLiveTicker() {

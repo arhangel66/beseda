@@ -22,10 +22,23 @@ final class PCMFloatRecorder: @unchecked Sendable {
     private var frameCount = 0
     private var paused = false
     private var failedWrites = 0
+    private var firstWriteError: String?
+    private let maximumDataBytes: Int
+
+    /// a WAV header holds 32-bit sizes: past 4 GiB (~3 h of 48 kHz stereo) the file is unreadable,
+    /// so the recorder refuses to grow the data chunk beyond this and leaves room for the header
+    static let wavDataLimit = 4_000_000_000
 
     /// opens `url` for writing at once: every appended buffer goes straight to disk; nil only meters levels
-    init(url: URL?, sampleRate: Double, channelCount: Int, activityTracker: AudioActivityTracker?) throws {
+    init(
+        url: URL?,
+        sampleRate: Double,
+        channelCount: Int,
+        activityTracker: AudioActivityTracker?,
+        maximumDataBytes: Int = PCMFloatRecorder.wavDataLimit
+    ) throws {
         self.url = url
+        self.maximumDataBytes = maximumDataBytes
         self.sampleRate = sampleRate
         self.channelCount = channelCount
         self.activityTracker = activityTracker
@@ -50,6 +63,11 @@ final class PCMFloatRecorder: @unchecked Sendable {
     /// buffers that did not reach the file: the live transcription backs off when this grows
     var droppedBufferCount: Int {
         lock.withLock { failedWrites }
+    }
+
+    /// the first write that failed (disk full, the file size limit), kept for the user to see
+    var writeError: String? {
+        lock.withLock { firstWriteError }
     }
 
     func append(pcmBuffer: AVAudioPCMBuffer) throws {
@@ -172,9 +190,13 @@ final class PCMFloatRecorder: @unchecked Sendable {
                 return
             }
             do {
+                guard (frameCount + frames) * channelCount * MemoryLayout<Float>.size <= maximumDataBytes else {
+                    throw AudioCaptureError.fileFull("The recording reached the 4 GB WAV limit")
+                }
                 try file.write(from: buffer)
             } catch {
                 failedWrites += 1
+                firstWriteError = firstWriteError ?? error.localizedDescription
                 throw error
             }
             frameCount += frames
@@ -196,7 +218,7 @@ final class PCMFloatRecorder: @unchecked Sendable {
             }
             let chunkSize = header.suffix(4).withUnsafeBytes { UInt64($0.loadUnaligned(as: UInt32.self).littleEndian) }
             if header.prefix(4) == Data("data".utf8) {
-                // ponytail: past 4 GB the sizes no longer fit a WAV header; a 4 h stereo tap is ~5.5 GB
+                // `wavDataLimit` keeps a live recording under 4 GB, so the sizes fit
                 try write(UInt32(clamping: fileLength - offset - 8), at: offset + 4, in: handle)
                 try write(UInt32(clamping: fileLength - 8), at: 4, in: handle)
                 return

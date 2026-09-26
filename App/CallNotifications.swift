@@ -55,6 +55,13 @@ final class CallNotifier: NSObject, @preconcurrency UNUserNotificationCenterDele
         post(content)
     }
 
+    func recordingStopped(reason: String) {
+        let content = UNMutableNotificationContent()
+        content.title = "Запись остановлена"
+        content.body = reason
+        post(content)
+    }
+
     private func post(_ content: UNMutableNotificationContent) {
         let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
         Task {

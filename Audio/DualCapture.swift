@@ -4,6 +4,7 @@ enum DualCaptureStopReason: String, Codable, Hashable {
     case maxDuration
     case manual
     case silence
+    case writeFailed
 }
 
 struct DualCaptureOutput {
@@ -71,6 +72,12 @@ final class DualCapture: @unchecked Sendable {
     var droppedBufferCount: Int {
         let (microphone, tap) = lock.withLock { (_microphone, _systemTap) }
         return (microphone?.droppedBufferCount ?? 0) + (tap?.droppedBufferCount ?? 0)
+    }
+
+    /// the first write either channel failed, e.g. disk full or the 4 GB WAV limit; nil while all is well
+    var writeError: String? {
+        let (microphone, tap) = lock.withLock { (_microphone, _systemTap) }
+        return microphone?.recorder?.writeError ?? tap?.recorder?.writeError
     }
 
     func setPaused(_ paused: Bool) {

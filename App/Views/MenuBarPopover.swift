@@ -77,6 +77,12 @@ struct MenuBarPopover: View {
             if let stage = controller.jobStage {
                 ProgressView(value: stage.overall)
             }
+            if let warning = controller.recordingWarning {
+                Label(warning, systemImage: "exclamationmark.triangle.fill")
+                    .font(.caption)
+                    .foregroundStyle(.orange)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
     }
 

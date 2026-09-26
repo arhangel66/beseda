@@ -28,7 +28,7 @@ final class SystemAudioTap: @unchecked Sendable {
     private var tapID = AudioObjectID(kAudioObjectUnknown)
     private var aggregateID = AudioObjectID(kAudioObjectUnknown)
     private var ioProcID: AudioDeviceIOProcID?
-    private var recorder: PCMFloatRecorder?
+    private(set) var recorder: PCMFloatRecorder?
     private var format = AudioStreamBasicDescription()
 
     init(activityTracker: AudioActivityTracker? = nil) {

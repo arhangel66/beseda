@@ -33,7 +33,7 @@ if [ ! -f "$NOTES" ]; then
     exit 1
 fi
 
-swift test --package-path "$ROOT"
+swift test --jobs 2 --package-path "$ROOT"
 swift build --package-path "$ROOT" -c release --product Beseda
 BIN_DIR="$(swift build --package-path "$ROOT" -c release --show-bin-path)"
 

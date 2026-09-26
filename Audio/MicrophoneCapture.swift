@@ -6,11 +6,12 @@ enum AudioCaptureError: LocalizedError {
     case unsupportedFormat(String)
     case permissionDenied(String)
     case noFrames(String)
+    case fileFull(String)
     case audioStatus(String, OSStatus)
 
     var errorDescription: String? {
         switch self {
-        case .unsupportedFormat(let message), .permissionDenied(let message), .noFrames(let message):
+        case .unsupportedFormat(let message), .permissionDenied(let message), .noFrames(let message), .fileFull(let message):
             message
         case .audioStatus(let operation, let status):
             "\(operation) failed with OSStatus \(status) (\(CoreAudioStatus.fourCC(status)))"
@@ -21,7 +22,7 @@ enum AudioCaptureError: LocalizedError {
 final class MicrophoneCapture: @unchecked Sendable {
     private let engine = AVAudioEngine()
     private let activityTracker: AudioActivityTracker
-    private var recorder: PCMFloatRecorder?
+    private(set) var recorder: PCMFloatRecorder?
 
     init(activityTracker: AudioActivityTracker) {
         self.activityTracker = activityTracker
