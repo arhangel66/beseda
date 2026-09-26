@@ -5,3 +5,5 @@ following them — never by guessing a path.
 
 Nothing is written yet. The first task that learns something durable about this project — what it is for,
 how it is built, why a choice was made — adds the document and its line here.
+
+- [Decisions](decisions/index.md) — product and architecture decisions, proposed and approved.
