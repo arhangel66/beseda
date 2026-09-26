@@ -40,6 +40,8 @@ green from then on.
 swift test
 ```
 
+Agents in this repo do not use Serena/LSP tools (sourcekit-lsp indexing eats tens of GB of RAM); they use grep/read, and `swift test` runs with `--jobs 2`.
+
 It builds the app and runs every test. `theInstalledModelTranscribesRealSpeech` is skipped unless the
 speech model is installed in Application Support and `samples/jfk.wav` (gitignored) is in the checkout.
 
