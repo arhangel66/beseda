@@ -34,6 +34,8 @@ struct StoredCallSummary: Identifiable, Hashable {
     let eventID: String?
     /// set when the event was chosen by hand: the matcher never touches such a call again
     let eventPinned: Bool
+    /// the `CallType.name` the call was processed as; nil for a call never processed
+    var callType: String? = nil
 
     var isFailed: Bool {
         status == "failed"
@@ -294,7 +296,8 @@ final class CallStore {
                 ("event_title", "TEXT"),
                 ("event_id", "TEXT"),
                 ("event_pinned", "INTEGER NOT NULL DEFAULT 0"),
-                ("summary_text", "TEXT")
+                ("summary_text", "TEXT"),
+                ("call_type", "TEXT")
             ] where !callColumns.contains(column) {
                 try execute(db, "ALTER TABLE calls ADD COLUMN \(column) \(type)")
             }
@@ -534,7 +537,7 @@ final class CallStore {
                (SELECT group_concat(text, '. ') FROM
                  (SELECT text FROM transcript_segments
                    WHERE call_id = c.id ORDER BY order_idx LIMIT 5)),
-               c.event_title, c.event_id, c.event_pinned
+               c.event_title, c.event_id, c.event_pinned, c.call_type
         FROM calls c
         """
 
@@ -554,7 +557,8 @@ final class CallStore {
             summaryText: columnString(statement, 10),
             eventTitle: columnString(statement, 12),
             eventID: columnString(statement, 13),
-            eventPinned: sqlite3_column_int64(statement, 14) != 0
+            eventPinned: sqlite3_column_int64(statement, 14) != 0,
+            callType: columnString(statement, 15)
         )
     }
 
@@ -574,6 +578,13 @@ final class CallStore {
         try database { db in
             try run(db, "UPDATE calls SET summary_text = ?, updated_at = ? WHERE id = ?",
                     text, Date().iso8601WithFractions, callID)
+        }
+    }
+
+    func setCallType(callID: String, name: String?) throws {
+        try database { db in
+            try run(db, "UPDATE calls SET call_type = ?, updated_at = ? WHERE id = ?",
+                    name, Date().iso8601WithFractions, callID)
         }
     }
 

@@ -66,3 +66,66 @@ enum SummarizationError: LocalizedError {
         }
     }
 }
+
+/// A kind of call the user defines: the classifier reads `name` and `description`, the summary runs `prompt`.
+struct CallType: Codable, Hashable, Identifiable, Sendable {
+    var id = UUID()
+    var name: String
+    var description: String
+    var prompt: String
+}
+
+extension SummarizationService {
+    /// ≈2k tokens: enough of the opening to tell a daily from a therapy session
+    static let classifierCharacterLimit = 8000
+
+    /// Picks the call's type (skipped when `chosen` is given or only one type exists), then runs
+    /// that type's prompt. `provider` builds the model client for a given system prompt.
+    static func process(
+        _ detail: StoredCallDetail,
+        types: [CallType],
+        chosen: CallType? = nil,
+        characterBudget: Int,
+        provider: (String) -> SummarizationProvider,
+        log: (String) -> Void = { _ in },
+        // runs on the caller's actor, so the closures need not be Sendable
+        isolation: isolated (any Actor)? = #isolation
+    ) async throws -> (type: CallType, text: String) {
+        let type: CallType
+        if let chosen {
+            type = chosen
+        } else if types.count == 1 {
+            type = types[0]
+        } else {
+            let opening = String(TranscriptCopy.render(detail, format: .clean).prefix(classifierCharacterLimit))
+            let answer = try await provider(classifierPrompt(types)).summarize(text: opening)
+            if let named = pickType(answer, from: types) {
+                type = named
+            } else {
+                log("Classifier answered «\(answer)», not a known type; using «\(types[0].name)»")
+                type = types[0]
+            }
+        }
+        let text = try await SummarizationService(provider: provider(type.prompt), characterBudget: characterBudget)
+            .summarize(detail)
+        return (type, text)
+    }
+
+    static func classifierPrompt(_ types: [CallType]) -> String {
+        let list = types.map { "- \($0.name): \($0.description)" }.joined(separator: "\n")
+        return """
+            Определи тип созвона по началу расшифровки. Ответь только названием одного типа из списка, \
+            без пояснений.
+
+            \(list)
+            """
+    }
+
+    /// tolerant of case, spaces, quotes and extra words; the longest name wins so «1:1» never beats «личный 1:1»
+    static func pickType(_ answer: String, from types: [CallType]) -> CallType? {
+        let answer = answer.lowercased()
+        return types
+            .filter { !$0.name.isEmpty && answer.contains($0.name.lowercased().trimmingCharacters(in: .whitespaces)) }
+            .max { $0.name.count < $1.name.count }
+    }
+}

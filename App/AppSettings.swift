@@ -59,7 +59,10 @@ final class AppSettings {
     private let openRouterModelKey = "beseda.openRouterModel"
     private let summaryServerURLKey = "beseda.summaryServerURL"
     private let summaryModelKey = "beseda.summaryModel"
-    private let summaryPromptKey = "beseda.summaryPrompt"
+    /// only read, to carry an edited summary prompt into the first call type
+    private let legacySummaryPromptKey = "beseda.summaryPrompt"
+    private let callTypesKey = "beseda.callTypes"
+    private let autoProcessCallsKey = "beseda.autoProcessCalls"
     private let webhookEnabledKey = "beseda.webhookEnabled"
     private let webhookURLKey = "beseda.webhookURL"
     private let webhookSecretKey = "beseda.webhookSecret"
@@ -159,10 +162,17 @@ final class AppSettings {
         }
     }
 
-    /// "" means automatic: `ChatCompletionsProvider.defaultPrompt`
-    var summaryPrompt: String {
+    /// never empty: the classifier runs only when there are two or more
+    var callTypes: [CallType] {
         didSet {
-            defaults.set(summaryPrompt, forKey: summaryPromptKey)
+            defaults.set(try? JSONEncoder().encode(callTypes), forKey: callTypesKey)
+        }
+    }
+
+    /// off: a call is processed only from «Итоги»
+    var autoProcessCalls: Bool {
+        didSet {
+            defaults.set(autoProcessCalls, forKey: autoProcessCallsKey)
         }
     }
 
@@ -222,7 +232,10 @@ final class AppSettings {
         self.openRouterModel = defaults.string(forKey: openRouterModelKey) ?? ""
         self.summaryServerURL = defaults.string(forKey: summaryServerURLKey) ?? ""
         self.summaryModel = defaults.string(forKey: summaryModelKey) ?? ""
-        self.summaryPrompt = defaults.string(forKey: summaryPromptKey) ?? ""
+        self.callTypes = defaults.data(forKey: callTypesKey)
+            .flatMap { try? JSONDecoder().decode([CallType].self, from: $0) }
+            .flatMap { $0.isEmpty ? nil : $0 } ?? [AppSettings.defaultCallType(legacyPrompt: defaults.string(forKey: legacySummaryPromptKey))]
+        self.autoProcessCalls = defaults.bool(forKey: autoProcessCallsKey)
         self.webhookEnabled = defaults.bool(forKey: webhookEnabledKey)
         self.webhookURL = defaults.string(forKey: webhookURLKey) ?? ""
         self.webhookSecret = defaults.string(forKey: webhookSecretKey) ?? ""
@@ -238,6 +251,11 @@ final class AppSettings {
                 defaults.set(value, forKey: newKey)
             }
         }
+    }
+
+    static func defaultCallType(legacyPrompt: String?) -> CallType {
+        let prompt = legacyPrompt.flatMap { $0.isEmpty ? nil : $0 } ?? ChatCompletionsProvider.defaultPrompt
+        return CallType(name: "Созвон", description: "любой разговор", prompt: prompt)
     }
 
     private static func bool(_ defaults: UserDefaults, _ key: String, otherwise fallback: Bool) -> Bool {

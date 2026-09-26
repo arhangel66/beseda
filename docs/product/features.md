@@ -25,7 +25,10 @@ What the code does today. Settings tabs are named as in the app: Основны�
   keep the text (`Storage/StorageJanitor.swift`).
 - **Summaries.** A summary of a call is written by one of three providers picked under Обработка: the
   built-in Gemma 4 E4B run by a downloaded llama.cpp server, OpenRouter with the user's key, or LM Studio
-  (`Summarization/`).
+  (`Summarization/`). The user defines call types (name, description, prompt) under Обработка; with two
+  or more, the same model first picks the type from the start of the transcript and that type's prompt
+  runs. Processing starts from «Итоги», or by itself after every call when «Обрабатывать созвоны
+  автоматически» is on (off by default).
 - **Calendar.** With calendar access, a call is named after the matching calendar event from the calendars
   picked under Интеграции (`Calendar/CalendarService.swift`).
 - **Webhook.** A finished transcript is POSTed as JSON to a URL set under Интеграции, with an optional secret

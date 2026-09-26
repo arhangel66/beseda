@@ -8,7 +8,7 @@ struct ChatCompletionsProvider: SummarizationProvider, Sendable {
 
     let baseURL: URL
     let model: String
-    let prompt: String
+    var prompt: String
     /// nil for the local servers, which take any request
     var apiKey: String?
     /// what the error messages call this endpoint, e.g. «OpenRouter» or «LM Studio на localhost:1234»

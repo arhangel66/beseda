@@ -329,41 +329,50 @@ private struct ProcessingPane: View {
                     }
                     .disabled(controller.isCheckingSummary)
                 }
-                DisclosureGroup("Дополнительно", isExpanded: $isAdvancedOpen) {
-                    if settings.summaryProvider == .lmStudio {
+                if settings.summaryProvider == .lmStudio {
+                    DisclosureGroup("Дополнительно", isExpanded: $isAdvancedOpen) {
                         TextField("Адрес сервера", text: Bindable(settings).summaryServerURL, prompt: Text("автоматически (lms server status)"))
-                    }
-                    VStack(alignment: .leading, spacing: 6) {
-                        HStack {
-                            Text("Инструкция модели")
-                            Spacer()
-                            Button("Сбросить") {
-                                settings.summaryPrompt = ""
-                            }
-                            .controlSize(.small)
-                            .disabled(settings.summaryPrompt.isEmpty)
-                        }
-                        TextEditor(text: Bindable(settings).summaryPrompt)
-                            .font(.body)
-                            .frame(minHeight: 120)
-                            .overlay(alignment: .topLeading) {
-                                if settings.summaryPrompt.isEmpty {
-                                    Text(ChatCompletionsProvider.defaultPrompt)
-                                        .foregroundStyle(.tertiary)
-                                        .padding(.top, 8)
-                                        .padding(.leading, 5)
-                                        .allowsHitTesting(false)
-                                }
-                            }
-                        Text("Без заголовков `#`: панель показывает только жирный текст и переносы.")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
                     }
                 }
             } header: {
                 Text("Итоги")
             } footer: {
                 Text(providerNote)
+            }
+
+            Section {
+                Toggle("Обрабатывать созвоны автоматически", isOn: Bindable(settings).autoProcessCalls)
+                ForEach(Bindable(settings).callTypes) { $type in
+                    DisclosureGroup {
+                        TextField("Название", text: $type.name)
+                        TextField("Когда выбирать", text: $type.description, prompt: Text("для классификатора, одной фразой"))
+                        TextEditor(text: $type.prompt)
+                            .font(.body)
+                            .frame(minHeight: 120)
+                        HStack {
+                            Button("Сбросить инструкцию") {
+                                type.prompt = ChatCompletionsProvider.defaultPrompt
+                            }
+                            Spacer()
+                            Button("Удалить тип", role: .destructive) {
+                                settings.callTypes.removeAll { $0.id == type.id }
+                            }
+                            .disabled(settings.callTypes.count == 1)
+                        }
+                        .controlSize(.small)
+                    } label: {
+                        Text(type.name.isEmpty ? "Без названия" : type.name)
+                    }
+                }
+                Button("Добавить тип") {
+                    settings.callTypes.append(
+                        CallType(name: "Новый тип", description: "", prompt: ChatCompletionsProvider.defaultPrompt)
+                    )
+                }
+            } header: {
+                Text("Типы созвонов")
+            } footer: {
+                Text("С одним типом его инструкция просто пишет итоги. С двумя и больше модель сначала выбирает тип по началу разговора. Без заголовков `#`: панель показывает только жирный текст и переносы.")
             }
         }
         .formStyle(.grouped)
