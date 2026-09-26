@@ -28,7 +28,10 @@ the vendored Swift wrapper in `Vendor/TranscribeCpp`). No audio leaves the machi
   `SentenceBuilder` groups words into sentence segments (punctuation or a long pause).
 - **Diarization** — only the system channel is diarized. `Diarizer` wraps FluidAudio's
   `OfflineDiarizerManager` (clustering threshold 0.70); its CoreML models download and compile on first
-  use. `SpeakerAssignment.remoteTurns` labels each sentence (`them-1`,
+  use. `SpeakerAssignment.remoteTurns` first merges short-reply speakers: a speaker with no segment ≥ 6 s
+  gives each segment to the nearest-in-time kept speaker (if none is kept, the one with the most seconds
+  stays) — on real calls these are the interlocutor's "да / угу" split into their own cluster
+  ([speaker accuracy](../decisions/speaker-accuracy.md)). Then it labels each sentence (`them-1`,
   `them-2`…) with the speaker of the diarizer segment it overlaps most, or the nearest one when it lies
   outside diarizer speech; every sentence stays its own line with its own times, so clicking it seeks there.
   Per-word labels, the earlier rule, were twice as wrong ([speaker accuracy](../decisions/speaker-accuracy.md)).

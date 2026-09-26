@@ -41,6 +41,11 @@ let package = Package(
         .executableTarget(
             name: "RealCalls",
             dependencies: [.product(name: "FluidAudio", package: "FluidAudio")]
+        ),
+        // BESEDA-84: them count through the app's Diarizer + SpeakerAssignment (symlinks), ../app_merge.sh
+        .executableTarget(
+            name: "AppMerge",
+            dependencies: [.product(name: "FluidAudio", package: "FluidAudio")]
         )
     ]
 )
