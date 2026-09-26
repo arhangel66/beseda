@@ -25,5 +25,5 @@ One SwiftPM target, SwiftUI, `MenuBarExtra` popover as the entry point (`App/Bes
 conversations window and Settings; system controls (`Toggle`, `Picker`, `NavigationSplitView`, `Form`).
 
 ## Consequences
-- macOS only; the minimum is macOS 14 (`Package.swift`).
+- macOS only; the minimum is macOS 14.2 (`Package.swift`), which process taps need.
 - Built and packaged by `scripts/`, not an Xcode project.

@@ -7,7 +7,7 @@ description: Package.swift, the build/sign/package/release scripts, Sparkle upda
 
 ## Package
 
-`Package.swift` (tools 6.0, macOS 14) has one executable target, `Beseda`, with `path: "."` and sources
+`Package.swift` (tools 6.0, macOS 14.2) has one executable target, `Beseda`, with `path: "."` and sources
 `App`, `Audio`, `Calendar`, `Storage`, `Summarization`, `Transcription`, `Webhooks`, `Runtime`, plus
 `Resources`. Dependencies: FluidAudio (diarization), Sparkle (updates), and transcribe.cpp as the
 `CTranscribe` binary xcframework (pinned v0.2.3 with checksum) wrapped by the vendored

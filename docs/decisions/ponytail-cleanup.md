@@ -34,5 +34,5 @@ Removed or folded:
 ## Consequences
 No feature, settings key or on-disk format changed.
 
-Open, Mikhail's call: raising the macOS minimum from 14.0 to 14.2 would remove the `AnyObject` storage and
-`#available(macOS 14.2, *)` casts around `SystemAudioTap` (`DualCapture`, `LevelMonitor`), but drops 14.0/14.1.
+Resolved: Mikhail raised the macOS minimum from 14.0 to 14.2, which removed the `AnyObject` storage and
+`#available(macOS 14.2, *)` casts around `SystemAudioTap` (`DualCapture`, `LevelMonitor`); 14.0/14.1 are dropped.

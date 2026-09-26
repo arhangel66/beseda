@@ -45,11 +45,6 @@ final class PermissionsModel {
 
     /// the only honest check is opening a tap: macOS grants system audio per app, silently
     func checkSystemAudio() async {
-        guard #available(macOS 14.2, *) else {
-            systemAudio = .denied("Системный звук требует macOS 14.2 или новее")
-            return
-        }
-
         systemAudio = .checking
         let result = await Task.detached(priority: .userInitiated) { () -> String? in
             let tap = SystemAudioTap()
