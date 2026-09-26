@@ -2,8 +2,8 @@ import SwiftUI
 
 struct Avatar: View {
     let initials: String?
-    var fallbackSymbol = "waveform"
-    var size: CGFloat = 22
+    let fallbackSymbol: String
+    let size: CGFloat
 
     var body: some View {
         Group {

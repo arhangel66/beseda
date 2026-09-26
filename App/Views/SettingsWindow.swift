@@ -286,7 +286,6 @@ private struct ProcessingPane: View {
     let controller: AppController
 
     @State private var isAdvancedOpen = false
-    @State private var isKeyShown = false
 
     private var settings: AppSettings {
         controller.settings
@@ -375,17 +374,7 @@ private struct ProcessingPane: View {
 
     @ViewBuilder
     private var openRouterRows: some View {
-        HStack {
-            if isKeyShown {
-                TextField("Ключ", text: Bindable(settings).openRouterAPIKey)
-            } else {
-                SecureField("Ключ", text: Bindable(settings).openRouterAPIKey)
-            }
-            Button(isKeyShown ? "Скрыть" : "Показать") {
-                isKeyShown.toggle()
-            }
-            .controlSize(.small)
-        }
+        SecretField(title: "Ключ", text: Bindable(settings).openRouterAPIKey)
         TextField("Модель", text: Bindable(settings).openRouterModel, prompt: Text(OpenRouter.defaultModel))
     }
 
@@ -578,7 +567,6 @@ private struct IntegrationsPane: View {
     let controller: AppController
 
     @State private var isCalendarPickerOpen = false
-    @State private var isSecretShown = false
 
     private var settings: AppSettings {
         controller.settings
@@ -605,7 +593,7 @@ private struct IntegrationsPane: View {
                         }
                     } else {
                         Button("Открыть доступ…") {
-                            openPrivacySettings()
+                            PermissionsModel.openPrivacySettings(pane: "Privacy_Calendars")
                         }
                     }
                 }
@@ -619,17 +607,7 @@ private struct IntegrationsPane: View {
             Section {
                 Toggle("Отправлять расшифровку на свой сервис", isOn: Bindable(settings).webhookEnabled)
                 TextField("Адрес", text: Bindable(settings).webhookURL, prompt: Text("https://example.com/webhook"))
-                HStack {
-                    if isSecretShown {
-                        TextField("Секрет", text: Bindable(settings).webhookSecret)
-                    } else {
-                        SecureField("Секрет", text: Bindable(settings).webhookSecret)
-                    }
-                    Button(isSecretShown ? "Скрыть" : "Показать") {
-                        isSecretShown.toggle()
-                    }
-                    .controlSize(.small)
-                }
+                SecretField(title: "Секрет", text: Bindable(settings).webhookSecret)
                 HStack {
                     Text(webhooks.testResult ?? "Пробный запрос сервис должен пропустить.")
                         .foregroundStyle(.secondary)
@@ -670,12 +648,27 @@ private struct IntegrationsPane: View {
         }
         return "Событие нашлось у \(coverage.matched) из \(coverage.total) разговоров"
     }
+}
 
-    private func openPrivacySettings() {
-        guard let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Calendars") else {
-            return
+/// A key typed once and hidden after, with a button to read it back.
+private struct SecretField: View {
+    let title: String
+    let text: Binding<String>
+
+    @State private var isShown = false
+
+    var body: some View {
+        HStack {
+            if isShown {
+                TextField(title, text: text)
+            } else {
+                SecureField(title, text: text)
+            }
+            Button(isShown ? "Скрыть" : "Показать") {
+                isShown.toggle()
+            }
+            .controlSize(.small)
         }
-        NSWorkspace.shared.open(url)
     }
 }
 

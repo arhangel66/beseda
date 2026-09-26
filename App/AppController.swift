@@ -799,8 +799,8 @@ final class AppController {
         processingCallID = summary.id
         let callID = summary.id
         let sessionDir = summary.audioDirectoryURL
-        let startedAt = parseISO8601(summary.startedAt) ?? Date()
-        let endedAt = summary.endedAt.flatMap(parseISO8601)
+        let startedAt = summary.startedDate ?? Date()
+        let endedAt = summary.endedAt.flatMap(CallFormatting.parseISO8601)
         let persist = { [unowned self] (status: String, transcriptURL: URL?) in
             saveCall(
                 callID, kind: summary.kind, in: sessionDir, startedAt: startedAt, endedAt: endedAt,
@@ -1002,16 +1002,6 @@ final class AppController {
         guard fileManager.fileExists(atPath: url.path) else {
             throw BesedaError.processFailed("Missing audio file: \(url.lastPathComponent)")
         }
-    }
-
-    private func parseISO8601(_ value: String) -> Date? {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        if let date = formatter.date(from: value) {
-            return date
-        }
-        formatter.formatOptions = [.withInternetDateTime]
-        return formatter.date(from: value)
     }
 
     /// remote speaker turns for the system channel; empty keeps today's single `them` label
