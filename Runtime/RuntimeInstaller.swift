@@ -3,13 +3,9 @@ import Foundation
 
 /// The speech engine is installed in stages; each one leaves an artefact on disk, so a relaunch
 /// resumes where the last run stopped instead of downloading again.
-enum RuntimeStage: String, CaseIterable, Identifiable {
+enum RuntimeStage: String, CaseIterable {
     case speechModel
     case warmUp
-
-    var id: String {
-        rawValue
-    }
 }
 
 enum RuntimeStageState: Equatable {
@@ -18,10 +14,6 @@ enum RuntimeStageState: Equatable {
     case running(fraction: Double?)
     case done
     case failed(String)
-
-    var isDone: Bool {
-        self == .done
-    }
 }
 
 /// Fetches one file, reporting the share received. Injected so the installer can be tested
@@ -59,7 +51,7 @@ final class RuntimeInstaller {
     }
 
     var isReady: Bool {
-        RuntimeStage.allCases.allSatisfy { states[$0]?.isDone == true }
+        RuntimeStage.allCases.allSatisfy { states[$0] == .done }
     }
 
     func state(of stage: RuntimeStage) -> RuntimeStageState {
@@ -99,7 +91,7 @@ final class RuntimeInstaller {
                 return
             }
             refresh()
-            for stage in RuntimeStage.allCases where !state(of: stage).isDone {
+            for stage in RuntimeStage.allCases where state(of: stage) != .done {
                 states[stage] = .running(fraction: nil)
                 do {
                     try await run(stage)
