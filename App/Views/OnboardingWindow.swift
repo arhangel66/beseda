@@ -150,7 +150,7 @@ struct OnboardingWindow: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .padding(20)
-                .background(Color.primary.opacity(0.05), in: .rect(cornerRadius: Metrics.windowCorner))
+                .background(Color.primary.opacity(0.05), in: .rect(cornerRadius: 12))
             }
         }
     }

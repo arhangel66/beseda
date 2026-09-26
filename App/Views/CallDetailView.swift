@@ -319,13 +319,7 @@ private struct ProgressBanner: View {
                     .frame(maxWidth: 420)
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 14)
-        .background(Color.accentColor.opacity(0.09), in: .rect(cornerRadius: Metrics.cardCorner))
-        .overlay {
-            RoundedRectangle(cornerRadius: Metrics.cardCorner)
-                .strokeBorder(Color.accentColor.opacity(0.3), lineWidth: 0.5)
-        }
+        .bannerCard(Color.accentColor)
     }
 }
 
@@ -365,13 +359,7 @@ private struct FailureBanner: View {
                 .disabled(controller.isBusy)
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 14)
-        .background(Color.red.opacity(0.09), in: .rect(cornerRadius: Metrics.cardCorner))
-        .overlay {
-            RoundedRectangle(cornerRadius: Metrics.cardCorner)
-                .strokeBorder(Color.red.opacity(0.3), lineWidth: 0.5)
-        }
+        .bannerCard(Color.red)
     }
 
     private var bodyText: String {

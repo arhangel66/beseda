@@ -134,13 +134,7 @@ struct CallSummaryView: View {
                 }
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 14)
-        .background(Color.red.opacity(0.09), in: .rect(cornerRadius: Metrics.cardCorner))
-        .overlay {
-            RoundedRectangle(cornerRadius: Metrics.cardCorner)
-                .strokeBorder(Color.red.opacity(0.3), lineWidth: 0.5)
-        }
+        .bannerCard(Color.red)
     }
 
     @ViewBuilder

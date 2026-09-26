@@ -14,7 +14,7 @@ enum SummaryRecovery: Equatable {
 final class AppController {
     enum Status: Equatable {
         case idle
-        case recording(TimeInterval)
+        case recording
         case callRecording
         case autoRecording(String)
         /// every step between a finished recording and a finished transcript
@@ -37,25 +37,6 @@ final class AppController {
                 true
             default:
                 false
-            }
-        }
-
-        var title: String {
-            switch self {
-            case .idle:
-                "Жду"
-            case .recording(let duration):
-                "Записываю \(Int(duration)) с"
-            case .callRecording:
-                "Записываю звонок"
-            case .autoRecording(let app):
-                "Записываю \(app)"
-            case .working(let stage):
-                stage.title
-            case .completed:
-                "Готово"
-            case .failed:
-                "Не получилось"
             }
         }
 
@@ -726,7 +707,7 @@ final class AppController {
             } else if autoStopSilenceDuration != nil {
                 status = .callRecording
             } else {
-                status = .recording(Self.maximumRecordingDuration)
+                status = .recording
             }
             if let autoStopSilenceDuration {
                 appendLog("Recording microphone and system audio to \(sessionDir.path); auto-stop after \(Int(autoStopSilenceDuration))s silence")
