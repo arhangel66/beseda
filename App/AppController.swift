@@ -392,7 +392,8 @@ final class AppController {
     /// nil means "Без события": the name falls back to the transcript and stays pinned there
     func assignEvent(_ event: CalendarEvent?, to call: StoredCallSummary) {
         do {
-            try callStore.setEvent(callID: call.id, title: event?.title, eventID: event?.id, pinned: true)
+            try callStore.setEvent(callID: call.id, title: event?.title, eventID: event?.id, pinned: true,
+                                   seriesID: event?.seriesID, participants: event?.participants ?? [])
             eventMatchAttempted.insert(call.id)
             refreshCallBrowser()
             eventCoverage = (try? callStore.eventCoverage()) ?? eventCoverage
@@ -443,7 +444,8 @@ final class AppController {
                 continue
             }
             do {
-                try callStore.setEvent(callID: call.id, title: event.title, eventID: event.id, pinned: false)
+                try callStore.setEvent(callID: call.id, title: event.title, eventID: event.id, pinned: false,
+                                       seriesID: event.seriesID, participants: event.participants)
                 matched = true
             } catch {
                 appendLog("Event match failed: \(error.localizedDescription)")
