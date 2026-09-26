@@ -98,6 +98,10 @@ private struct UpcomingEvents: View {
                         .font(.caption)
                         .foregroundStyle(controller.willRecord(event) ? Color.green : Color.secondary)
                 }
+
+                if let previous = PreviousCallContent(controller.previousCallByEventID[event.id]) {
+                    PreviousCallBlock(content: previous, digestLineLimit: 3) { controller.selectCall(id: $0) }
+                }
             }
 
             Text("«Запишется» — догадка по ссылке на созвон в событии. Запись всё равно включает звук звонка.")

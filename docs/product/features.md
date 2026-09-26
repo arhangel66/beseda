@@ -32,6 +32,9 @@ What the code does today. Settings tabs are named as in the app: Основны�
 - **Call screen result.** A processed call opens on «Итоги» with its type in the header; a call that was
   only transcribed opens on the transcript. «Тип: …» reruns the call as another configured type (no
   classifier), «Скопировать результат» copies the result (`App/Views/CallDetailView.swift`).
+- **В прошлый раз.** The call screen and each upcoming calendar event show the date and stored digest of the
+  previous related call (decisions, next steps, open questions) with a link that opens it; nothing when there
+  is no related call with a summary.
 - **Export.** With a folder picked under Хранение → Экспорт результатов, every stored result (auto, manual
   or rerun) is written there as Markdown: title, date, type, result, then the clean transcript. The file
   is named by date and title, so a rerun overwrites it (`Storage/CallExport.swift`).

@@ -38,6 +38,9 @@ capture.
   first launch until `onboardingDone`.
 - **Conversations** — `ConversationsWindow` with `CallSidebar` (calls by day, search, upcoming calendar
   events) and `CallDetailView` (tabs «Расшифровка», «Итоги» via `CallSummaryView`, «Сведения»).
+  `PreviousCallBlock` («В прошлый раз», [related calls](related-calls.md)) sits above the tab content in
+  `CallDetailView` and under each upcoming event in `CallSidebar`; `AppController` looks it up once per
+  selected call (`previousCallForSelected`) and per calendar refresh (`previousCallByEventID`).
 - **Player** — `PlayerBar` with `CallPlayer` and per-speaker lanes.
 - **Settings** — `SettingsWindow`, sections: general, recording, processing, storage, integrations;
   `SpeechModelList` picks the ASR model.
