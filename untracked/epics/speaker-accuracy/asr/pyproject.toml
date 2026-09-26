@@ -1,0 +1,19 @@
+[project]
+name = "speaker-accuracy-asr"
+version = "0.1.0"
+description = "Local remote-speech ASR alternatives for Beseda, scored with the speaker-accuracy eval set"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "gigaam",
+    "jiwer>=4.0.0",
+    "mlx-whisper>=0.4.3",
+    "numpy>=2.5.3",
+    "parakeet-mlx>=0.5.2",
+    "pyannote-metrics>=4.1",
+    "silero-vad>=6.2.3",
+    "soundfile>=0.14.0",
+    "torchaudio>=2.11.0",
+]
+
+[tool.uv.sources]
+gigaam = { git = "https://github.com/salute-developers/GigaAM" }

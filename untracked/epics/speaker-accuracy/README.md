@@ -14,6 +14,7 @@ measurement uses: a small eval set with reference labels and one scorer. Researc
 | `results/` | committed score tables |
 | `baseline/` | Beseda's current pipeline: what it does (with code references), the adapter that runs it on this set, its numbers — [baseline/README.md](baseline/README.md) |
 | `diarization/` | local diarization and me/them alternatives on FluidAudio 0.17.4 + an echo gate, compared to the baseline — [diarization/README.md](diarization/README.md) |
+| `asr/` | local remote-speech ASR alternatives (Whisper turbo, GigaAM CTC, loudnorm, ru/en routing) vs the baseline engines, WER/CER by language — [asr/README.md](asr/README.md) |
 
 ## What is in the set (28 min, 13 recordings)
 
