@@ -9,7 +9,16 @@ REPO="arhangel66/beseda"
 VERSION="$(tr -d '[:space:]' < "$ROOT/VERSION")"
 TAG="v$VERSION"
 SPARKLE_BIN="$ROOT/.build/artifacts/sparkle/Sparkle/bin"
+NOTES="$ROOT/docs/release-notes/$VERSION.md"
 
+# the feed Sparkle reads lives on main, and the commit below lands on the current
+# branch: a release cut anywhere else publishes a tag and a zip while leaving every
+# installed copy on the old version, without a single command failing
+BRANCH="$(git -C "$ROOT" rev-parse --abbrev-ref HEAD)"
+if [ "$BRANCH" != "main" ]; then
+    echo "on $BRANCH; releases are cut from main" >&2
+    exit 1
+fi
 if gh release view "$TAG" --repo "$REPO" > /dev/null 2>&1; then
     echo "$TAG is already published; bump VERSION first" >&2
     exit 1
@@ -19,7 +28,12 @@ if [ -n "$(git -C "$ROOT" status --porcelain)" ]; then
     echo "uncommitted changes; commit first" >&2
     exit 1
 fi
+if [ ! -f "$NOTES" ]; then
+    echo "no $NOTES; an update has to say what changed" >&2
+    exit 1
+fi
 
+swift test --package-path "$ROOT"
 swift build --package-path "$ROOT" -c release --product Beseda
 BIN_DIR="$(swift build --package-path "$ROOT" -c release --show-bin-path)"
 
@@ -35,16 +49,21 @@ ZIP="$DIST/Beseda-$VERSION.zip"
 ditto -c -k --keepParent "$APP_DIR" "$ZIP"
 rm -rf "$APP_DIR"
 
+# generate_appcast pairs release notes with an archive by filename
+cp "$NOTES" "$DIST/Beseda-$VERSION.md"
+
 # signs the zip with the EdDSA key from the keychain; the feed lives at the repo root
-# so its URL never changes
+# so its URL never changes. --embed-release-notes puts the notes inside the feed,
+# leaving nothing extra to host
 "$SPARKLE_BIN/generate_appcast" \
     --download-url-prefix "https://github.com/$REPO/releases/download/$TAG/" \
+    --embed-release-notes \
     -o "$ROOT/appcast.xml" "$DIST"
 
 git -C "$ROOT" add appcast.xml
 git -C "$ROOT" commit -q -m "Beseda $VERSION"
 git -C "$ROOT" tag -a "$TAG" -m "Beseda $VERSION"
 git -C "$ROOT" push -q origin main "$TAG"
-gh release create "$TAG" "$ZIP" --repo "$REPO" --title "Beseda $VERSION" --notes "Beseda $VERSION"
+gh release create "$TAG" "$ZIP" --repo "$REPO" --title "Beseda $VERSION" --notes-file "$NOTES"
 
 echo "published $TAG: https://github.com/$REPO/releases/tag/$TAG"
