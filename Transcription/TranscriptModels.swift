@@ -6,17 +6,13 @@ struct TranscriptWord: Codable, Hashable {
     let text: String
 }
 
-struct TranscriptSegment: Codable, Hashable, Identifiable {
+struct TranscriptSegment: Codable, Hashable {
     let start: Double
     let end: Double
     let text: String
     let confidence: Double?
     /// absent in transcripts recorded before speaker attribution needed word times
     let words: [TranscriptWord]?
-
-    var id: String {
-        "\(start)-\(end)-\(text)"
-    }
 
     var timeRangeDescription: String {
         "\(start.mmss)-\(end.mmss)"
@@ -50,7 +46,7 @@ struct ASRTranscription: Codable {
     }
 }
 
-struct TranscriptResult: Identifiable {
+struct TranscriptResult {
     let id: String
     let createdAt: Date
     let sessionDirectory: URL
@@ -77,13 +73,9 @@ struct TranscriptResult: Identifiable {
     }
 }
 
-enum TranscriptChannel: String, Codable, Hashable, Identifiable {
+enum TranscriptChannel: String, Codable, Hashable {
     case microphone
     case systemAudio
-
-    var id: String {
-        rawValue
-    }
 
     var title: String {
         switch self {
@@ -113,16 +105,12 @@ enum TranscriptChannel: String, Codable, Hashable, Identifiable {
     }
 }
 
-struct ChannelTranscriptResult: Identifiable {
+struct ChannelTranscriptResult {
     let channel: TranscriptChannel
     let result: TranscriptResult
-
-    var id: String {
-        channel.rawValue
-    }
 }
 
-struct DualTranscriptResult: Identifiable {
+struct DualTranscriptResult {
     let id: String
     let createdAt: Date
     let sessionDirectory: URL
@@ -186,13 +174,9 @@ struct DualTranscriptResult: Identifiable {
     }
 }
 
-struct SpeakerTranscriptSegment: Identifiable {
+struct SpeakerTranscriptSegment {
     let speaker: String
     let segment: TranscriptSegment
-
-    var id: String {
-        "\(speaker)-\(segment.id)"
-    }
 }
 
 private extension Double {

@@ -21,19 +21,8 @@ final class CallDetector {
         ("com.google.Chrome", "Chrome / Google Meet")
     ]
 
-    static let defaultEnabledBundleIDs: Set<String> = [
-        "us.zoom.xos",
-        "com.microsoft.teams2",
-        "com.tinyspeck.slackmacgap",
-        "com.tdesktop.Telegram",
-        "org.telegram.desktop",
-        "ru.keepcoder.Telegram",
-        "com.hnc.Discord",
-        "com.apple.FaceTime",
-        "ru.yandex.mobile.telemost"
-    ]
-
-    var allowedBundleIDs: Set<String>
+    /// set from the settings before every `start()`
+    var allowedBundleIDs: Set<String> = []
     /// answers whether the user is recording by hand right now; a manual recording wins over auto-start
     var isManualRecordingActive: () -> Bool = { false }
 
@@ -46,10 +35,6 @@ final class CallDetector {
     private var watcher: MicrophoneProcessWatcher?
     private var micHolders: Set<String> = []
     private var evaluationTask: Task<Void, Never>?
-
-    init(allowedBundleIDs: Set<String> = CallDetector.defaultEnabledBundleIDs) {
-        self.allowedBundleIDs = allowedBundleIDs
-    }
 
     func start() {
         guard !isRunning else {
@@ -82,10 +67,6 @@ final class CallDetector {
     func recordingEnded() {
         policy.recordingEnded(now: Date())
         evaluate()
-    }
-
-    static func displayName(for bundleID: String) -> String {
-        knownCallApps.first { $0.bundleID == bundleID }?.name ?? bundleID
     }
 
     private func micHoldersChanged(_ bundleIDs: Set<String>) {
@@ -137,7 +118,7 @@ final class CallDetector {
         guard let bundleID = micHolders.compactMap(matchingAllowedBundleID).sorted().first else {
             return nil
         }
-        return Detection(bundleID: bundleID, appName: Self.displayName(for: bundleID))
+        return Detection(bundleID: bundleID, appName: Self.knownCallApps.first { $0.bundleID == bundleID }?.name ?? bundleID)
     }
 
     private func matchingAllowedBundleID(for bundleID: String) -> String? {
@@ -269,7 +250,7 @@ private final class MicrophoneProcessWatcher: @unchecked Sendable {
             publish()
         }
         listListener = block
-        var address = processListAddress()
+        var address = globalPropertyAddress(kAudioHardwarePropertyProcessObjectList)
         AudioObjectAddPropertyListenerBlock(AudioObjectID(kAudioObjectSystemObject), &address, queue, block)
     }
 
@@ -278,13 +259,10 @@ private final class MicrophoneProcessWatcher: @unchecked Sendable {
             return
         }
         listListener = nil
-        var address = processListAddress()
+        var address = globalPropertyAddress(kAudioHardwarePropertyProcessObjectList)
         AudioObjectRemovePropertyListenerBlock(AudioObjectID(kAudioObjectSystemObject), &address, queue, block)
     }
 
-    private func processListAddress() -> AudioObjectPropertyAddress {
-        globalPropertyAddress(kAudioHardwarePropertyProcessObjectList)
-    }
 }
 
 private func globalPropertyAddress(_ selector: AudioObjectPropertySelector) -> AudioObjectPropertyAddress {
