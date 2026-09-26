@@ -28,14 +28,14 @@ the vendored Swift wrapper in `Vendor/TranscribeCpp`). No audio leaves the machi
   `SentenceBuilder` groups words into sentence segments (punctuation or a long pause).
 - **Diarization** — only the system channel is diarized. `Diarizer` wraps FluidAudio's
   `OfflineDiarizerManager` (clustering threshold 0.70); its CoreML models download and compile on first
-  use. `SpeakerAssignment.remoteTurns` first merges short-reply speakers: a speaker with no segment ≥ 6 s
-  gives each segment to the nearest-in-time kept speaker (if none is kept, the one with the most seconds
-  stays) — on real calls these are the interlocutor's "да / угу" split into their own cluster
-  ([speaker accuracy](../decisions/speaker-accuracy.md)). Then it labels each sentence (`them-1`,
+  use. `SpeakerAssignment.remoteTurns` labels each sentence (`them-1`,
   `them-2`…) with the speaker of the diarizer segment it overlaps most, or the nearest one when it lies
   outside diarizer speech; every sentence stays its own line with its own times, so clicking it seeks there.
   Per-word labels, the earlier rule, were twice as wrong ([speaker accuracy](../decisions/speaker-accuracy.md)).
   Diarization failure is logged and skipped: the transcript falls back to one `them`.
+  A call whose calendar event has exactly one other attendee is known 1:1: `CallStore` relabels all its
+  `them-N` as `them-1` when segments are written or the event is linked
+  ([speaker accuracy](../decisions/speaker-accuracy.md)).
 - **Echo gate** — remote speech leaking from the speakers into the mic would be transcribed again as
   `me`. `EchoGate` finds the delay (FFT cross-correlation, 0–500 ms) and gain of the system channel
   inside the mic; a 20 ms mic frame is own speech only when its energy beats the predicted echo by 6 dB

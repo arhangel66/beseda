@@ -632,6 +632,17 @@ final class CallStore {
                 "\(callID)-\(segment.orderIndex)", callID, segment.speaker,
                 segment.startSec, segment.endSec, segment.text, segment.orderIndex)
         }
+        try mergeRemoteSpeakersOfOneToOneCall(db, callID: callID)
+    }
+
+    private func mergeRemoteSpeakersOfOneToOneCall(_ db: OpaquePointer, callID: String) throws {
+        // a calendar event with exactly one other attendee: the diarizer's extra `them-N` are that person's short
+        // replies (docs/decisions/speaker-accuracy.md). Plain `them` (no diarization) and group calls stay as they are
+        try run(db, """
+            UPDATE transcript_segments SET speaker = 'them-1'
+            WHERE call_id = ? AND speaker LIKE 'them-%' AND speaker != 'them-1'
+              AND (SELECT instr(participants, char(10)) = 0 FROM calls WHERE id = ?)
+            """, callID, callID)
     }
 
     func upsertTranscriptJob(
@@ -737,6 +748,7 @@ final class CallStore {
                     updated_at = ?
                 WHERE id = ?
                 """, title, eventID, pinned, seriesID, joinedParticipants, Date().iso8601WithFractions, callID)
+            try mergeRemoteSpeakersOfOneToOneCall(db, callID: callID)
         }
     }
 
