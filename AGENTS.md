@@ -38,3 +38,9 @@ green from then on.
 
 ```
 ```
+
+## Kit
+
+This project is built with the ios kit at `/Users/mikhail/w/learning/ios-kit`: its `docs/index.md` is the
+way in, its skills are copied into this project's `.agents/skills/` (`.claude/skills` links there).
+What the kit lacks is fixed in the kit, never worked around here.
