@@ -29,11 +29,10 @@ final class CalendarService {
         authorization == .fullAccess
     }
 
-    func requestAccess() async -> Bool {
+    func requestAccess() async {
         // macOS 14 split calendar access in two, and reading events needs the full kind
-        let granted = (try? await store.requestFullAccessToEvents()) ?? false
+        _ = try? await store.requestFullAccessToEvents()
         authorization = EKEventStore.authorizationStatus(for: .event)
-        return granted
     }
 
     /// title and identifier of every calendar the user could pick from
@@ -68,15 +67,10 @@ final class CalendarService {
     /// a flight, a "Busy" block or a day-long hold would swallow every call inside it.
     /// The length floor drops the reminders and buffers nobody talks through.
     /// With several candidates the one starting nearest the call wins.
-    nonisolated static func match(
-        events: [CalendarEvent],
-        callStart: Date,
-        tolerance: TimeInterval = 5 * 60,
-        minimumLength: TimeInterval = 15 * 60
-    ) -> CalendarEvent? {
+    nonisolated static func match(events: [CalendarEvent], callStart: Date) -> CalendarEvent? {
         events
-            .filter { $0.endsAt.timeIntervalSince($0.startsAt) > minimumLength }
-            .filter { abs($0.startsAt.timeIntervalSince(callStart)) <= tolerance }
+            .filter { $0.endsAt.timeIntervalSince($0.startsAt) > 15 * 60 }
+            .filter { abs($0.startsAt.timeIntervalSince(callStart)) <= 5 * 60 }
             .min { abs($0.startsAt.timeIntervalSince(callStart)) < abs($1.startsAt.timeIntervalSince(callStart)) }
     }
 
