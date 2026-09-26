@@ -50,7 +50,7 @@ func liveModeLoadOfATenMinuteCall() async throws {
             stats.chunkFinished(seconds: Date().timeIntervalSince(started))
             return words
         },
-        droppedBuffers: { stats.droppedBuffers },
+        droppedBuffers: { stats.droppedBuffers + microphone.droppedBufferCount + system.droppedBufferCount },
         isPaused: { false },
         log: { stats.note($0) },
         update: { lines, recordedSeconds in
@@ -178,7 +178,7 @@ private final class LoadStats: @unchecked Sendable {
     var droppedBuffers: Int { lock.withLock { dropped } }
     var chunkCount: Int { lock.withLock { chunkSeconds.count } }
 
-    /// a failed write is what `DualCapture.droppedBufferCount` counts
+    /// a buffer the recorder refused (wrong format); failed writes are counted by the recorder itself
     func append(_ buffer: AVAudioPCMBuffer, to recorder: PCMFloatRecorder) {
         do {
             try recorder.append(pcmBuffer: buffer)

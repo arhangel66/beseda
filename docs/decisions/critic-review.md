@@ -95,6 +95,9 @@ Effort is S (hours), M (days), or L (weeks). Priority is P0 (blocks safe sale or
    disk can glitch before the polling UI notices an error, and `droppedBufferCount` counts thrown writes,
    not callback starvation. Copy into bounded preallocated ring buffers and write on dedicated serial
    workers; stop visibly on overflow. Stress this while ASR, diarization and the local LLM load the machine.
+   Fixed in BESEDA-101: the callback only copies into a preallocated lock-free ring; a writer thread per
+   recorder writes the file, an overflow stops the recording through the write-error path. Under CPU and disk
+   load callback p99 fell from 1.6–11.8 ms to 27–122 µs ([audio capture](../architecture/audio-capture.md)).
 
 10. **Deletion can destroy files while leaving a live database row — P1, M.**
     `Storage/CallStore.swift:450-463` deletes the transcript, export and call folder first, then deletes the
