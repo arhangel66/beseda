@@ -41,7 +41,8 @@ track.
 ## Data flow
 
 In: microphone buffers (Float32) and tap buffers (Float32 or Int16 PCM, interleaved or not), both
-converted to interleaved Float32 by `PCMFloatRecorder`.
+converted to Float32 by `PCMFloatRecorder` and written to the raw WAV as they arrive (`AVAudioFile.write`
+per buffer; the level checks pass no file and write nothing).
 
 Out, into the call folder (see [storage](storage.md)): `me.raw.wav`, `them.raw.wav` at the device
 rate and channel count, and `session.json` (start/end, duration, stop reason, file metadata).
@@ -50,9 +51,12 @@ rate and channel count, and `session.json` (start/end, duration, stop reason, fi
 
 ## Constraints
 
-- **The whole call lives in memory until stop.** `PCMFloatRecorder` appends every sample to a
-  `[Float]` and writes the WAV only in `writeWAV` at the end. A crash or kill mid-call loses the
-  recording; on the next launch `CallStore.failInterruptedCalls` marks such rows failed.
+- **A crash keeps the audio.** Every buffer reaches the raw file as it arrives, but AudioFile fills in
+  the WAV header sizes only at close, so a killed call leaves `me.raw.wav` / `them.raw.wav` whose header
+  says zero frames (and no `session.json`). On the next launch `CallStore.failInterruptedCalls` marks
+  the row failed and returns its folder, and `PCMFloatRecorder.repairWAVHeader` rewrites the sizes from
+  the file length. The call stays in the archive; its retry normalizes the raw files first when the
+  `asr.wav` files are missing. A WAV header cannot count past 4 GB (~4 h of a 48 kHz stereo tap).
 - **macOS 14.2 for system audio.** The package targets macOS 14, but process taps need 14.2, so
   `SystemAudioTap` is `@available(macOS 14.2, *)`. `DualCapture.record` throws below 14.2, and
   `DualCapture` / `LevelMonitor` keep the tap as `AnyObject?` (`_systemTap`, `tap`) and cast it back

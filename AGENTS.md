@@ -37,7 +37,7 @@ The first task writes the check here — the one command that builds and tests t
 green from then on.
 
 ```
-swift test
+swift test --jobs 2
 ```
 
 Agents in this repo do not use Serena/LSP tools (sourcekit-lsp indexing eats tens of GB of RAM); they use grep/read, and `swift test` runs with `--jobs 2`.

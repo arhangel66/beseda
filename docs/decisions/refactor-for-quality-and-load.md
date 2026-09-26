@@ -28,15 +28,15 @@ them buys quality or load. [Local ASR](local-asr.md) is deliberate and stays. Nu
 - **Cost / risk:** small; the gain is measured on pure-delay echo, an upper bound — must be checked on real
   room echo before trusting it.
 
-## Capture memory (`PCMFloatRecorder`)
+## Capture memory (`PCMFloatRecorder`) — done
 
-- **Today:** the whole call is a `[Float]` in RAM until stop. At 48 kHz Float32 that is ~0.7 GB per hour per
-  mono channel, twice that for a stereo tap — one-hour call ≈ 2 GB. A crash mid-call loses the recording.
-- **Option: stream to the WAV file** (`AVAudioFile.write` per buffer, or append to a file handle and patch
-  the header at stop).
-- **Gain:** RAM flat (a few MB) whatever the call length; a crash keeps the audio up to that moment.
-- **Cost / risk:** small, one class; write errors now happen mid-call and need handling so no audio is
-  silently dropped.
+- **Was:** the whole call was a `[Float]` in RAM until stop (~2 GB for a one-hour call); a crash mid-call
+  lost the recording.
+- **Now:** `PCMFloatRecorder` opens the raw WAV at start and writes every buffer with `AVAudioFile.write`;
+  a crash leaves every sample on disk, and the next launch rewrites the header sizes
+  (`repairWAVHeader`) so the file plays and the call can be retried. RAM is flat whatever the call length.
+- **Left:** a write error mid-call is only printed to stderr by the capture callbacks; the audio of that
+  buffer is dropped without telling the user.
 
 ## ASR / diarization pipeline
 

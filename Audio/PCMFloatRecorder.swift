@@ -12,23 +12,32 @@ struct AudioFileMetadata: Codable, Hashable {
 final class PCMFloatRecorder: @unchecked Sendable {
     let sampleRate: Double
     let channelCount: Int
+    let url: URL?
 
     private let lock = NSLock()
     private let activityTracker: AudioActivityTracker?
-    private var samples: [Float] = []
+    private let format: AVAudioFormat
+    // samples reach the disk on every write; after a crash `repairWAVHeader` makes the file readable
+    private var file: AVAudioFile?
+    private var frameCount = 0
     private var paused = false
 
-    init(
-        sampleRate: Double,
-        channelCount: Int,
-        expectedDuration: TimeInterval,
-        activityTracker: AudioActivityTracker?
-    ) {
+    /// opens `url` for writing at once: every appended buffer goes straight to disk; nil only meters levels
+    init(url: URL?, sampleRate: Double, channelCount: Int, activityTracker: AudioActivityTracker?) throws {
+        self.url = url
         self.sampleRate = sampleRate
         self.channelCount = channelCount
         self.activityTracker = activityTracker
-        let reserveDuration = min(expectedDuration, 120)
-        samples.reserveCapacity(Int(sampleRate * reserveDuration) * channelCount)
+        format = AVAudioFormat(
+            commonFormat: .pcmFormatFloat32,
+            sampleRate: sampleRate,
+            channels: AVAudioChannelCount(channelCount),
+            interleaved: false
+        )!
+        if let url {
+            try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+            file = try AVAudioFile(forWriting: url, settings: format.settings)
+        }
     }
 
     /// while paused both channels drop their buffers, so the two files stay aligned
@@ -59,9 +68,7 @@ final class PCMFloatRecorder: @unchecked Sendable {
             }
         }
 
-        lock.withLock {
-            samples.append(contentsOf: chunk)
-        }
+        try write(interleaved: chunk)
         activityTracker?.observe(samples: chunk)
     }
 
@@ -125,44 +132,71 @@ final class PCMFloatRecorder: @unchecked Sendable {
             }
         }
 
-        lock.withLock {
-            samples.append(contentsOf: chunk)
-        }
+        try write(interleaved: chunk)
         activityTracker?.observe(samples: chunk)
     }
 
-    func writeWAV(to url: URL) throws -> AudioFileMetadata {
-        let snapshot = lock.withLock {
-            samples
+    /// closes the file; the audio is already on disk
+    func finish() throws -> AudioFileMetadata {
+        let frames = lock.withLock {
+            file = nil
+            return frameCount
         }
-        let frames = snapshot.count / channelCount
         guard frames > 0 else {
-            throw AudioCaptureError.noFrames("No microphone frames captured for \(url.path)")
+            throw AudioCaptureError.noFrames("No frames captured for \(url?.path ?? "a level check")")
         }
+        return AudioFileMetadata(path: url?.path ?? "", sampleRate: sampleRate, channelCount: channelCount, frameCount: frames)
+    }
 
-        let format = AVAudioFormat(
-            commonFormat: .pcmFormatFloat32,
-            sampleRate: sampleRate,
-            channels: AVAudioChannelCount(channelCount),
-            interleaved: false
-        )!
+    private func write(interleaved chunk: [Float]) throws {
+        let frames = chunk.count / channelCount
+        guard frames > 0, url != nil else {
+            return
+        }
         let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: AVAudioFrameCount(frames))!
         buffer.frameLength = AVAudioFrameCount(frames)
-
-        guard let channelData = buffer.floatChannelData else {
-            throw AudioCaptureError.unsupportedFormat("Could not allocate Float32 output buffer")
-        }
-
+        let channelData = buffer.floatChannelData!
         for frame in 0..<frames {
             for channel in 0..<channelCount {
-                channelData[channel][frame] = snapshot[frame * channelCount + channel]
+                channelData[channel][frame] = chunk[frame * channelCount + channel]
             }
         }
+        try lock.withLock {
+            guard let file else {
+                return
+            }
+            try file.write(from: buffer)
+            frameCount += frames
+        }
+    }
 
-        try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
-        let file = try AVAudioFile(forWriting: url, settings: format.settings)
-        try file.write(from: buffer)
-        return AudioFileMetadata(path: url.path, sampleRate: sampleRate, channelCount: channelCount, frameCount: frames)
+    /// a WAV whose writer died: AudioFile fills in the header sizes only at close, so a killed
+    /// recording has all its samples on disk and a header that says zero frames
+    static func repairWAVHeader(at url: URL) throws {
+        let handle = try FileHandle(forUpdating: url)
+        defer { try? handle.close() }
+        let fileLength = try handle.seekToEnd()
+        var offset: UInt64 = 12
+        while offset + 8 <= fileLength {
+            try handle.seek(toOffset: offset)
+            let header = try handle.read(upToCount: 8) ?? Data()
+            guard header.count == 8 else {
+                return
+            }
+            let chunkSize = header.suffix(4).withUnsafeBytes { UInt64($0.loadUnaligned(as: UInt32.self).littleEndian) }
+            if header.prefix(4) == Data("data".utf8) {
+                // ponytail: past 4 GB the sizes no longer fit a WAV header; a 4 h stereo tap is ~5.5 GB
+                try write(UInt32(clamping: fileLength - offset - 8), at: offset + 4, in: handle)
+                try write(UInt32(clamping: fileLength - 8), at: 4, in: handle)
+                return
+            }
+            offset += 8 + chunkSize + chunkSize % 2
+        }
+    }
+
+    private static func write(_ value: UInt32, at offset: UInt64, in handle: FileHandle) throws {
+        try handle.seek(toOffset: offset)
+        try handle.write(contentsOf: withUnsafeBytes(of: value.littleEndian) { Data($0) })
     }
 
     private func readSample(data: UnsafeMutableRawPointer, index: Int, isFloat: Bool, bitsPerChannel: Int) -> Float {

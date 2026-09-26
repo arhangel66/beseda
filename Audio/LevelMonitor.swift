@@ -36,7 +36,7 @@ final class LevelMonitor {
         if #available(macOS 14.2, *) {
             let tap = SystemAudioTap(activityTracker: systemTracker)
             do {
-                try tap.start(expectedDuration: duration)
+                try tap.start()
                 self.tap = tap
             } catch {
                 tap.cleanup()
@@ -46,7 +46,7 @@ final class LevelMonitor {
 
         Task {
             do {
-                try await microphone.start(expectedDuration: duration)
+                try await microphone.start()
                 isRunning = true
                 startTicking()
                 stopTask = Task {

@@ -119,8 +119,8 @@ final class DualCapture: @unchecked Sendable {
 
         do {
             stopReason = nil
-            try systemTap.start(expectedDuration: duration)
-            try await microphone.start(expectedDuration: duration)
+            try systemTap.start(writingTo: systemRawURL)
+            try await microphone.start(writingTo: microphoneRawURL)
 
             let startedAt = Date()
             let task = Task { try await Task.sleep(for: .seconds(duration)) }
@@ -150,8 +150,8 @@ final class DualCapture: @unchecked Sendable {
             let resolvedStopReason = stopReason ?? .maxDuration
             stopReason = nil
 
-            let systemMetadata = try systemTap.stopAndWrite(to: systemRawURL)
-            let microphoneMetadata = try microphone.stopAndWrite(to: microphoneRawURL)
+            let systemMetadata = try systemTap.stop()
+            let microphoneMetadata = try microphone.stop()
 
             let output = DualCaptureOutput(
                 startedAt: startedAt,
