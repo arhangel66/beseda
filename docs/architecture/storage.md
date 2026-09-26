@@ -30,7 +30,10 @@ folder is moved here once by `LegacyDataMigration`.
   with `foreign_keys = ON` and WAL. Migrations are inline in `prepare()`: missing columns are added with
   `ALTER TABLE`, the dead `keep_audio` column is dropped. `calls.call_type` (nullable TEXT) holds the
   `CallType.name` the call was processed as (`setCallType`, `StoredCallSummary.callType`); null means
-  never processed, as for every call older than the column. On launch `failInterruptedCalls` marks calls
+  never processed, as for every call older than the column. `calls.event_series_id` (EventKit
+  `calendarItemExternalIdentifier` of a recurring event) and `calls.participants` (event attendees except
+  the user, lowercased emails, newline-joined) are nullable TEXT written by `setEvent` whenever an event
+  is matched or picked; calls linked before them stay null. They feed [related calls](related-calls.md). On launch `failInterruptedCalls` marks calls
   left in `recording`/`normalizing`/`transcribing` as failed.
 - **Search** — the sidebar filters loaded calls by `StoredCallSummary.searchableText` (title, app, date,
   preview, error). From two characters on, `searchCallIDs` also matches transcript text with an escaped

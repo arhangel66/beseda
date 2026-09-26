@@ -36,6 +36,10 @@ struct StoredCallSummary: Identifiable, Hashable {
     let eventPinned: Bool
     /// the `CallType.name` the call was processed as; nil for a call never processed
     var callType: String? = nil
+    /// shared by every occurrence of a recurring calendar event; nil for one-off events
+    var eventSeriesID: String? = nil
+    /// attendees of the linked calendar event, lowercased emails or names
+    var participants: [String] = []
 
     var isFailed: Bool {
         status == "failed"
@@ -297,7 +301,9 @@ final class CallStore {
                 ("event_id", "TEXT"),
                 ("event_pinned", "INTEGER NOT NULL DEFAULT 0"),
                 ("summary_text", "TEXT"),
-                ("call_type", "TEXT")
+                ("call_type", "TEXT"),
+                ("event_series_id", "TEXT"),
+                ("participants", "TEXT")
             ] where !callColumns.contains(column) {
                 try execute(db, "ALTER TABLE calls ADD COLUMN \(column) \(type)")
             }
@@ -537,7 +543,8 @@ final class CallStore {
                (SELECT group_concat(text, '. ') FROM
                  (SELECT text FROM transcript_segments
                    WHERE call_id = c.id ORDER BY order_idx LIMIT 5)),
-               c.event_title, c.event_id, c.event_pinned, c.call_type
+               c.event_title, c.event_id, c.event_pinned, c.call_type,
+               c.event_series_id, c.participants
         FROM calls c
         """
 
@@ -558,18 +565,29 @@ final class CallStore {
             eventTitle: columnString(statement, 12),
             eventID: columnString(statement, 13),
             eventPinned: sqlite3_column_int64(statement, 14) != 0,
-            callType: columnString(statement, 15)
+            callType: columnString(statement, 15),
+            eventSeriesID: columnString(statement, 16),
+            participants: columnString(statement, 17)?.split(separator: "\n").map(String.init) ?? []
         )
     }
 
     /// nil title clears the link, so "Без события" is stored rather than left to the matcher
-    func setEvent(callID: String, title: String?, eventID: String?, pinned: Bool) throws {
+    func setEvent(
+        callID: String,
+        title: String?,
+        eventID: String?,
+        pinned: Bool,
+        seriesID: String? = nil,
+        participants: [String] = []
+    ) throws {
+        let joinedParticipants = participants.isEmpty ? nil : participants.joined(separator: "\n")
         try database { db in
             try run(db, """
                 UPDATE calls
-                SET event_title = ?, event_id = ?, event_pinned = ?, updated_at = ?
+                SET event_title = ?, event_id = ?, event_pinned = ?, event_series_id = ?, participants = ?,
+                    updated_at = ?
                 WHERE id = ?
-                """, title, eventID, pinned, Date().iso8601WithFractions, callID)
+                """, title, eventID, pinned, seriesID, joinedParticipants, Date().iso8601WithFractions, callID)
         }
     }
 

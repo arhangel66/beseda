@@ -10,6 +10,10 @@ struct CalendarEvent: Identifiable, Hashable, Sendable {
     let endsAt: Date
     /// a Zoom / Meet / Teams / Telegram link somewhere on the event
     let hasConferenceLink: Bool
+    /// the same for every occurrence of a recurring event; nil for one-off events
+    var seriesID: String? = nil
+    /// attendees other than the user, lowercased emails (or names when there is no email)
+    var participants: [String] = []
 
     var timeDescription: String {
         CallFormatting.clock(startsAt)
@@ -90,8 +94,18 @@ final class CalendarService {
             title: title,
             startsAt: start,
             endsAt: end,
-            hasConferenceLink: Self.carriesConferenceLink(haystack)
+            hasConferenceLink: Self.carriesConferenceLink(haystack),
+            seriesID: event.hasRecurrenceRules ? event.calendarItemExternalIdentifier : nil,
+            participants: (event.attendees ?? []).filter { !$0.isCurrentUser }.compactMap(Self.participantKey)
         )
+    }
+
+    private nonisolated static func participantKey(_ participant: EKParticipant) -> String? {
+        let url = participant.url.absoluteString
+        if url.lowercased().hasPrefix("mailto:") {
+            return String(url.dropFirst("mailto:".count)).lowercased()
+        }
+        return participant.name?.lowercased()
     }
 
     /// a guess, and the sidebar says so: an event with a call link is one we would record
