@@ -41,7 +41,7 @@ private let call = StoredCallDetail(
 @Test func theClassifierPicksTheTypeTheModelNamesAndRunsItsPrompt() async throws {
     let model = StubModel(answer: "  «личный 1:1»\n")
 
-    let (type, _) = try await SummarizationService.process(
+    let (type, _, _) = try await SummarizationService.process(
         call, types: [work, personal], characterBudget: 1000, provider: model.provider
     )
 
@@ -52,7 +52,7 @@ private let call = StoredCallDetail(
 @Test func aGarbageAnswerFallsBackToTheFirstTypeWhateverItIsNamed() async throws {
     let model = StubModel(answer: "не знаю")
 
-    let (type, _) = try await SummarizationService.process(
+    let (type, _, _) = try await SummarizationService.process(
         call, types: [work, personal], characterBudget: 1000, provider: model.provider
     )
 
@@ -63,7 +63,7 @@ private let call = StoredCallDetail(
 @Test func oneTypeRunsItsPromptWithoutAskingTheClassifier() async throws {
     let model = StubModel(answer: "итоги")
 
-    let (type, text) = try await SummarizationService.process(
+    let (type, text, _) = try await SummarizationService.process(
         call, types: [work], characterBudget: 1000, provider: model.provider
     )
 
@@ -75,7 +75,7 @@ private let call = StoredCallDetail(
 @Test func aGivenTypeSkipsTheClassifier() async throws {
     let model = StubModel(answer: "итоги")
 
-    let (type, _) = try await SummarizationService.process(
+    let (type, _, _) = try await SummarizationService.process(
         call, types: [work, personal], chosen: personal, characterBudget: 1000, provider: model.provider
     )
 
@@ -140,7 +140,7 @@ private func jev(answering choice: String, probability: Double) -> JevClassifier
 @Test func aGarbageAnswerFromTheLocalModelFallsBackToOtherWhereverItIsListed() async throws {
     let model = StubModel(answer: "не знаю")
 
-    let (type, _) = try await SummarizationService.process(
+    let (type, _, _) = try await SummarizationService.process(
         call, types: [work, other], characterBudget: 1000, provider: model.provider
     )
 
@@ -150,7 +150,7 @@ private func jev(answering choice: String, probability: Double) -> JevClassifier
 @Test func jevsConfidentPickIsUsedWithoutAskingTheSummaryModel() async throws {
     let model = StubModel(answer: "итоги")
 
-    let (type, _) = try await SummarizationService.process(
+    let (type, _, _) = try await SummarizationService.process(
         call, types: [other, work], characterBudget: 1000, provider: model.provider,
         jev: jev(answering: "Рабочая встреча", probability: 0.9)
     )
@@ -162,7 +162,7 @@ private func jev(answering choice: String, probability: Double) -> JevClassifier
 @Test func aLowConfidenceJevPickFallsBackToOther() async throws {
     let model = StubModel(answer: "итоги")
 
-    let (type, _) = try await SummarizationService.process(
+    let (type, _, _) = try await SummarizationService.process(
         call, types: [other, work], characterBudget: 1000, provider: model.provider,
         jev: jev(answering: "Рабочая встреча", probability: 0.3)
     )
@@ -173,7 +173,7 @@ private func jev(answering choice: String, probability: Double) -> JevClassifier
 @Test func anUnknownJevChoiceFallsBackToOther() async throws {
     let model = StubModel(answer: "итоги")
 
-    let (type, _) = try await SummarizationService.process(
+    let (type, _, _) = try await SummarizationService.process(
         call, types: [other, work], characterBudget: 1000, provider: model.provider,
         jev: jev(answering: "payments", probability: 0.99)
     )
@@ -186,7 +186,7 @@ private func jev(answering choice: String, probability: Double) -> JevClassifier
     let failing = JevClassifier(apiKey: "k", transport: { _ in throw URLError(.notConnectedToInternet) })
     var logs: [String] = []
 
-    let (type, _) = try await SummarizationService.process(
+    let (type, _, _) = try await SummarizationService.process(
         call, types: [other, work], characterBudget: 1000, provider: model.provider, jev: failing,
         log: { logs.append($0) }
     )
@@ -239,4 +239,91 @@ func jevClassifiesATinySyntheticExcerptLive() async throws {
 
     print("Jev live: «\(answer.choice)» p=\(answer.probability) cost=$\(answer.cost ?? 0)")
     #expect([other, work, personal].map(\.name).contains(answer.choice))
+}
+
+// MARK: - BESEDA-104: the same classification also says whether one other person spoke
+
+@Test func theLocalClassifiersSecondLineSaysWhetherOneOtherPersonSpoke() async throws {
+    let one = StubModel(answer: "Рабочая встреча\nодин")
+    let several = StubModel(answer: "Рабочая встреча\n\nнесколько")
+    let silent = StubModel(answer: "Рабочая встреча")
+
+    let (typeOfOne, _, oneOtherPerson) = try await SummarizationService.process(
+        call, types: [other, work], characterBudget: 1000, provider: one.provider
+    )
+    let (_, _, severalPeople) = try await SummarizationService.process(
+        call, types: [other, work], characterBudget: 1000, provider: several.provider
+    )
+    let (_, _, noAnswer) = try await SummarizationService.process(
+        call, types: [other, work], characterBudget: 1000, provider: silent.provider
+    )
+
+    #expect(typeOfOne == work)
+    #expect(oneOtherPerson == true)
+    #expect(severalPeople == false)
+    #expect(noAnswer == nil)
+}
+
+@Test func jevsOtherPeopleAnswerCountsAsOneOnlyAtTheProbabilityBar() throws {
+    func answer(one: Double) throws -> Bool? {
+        let body = #"{"answers":{"call_type":{"choice":"Другое","probabilities":{"Другое":0.9}},"other_people":{"choice":"one","probabilities":{"one":\#(one),"several":\#(1 - one)}}}}"#
+        return try JevClassifier.parse(Data(body.utf8)).oneOtherPerson
+    }
+
+    #expect(try answer(one: 0.8) == true)
+    #expect(try answer(one: 0.3) == false)
+    #expect(try JevClassifier.parse(Data(recordedJevResponse.utf8)).oneOtherPerson == nil)
+}
+
+@Test func theClassifierSeesEveryRemoteSpeakerUnderOneLabel() {
+    let detail = StoredCallDetail(
+        summary: call.summary,
+        segments: [
+            StoredTranscriptSegment(speaker: "me", startSec: 0, endSec: 1, text: "Привет", orderIndex: 0),
+            StoredTranscriptSegment(speaker: "them-1", startSec: 1, endSec: 2, text: "Привет", orderIndex: 1),
+            StoredTranscriptSegment(speaker: "them-2", startSec: 2, endSec: 3, text: "Да", orderIndex: 2)
+        ],
+        speakerNames: ["them-2": "Анна"],
+        markdownText: nil,
+        jobStats: nil
+    )
+
+    let context = ClassifierContext(detail)
+
+    #expect(context.opening == "Вы: Привет\nУдалённо: Привет\nУдалённо: Да")
+}
+
+/// BESEDA-104 measurement, never in the check: the app's classification of each call in a read-only copy of
+/// `calls.sqlite` against llama-server serving the bundled model. Driven by
+/// untracked/epics/speaker-accuracy/one_other_person.sh, which sets BESEDA_ONE_OTHER_PERSON_DB.
+@Test(.enabled(if: ProcessInfo.processInfo.environment["BESEDA_ONE_OTHER_PERSON_DB"] != nil))
+func oneOtherPersonOnRealCallsWithTheBundledModel() async throws {
+    let environment = ProcessInfo.processInfo.environment
+    let store = CallStore(dbURL: URL(fileURLWithPath: environment["BESEDA_ONE_OTHER_PERSON_DB"]!))
+    // Mikhail's call types as the settings hold them on 2026-09-26
+    let types = [
+        CallType(name: "Другое", description: "ни один другой тип не подходит", prompt: "", isOther: true),
+        CallType(name: "Дейли", description: "ежедневный отчет с командой о сделанном за день", prompt: "")
+    ]
+    for callID in environment["BESEDA_ONE_OTHER_PERSON_CALLS"]!.split(separator: " ").map(String.init) {
+        let detail = StoredCallDetail(
+            summary: try #require(try store.fetchCall(id: callID)),
+            segments: try store.fetchSegments(callID: callID),
+            speakerNames: try store.fetchSpeakerNames(callID: callID),
+            markdownText: nil,
+            jobStats: nil
+        )
+        let provider = { (prompt: String) -> SummarizationProvider in
+            ChatCompletionsProvider(
+                baseURL: URL(string: environment["BESEDA_ONE_OTHER_PERSON_SERVER"]!)!, model: BundledSummary.current.modelID,
+                prompt: prompt, serviceName: "llama-server", timeout: 900
+            )
+        }
+        var answers: [String] = []
+        let (type, oneOtherPerson) = try await SummarizationService.classify(
+            detail, types: types, provider: provider, jev: nil, log: { answers.append($0) }
+        )
+        let remoteSpeakers = Set(detail.segments.map(\.speaker).filter { SpeakerNaming.remoteIndex(of: $0) != nil }).count
+        print("ONE_OTHER_PERSON \(callID) type=\(type.name) answer=\(oneOtherPerson.map(String.init) ?? "nil") remote=\(remoteSpeakers) \(answers)")
+    }
 }

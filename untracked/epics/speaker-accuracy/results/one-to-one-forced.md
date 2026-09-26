@@ -41,3 +41,36 @@ path, and `SpeakerAssignment` is now plain t0.70 — equal to the t0.70 row
 
 **Caveat (critic finding 15):** the real counts are inferred from transcript text by an LLM, not
 hand-labelled, and counts cannot show a merge and a split that cancel out.
+
+## Inferred 1:1 from the call-type classification (BESEDA-104, 2026-09-27)
+
+`one_other_person.sh`: the app's own `SummarizationService.classify` (types «Другое», «Дейли» as in Mikhail's
+settings, remote speakers collapsed to «Удалённо») on a read-only copy of `calls.sqlite`, bundled Gemma 4 E4B
+through llama-server with the app's arguments on its own port, one call at a time under the harness lock,
+nice 19, llama-server RSS 4.2–4.5 GB. `before` = remote speakers stored now; `after` = 1 when the answer is «один».
+
+| call | real others | answer (prompt A, shipped) | before → after | answer (prompt B, count) |
+|---|---|---|---|---|
+| 20260925-114649 | 1 | один | 2 → 1 | 1 |
+| 20260925-111702 | 1 | один | 2 → 1 | 1 |
+| 20260924-173649 | 1 | один | 2 → 1 | 1 |
+| 20260924-173310 | 1 | один | 2 → 1 | 1 |
+| 20260924-133358 | 1 | один | 3 → 1 | 3 |
+| 20260924-110157 | 1 | один | 3 → 1 | 1 |
+| 20260923-125419 | 1 | один | 2 → 1 | 1 |
+| 20260923-101613 | 1 | один | 3 → 1 | 1 |
+| 20260922-115609 | 1 | один | 2 → 1 | 1 |
+| 20260922-084404 | 1 | один | 2 → 1 | 1 |
+| 20260925-125945 | 3 | **один** | 4 → **1** | 3 |
+| 20260924-130017 | 4 | **один** | 4 → **1** | 3 |
+| 20260923-130021 | 4 | несколько | 7 → 7 | **1** |
+| 20260922-125838 | 4 | **один** | 6 → **1** | **1** |
+| 20260921-125925 | 4 | несколько | 5 → 5 | **1** |
+
+Prompt A («один» / «несколько», shipped): 10/10 one-to-one calls → 1, but **3 of 5 dailies collapsed to one
+remote speaker**. Prompt B (a number of people, "reports from several people are several people"): 9/10 and 3
+of 5 dailies collapsed — worse, reverted. The target (10/10 and no daily collapsed) is **not met** by the
+bundled model: on an 8000-char opening it says «один» for most calls. The Jev path is **unmeasured** (no cloud
+in the harness).
+
+**Caveat (critic finding 15):** the real counts are inferred from transcript text by an LLM, not hand-labelled.

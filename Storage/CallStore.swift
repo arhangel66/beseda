@@ -357,7 +357,8 @@ final class CallStore {
             ("call_type", "TEXT"),
             ("event_series_id", "TEXT"),
             ("participants", "TEXT"),
-            ("export_path", "TEXT")
+            ("export_path", "TEXT"),
+            ("one_other_person", "INTEGER")
         ] where !callColumns.contains(column) {
             try execute(db, "ALTER TABLE calls ADD COLUMN \(column) \(type)")
         }
@@ -610,12 +611,13 @@ final class CallStore {
     func markReady(callID: String, transcriptURL: URL, segments: [StoredTranscriptSegment]) throws {
         try database { db in
             try transaction(db) {
-                try writeSegments(db, callID: callID, segments: segments)
                 try run(db, "UPDATE calls SET status = 'ready', transcript_path = ?, error = NULL, updated_at = ? WHERE id = ?",
                         transcriptURL.path, Date().iso8601WithFractions, callID)
                 guard sqlite3_changes(db) == 1 else {
                     throw CallStoreError.sqlite("No call \(callID) to mark ready")
                 }
+                // after the path is set: a known 1:1 call's merge rewrites that file
+                try writeSegments(db, callID: callID, segments: segments)
             }
         }
     }
@@ -636,13 +638,33 @@ final class CallStore {
     }
 
     private func mergeRemoteSpeakersOfOneToOneCall(_ db: OpaquePointer, callID: String) throws {
-        // a calendar event with exactly one other attendee: the diarizer's extra `them-N` are that person's short
-        // replies (docs/decisions/speaker-accuracy.md). Plain `them` (no diarization) and group calls stay as they are
+        // a calendar event with exactly one other attendee, or the classifier inferring one other person from the text:
+        // the diarizer's extra `them-N` are that person's short replies (docs/decisions/speaker-accuracy.md).
+        // Plain `them` (no diarization) and group calls stay as they are
         try run(db, """
             UPDATE transcript_segments SET speaker = 'them-1'
             WHERE call_id = ? AND speaker LIKE 'them-%' AND speaker != 'them-1'
-              AND (SELECT instr(participants, char(10)) = 0 FROM calls WHERE id = ?)
+              AND (SELECT instr(participants, char(10)) = 0 OR one_other_person = 1 FROM calls WHERE id = ?)
             """, callID, callID)
+        guard sqlite3_changes(db) > 0,
+              let path = try query(db, "SELECT transcript_path FROM calls WHERE id = ?", callID, row: { columnString($0, 0) })
+                .first ?? nil
+        else {
+            return
+        }
+        // transcript.md was written with the diarizer's speakers: the file and the index must name the same people
+        try TranscriptMerger.rewriteDialogue(
+            in: URL(fileURLWithPath: path), segments: try segments(db, callID: callID), names: try speakerNames(db, callID: callID)
+        )
+    }
+
+    /// the classifier's «exactly one other person» answer; true folds the remote speakers into one
+    func setOneOtherPerson(callID: String, _ oneOtherPerson: Bool) throws {
+        try database { db in
+            try run(db, "UPDATE calls SET one_other_person = ?, updated_at = ? WHERE id = ?",
+                    oneOtherPerson, Date().iso8601WithFractions, callID)
+            try mergeRemoteSpeakersOfOneToOneCall(db, callID: callID)
+        }
     }
 
     func upsertTranscriptJob(
@@ -961,30 +983,34 @@ final class CallStore {
     }
 
     func fetchSpeakerNames(callID: String) throws -> [String: String] {
-        try database { db in
-            let pairs = try query(db, "SELECT speaker_key, display_name FROM call_speakers WHERE call_id = ?", callID) {
-                (columnString($0, 0) ?? "", columnString($0, 1) ?? "")
-            }
-            return Dictionary(pairs, uniquingKeysWith: { _, last in last })
+        try database { db in try speakerNames(db, callID: callID) }
+    }
+
+    private func speakerNames(_ db: OpaquePointer, callID: String) throws -> [String: String] {
+        let pairs = try query(db, "SELECT speaker_key, display_name FROM call_speakers WHERE call_id = ?", callID) {
+            (columnString($0, 0) ?? "", columnString($0, 1) ?? "")
         }
+        return Dictionary(pairs, uniquingKeysWith: { _, last in last })
     }
 
     func fetchSegments(callID: String) throws -> [StoredTranscriptSegment] {
-        try database { db in
-            try query(db, """
-                SELECT speaker, start_sec, end_sec, text, order_idx
-                FROM transcript_segments
-                WHERE call_id = ?
-                ORDER BY order_idx ASC
-                """, callID) { statement in
-                StoredTranscriptSegment(
-                    speaker: columnString(statement, 0) ?? "",
-                    startSec: columnDouble(statement, 1) ?? 0,
-                    endSec: columnDouble(statement, 2),
-                    text: columnString(statement, 3) ?? "",
-                    orderIndex: Int(sqlite3_column_int64(statement, 4))
-                )
-            }
+        try database { db in try segments(db, callID: callID) }
+    }
+
+    private func segments(_ db: OpaquePointer, callID: String) throws -> [StoredTranscriptSegment] {
+        try query(db, """
+            SELECT speaker, start_sec, end_sec, text, order_idx
+            FROM transcript_segments
+            WHERE call_id = ?
+            ORDER BY order_idx ASC
+            """, callID) { statement in
+            StoredTranscriptSegment(
+                speaker: columnString(statement, 0) ?? "",
+                startSec: columnDouble(statement, 1) ?? 0,
+                endSec: columnDouble(statement, 2),
+                text: columnString(statement, 3) ?? "",
+                orderIndex: Int(sqlite3_column_int64(statement, 4))
+            )
         }
     }
 
