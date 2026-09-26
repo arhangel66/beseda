@@ -19,11 +19,7 @@ enum LocalModelSupport {
 
     static func discoverServer() async throws -> URL? {
         let lms = try lmsExecutable()
-        let output = try await ProcessRunner.output(
-            executableURL: lms,
-            arguments: ["server", "status", "--json"],
-            currentDirectoryURL: nil
-        )
+        let output = try await ProcessRunner.run(lms, ["server", "status", "--json"])
         let status = try JSONDecoder().decode(ServerStatus.self, from: Data(output.utf8))
         guard status.running else {
             return nil
@@ -32,11 +28,7 @@ enum LocalModelSupport {
     }
 
     static func startServer() async throws {
-        try await ProcessRunner.run(
-            executableURL: try lmsExecutable(),
-            arguments: ["server", "start"],
-            currentDirectoryURL: nil
-        )
+        try await ProcessRunner.run(try lmsExecutable(), ["server", "start"])
     }
 
     static func chatModels(at baseURL: URL) async throws -> [String] {
@@ -52,11 +44,7 @@ enum LocalModelSupport {
         guard let lms = try? lmsExecutable() else {
             return []
         }
-        let output = try await ProcessRunner.output(
-            executableURL: lms,
-            arguments: ["ps", "--json"],
-            currentDirectoryURL: nil
-        )
+        let output = try await ProcessRunner.run(lms, ["ps", "--json"])
         return try parseLoaded(Data(output.utf8))
     }
 
@@ -116,5 +104,42 @@ enum LocalModelSupport {
     private struct LoadedModel: Decodable {
         let type: String
         let identifier: String
+    }
+}
+
+/// `lms` and `tar`, run to the end; a non-zero exit throws with the tool's own complaint
+enum ProcessRunner {
+    /// the trimmed stdout
+    @discardableResult
+    static func run(_ executableURL: URL, _ arguments: [String]) async throws -> String {
+        try await withCheckedThrowingContinuation { continuation in
+            let process = Process()
+            let stdout = Pipe()
+            let stderr = Pipe()
+            process.executableURL = executableURL
+            process.arguments = arguments
+            process.standardOutput = stdout
+            process.standardError = stderr
+
+            // ponytail: pipes are drained only after exit, so a tool printing over 64 KB would hang;
+            // lms and a quiet tar print far less. Read them while running if that changes.
+            process.terminationHandler = { process in
+                let out = String(decoding: stdout.fileHandleForReading.readDataToEndOfFile(), as: UTF8.self)
+                let err = String(decoding: stderr.fileHandleForReading.readDataToEndOfFile(), as: UTF8.self)
+                if process.terminationStatus == 0 {
+                    continuation.resume(returning: out.trimmingCharacters(in: .whitespacesAndNewlines))
+                } else {
+                    continuation.resume(throwing: BesedaError.processFailed(
+                        "\(executableURL.lastPathComponent) exited with \(process.terminationStatus): \(err.isEmpty ? out : err)"
+                    ))
+                }
+            }
+
+            do {
+                try process.run()
+            } catch {
+                continuation.resume(throwing: error)
+            }
+        }
     }
 }

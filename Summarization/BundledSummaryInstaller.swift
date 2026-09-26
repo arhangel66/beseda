@@ -122,11 +122,7 @@ final class BundledSummaryInstaller {
             throw BesedaError.processFailed("Движок повредился при скачивании")
         }
 
-        try await ProcessRunner.run(
-            executableURL: URL(fileURLWithPath: "/usr/bin/tar"),
-            arguments: ["xzf", archive.path, "-C", staging.path],
-            currentDirectoryURL: nil
-        )
+        try await ProcessRunner.run(URL(fileURLWithPath: "/usr/bin/tar"), ["xzf", archive.path, "-C", staging.path])
 
         let unpacked = staging.appendingPathComponent(artifacts.archiveRootName, isDirectory: true)
         let build = artifacts.buildDirectory(paths)
