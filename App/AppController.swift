@@ -495,7 +495,7 @@ final class AppController {
     func runCleanupNow() {
         guard let protected = protectedAudioDirectories() else {
             appendLog("Cleanup skipped: the call index is unavailable")
-            flash("Уборка не вышла: индекс звонков недоступен")
+            flash("Очистка не удалась: не открылся список разговоров")
             return
         }
         let freed = janitor.sweep(rules: settings.retentionRules, protecting: protected)
@@ -680,6 +680,8 @@ final class AppController {
             } else if callBrowserCalls.isEmpty {
                 selectedCallDetail = nil
             }
+            // a deleted or renamed call may be the one an upcoming event's «В прошлый раз» points at
+            refreshPreviousCallsForEvents()
         } catch {
             callBrowserError = error.localizedDescription
             appendLog("Calls browser failed: \(error.localizedDescription)")
@@ -901,7 +903,7 @@ final class AppController {
                 try await transcribeDualCall(callID, in: sessionDir, stages: 4, persist: persist)
 
             default:
-                throw BesedaError.processFailed("Unsupported call kind: \(summary.kind)")
+                throw BesedaError.processFailed("Неизвестный вид записи: \(summary.kind)")
             }
             appendLog("Retry succeeded for \(callID)")
         } catch {
@@ -1096,7 +1098,7 @@ final class AppController {
 
     private func requireFile(at url: URL) throws {
         guard fileManager.fileExists(atPath: url.path) else {
-            throw BesedaError.processFailed("Missing audio file: \(url.lastPathComponent)")
+            throw BesedaError.processFailed("Нет файла записи: \(url.lastPathComponent)")
         }
     }
 
@@ -1267,7 +1269,7 @@ final class AppController {
                 let provider = try await self.makeSummaryProvider().provider
                 _ = try await provider.summarize(text: "Скажи «готово»")
                 let elapsed = Date().timeIntervalSince(startedAt)
-                self.summaryCheckResult = "Ответила за \(String(format: "%.1f", elapsed)) с"
+                self.summaryCheckResult = "Ответила за \(String(format: "%.1f", elapsed).replacingOccurrences(of: ".", with: ",")) с"
             } catch {
                 self.summaryCheckResult = error.localizedDescription
             }
@@ -1579,9 +1581,9 @@ final class AppController {
 
     nonisolated static func recordingWarning(forWriteError writeError: any Error) -> String {
         if case AudioCaptureError.fileFull = writeError {
-            return "Запись остановлена: файл дошёл до предела в 4 ГБ (около 3 часов). Сохранённое будет расшифровано."
+            return "Запись остановлена: файл достиг предела в 4 ГБ (около 3 часов). Всё записанное до этого будет расшифровано."
         }
-        return "Запись остановлена: не удалось записать звук на диск (\(writeError.localizedDescription)). Сохранённое будет расшифровано."
+        return "Запись остановлена: не удалось записать звук на диск (\(writeError.localizedDescription)). Всё записанное до этого будет расшифровано."
     }
 
     private func stopLiveTicker() {

@@ -6,6 +6,7 @@ struct BesedaApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @Environment(\.openWindow) private var openWindow
     @Environment(\.dismissWindow) private var dismissWindow
+    @Environment(\.openSettings) private var openSettings
 
     private var controller: AppController {
         appDelegate.controller
@@ -41,17 +42,39 @@ struct BesedaApp: App {
             }
             .onAppear {
                 // the label is the one view that exists from launch, so first-run work starts here
+                #if DEBUG
+                // a screenshot run is launched hidden, and activation would take the owner's focus
+                let isShotRun = ProcessInfo.processInfo.environment.keys.contains { $0.hasPrefix("BESEDA_PREVIEW") }
+                #else
+                let isShotRun = false
+                #endif
                 if !controller.settings.onboardingDone {
                     openWindow(id: "onboarding")
-                    NSApplication.shared.activate(ignoringOtherApps: true)
+                    if !isShotRun {
+                        NSApplication.shared.activate(ignoringOtherApps: true)
+                    }
                 }
                 #if DEBUG
-                if let preview = ProcessInfo.processInfo.environment["BESEDA_PREVIEW_POPOVER"] {
-                    if preview == "live" {
+                let environment = ProcessInfo.processInfo.environment
+                if let preview = environment["BESEDA_PREVIEW_POPOVER"] {
+                    let stage = JobStage(title: "Расшифровка собеседников", index: 4, total: 5)
+                    switch preview {
+                    case "live":
                         controller.status = .callRecording
                         controller.liveTranscription = .preview()
+                    case "processing":
+                        controller.status = .working(stage)
+                    case "warning":
+                        controller.status = .working(stage)
+                        controller.recordingWarning = AppController.recordingWarning(forWriteError: AudioCaptureError.fileFull(""))
+                    default:
+                        break
                     }
                     openWindow(id: "popover-preview")
+                }
+                if let section = environment["BESEDA_PREVIEW_SETTINGS"] {
+                    controller.requestedSettingsSection = section
+                    openSettings()
                 }
                 #endif
             }

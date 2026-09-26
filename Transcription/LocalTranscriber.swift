@@ -191,11 +191,11 @@ final class LocalTranscriber: @unchecked Sendable {
             pcmFormat: file.processingFormat,
             frameCapacity: AVAudioFrameCount(file.length)
         ) else {
-            throw BesedaError.processFailed("Could not allocate a buffer for \(url.lastPathComponent)")
+            throw BesedaError.processFailed("Не хватило памяти под \(url.lastPathComponent)")
         }
         try file.read(into: buffer)
         guard let channel = buffer.floatChannelData?[0] else {
-            throw BesedaError.processFailed("No audio in \(url.lastPathComponent)")
+            throw BesedaError.processFailed("В \(url.lastPathComponent) нет звука")
         }
         return Array(UnsafeBufferPointer(start: channel, count: Int(buffer.frameLength)))
     }

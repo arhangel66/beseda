@@ -122,7 +122,7 @@ final class GrowingWAVFile {
                   pcmFormat: target,
                   frameCapacity: AVAudioFrameCount(Double(frames) * target.sampleRate / source.sampleRate) + 64
               ) else {
-            throw BesedaError.processFailed("Cannot convert \(url.lastPathComponent) to 16 kHz mono")
+            throw BesedaError.processFailed("Не получилось перевести \(url.lastPathComponent) в 16 кГц моно")
         }
         bytes.withUnsafeBytes { raw in
             let samples = raw.bindMemory(to: Float.self)
@@ -168,7 +168,7 @@ final class GrowingWAVFile {
             let size = Int(header.loadUInt32(at: offset + 4))
             if id == Data("fmt ".utf8), offset + 24 <= header.count {
                 guard header.loadUInt16(at: offset + 22) == 32 else {
-                    throw BesedaError.processFailed("\(url.lastPathComponent) is not Float32")
+                    throw BesedaError.processFailed("\(url.lastPathComponent) не в формате Float32")
                 }
                 format = (Double(header.loadUInt32(at: offset + 12)), Int(header.loadUInt16(at: offset + 10)))
             }
@@ -179,7 +179,7 @@ final class GrowingWAVFile {
             }
             offset += 8 + size + size % 2
         }
-        throw BesedaError.processFailed("No audio yet in \(url.lastPathComponent)")
+        throw BesedaError.processFailed("В \(url.lastPathComponent) пока нет звука")
     }
 }
 

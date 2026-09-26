@@ -111,7 +111,7 @@ final class SystemAudioTap: @unchecked Sendable {
             cleanup()
         }
         guard let recorder else {
-            throw AudioCaptureError.noFrames("System audio recorder was not started")
+            throw AudioCaptureError.noFrames("Запись системного звука не запустилась")
         }
         return try recorder.finish()
     }

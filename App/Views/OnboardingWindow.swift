@@ -4,17 +4,22 @@ struct OnboardingWindow: View {
     let controller: AppController
     let onFinish: () -> Void
 
+    #if DEBUG
+    // BESEDA_PREVIEW_ONBOARDING opens a given step for screenshots
+    @State private var step = Int(ProcessInfo.processInfo.environment["BESEDA_PREVIEW_ONBOARDING"] ?? "") ?? 1
+    #else
     @State private var step = 1
+    #endif
     private static let stepCount = 4
     @State private var permissions = PermissionsModel()
     @State private var monitor = LevelMonitor()
 
     private static let texts = [
         ("Ваши разговоры остаются на этом Mac",
-         "Beseda записывает звонки и превращает их в текст локально. Ни аудио, ни расшифровки не уходят в сеть."),
+         "Beseda записывает звонки и превращает их в текст прямо на этом Mac. Аудио не уходит в сеть, а текст — только если вы сами включите облачные итоги."),
         ("Два доступа — и можно записывать",
          "Проверю оба сразу, чтобы первая настоящая встреча не оказалась первой попыткой."),
-        ("Движок распознавания",
+        ("Модель распознавания",
          "Речь превращается в текст на этом Mac. Для этого нужно один раз скачать модель распознавания — от 270 до 490 МБ, смотря какую выбрать."),
         ("Проверим, что вас слышно",
          "Скажите пару слов: если полоска двигается, микрофон и системный звук пойдут в запись.")
@@ -54,7 +59,7 @@ struct OnboardingWindow: View {
             HStack(spacing: 12) {
                 Text(footnote)
                     .font(.callout)
-                    .foregroundStyle(.quaternary)
+                    .foregroundStyle(.tertiary)
 
                 Spacer()
 
@@ -157,7 +162,7 @@ struct OnboardingWindow: View {
 
     private static let promises = [
         "Аудио и текст лежат в папке на этом компьютере — их видно в Finder.",
-        "Расшифровка считается офлайн, моделью на вашем железе.",
+        "Расшифровка делается без интернета, моделью на этом Mac.",
         "Аудио можно удалять автоматически, оставляя только текст."
     ]
 
@@ -186,20 +191,20 @@ struct OnboardingWindow: View {
 
     private var runtimeHint: String {
         if controller.runtime.isReady {
-            return "Всё на месте, расшифровка работает офлайн"
+            return "Всё на месте, расшифровка работает без интернета"
         }
         if controller.runtime.isInstalling {
             return "Можно идти дальше, скачивание не прервётся"
         }
-        return "Parakeet понимает 25 языков, GigaAM — только русский, зато вчетверо легче"
+        return "Parakeet понимает 25 языков, GigaAM — только русский, зато почти вдвое легче"
     }
 
     private var footnote: String {
         switch step {
         case 2:
-            "Можно пропустить и настроить позже"
+            "Системный звук можно проверить и позже"
         case 3:
-            "Без модели записи останутся без текста; скачать можно и потом, в настройках"
+            "Без модели записи останутся без текста. Скачать её можно и потом, в настройках"
         case 4:
             "Эта запись никуда не сохранится"
         default:

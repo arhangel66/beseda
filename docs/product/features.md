@@ -33,7 +33,7 @@ What the code does today. Settings tabs are named as in the app: Основны�
   built-in «Другое» always exists, cannot be deleted and holds the general prompt. With another type
   besides it, a classifier first picks the type from the call's weekday and time, duration and the start
   of the transcript — Jev via OpenRouter when a key is set (the time, duration and excerpt leave the
-  Mac), else the summary model — and that type's prompt runs; an unsure or unknown pick is «Другое». Processing starts from «Итоги», or by itself after every call when «Обрабатывать созвоны
+  Mac), else the summary model — and that type's prompt runs; an unsure or unknown pick is «Другое». Processing starts from «Итоги», or by itself after every call when «Обрабатывать звонки
   автоматически» is on (off by default).
 - **Call screen result.** A processed call opens on «Итоги» with its type in the header; a call that was
   only transcribed opens on the transcript. «Тип: …» reruns the call as another configured type (no
@@ -41,18 +41,18 @@ What the code does today. Settings tabs are named as in the app: Основны�
 - **В прошлый раз.** The call screen and each upcoming calendar event show the date and stored digest of the
   previous related call (decisions, next steps, open questions) with a link that opens it; nothing when there
   is no related call with a summary.
-- **Export.** With a folder picked under Хранение → Экспорт результатов, every stored result (auto, manual
+- **Export.** With a folder picked under Хранение → Экспорт результатов → «Папка экспорта», every stored result (auto, manual
   or rerun) is written there as Markdown: title, date, type, result, then the clean transcript. The file
   is named by date and title, so a rerun overwrites it (`Storage/CallExport.swift`).
 - **Privacy.** The data folder is owner-only (0700/0600, platform file protection where the volume
   supports it), tightened on every launch (`StorageProtection` in `Storage/StorageJanitor.swift`).
   «Удалить» in the conversations toolbar or a sidebar row's context menu, after a confirmation, removes the
   call's row and transcript, its folder and its export copy (`CallStore.deleteCallAndFiles`); a call being
-  recorded or processed cannot be deleted. Under Обработка, a note says what text goes to OpenRouter when
-  summaries or Jev use it.
+  recorded or processed cannot be deleted. Under Обработка → «Кто пишет итоги», one note says what leaves the Mac
+  (OpenRouter for summaries or Jev, a remote LM Studio host, the webhook) or that nothing does.
 - **Calendar.** With calendar access, a call is named after the matching calendar event from the calendars
   picked under Интеграции (`Calendar/CalendarService.swift`).
-- **Webhook.** A finished transcript is POSTed as JSON to a URL set under Интеграции, with an optional secret
+- **Webhook.** A finished transcript is POSTed as JSON to a URL set under Интеграции → «Свой сервис», with an optional secret
   in the `Authorization` header, retried on failure, with a delivery log (`Webhooks/`).
 - **Onboarding.** A first-run window: welcome, microphone and system audio permissions, speech model
   download, a test recording that shows both channels (`App/Views/OnboardingWindow.swift`).

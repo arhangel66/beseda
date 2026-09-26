@@ -14,7 +14,7 @@ enum AudioCaptureError: LocalizedError {
         case .unsupportedFormat(let message), .permissionDenied(let message), .noFrames(let message), .fileFull(let message):
             message
         case .audioStatus(let operation, let status):
-            "\(operation) failed with OSStatus \(status) (\(CoreAudioStatus.fourCC(status)))"
+            "Ошибка звука: \(operation), OSStatus \(status) (\(CoreAudioStatus.fourCC(status)))"
         }
     }
 }
@@ -43,7 +43,7 @@ final class MicrophoneCapture: @unchecked Sendable {
         let input = engine.inputNode
         let format = input.outputFormat(forBus: 0)
         guard format.sampleRate > 0, format.channelCount > 0 else {
-            throw AudioCaptureError.unsupportedFormat("Default microphone returned invalid format: \(format)")
+            throw AudioCaptureError.unsupportedFormat("Микрофон отдаёт звук в неподходящем формате: \(format)")
         }
 
         let recorder = try PCMFloatRecorder(
@@ -69,7 +69,7 @@ final class MicrophoneCapture: @unchecked Sendable {
         engine.inputNode.removeTap(onBus: 0)
         engine.stop()
         guard let recorder else {
-            throw AudioCaptureError.noFrames("Microphone recorder was not started")
+            throw AudioCaptureError.noFrames("Запись микрофона не запустилась")
         }
         return try recorder.finish()
     }
@@ -85,7 +85,7 @@ final class MicrophoneCapture: @unchecked Sendable {
             return
         }
         if permission == .denied {
-            throw AudioCaptureError.permissionDenied("Microphone permission is denied for Beseda")
+            throw AudioCaptureError.permissionDenied("Beseda не разрешён доступ к микрофону")
         }
 
         let granted = await withCheckedContinuation { continuation in
@@ -95,7 +95,7 @@ final class MicrophoneCapture: @unchecked Sendable {
         }
 
         if !granted {
-            throw AudioCaptureError.permissionDenied("Microphone permission was not granted")
+            throw AudioCaptureError.permissionDenied("Доступ к микрофону не выдан")
         }
     }
 }

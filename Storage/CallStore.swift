@@ -132,16 +132,22 @@ struct StoredCallSummary: Identifiable, Hashable {
             return "не расшифрован · \(error ?? "ошибка")"
         }
         if status != "ready" {
-            return "\(appLabel) · \(Self.statusLabels[status] ?? status)"
+            return "\(appLabel) · \(statusLabel)"
         }
         return "\(appLabel) · \(isDual ? "два канала" : "микрофон")"
     }
 
-    /// a call left in one of these states by a crash still has to read as Russian
+    /// the stored status in Russian: a call left mid-way by a crash still has to read as Russian
+    var statusLabel: String {
+        Self.statusLabels[status] ?? status
+    }
+
     private static let statusLabels = [
         "recording": "записываю",
         "normalizing": "готовлю запись",
-        "transcribing": "расшифровываю"
+        "transcribing": "расшифровываю",
+        "ready": "готов",
+        "failed": "ошибка"
     ]
 
     var searchableText: String {
@@ -184,7 +190,11 @@ struct StoredJobStats: Hashable {
         guard let realTimeFactor else {
             return "\(String(format: "%.0f", wallTimeSec)) с"
         }
-        return "RTF \(String(format: "%.3f", realTimeFactor))× · расшифровка за \(String(format: "%.0f", wallTimeSec)) с"
+        let wallTime = "расшифровка за \(String(format: "%.0f", wallTimeSec)) с"
+        guard realTimeFactor > 0 else {
+            return wallTime
+        }
+        return "\(wallTime) · в \(String(format: "%.0f", 1 / realTimeFactor)) раз быстрее записи"
     }
 }
 

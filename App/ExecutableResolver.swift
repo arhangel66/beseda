@@ -44,7 +44,7 @@ enum BesedaError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .executableNotFound(let name):
-            "Executable not found: \(name)"
+            "Не найдена программа: \(name)"
         case .runtimeMissing:
             Self.runtimeMissingMessage
         case .processFailed(let message):

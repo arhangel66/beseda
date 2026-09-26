@@ -251,7 +251,7 @@ struct SendToWebhookButton: View {
                     Image(systemName: icon)
                         .foregroundStyle(iconColor)
                 }
-                Text(deliveries.first?.state == "failed" ? "Повторить на вебхук" : "Отправить на вебхук")
+                Text(deliveries.first?.state == "failed" ? "Повторить отправку" : "Отправить на сервис")
             }
         } primaryAction: {
             // the history half of the old split button was always live; a disabled Menu would hide it
@@ -296,7 +296,7 @@ struct SendToWebhookButton: View {
 
     private var statusLine: String {
         guard let latest = deliveries.first else {
-            return controller.settings.webhookEnabled ? "Ещё не отправлялся" : "Вебхук выключен в настройках"
+            return controller.settings.webhookEnabled ? "Ещё не отправлялся" : "Отправка на сервис выключена в настройках"
         }
         return [latest.stateLabel, latest.detailLine].filter { !$0.isEmpty }.joined(separator: " · ")
     }
@@ -418,7 +418,7 @@ private struct FailureBanner: View {
     private var bodyText: String {
         let audio = "Аудио записано и лежит на месте — \(summary.durationDescription)\(summary.isDual ? " в двух каналах" : "")."
         if isRuntimeMissing {
-            return "\(audio) Как только движок скачается, нажмите «Расшифровать снова»."
+            return "\(audio) Как только модель скачается, нажмите «Расшифровать снова»."
         }
         return "\(audio) \(summary.error ?? "")"
     }
@@ -623,7 +623,7 @@ private struct CallInfo: View {
             ("Записан", summary.whenDescription),
             ("Каналы", summary.isDual ? "микрофон + системный звук" : "микрофон"),
             ("Длительность", CallFormatting.hms(summary.duration)),
-            ("Состояние", summary.status)
+            ("Состояние", summary.statusLabel)
         ]
         if let eventTitle = summary.eventTitle {
             rows.append(("Событие календаря", eventTitle))
@@ -632,7 +632,7 @@ private struct CallInfo: View {
             rows.append(("Скорость", stats.description))
             rows.append(("Модель", stats.model.flatMap { SpeechModel.named($0)?.title } ?? stats.model ?? "неизвестно"))
         }
-        rows.append(("Вебхук", webhookLine))
+        rows.append(("Отправка на сервис", webhookLine))
         rows.append(("Папка", summary.audioDirectoryPath))
         if let error = summary.error, !error.isEmpty {
             rows.append(("Ошибка", error))
