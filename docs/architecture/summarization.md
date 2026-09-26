@@ -10,7 +10,12 @@ description: How a call summary is produced, shown and exported, through one cha
 A summary is written on request («Итоги» tab, `AppController.generateSummary`), or right after
 `finishCall` marks a call ready when `AppSettings.autoProcessCalls` is on (off by default).
 Both go through one `SerialQueue` in `AppController`: a call that finishes while another is processed
-waits its turn and is processed after it, in order. The queue lives in memory only — a quit drops it.
+waits its turn and is processed after it, in order. An auto-processing job is persisted: `finishCall` sets
+`calls.processing_pending` before queueing it, the attempt clears it when it ends (success or error — a
+failed summary is retried from its error card, not at every launch), and launch re-queues every call still
+marked, oldest first. So a quit mid-queue resumes the rest at the next launch, each once. Manual jobs
+(«Итоги», a picked type) stay in memory only. `AppController(summarize:)` takes a stub in tests; nil means
+`summarizeWithSettings`, the real pipeline below.
 
 **Call types.** `AppSettings.callTypes` (`[CallType]`, JSON under `beseda.callTypes`) — name, description
 for the classifier, prompt; never empty. The one type with `isOther` is the built-in «Другое» (`CallType.otherName`,

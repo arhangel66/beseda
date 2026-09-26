@@ -11,9 +11,13 @@ final class CallNotifier: NSObject, @preconcurrency UNUserNotificationCenterDele
     var onOpenCalls: (() -> Void)?
     var onDiagnostics: ((String) -> Void)?
 
-    private let center = UNUserNotificationCenter.current()
+    private lazy var center = UNUserNotificationCenter.current()
 
     func start() {
+        // outside an app bundle (swift test, swift run) the notification center raises on first use
+        guard Bundle.main.bundleURL.pathExtension == "app" else {
+            return
+        }
         center.delegate = self
         center.setNotificationCategories([
             UNNotificationCategory(

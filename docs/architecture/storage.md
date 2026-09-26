@@ -33,7 +33,8 @@ folder is moved here once by `LegacyDataMigration`.
   release ran the same `prepare`) needed: tables, missing columns added with `ALTER TABLE`, the dead
   `keep_audio` dropped. Before any migration on an existing file, `VACUUM INTO` writes
   `calls.sqlite.v<old version>.backup` next to it; a current file is neither migrated nor copied again.
-  A new migration is appended to the list, a released one is never edited. `calls.call_type` (nullable TEXT) holds the
+  A new migration is appended to the list, a released one is never edited. Version 2 adds
+  `calls.processing_pending` (INTEGER, 0/1): the call waits for auto-processing. `calls.call_type` (nullable TEXT) holds the
   `CallType.name` the call was processed as (`setCallType`, `StoredCallSummary.callType`); null means
   never processed, as for every call older than the column. `calls.event_series_id` (EventKit
   `calendarItemExternalIdentifier` of a recurring event) and `calls.participants` (event attendees except
@@ -43,8 +44,16 @@ folder is moved here once by `LegacyDataMigration`.
   `upsertTranscriptJob`) throws into the job's error path, which shows the failure in the status line. A
   finished transcript goes in through `markReady`: segments and `status = 'ready'` in one transaction; only
   after it commits does `AppController.finishCall` clean audio, enqueue the webhook and start
-  auto-processing. A failed write leaves the call not ready with its audio, so retry still works. They feed [related calls](related-calls.md). On launch `failInterruptedCalls` marks calls
-  left in `recording`/`normalizing`/`transcribing` as failed.
+  auto-processing. A failed write leaves the call not ready with its audio, so retry still works. They feed [related calls](related-calls.md).
+- **Launch recovery** — `AppController.init` takes `AppPaths` (and settings) by injection, default the real
+  folder, so tests run a whole controller over a temp one. After `prepare()`:
+  `failInterruptedCalls` marks calls left in `recording`/`normalizing`/`transcribing` as failed; every
+  folder under `calls/` with `me.raw.wav`/`them.raw.wav` (or `mic.raw.wav`) and no row gets a failed row
+  («Найдена на диске без записи в индексе»), times from `session.json`, else folder creation and last file
+  modification; both kinds get their WAVs repaired and checked (see [Audio capture](audio-capture.md)),
+  a failure appended to `calls.error`. So a folder whose index write never landed shows in the archive with
+  «Расшифровать снова». If the index cannot be opened, the status line says «Индекс звонков недоступен».
+  Then pending auto-processing resumes ([Summarization](summarization.md)).
 - **Speaker merge** — the diarizer can split one remote person into several `them-N`. In the call view a
   line's context menu «Объединить с» folds its speaker into another remote one: `mergeSpeaker` rewrites
   `transcript_segments.speaker` and drops the merged key's rename in one transaction, then

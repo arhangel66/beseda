@@ -209,12 +209,17 @@ final class PCMFloatRecorder: @unchecked Sendable {
         let handle = try FileHandle(forUpdating: url)
         defer { try? handle.close() }
         let fileLength = try handle.seekToEnd()
+        try handle.seek(toOffset: 0)
+        let riff = try handle.read(upToCount: 12) ?? Data()
+        guard riff.count == 12, riff.prefix(4) == Data("RIFF".utf8), riff.suffix(4) == Data("WAVE".utf8) else {
+            throw BesedaError.processFailed("\(url.lastPathComponent): файл не в формате WAV")
+        }
         var offset: UInt64 = 12
         while offset + 8 <= fileLength {
             try handle.seek(toOffset: offset)
             let header = try handle.read(upToCount: 8) ?? Data()
             guard header.count == 8 else {
-                return
+                break
             }
             let chunkSize = header.suffix(4).withUnsafeBytes { UInt64($0.loadUnaligned(as: UInt32.self).littleEndian) }
             if header.prefix(4) == Data("data".utf8) {
@@ -225,6 +230,7 @@ final class PCMFloatRecorder: @unchecked Sendable {
             }
             offset += 8 + chunkSize + chunkSize % 2
         }
+        throw BesedaError.processFailed("\(url.lastPathComponent): в файле нет блока со звуком")
     }
 
     private static func write(_ value: UInt32, at offset: UInt64, in handle: FileHandle) throws {

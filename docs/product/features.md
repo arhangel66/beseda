@@ -53,7 +53,7 @@ What the code does today. Settings tabs are named as in the app: Основны�
 - **Calendar.** With calendar access, a call is named after the matching calendar event from the calendars
   picked under Интеграции (`Calendar/CalendarService.swift`).
 - **Webhook.** A finished transcript is POSTed as JSON to a URL set under Интеграции → «Свой сервис», with an optional secret
-  in the `Authorization: Bearer` header (https only, http just for localhost), retried on failure, with a delivery log (`Webhooks/`).
+  as the bare `Authorization` header value (https only, http just for localhost), retried on failure, with a delivery log (`Webhooks/`).
 - **Onboarding.** A first-run window: welcome, microphone and system audio permissions, speech model
   download, a test recording that shows both channels (`App/Views/OnboardingWindow.swift`).
 - **Updates.** Sparkle checks hourly and installs when no call is being recorded; Основные → Обновления

@@ -103,7 +103,7 @@ final class WebhookSender: Sendable {
         request.httpBody = body
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         if !secret.isEmpty {
-            request.setValue("Bearer \(secret)", forHTTPHeaderField: "Authorization")
+            request.setValue(secret, forHTTPHeaderField: "Authorization")
         }
         request.setValue(event, forHTTPHeaderField: "X-Podushka-Event")
         request.setValue(deliveryID, forHTTPHeaderField: "X-Podushka-Delivery")

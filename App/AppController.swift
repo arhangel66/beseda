@@ -1,4 +1,5 @@
 import AppKit
+import AVFAudio
 import Foundation
 import Observation
 
@@ -106,19 +107,22 @@ final class AppController {
     var requestedSettingsSection: String?
 
     @ObservationIgnored private let fileManager = FileManager.default
-    @ObservationIgnored private let transcriber = LocalTranscriber(paths: AppPaths.current)
+    @ObservationIgnored let paths: AppPaths
+    @ObservationIgnored private let transcriber: LocalTranscriber
     @ObservationIgnored private let diarizer = Diarizer()
-    @ObservationIgnored private let callStore = CallStore()
+    @ObservationIgnored private let callStore: CallStore
     @ObservationIgnored private let callDetector = CallDetector()
     @ObservationIgnored private let notifier = CallNotifier()
     @ObservationIgnored let calendarService = CalendarService()
     /// a call with no event nearby would otherwise be looked up again on every refresh
     @ObservationIgnored private var eventMatchAttempted: Set<String> = []
-    @ObservationIgnored let settings = AppSettings()
+    @ObservationIgnored let settings: AppSettings
+    /// the summary pipeline; tests put a stub here so no model runs
+    @ObservationIgnored private let summarize: Summarize?
     @ObservationIgnored let webhooks: WebhookService
     @ObservationIgnored let runtime: RuntimeInstaller
     @ObservationIgnored let bundledSummary: BundledSummaryInstaller
-    @ObservationIgnored private let llamaServer = LlamaServer(paths: AppPaths.current)
+    @ObservationIgnored private let llamaServer: LlamaServer
     @ObservationIgnored let updater = AppUpdater()
     @ObservationIgnored private lazy var processingQueue = SerialQueue<(StoredCallDetail, CallType?)> { [unowned self] job in
         await self.runQueuedProcessing(of: job.0, as: job.1)
@@ -128,7 +132,7 @@ final class AppController {
     @ObservationIgnored private var cancelRequested = false
     @ObservationIgnored private var liveTicker: Timer?
     @ObservationIgnored private var toastTask: Task<Void, Never>?
-    @ObservationIgnored private let janitor = StorageJanitor(callsDirectory: AppPaths.current.callsDirectory)
+    @ObservationIgnored private let janitor: StorageJanitor
     @ObservationIgnored private var transcriptMatchIDs: Set<String>?
     @ObservationIgnored private var dailySweep: Timer?
     /// set by the app scene: a notification callback has no `openWindow` environment value
@@ -190,21 +194,30 @@ final class AppController {
     }
 
     var callsDirectory: URL {
-        AppPaths.current.callsDirectory
+        paths.callsDirectory
     }
 
-    init() {
+    typealias Summarize = (StoredCallDetail, CallType?) async throws -> (type: CallType, text: String)
+
+    init(paths: AppPaths = .current, settings: AppSettings = AppSettings(), summarize: Summarize? = nil) {
+        self.paths = paths
+        self.settings = settings
+        self.summarize = summarize
+        transcriber = LocalTranscriber(paths: paths)
+        callStore = CallStore(dbURL: paths.callIndexURL)
+        llamaServer = LlamaServer(paths: paths)
+        janitor = StorageJanitor(callsDirectory: paths.callsDirectory)
         // before anything logs or opens the index: the folder may still carry the old name
-        let migration = Result { try LegacyDataMigration.run(from: AppPaths.legacyDataDirectory, to: AppPaths.current) }
+        let migration = Result { try LegacyDataMigration.run(from: paths.legacyDataDirectory, to: paths) }
         webhooks = WebhookService(store: callStore, settings: settings)
         let transcriber = transcriber
         let selectedModel = settings.speechModel
         transcriber.select(selectedModel)
-        runtime = RuntimeInstaller(paths: AppPaths.current, model: selectedModel) {
+        runtime = RuntimeInstaller(paths: paths, model: selectedModel) {
             _ = try await transcriber.start()
         }
         let llamaServer = llamaServer
-        bundledSummary = BundledSummaryInstaller(paths: AppPaths.current) {
+        bundledSummary = BundledSummaryInstaller(paths: paths) {
             _ = try await llamaServer.ensureRunning()
             llamaServer.stop()
         }
@@ -239,16 +252,16 @@ final class AppController {
 
         switch migration {
         case .success(true):
-            appendLog("Moved \(AppPaths.legacyDataDirectory.path) to \(AppPaths.current.dataDirectory.path)")
+            appendLog("Moved \(paths.legacyDataDirectory.path) to \(paths.dataDirectory.path)")
         case .failure(let error):
             appendLog("Legacy data left in place: \(error.localizedDescription)")
         default:
             break
         }
 
-        StorageProtection.apply(to: AppPaths.current.dataDirectory)
+        StorageProtection.apply(to: paths.dataDirectory)
 
-        let freed = PythonRuntimeCleanup.run(AppPaths.current)
+        let freed = PythonRuntimeCleanup.run(paths)
         if freed > 0 {
             appendLog("Removed the old Python engine, freed \(freed.byteSizeDescription)")
         }
@@ -259,15 +272,16 @@ final class AppController {
             if !sweptDirectories.isEmpty {
                 appendLog("Marked \(sweptDirectories.count) interrupted call(s) as failed")
             }
-            for directory in sweptDirectories {
-                for name in [DualFiles.microphoneRaw, DualFiles.systemRaw] {
-                    try? PCMFloatRecorder.repairWAVHeader(at: URL(fileURLWithPath: directory).appendingPathComponent(name))
-                }
+            let orphanDirectories = try indexOrphanCallFolders()
+            for directory in sweptDirectories.map({ URL(fileURLWithPath: $0) }) + orphanDirectories {
+                try repairRecordedAudio(in: directory)
             }
             webhooks.start()
             refreshRecentCalls()
-            appendLog("Call index ready: \(AppPaths.current.callIndexURL.path)")
+            appendLog("Call index ready: \(paths.callIndexURL.path)")
+            try resumePendingProcessing()
         } catch {
+            status = .failed("Индекс звонков недоступен: \(error.localizedDescription)")
             appendLog("Call index unavailable: \(error.localizedDescription)")
         }
         do {
@@ -278,6 +292,91 @@ final class AppController {
 
 
         startDailySweep()
+    }
+
+    /// call folders under calls/ with audio but no row, e.g. the index write failed or the file was lost;
+    /// each gets a failed row so it shows in the archive and can be retried
+    private func indexOrphanCallFolders() throws -> [URL] {
+        guard fileManager.fileExists(atPath: callsDirectory.path) else {
+            return []
+        }
+        var orphans: [URL] = []
+        for folder in try fileManager.contentsOfDirectory(at: callsDirectory, includingPropertiesForKeys: [.creationDateKey]) {
+            let kind = if fileManager.fileExists(atPath: folder.appendingPathComponent(DualFiles.microphoneRaw).path)
+                || fileManager.fileExists(atPath: folder.appendingPathComponent(DualFiles.systemRaw).path) {
+                "dual"
+            } else if fileManager.fileExists(atPath: folder.appendingPathComponent("mic.raw.wav").path) {
+                "mic"
+            } else {
+                nil as String?
+            }
+            guard let kind, try callStore.fetchCall(id: folder.lastPathComponent) == nil else {
+                continue
+            }
+            let session = (try? Data(contentsOf: folder.appendingPathComponent("session.json")))
+                .flatMap { try? JSONDecoder().decode(RecordedSession.self, from: $0) }
+            let startedAt = session.flatMap { CallFormatting.parseISO8601($0.startedAt) }
+                ?? (try? folder.resourceValues(forKeys: [.creationDateKey]).creationDate) ?? Date()
+            let endedAt = session.flatMap { CallFormatting.parseISO8601($0.endedAt) } ?? latestModification(in: folder) ?? startedAt
+            try saveCall(
+                folder.lastPathComponent, kind: kind, in: folder, startedAt: startedAt, endedAt: endedAt,
+                durationSec: session?.durationSec ?? endedAt.timeIntervalSince(startedAt), status: "failed",
+                error: "Найдена на диске без записи в индексе"
+            )
+            appendLog("Indexed orphan call folder \(folder.lastPathComponent)")
+            orphans.append(folder)
+        }
+        return orphans
+    }
+
+    /// what `DualCapture` writes to session.json once a recording ends
+    private struct RecordedSession: Decodable {
+        let startedAt: String
+        let endedAt: String
+        let durationSec: Double
+    }
+
+    private func latestModification(in folder: URL) -> Date? {
+        (try? fileManager.contentsOfDirectory(at: folder, includingPropertiesForKeys: [.contentModificationDateKey]))?
+            .compactMap { try? $0.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate }
+            .max()
+    }
+
+    /// raw audio a crash left behind: fixes each channel's WAV header and checks it reads back;
+    /// what cannot be repaired is written into the call's error so the archive shows it
+    private func repairRecordedAudio(in folder: URL) throws {
+        let names = fileManager.fileExists(atPath: folder.appendingPathComponent("mic.raw.wav").path)
+            ? ["mic.raw.wav"] : [DualFiles.microphoneRaw, DualFiles.systemRaw]
+        var problems: [String] = []
+        for name in names {
+            let url = folder.appendingPathComponent(name)
+            do {
+                guard fileManager.fileExists(atPath: url.path) else {
+                    throw BesedaError.processFailed("\(name): файла нет")
+                }
+                try PCMFloatRecorder.repairWAVHeader(at: url)
+                _ = try AVAudioFile(forReading: url)
+            } catch {
+                problems.append(error.localizedDescription)
+            }
+        }
+        guard !problems.isEmpty, let call = try callStore.fetchCall(id: folder.lastPathComponent) else {
+            return
+        }
+        let message = "Запись повреждена: \(problems.joined(separator: "; "))"
+        appendLog("Audio repair failed for \(call.id): \(message)")
+        try callStore.setError(callID: call.id, error: [call.error, message].compactMap { $0 }.joined(separator: ". "))
+    }
+
+    /// auto-processing the last run queued but never finished, e.g. the app quit mid-queue
+    private func resumePendingProcessing() throws {
+        for id in try callStore.fetchProcessingPendingCallIDs() {
+            guard let call = try callStore.fetchCall(id: id) else {
+                continue
+            }
+            appendLog("Resuming processing of \(id)")
+            startProcessing(try makeCallDetail(call), as: nil)
+        }
     }
 
     func stopActiveRecording() {
@@ -1063,7 +1162,7 @@ final class AppController {
     }
 
     /// a written transcript: index its lines, mark the call ready, drop audio the rules say goes now
-    private func finishCall(
+    func finishCall(
         _ callID: String,
         in sessionDir: URL,
         segments: [SpeakerTranscriptSegment],
@@ -1089,6 +1188,8 @@ final class AppController {
         webhooks.enqueue(callID: callID)
         if settings.autoProcessCalls {
             do {
+                // persisted before it is queued: a quit before it runs resumes it at the next launch
+                try callStore.setProcessingPending(callID: callID, true)
                 if let call = try callStore.fetchCall(id: callID) {
                     startProcessing(try makeCallDetail(call), as: nil)
                 }
@@ -1215,6 +1316,12 @@ final class AppController {
         summarizingCallID = detail.id
         summaryStartedAt = Date()
         await runSummary(for: detail, as: type)
+        // a failed summary is not retried at every launch: its error card offers the retry
+        do {
+            try callStore.setProcessingPending(callID: detail.id, false)
+        } catch {
+            appendLog("Could not clear the processing queue mark of \(detail.id): \(error.localizedDescription)")
+        }
     }
 
     /// starts LM Studio when it stopped answering, then picks up the summary that failed on it
@@ -1319,20 +1426,11 @@ final class AppController {
         }
         defer { llamaServer.noteIdle() }
         do {
-            let (provider, characterBudget) = try await makeSummaryProvider()
-            let (type, text) = try await SummarizationService.process(
-                detail,
-                types: settings.callTypes,
-                chosen: chosenType,
-                characterBudget: characterBudget,
-                provider: { prompt in
-                    var typed = provider
-                    typed.prompt = prompt
-                    return typed
-                },
-                jev: settings.classifiesWithJev ? JevClassifier(apiKey: settings.openRouterAPIKey) : nil,
-                log: { [weak self] in self?.appendLog($0) }
-            )
+            let (type, text) = if let summarize {
+                try await summarize(detail, chosenType)
+            } else {
+                try await summarizeWithSettings(detail, as: chosenType)
+            }
             appendLog("Processed \(detail.id) as «\(type.name)»")
             try callStore.setSummary(callID: detail.id, text: text)
             try callStore.setCallType(callID: detail.id, name: type.name)
@@ -1358,6 +1456,24 @@ final class AppController {
                 )
             }
         }
+    }
+
+    /// the call through the provider the settings point at, classifier first unless a type is given
+    private func summarizeWithSettings(_ detail: StoredCallDetail, as chosenType: CallType?) async throws -> (type: CallType, text: String) {
+        let (provider, characterBudget) = try await makeSummaryProvider()
+        return try await SummarizationService.process(
+            detail,
+            types: settings.callTypes,
+            chosen: chosenType,
+            characterBudget: characterBudget,
+            provider: { prompt in
+                var typed = provider
+                typed.prompt = prompt
+                return typed
+            },
+            jev: settings.classifiesWithJev ? JevClassifier(apiKey: settings.openRouterAPIKey) : nil,
+            log: { [weak self] in self?.appendLog($0) }
+        )
     }
 
     /// a failed write is only logged: the result is already stored and shown
@@ -1652,16 +1768,16 @@ final class AppController {
     private func writeLogLine(_ message: String) {
         do {
             try fileManager.createDirectory(
-                at: AppPaths.current.appLogURL.deletingLastPathComponent(),
+                at: paths.appLogURL.deletingLastPathComponent(),
                 withIntermediateDirectories: true
             )
             let line = "[\(Date().formatted(date: .numeric, time: .standard))] \(message)\n"
-            if !fileManager.fileExists(atPath: AppPaths.current.appLogURL.path) {
-                try line.write(to: AppPaths.current.appLogURL, atomically: true, encoding: .utf8)
+            if !fileManager.fileExists(atPath: paths.appLogURL.path) {
+                try line.write(to: paths.appLogURL, atomically: true, encoding: .utf8)
                 return
             }
 
-            let handle = try FileHandle(forWritingTo: AppPaths.current.appLogURL)
+            let handle = try FileHandle(forWritingTo: paths.appLogURL)
             try handle.seekToEnd()
             try handle.write(contentsOf: Data(line.utf8))
             try handle.close()

@@ -25,8 +25,8 @@ struct AppPaths {
     }()
 
     /// the folder the app used while it was called Podushka
-    static var legacyDataDirectory: URL {
-        current.dataDirectory.deletingLastPathComponent().appendingPathComponent("Podushka", isDirectory: true)
+    var legacyDataDirectory: URL {
+        dataDirectory.deletingLastPathComponent().appendingPathComponent("Podushka", isDirectory: true)
     }
 
     var callsDirectory: URL {
