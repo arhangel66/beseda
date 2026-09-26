@@ -28,10 +28,10 @@ the vendored Swift wrapper in `Vendor/TranscribeCpp`). No audio leaves the machi
   `SentenceBuilder` groups words into sentence segments (punctuation or a long pause).
 - **Diarization** — only the system channel is diarized. `Diarizer` wraps FluidAudio's
   `OfflineDiarizerManager` (clustering threshold 0.70); its CoreML models download and compile on first
-  use. `SpeakerAssignment.remoteTurns` takes the diarizer's own segments as the turns (`them-1`,
-  `them-2`…, with the segment's times): each sentence goes onto the segment it overlaps most, a sentence
-  outside diarizer speech keeps its times and takes the nearest segment's speaker, a segment with no words
-  is dropped. Per-word labels, the earlier rule, were twice as wrong ([speaker accuracy](../decisions/speaker-accuracy.md)).
+  use. `SpeakerAssignment.remoteTurns` labels each sentence (`them-1`,
+  `them-2`…) with the speaker of the diarizer segment it overlaps most, or the nearest one when it lies
+  outside diarizer speech; every sentence stays its own line with its own times, so clicking it seeks there.
+  Per-word labels, the earlier rule, were twice as wrong ([speaker accuracy](../decisions/speaker-accuracy.md)).
   Diarization failure is logged and skipped: the transcript falls back to one `them`.
 - **Echo gate** — remote speech leaking from the speakers into the mic would be transcribed again as
   `me`. `EchoGate` finds the delay (FFT cross-correlation, 0–500 ms) and gain of the system channel
