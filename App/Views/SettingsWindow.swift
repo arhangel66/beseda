@@ -376,6 +376,10 @@ private struct ProcessingPane: View {
                     Text("Jev через OpenRouter (по умолчанию, если есть ключ)").tag(false)
                     Text("Локально").tag(true)
                 }
+                // Jev needs the key even when another provider writes summaries.
+                if !settings.classifyLocally && settings.summaryProvider != .openRouter {
+                    SecretField(title: "Ключ OpenRouter", text: Bindable(settings).openRouterAPIKey)
+                }
             } header: {
                 Text("Типы созвонов")
             } footer: {
