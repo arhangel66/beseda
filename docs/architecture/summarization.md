@@ -41,6 +41,8 @@ to their first type, which was «Другое» by position then.
     containment, longest name first. An unknown answer falls back to «Другое» and is logged.
   - Privacy is per app, not per type: the type is unknown before classification, so a private type
     cannot keep its call away from Jev. Settings say what leaves the Mac next to the picker.
+  - «Только локально» (`AppSettings.localOnly`, off by default) turns Jev off, replaces OpenRouter or a
+    remote LM Studio with the built-in model (`effectiveSummaryProvider`) and holds webhooks (`sendsWebhooks`).
   Decision: [call-type classifier](../decisions/call-type-classifier.md).
 
 The chosen type's name is stored on the call (`callStore.setCallType`, column `calls.call_type`).
@@ -49,8 +51,8 @@ The chosen type's name is stored on the call (`callStore.setCallType`, column `c
    (`TranscriptCopy.render(.clean)`). An empty render throws `emptyTranscript`. Text over the character
    budget is cut at the last newline before it, and the summary is prefixed with a note that only the start
    was summarized.
-2. `AppController.makeSummaryProvider` builds a `ChatCompletionsProvider` for the provider chosen in
-   settings (`SummaryProvider`). All three speak the OpenAI-compatible `chat/completions` API; one request
+2. `AppController.makeSummaryProvider` builds a `ChatCompletionsProvider` for
+   `AppSettings.effectiveSummaryProvider` (the chosen `SummaryProvider`, or built-in under «Только локально»). All three speak the OpenAI-compatible `chat/completions` API; one request
    shape (system prompt + transcript, temperature 0.3, `max_tokens` 4096):
    - **OpenRouter** — cloud, needs a key; model defaults to `OpenRouter.defaultModel`. Budget 300k chars.
    - **LM Studio** — `LocalModelSupport.resolve` takes the URL/model from settings or discovers them with

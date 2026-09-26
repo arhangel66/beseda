@@ -230,7 +230,7 @@ struct SendToWebhookButton: View {
     }
 
     private var canSend: Bool {
-        controller.settings.webhookEnabled && !isSending && !detail.segments.isEmpty
+        controller.settings.sendsWebhooks && !isSending && !detail.segments.isEmpty
     }
 
     var body: some View {
@@ -296,7 +296,7 @@ struct SendToWebhookButton: View {
 
     private var statusLine: String {
         guard let latest = deliveries.first else {
-            return controller.settings.webhookEnabled ? "Ещё не отправлялся" : "Отправка на сервис выключена в настройках"
+            return controller.settings.sendsWebhooks ? "Ещё не отправлялся" : "Отправка на сервис выключена в настройках"
         }
         return [latest.stateLabel, latest.detailLine].filter { !$0.isEmpty }.joined(separator: " · ")
     }
@@ -665,7 +665,7 @@ private struct CallInfo: View {
 
     private var webhookLine: String {
         guard let latest = controller.webhooks.selected.first else {
-            return controller.settings.webhookEnabled ? "не отправлялся" : "выключен"
+            return controller.settings.sendsWebhooks ? "не отправлялся" : "выключен"
         }
         return [latest.stateLabel, latest.detailLine].filter { !$0.isEmpty }.joined(separator: " · ")
     }

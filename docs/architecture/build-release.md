@@ -47,14 +47,18 @@ warns about the missing excluded paths; the warnings are harmless.
 The script refuses to run unless it is on `main`, the tag `v<version>` is not published, the tree is clean
 and the notes exist. It runs `swift test --jobs 2`, makes a release build and bundle, zips it into
 `dist/v<version>/`, runs Sparkle's `generate_appcast` (signs the zip with the EdDSA key from the login
-keychain, embeds the notes) into `appcast.xml` at the repo root, commits it, tags, pushes `main` with the
-tag, and creates the GitHub release in `arhangel66/beseda` with the zip.
+keychain, embeds the notes) into `dist/v<version>/appcast.xml`, then publishes in this order: tags the last
+pushed commit and pushes the tag, creates the GitHub release in `arhangel66/beseda` with the zip, downloads the
+zip back and compares it byte for byte, and only then copies the feed to `appcast.xml`, commits it and pushes
+`main`. A failed upload or download stops before the feed changes, so no installed copy is offered a missing
+asset; to rerun, delete the tag (`git push origin :v<version> && git tag -d v<version>`).
 
 Installed release copies check the feed hourly; `AppUpdater` holds the install until no call is being
 recorded. Dev builds carry no feed and never update themselves.
 
 ## Constraints
 
+- The tag points at the commit before the appcast commit: the feed is not part of the build.
 - Release only from `main`: the appcast commit lands on the current branch while the push targets `main`,
   so a release cut elsewhere would publish a tag and zip no installed copy is offered.
 - The private EdDSA key exists only in the login keychain of Mikhail's Mac; losing it means installed

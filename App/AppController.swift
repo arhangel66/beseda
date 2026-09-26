@@ -1451,7 +1451,7 @@ final class AppController {
                 summaryError = error.localizedDescription
                 summaryRecovery = Self.recovery(
                     for: error,
-                    provider: settings.summaryProvider,
+                    provider: settings.effectiveSummaryProvider,
                     isLMStudioInstalled: LocalModelSupport.isInstalled
                 )
             }
@@ -1523,7 +1523,7 @@ final class AppController {
     /// model has a 64k context, the other two take the whole call.
     private func makeSummaryProvider() async throws -> (provider: ChatCompletionsProvider, characterBudget: Int) {
         let prompt = settings.callTypes.other.prompt
-        switch settings.summaryProvider {
+        switch settings.effectiveSummaryProvider {
         case .openRouter:
             guard !settings.openRouterAPIKey.isEmpty else {
                 throw SummarizationError.unauthorized("Ключ OpenRouter не введён")

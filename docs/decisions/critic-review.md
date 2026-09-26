@@ -163,6 +163,9 @@ Effort is S (hours), M (days), or L (weeks). Priority is P0 (blocks safe sale or
     and a private call type cannot prevent Jev because classification happens first. Disable cloud use in
     live mode, require an explicit first-send confirmation naming the destination, and add a per-call
     “never leave this Mac” switch that bypasses Jev, cloud summaries and webhooks.
+    Fixed in BESEDA-88: a global «Только локально» switch (off by default, OpenRouter stays the default with a
+    key) turns off Jev and webhooks and moves summaries and live key points to the built-in model; Settings
+    show one line saying what goes to the cloud now. No per-call gate or confirmation dialog, by decision.
 
 18. **Secrets and transcripts can be sent in plaintext — P0, S.** The OpenRouter key and webhook secret are
     stored in UserDefaults (`App/AppSettings.swift:149-150,227-230`); webhook validation accepts `http://`
@@ -194,6 +197,8 @@ Effort is S (hours), M (days), or L (weeks). Priority is P0 (blocks safe sale or
     referenced zip. Network or GitHub failure at the last command leaves installed apps offered a missing
     asset. Create a draft release and upload the asset first, verify its URL and signature, then push/publish
     the feed; make reruns idempotent.
+    Fixed in BESEDA-88: the release is uploaded on a pushed tag, downloaded back and compared with the local
+    zip before the appcast is written into the repo, committed and pushed; a rerun needs the tag deleted.
 
 22. **Tests do not prove the destructive and distributable paths — P1, M.** The suite has unit coverage for
     copied WAV repair and storage helpers, but no subprocess-kill test spanning capture → crash → relaunch →
