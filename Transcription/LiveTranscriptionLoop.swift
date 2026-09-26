@@ -48,6 +48,10 @@ struct LiveTranscriptionLoop: Sendable {
                         channels[index].words, chunk: words, chunkStart: start,
                         overlap: max(0, channels[index].transcribedUntil - start)
                     )
+                } catch BesedaError.runtimeMissing {
+                    // no speech model: every chunk would fail the same way
+                    log("Live transcription stopped: \(BesedaError.runtimeMissing.localizedDescription)")
+                    return
                 } catch {
                     log("Live transcription skipped \(channels[index].kind.rawValue) at \(Int(start))s: \(error.localizedDescription)")
                 }
