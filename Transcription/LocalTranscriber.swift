@@ -101,7 +101,7 @@ final class LocalTranscriber: @unchecked Sendable {
         let started = Date()
         let chunkSeconds = loaded.model.maxUtteranceSec ?? Self.progressChunkSeconds
         let pieces = UtteranceSplitter.split(samples, sampleRate: Self.sampleRate, maxSeconds: chunkSeconds)
-        let options = RunOptions(timestamps: .word, language: loaded.model.transcriptionLanguage)
+        let options = RunOptions(timestamps: .word, language: "ru")
 
         var words: [TranscriptWord] = []
         for (index, piece) in pieces.enumerated() {

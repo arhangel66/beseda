@@ -4,8 +4,8 @@ import Foundation
 /// what they cost, what they need installed and how good the result is
 /// (docs/summary-model-choice-plan.md).
 enum SummaryProvider: String, CaseIterable, Identifiable, Sendable {
-    case openRouter = "openrouter"
     case builtIn = "builtin"
+    case openRouter = "openrouter"
     case lmStudio = "lmstudio"
 
     var id: String {

@@ -100,7 +100,7 @@ struct ChatCompletionsProvider: SummarizationProvider, Sendable {
         let message = (try? JSONDecoder().decode(ErrorResponse.self, from: data))?.error?.message
         // 402 is OpenRouter's «no credit left»; both it and 401 are fixed in the same field
         if [401, 402, 403].contains(status) {
-            throw SummarizationError.unauthorized("Ключ \(serviceName) не принят")
+            throw SummarizationError.unauthorized(message ?? "\(serviceName) не принял ключ")
         }
         throw SummarizationError.unavailable(message ?? "\(serviceName) ответил кодом \(status)")
     }

@@ -85,16 +85,10 @@ final class BundledSummaryInstaller {
         }
     }
 
-    /// Frees the 4.6 GB model. The small engine stays so reinstalling only downloads the model.
+    /// Frees the 4.6 GB; the engine goes with it, since nothing else uses it.
     func remove() throws {
-        let model = artifacts.modelFile(paths)
-        if FileManager.default.fileExists(atPath: model.path) {
-            try FileManager.default.removeItem(at: model)
-        }
-        let marker = artifacts.warmUpMarker(paths)
-        if FileManager.default.fileExists(atPath: marker.path) {
-            try FileManager.default.removeItem(at: marker)
-        }
+        try? FileManager.default.removeItem(at: artifacts.modelFile(paths))
+        try? FileManager.default.removeItem(at: artifacts.buildDirectory(paths))
         isReady = artifacts.isInstalled(paths)
     }
 

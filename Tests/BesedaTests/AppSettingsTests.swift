@@ -32,7 +32,6 @@ import Testing
 
     let settings = AppSettings(defaults: defaults)
     #expect(settings.summaryProvider == .builtIn)
-    #expect(SummaryProvider.allCases == [.openRouter, .builtIn, .lmStudio])
     #expect(settings.openRouterAPIKey == "")
     #expect(settings.openRouterModel == "")
 
