@@ -37,10 +37,8 @@
 ├── Vendor/            # Swift-обёртка transcribe.cpp (MIT, скопирована из тега v0.2.3)
 ├── Webhooks/          # Отправка готовой расшифровки на URL (payload, sender, очередь с повторами)
 ├── scripts/           # Сборка (build_app.sh) и упаковка в zip (package_app.sh)
-├── spikes/            # Прототипы/тесты
 ├── docs/              # Техническая документация и планы
-├── untracked/         # Черновики, спайки, дизайн (данные приложения живут в Application Support)
-└── MVP_PHASE_PLAN.md # План развития проекта
+└── untracked/         # Черновики, спайки, дизайн (данные приложения живут в Application Support)
 ```
 
 ---
@@ -61,7 +59,7 @@
 *   **`App/AppController.swift`**: Сердце приложения, связывающее аудио и UI.
 *   **`Transcription/LocalTranscriber.swift`**: Реализация логики распознавания.
 *   **`untracked/calls.sqlite`**: Основная база данных с историей вызовов.
-*   **`MVP_PHASE_PLAN.md`**: Документ, определяющий вектор разработки.
+*   **`docs/index.md`**: Документация о продукте, архитектуре и решениях.
 
 ### Команды запуска:
 *   **Тесты:** `swift test`

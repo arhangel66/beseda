@@ -1,3 +1,5 @@
+> Historical: the Python ASR worker is gone; transcription runs in the app process (`Transcription/`).
+
 # Swift App to Python Pipeline
 
 ## Decision

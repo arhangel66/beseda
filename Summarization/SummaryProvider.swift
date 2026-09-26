@@ -2,7 +2,7 @@ import Foundation
 
 /// Where summaries are written. All three speak the same chat completions API; they differ in
 /// what they cost, what they need installed and how good the result is
-/// (docs/summary-model-choice-plan.md).
+/// (docs/archive/summary-model-choice-plan.md).
 enum SummaryProvider: String, CaseIterable, Identifiable, Sendable {
     case openRouter = "openrouter"
     case builtIn = "builtin"

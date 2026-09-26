@@ -1,3 +1,5 @@
+> Historical: `spikes/DiarizeSpike` is deleted; diarization now lives in `Transcription/Diarizer.swift`.
+
 # Speaker diarization for the system-audio channel
 
 ## Problem

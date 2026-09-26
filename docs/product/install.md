@@ -1,3 +1,6 @@
+---
+type: Guide
+---
 # Installing Beseda on another Mac
 
 What you need: a Mac with Apple Silicon (M1 or newer), macOS 14.2 or newer, about
@@ -17,10 +20,10 @@ What you need: a Mac with Apple Silicon (M1 or newer), macOS 14.2 or newer, abou
      lighter and writes punctuation. The file goes into
      `~/Library/Application Support/Beseda/runtime/models`. The step can be
      skipped: the download keeps running and the menu bar shows its progress.
-     The model can be changed later under Настройки → Хранение.
+     The model can be changed later under Настройки → Обработка.
    - **Пробная запись**: say a few words with some music playing to see both
      channels move.
-4. Record a call: «Записать» in the menu bar, or let the automatic detection start
+4. Record a call: «Начать запись» in the menu bar, or let the automatic detection start
    with Zoom, Meet and the other apps listed under Настройки → Запись.
 
 Everything the app creates lives in `~/Library/Application Support/Beseda`. To
@@ -35,7 +38,7 @@ transcription work whatever you pick.
 
 The app updates itself: it checks
 https://github.com/arhangel66/beseda hourly and installs a new version as soon as
-no call is being recorded. «Обновления» in the menu bar popover forces a check. Calls,
+no call is being recorded. Настройки → Основные → Обновления forces a check. Calls,
 the index and the downloaded engine stay in Application Support.
 
 A Podushka copy is replaced by hand once: install `Beseda.app`, open it, then delete
@@ -44,5 +47,5 @@ because macOS sees a new app; calls, settings and the model come along.
 
 ## Publishing a version
 
-See `release.md`. `scripts/package_app.sh` still builds a dev zip without the
+Publishing is described under [Architecture](../architecture/index.md). `scripts/package_app.sh` still builds a dev zip without the
 updater for trying a build on another Mac.

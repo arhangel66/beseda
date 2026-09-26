@@ -17,7 +17,7 @@ struct ChatCompletionsProvider: SummarizationProvider, Sendable {
     var transport: Transport = { try await URLSession.shared.data(for: $0) }
 
     /// Bold on the section names only: the earlier «только жирный текст» made small models
-    /// write every line bold (docs/summary-model-choice-plan.md). No `#` headers either,
+    /// write every line bold (docs/archive/summary-model-choice-plan.md). No `#` headers either,
     /// the pane renders inline markdown and would show them as hashes.
     static let defaultPrompt = """
         Прочитай расшифровку созвона и напиши по-русски краткое саммари. Без вступления и без \

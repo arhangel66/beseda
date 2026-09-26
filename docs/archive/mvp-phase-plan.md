@@ -1,3 +1,5 @@
+> Historical: the original Podushka MVP plan. The Python sidecar and `spikes/` it describes no longer exist.
+
 # Podushka Calls MVP Phase Plan
 
 Goal: build a local macOS menu bar proof of concept that records calls, separates "me" and "them" audio streams, transcribes both locally, and writes a merged Markdown transcript.

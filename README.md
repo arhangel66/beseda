@@ -16,7 +16,7 @@ internet connection for the first launch (the speech model is downloaded then).
 3. Beseda lives in the menu bar. Follow the onboarding: allow the microphone and
    system audio, pick a speech model, make a test recording.
 
-Installed copies update themselves through Sparkle. See `docs/install.md` for
+Installed copies update themselves through Sparkle. See `docs/product/install.md` for
 details and `docs/release.md` for publishing.
 
 ## Building from source
@@ -63,7 +63,7 @@ Krisp-compatible keys kushetka's `/api/webhooks/krisp` expects (`event`,
 `participants`, `dialogue` and `summary`. Every attempt is a row in
 `webhook_deliveries`: network errors and 5xx are retried after 1, 5 and 30
 minutes, 4xx stops, and `Отправить тест` sends a probe the server skips. The
-journal lives in Settings and under `Инфо` of each call. See `docs/webhook-plan.md`.
+journal lives in Settings and under `Инфо` of each call. See `docs/archive/webhook-plan.md`.
 
 On first launch a four-step onboarding checks the microphone permission and the
 system audio tap, downloads a speech model, then records ten seconds to prove
@@ -79,7 +79,7 @@ The file lands in `~/Library/Application Support/Beseda/runtime/models` and is
 checked against a pinned sha256 before it is used. Speech recognition itself is
 [transcribe.cpp](https://github.com/handy-computer/transcribe.cpp) linked into
 the app, so nothing else is installed at runtime. See
-`docs/speech-model-choice-plan.md`.
+`docs/archive/speech-model-choice-plan.md`.
 
 ## Giving a dev build to someone else
 

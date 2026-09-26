@@ -50,7 +50,6 @@ let package = Package(
                 ".venv",
                 "AGENT.md",
                 "dist",
-                "MVP_PHASE_PLAN.md",
                 "README.md",
                 "Tests",
                 "VERSION",
