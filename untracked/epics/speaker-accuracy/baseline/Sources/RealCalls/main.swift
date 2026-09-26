@@ -1,3 +1,4 @@
+import Accelerate
 import AVFoundation
 import FluidAudio
 import Foundation
@@ -95,6 +96,53 @@ func diarizerVariants(of url: URL) async throws -> [(String, [SpeakerInterval])]
         ("t0.70-merge2%", mergingSmallSpeakers(current, minimumShare: 0.02)),
         ("t0.70-merge5%", mergingSmallSpeakers(current, minimumShare: 0.05)),
     ]
+}
+
+// BESEDA-79: `RealCalls <call dir or wav> dump` prints one JSON line for ../extra_speakers.py: the t0.70 diarizer
+// segments with embeddings of the system channel (of a call: also of the mic), the echo gate's own-speech
+// intervals and 100 ms RMS levels in dBFS. No audio and no text leave the temp copy.
+struct DumpedSegment: Encodable { let start: Float, end: Float, speaker: String, quality: Float, embedding: [Float] }
+struct Dump: Encodable {
+    let system: [DumpedSegment]
+    let mic: [DumpedSegment]
+    let ownSpeech: [[Double]]
+    let systemDb: [Float]
+    let micDb: [Float]
+}
+
+func dumpedSegments(_ url: URL) async throws -> [DumpedSegment] {
+    let manager = OfflineDiarizerManager(config: OfflineDiarizerConfig(clusteringThreshold: 0.7))
+    try await manager.prepareModels()
+    return try manager.cluster(try await manager.prepare(audio: try AudioConverter().resampleAudioFile(url))).segments.map {
+        DumpedSegment(start: $0.startTimeSeconds, end: $0.endTimeSeconds, speaker: $0.speakerId, quality: $0.qualityScore, embedding: $0.embedding)
+    }
+}
+
+func decibels(_ samples: [Float]) -> [Float] {
+    stride(from: 0, to: samples.count - 1_599, by: 1_600).map { 10 * log10(vDSP.meanSquare(samples[$0..<$0 + 1_600]) + 1e-10) }
+}
+
+if CommandLine.arguments.count > 2, CommandLine.arguments[2] == "dump" {
+    let input = URL(fileURLWithPath: CommandLine.arguments[1])
+    let dump: Dump
+    if input.pathExtension == "wav" {
+        dump = Dump(system: try await dumpedSegments(input), mic: [], ownSpeech: [], systemDb: decibels(try readSamples(at: input)), micDb: [])
+    } else {
+        let systemURL = input.appendingPathComponent("them.asr.wav"), micURL = input.appendingPathComponent("me.asr.wav")
+        let system = try readSamples(at: systemURL), mic = try readSamples(at: micURL)
+        let own = EchoGate.ownSpeechFrames(mic: mic, system: system)
+        var runs: [[Double]] = []
+        for (frame, isOwn) in own.enumerated() where isOwn {
+            if let last = runs.last, last[1] == Double(frame) / 50 { runs[runs.count - 1][1] = Double(frame + 1) / 50 }
+            else { runs.append([Double(frame) / 50, Double(frame + 1) / 50]) }
+        }
+        dump = Dump(
+            system: try await dumpedSegments(systemURL), mic: try await dumpedSegments(micURL),
+            ownSpeech: runs, systemDb: decibels(system), micDb: decibels(mic)
+        )
+    }
+    print(String(decoding: try JSONEncoder().encode(dump), as: UTF8.self))
+    exit(0)
 }
 
 let started = Date()
