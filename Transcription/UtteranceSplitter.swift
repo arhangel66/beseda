@@ -17,35 +17,39 @@ enum UtteranceSplitter {
     private static let hopSeconds = 0.01
 
     static func split(_ samples: [Float], sampleRate: Double, maxSeconds: Double) -> [AudioPiece] {
-        let maxSamples = Int(maxSeconds * sampleRate)
-        guard maxSamples > 0, samples.count > maxSamples else {
-            return [AudioPiece(offsetSec: 0, samples: samples)]
-        }
-
         var pieces: [AudioPiece] = []
-        var cursor = 0
-        while cursor < samples.count {
-            let remaining = samples.count - cursor
-            let end = remaining <= maxSamples
-                ? samples.count
-                : cursor + quietestCut(in: samples, from: cursor, window: maxSamples, sampleRate: sampleRate)
-            pieces.append(AudioPiece(
-                offsetSec: Double(cursor) / sampleRate,
-                samples: Array(samples[cursor..<end])
-            ))
-            cursor = end
+        try? forEachPiece(of: SampleSource(samples), sampleRate: sampleRate, maxSeconds: maxSeconds) {
+            pieces.append($0)
         }
         return pieces
     }
 
-    /// the offset from `start`, inside the window's tail, whose frame is quietest
-    private static func quietestCut(in samples: [Float], from start: Int, window: Int, sampleRate: Double) -> Int {
+    /// the same pieces as `split`, reading one window past the limit at a time: a cut only looks inside
+    /// the window, so a long file never has to be in memory whole
+    static func forEachPiece(
+        of source: SampleSource, sampleRate: Double, maxSeconds: Double, _ body: (AudioPiece) throws -> Void
+    ) throws {
+        let maxSamples = Int(maxSeconds * sampleRate)
+        let window = maxSamples > 0 ? maxSamples + 1 : source.count
+        var cursor = 0
+        repeat {
+            let samples = try source.read(cursor..<min(cursor + window, source.count))
+            let length = maxSamples > 0 && samples.count > maxSamples
+                ? quietestCut(in: samples, window: maxSamples, sampleRate: sampleRate)
+                : samples.count
+            try body(AudioPiece(offsetSec: Double(cursor) / sampleRate, samples: Array(samples.prefix(length))))
+            cursor += length
+        } while cursor < source.count
+    }
+
+    /// the offset inside the window's tail whose frame is quietest
+    private static func quietestCut(in samples: [Float], window: Int, sampleRate: Double) -> Int {
         let frame = Int(frameSeconds * sampleRate)
         let hop = Int(hopSeconds * sampleRate)
-        let searchStart = start + Int(Double(window) * (1 - searchTailShare))
+        let searchStart = Int(Double(window) * (1 - searchTailShare))
         // the cut lands half a frame past the position, so the search has to stop a frame
         // short of the window or the piece comes out longer than the model accepts
-        let searchEnd = min(start + window - frame, samples.count - frame)
+        let searchEnd = min(window - frame, samples.count - frame)
         guard searchEnd > searchStart else {
             return window
         }
@@ -59,7 +63,7 @@ enum UtteranceSplitter {
             }
             if energy < bestEnergy {
                 bestEnergy = energy
-                bestOffset = position + frame / 2 - start
+                bestOffset = position + frame / 2
             }
         }
         return bestOffset

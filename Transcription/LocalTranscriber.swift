@@ -1,4 +1,3 @@
-import AVFoundation
 import Foundation
 import TranscribeCpp
 
@@ -62,16 +61,20 @@ final class LocalTranscriber: @unchecked Sendable {
     }
 
     func transcribe(audioURL: URL) async throws -> ASRTranscription {
-        try await transcribe(samples: Self.readSamples(at: audioURL))
+        try await transcribe(source: .file(at: audioURL))
     }
 
     /// 16 kHz mono already in memory: the live preview's chunks during a call
     func transcribe(samples: [Float]) async throws -> ASRTranscription {
+        try await transcribe(source: SampleSource(samples))
+    }
+
+    private func transcribe(source: SampleSource) async throws -> ASRTranscription {
         try await withCheckedThrowingContinuation { continuation in
             queue.async {
                 self.cancelIdleShutdown()
                 do {
-                    continuation.resume(returning: try self.run(samples: samples))
+                    continuation.resume(returning: try self.run(source: source))
                 } catch {
                     continuation.resume(throwing: error)
                 }
@@ -100,15 +103,14 @@ final class LocalTranscriber: @unchecked Sendable {
         _ = done.wait(timeout: .now() + timeout)
     }
 
-    private func run(samples: [Float]) throws -> ASRTranscription {
+    private func run(source: SampleSource) throws -> ASRTranscription {
         let loaded = try load()
         let started = Date()
         let chunkSeconds = loaded.model.maxUtteranceSec ?? Self.progressChunkSeconds
-        let pieces = UtteranceSplitter.split(samples, sampleRate: Self.sampleRate, maxSeconds: chunkSeconds)
         let options = RunOptions(timestamps: .word, language: loaded.model.transcriptionLanguage)
 
         var words: [TranscriptWord] = []
-        for (index, piece) in pieces.enumerated() {
+        try UtteranceSplitter.forEachPiece(of: source, sampleRate: Self.sampleRate, maxSeconds: chunkSeconds) { piece in
             let transcript = try loaded.session.run(piece.samples, options: options)
             words += Self.words(in: transcript).map { word in
                 TranscriptWord(
@@ -117,11 +119,12 @@ final class LocalTranscriber: @unchecked Sendable {
                     text: word.text
                 )
             }
-            progressHandler?(Double(index + 1) / Double(pieces.count))
+            let reached = piece.offsetSec * Self.sampleRate + Double(piece.samples.count)
+            progressHandler?(reached / Double(max(source.count, 1)))
         }
 
         let segments = SentenceBuilder.segments(from: words)
-        let audioDuration = Double(samples.count) / Self.sampleRate
+        let audioDuration = Double(source.count) / Self.sampleRate
         let wallTime = Date().timeIntervalSince(started)
         return ASRTranscription(
             id: UUID().uuidString,
@@ -182,21 +185,5 @@ final class LocalTranscriber: @unchecked Sendable {
         return WordAssembler.words(from: transcript.tokens.map {
             WordAssembler.Token(start: Double($0.t0Ms) / 1000, end: Double($0.t1Ms) / 1000, text: $0.text)
         })
-    }
-
-    /// the normalized file is already 16 kHz mono; the engine wants it as float32 in [-1, 1]
-    static func readSamples(at url: URL) throws -> [Float] {
-        let file = try AVAudioFile(forReading: url, commonFormat: .pcmFormatFloat32, interleaved: false)
-        guard let buffer = AVAudioPCMBuffer(
-            pcmFormat: file.processingFormat,
-            frameCapacity: AVAudioFrameCount(file.length)
-        ) else {
-            throw BesedaError.processFailed("Не хватило памяти под \(url.lastPathComponent)")
-        }
-        try file.read(into: buffer)
-        guard let channel = buffer.floatChannelData?[0] else {
-            throw BesedaError.processFailed("В \(url.lastPathComponent) нет звука")
-        }
-        return Array(UnsafeBufferPointer(start: channel, count: Int(buffer.frameLength)))
     }
 }

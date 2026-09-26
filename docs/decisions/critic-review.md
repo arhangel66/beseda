@@ -113,6 +113,9 @@ Effort is S (hours), M (days), or L (weeks). Priority is P0 (blocks safe sale or
     call is roughly 0.9 GB per mono Float array before model, words and FFT scratch; the built-in summary model
     separately needs about 5 GB. Stream fixed windows through ASR and echo cancellation, retaining only word
     metadata, and publish a peak-memory test for the four-hour supported limit.
+    Fixed in BESEDA-102: ASR and the echo gate read the normalized files in windows through `SampleSource`;
+    on a synthetic 4-hour call peak RSS fell from 3576 MB to 62 MB (echo gate) and from 1772 MB to 77 MB
+    (reading for ASR) ([ASR](../architecture/asr.md)).
 
 12. **Migrations have no version, transaction or backup — P1, M.** `CallStore.prepare` conditionally executes
     many `ALTER TABLE` statements (`Storage/CallStore.swift:290-361`) outside a migration transaction and
