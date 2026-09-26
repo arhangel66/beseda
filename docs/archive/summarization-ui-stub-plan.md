@@ -1,3 +1,6 @@
+---
+type: Plan
+---
 # Plan: Summarization, UI on a stub provider
 
 Goal of this stage: the whole click path works and looks finished, with a fake model

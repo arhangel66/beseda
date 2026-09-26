@@ -1,3 +1,6 @@
+---
+type: Plan
+---
 # UI redesign v2 — what the app still gets wrong, and the calendar
 
 Source: `untracked/design/prototype-v2.dc.html`, pulled from the claude.ai/design project

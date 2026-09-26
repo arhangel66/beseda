@@ -16,7 +16,7 @@ What you need: a Mac with Apple Silicon (M1 or newer), macOS 14.2 or newer, abou
    onboarding:
    - **Микрофон** and **Системный звук**: allow both when macOS asks.
    - **Речевая модель**: pick one and press «Скачать». Parakeet v3 (485 MB)
-     understands 25 languages; GigaAM v3 from Sber (261 MB) is Russian only but
+     understands 25 languages; GigaAM v3 from Sber (274 MB) is Russian only but
      lighter and writes punctuation. The file goes into
      `~/Library/Application Support/Beseda/runtime/models`. The step can be
      skipped: the download keeps running and the menu bar shows its progress.

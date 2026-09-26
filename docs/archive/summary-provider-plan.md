@@ -1,3 +1,6 @@
+---
+type: Plan
+---
 # Summary provider picker
 
 Date: 2026-09-06. Follows `docs/summary-model-choice-plan.md`.

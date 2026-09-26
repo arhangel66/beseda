@@ -1,3 +1,6 @@
+---
+type: Roadmap
+---
 # Roadmap — September 2026
 
 Context: Beseda runs on two Macs (Mikhail and his wife). Updates are a zip copied by

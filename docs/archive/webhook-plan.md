@@ -1,3 +1,6 @@
+---
+type: Plan
+---
 # Webhook delivery for Podushka (kushetka-compatible)
 
 ## Context

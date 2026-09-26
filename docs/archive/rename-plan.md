@@ -1,3 +1,6 @@
+---
+type: Plan
+---
 # Podushka → Beseda, and the code goes public
 
 Decided 2026-09-05: the app and the repository are renamed to **Beseda**; the source

@@ -1,3 +1,6 @@
+---
+type: Plan
+---
 # Native UI plan
 
 Turns the findings in [ui-review.md](ui-review.md) into work. Mock-ups that were agreed on

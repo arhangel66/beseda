@@ -1,3 +1,6 @@
+---
+type: Plan
+---
 # Summary model choice
 
 Date: 2026-09-06

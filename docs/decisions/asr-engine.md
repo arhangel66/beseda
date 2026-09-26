@@ -17,7 +17,7 @@ sidecar: good Russian on two voice notes, sentence timestamps, faster than real 
 [speech model choice plan](../archive/speech-model-choice-plan.md) measured transcribe.cpp on three real
 call excerpts and found:
 - Q4_K_M Parakeet drifts 2.9–6.8% from F16 with no systematic loss: 485 MB instead of 2.51 GB.
-- GigaAM v3 (261 MB) is a usable Russian model when fed ≤20 s chunks, but silently drops audio on long
+- GigaAM v3 (274 MB) is a usable Russian model when fed ≤20 s chunks, but silently drops audio on long
   input and cannot write Latin script (`SSH` → `сей`).
 - GigaAM has no MLX port; `parakeet-mlx` 0.5.1 cannot load quantized weights; the Python/`uv` stage broke the
   clean-machine install with an unparseable progress.

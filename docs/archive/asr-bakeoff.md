@@ -1,3 +1,6 @@
+---
+type: Experiment Report
+---
 # ASR Bakeoff
 
 Date: 2026-05-10

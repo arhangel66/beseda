@@ -59,3 +59,6 @@ detail, search, and the webhook/summary features read rows back.
   are read back by later versions: `asr.json` uses snake_case keys (`audio_duration_sec`,
   `wall_time_sec`, `real_time_factor`), and file names are what `StorageJanitor` and retry rely on. Do
   not rename or change them without a migration in `prepare()` or a reader for the old shape.
+- **Call file names have no single owner.** They are spelled in three places: `AppController.DualFiles`,
+  `DualCapture` (which writes `me.raw.wav` and `them.raw.wav`) and the suffix rules in `StorageJanitor`.
+  Renaming a file in one place silently breaks retention and retry.

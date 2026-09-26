@@ -1,3 +1,6 @@
+---
+type: Plan
+---
 # Self-contained Podushka for another Mac
 
 ## Context

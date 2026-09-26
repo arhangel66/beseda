@@ -13,8 +13,10 @@ description: Package.swift, the build/sign/package/release scripts, Sparkle upda
 `CTranscribe` binary xcframework (pinned v0.2.3 with checksum) wrapped by the vendored
 `Vendor/TranscribeCpp` target. Tests are `Tests/BesedaTests`.
 
-Because the target sits at the repo root, everything else is listed in `exclude`, including `.venv`,
-`samples`, `.idea`, `untracked` and `dist`. In a clean worktree some of these do not exist and SwiftPM
+Because the target sits at the repo root, `exclude` lists `.agents`, `.gitignore`, `.idea`, `.venv`,
+`AGENT.md`, `dist`, `README.md`, `Tests`, `VERSION`, `Vendor`, `docs`, `implementation_journal.md`,
+`samples`, `scripts`, `skills-lock.json` and `untracked`. Other root files (`AGENTS.md`,
+`Package.resolved`, `appcast.xml`, `.mcp.json`) are not excluded. In a clean worktree some of these do not exist and SwiftPM
 warns about the missing excluded paths; the warnings are harmless.
 
 ## Check

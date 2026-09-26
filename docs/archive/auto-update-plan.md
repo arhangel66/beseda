@@ -1,3 +1,6 @@
+---
+type: Plan
+---
 # Auto-update with Sparkle
 
 ## Context

@@ -1,3 +1,6 @@
+---
+type: Review
+---
 # Podushka — архитектурный обзор и находки по багам
 
 Автор: Claude Sonnet 5 (Claude Code). Ревью read-only, код не менялся.

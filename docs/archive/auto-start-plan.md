@@ -1,3 +1,6 @@
+---
+type: Plan
+---
 > Historical: the `spikes/` tools and spike build scripts named here are deleted.
 
 # Auto-Start Plan

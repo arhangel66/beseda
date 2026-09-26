@@ -1,3 +1,6 @@
+---
+type: Spike Report
+---
 > Historical: `spikes/CallDetectSpike` and `scripts/build_call_detect_spike.sh` are deleted; detection now lives in `Audio/CallDetector.swift`.
 
 # Call Detection Spike (auto-start plan B1)

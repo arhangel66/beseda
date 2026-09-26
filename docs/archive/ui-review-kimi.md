@@ -1,3 +1,6 @@
+---
+type: Review
+---
 # UI review — third pass (designer's eye)
 
 Reviewer: Kimi, 2026-08-29. Method: read `untracked/design/prototype-v2.dc.html` and

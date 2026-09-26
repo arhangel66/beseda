@@ -1,3 +1,6 @@
+---
+type: Plan
+---
 > Historical: the original Podushka MVP plan. The Python sidecar and `spikes/` it describes no longer exist.
 
 # Podushka Calls MVP Phase Plan
