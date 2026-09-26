@@ -1,5 +1,6 @@
 # Decisions
 
+- [Adversarial product and code review](critic-review.md) — product, architecture, speaker, privacy and release findings; proposed.
 - [Development directions](development-directions.md) — where Beseda goes next: Mikhail's answers and the phased plan; approved with changes.
 - [Speaker accuracy, local](speaker-accuracy.md) — echo gate and diarizer timeline first, models pending the benchmark; proposed.
 - [Local on-device ASR](local-asr.md) — speech is transcribed on the Mac, no cloud ASR.
