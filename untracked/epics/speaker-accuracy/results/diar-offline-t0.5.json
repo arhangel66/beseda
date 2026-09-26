@@ -1,0 +1,138 @@
+{
+ "summary": {
+  "real (VoxConverse+AMI)": {
+   "files": 5,
+   "der": 0.1305381498184215,
+   "der_no_overlap": 0.07354523176607422,
+   "speaker_count_error": 0.6,
+   "wer": null,
+   "cer": null,
+   "me_them_error": null,
+   "bleed_duplicate_word_rate": null,
+   "x_realtime": 49.211933697285055
+  },
+  "synthetic calls (FLEURS)": {
+   "files": 8,
+   "der": 0.26407059585492226,
+   "der_no_overlap": 0.2620645428216798,
+   "speaker_count_error": 0.75,
+   "wer": 0.2590909090909091,
+   "cer": 0.2016376663254862,
+   "me_them_error": 0.0013085904967153187,
+   "bleed_duplicate_word_rate": 0.013490991650731286,
+   "x_realtime": 35.4022956666309
+  },
+  "all": {
+   "files": 13,
+   "der": 0.15515172768853125,
+   "der_no_overlap": 0.11136676793333013,
+   "speaker_count_error": 0.6923076923076923,
+   "wer": 0.2590909090909091,
+   "cer": 0.2016376663254862,
+   "me_them_error": 0.0013085904967153187,
+   "bleed_duplicate_word_rate": 0.013490991650731286,
+   "x_realtime": 45.97605599218864
+  }
+ },
+ "files": [
+  {
+   "file": "ami_ES2004a",
+   "der": 0.2272700687234981,
+   "der_no_overlap": 0.16507900290913274,
+   "ref_speakers": 4,
+   "hyp_speakers": 3
+  },
+  {
+   "file": "ami_IS1009a",
+   "der": 0.22115226693175444,
+   "der_no_overlap": 0.1770371443752113,
+   "ref_speakers": 4,
+   "hyp_speakers": 4
+  },
+  {
+   "file": "call_en_me_ru_3spk",
+   "der": 0.20856180856180853,
+   "der_no_overlap": 0.2109521460286139,
+   "ref_speakers": 4,
+   "hyp_speakers": 4,
+   "wer": 0.2564102564102564
+  },
+  {
+   "file": "call_mix_2spk",
+   "der": 0.03096514745308317,
+   "der_no_overlap": 0.01312615955473104,
+   "ref_speakers": 3,
+   "hyp_speakers": 3,
+   "wer": 0.2857142857142857
+  },
+  {
+   "file": "call_mix_3spk",
+   "der": 0.06601995565410185,
+   "der_no_overlap": 0.06295652173913036,
+   "ref_speakers": 4,
+   "hyp_speakers": 4,
+   "wer": 0.25757575757575757
+  },
+  {
+   "file": "call_mix_4spk",
+   "der": 0.6023930601256356,
+   "der_no_overlap": 0.6028236707720036,
+   "ref_speakers": 5,
+   "hyp_speakers": 2,
+   "wer": 0.6716417910447762
+  },
+  {
+   "file": "call_ru_2spk",
+   "der": 0.20451638689048765,
+   "der_no_overlap": 0.1942105263157895,
+   "ref_speakers": 3,
+   "hyp_speakers": 3,
+   "wer": 0.11764705882352941
+  },
+  {
+   "file": "call_ru_3spk_a",
+   "der": 0.21070422535211256,
+   "der_no_overlap": 0.2102444284687274,
+   "ref_speakers": 4,
+   "hyp_speakers": 3,
+   "wer": 0.12962962962962962
+  },
+  {
+   "file": "call_ru_3spk_b",
+   "der": 0.2560923369823894,
+   "der_no_overlap": 0.25231996133397794,
+   "ref_speakers": 4,
+   "hyp_speakers": 4,
+   "wer": 0.1323529411764706
+  },
+  {
+   "file": "call_ru_4spk",
+   "der": 0.40660328879753355,
+   "der_no_overlap": 0.4047930853850184,
+   "ref_speakers": 5,
+   "hyp_speakers": 3,
+   "wer": 0.12698412698412698
+  },
+  {
+   "file": "vox_asxwr",
+   "der": 0.014385571280635336,
+   "der_no_overlap": 0.0010816561751929288,
+   "ref_speakers": 3,
+   "hyp_speakers": 3
+  },
+  {
+   "file": "vox_azisu",
+   "der": 0.1401036066855634,
+   "der_no_overlap": 0.021989763275751827,
+   "ref_speakers": 4,
+   "hyp_speakers": 4
+  },
+  {
+   "file": "vox_gzvkx",
+   "der": 0.05858264856766715,
+   "der_no_overlap": 0.007816115078966,
+   "ref_speakers": 6,
+   "hyp_speakers": 4
+  }
+ ]
+}

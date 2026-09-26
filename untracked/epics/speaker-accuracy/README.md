@@ -13,6 +13,7 @@ measurement uses: a small eval set with reference labels and one scorer. Researc
 | `data/built.sha256` | sha256 of every built audio file; a rebuild warns if the bytes differ |
 | `results/` | committed score tables |
 | `baseline/` | Beseda's current pipeline: what it does (with code references), the adapter that runs it on this set, its numbers — [baseline/README.md](baseline/README.md) |
+| `diarization/` | local diarization and me/them alternatives on FluidAudio 0.17.4 + an echo gate, compared to the baseline — [diarization/README.md](diarization/README.md) |
 
 ## What is in the set (28 min, 13 recordings)
 
