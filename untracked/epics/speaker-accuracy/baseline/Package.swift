@@ -36,6 +36,11 @@ let package = Package(
                 .product(name: "FluidAudio", package: "FluidAudio"),
                 "TranscribeCpp"
             ]
+        ),
+        // speaker counts on Mikhail's archived calls, old vs new assignment (../real_calls.sh)
+        .executableTarget(
+            name: "RealCalls",
+            dependencies: [.product(name: "FluidAudio", package: "FluidAudio")]
         )
     ]
 )
