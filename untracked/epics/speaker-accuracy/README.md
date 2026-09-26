@@ -12,6 +12,7 @@ measurement uses: a small eval set with reference labels and one scorer. Researc
 | `sanity_check.py` | scores the reference against itself and a one-speaker hypothesis, asserts the numbers below |
 | `data/built.sha256` | sha256 of every built audio file; a rebuild warns if the bytes differ |
 | `results/` | committed score tables |
+| `baseline/` | Beseda's current pipeline: what it does (with code references), the adapter that runs it on this set, its numbers — [baseline/README.md](baseline/README.md) |
 
 ## What is in the set (28 min, 13 recordings)
 
