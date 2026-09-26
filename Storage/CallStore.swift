@@ -380,16 +380,21 @@ final class CallStore {
         }
     }
 
-    func failInterruptedCalls(reason: String) throws -> Int {
-        // a call left mid-flight belongs to a process that is gone: the audio was only
-        // buffered in memory, so the row can never move forward on its own
+    /// audio folders of the calls it marked failed
+    func failInterruptedCalls(reason: String) throws -> [String] {
+        // a call left mid-flight belongs to a process that is gone, so the row can never move
+        // forward on its own; failed keeps its folder and offers retry from the streamed raw audio
         try database { db in
+            let paths = try query(db, """
+                SELECT audio_dir FROM calls
+                WHERE status IN ('recording', 'normalizing', 'transcribing')
+                """) { columnString($0, 0) }
             try run(db, """
                 UPDATE calls
                 SET status = 'failed', error = ?, updated_at = ?
                 WHERE status IN ('recording', 'normalizing', 'transcribing')
                 """, reason, Date().iso8601WithFractions)
-            return Int(sqlite3_changes(db))
+            return paths.compactMap { $0 }
         }
     }
 

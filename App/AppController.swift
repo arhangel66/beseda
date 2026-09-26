@@ -238,9 +238,14 @@ final class AppController {
 
         do {
             try callStore.prepare()
-            let sweptCalls = try callStore.failInterruptedCalls(reason: "Interrupted before the app restarted")
-            if sweptCalls > 0 {
-                appendLog("Marked \(sweptCalls) interrupted call(s) as failed")
+            let sweptDirectories = try callStore.failInterruptedCalls(reason: "Interrupted before the app restarted")
+            if !sweptDirectories.isEmpty {
+                appendLog("Marked \(sweptDirectories.count) interrupted call(s) as failed")
+            }
+            for directory in sweptDirectories {
+                for name in [DualFiles.microphoneRaw, DualFiles.systemRaw] {
+                    try? PCMFloatRecorder.repairWAVHeader(at: URL(fileURLWithPath: directory).appendingPathComponent(name))
+                }
             }
             webhooks.start()
             refreshRecentCalls()
@@ -814,8 +819,14 @@ final class AppController {
                 finishCall(callID, in: sessionDir, segments: segments, audio: [rawURL, normalizedURL], persist: persist)
 
             case "dual":
-                try requireFile(at: sessionDir.appendingPathComponent(DualFiles.microphoneASR))
-                try requireFile(at: sessionDir.appendingPathComponent(DualFiles.systemASR))
+                // a call cut off by a crash has only the raw files, streamed to disk while it recorded
+                for (raw, asr) in [(DualFiles.microphoneRaw, DualFiles.microphoneASR), (DualFiles.systemRaw, DualFiles.systemASR)]
+                where !fileManager.fileExists(atPath: sessionDir.appendingPathComponent(asr).path) {
+                    _ = try await AudioNormalizer.normalize(
+                        inputURL: sessionDir.appendingPathComponent(raw),
+                        outputURL: sessionDir.appendingPathComponent(asr)
+                    )
+                }
                 try await transcribeDualCall(callID, in: sessionDir, stages: 4, persist: persist)
 
             default:

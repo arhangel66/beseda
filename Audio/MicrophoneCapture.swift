@@ -32,7 +32,7 @@ final class MicrophoneCapture: @unchecked Sendable {
         set { recorder?.isPaused = newValue }
     }
 
-    func start(expectedDuration: TimeInterval) async throws {
+    func start(writingTo url: URL? = nil) async throws {
         try await requestMicrophonePermission()
 
         let input = engine.inputNode
@@ -41,10 +41,10 @@ final class MicrophoneCapture: @unchecked Sendable {
             throw AudioCaptureError.unsupportedFormat("Default microphone returned invalid format: \(format)")
         }
 
-        let recorder = PCMFloatRecorder(
+        let recorder = try PCMFloatRecorder(
+            url: url,
             sampleRate: format.sampleRate,
             channelCount: Int(format.channelCount),
-            expectedDuration: expectedDuration,
             activityTracker: activityTracker
         )
         input.installTap(onBus: 0, bufferSize: 4096, format: format) { buffer, _ in
@@ -60,13 +60,13 @@ final class MicrophoneCapture: @unchecked Sendable {
         try engine.start()
     }
 
-    func stopAndWrite(to url: URL) throws -> AudioFileMetadata {
+    func stop() throws -> AudioFileMetadata {
         engine.inputNode.removeTap(onBus: 0)
         engine.stop()
         guard let recorder else {
             throw AudioCaptureError.noFrames("Microphone recorder was not started")
         }
-        return try recorder.writeWAV(to: url)
+        return try recorder.finish()
     }
 
     func stopDiscarding() {

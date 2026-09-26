@@ -41,7 +41,7 @@ final class SystemAudioTap: @unchecked Sendable {
         set { recorder?.isPaused = newValue }
     }
 
-    func start(expectedDuration: TimeInterval) throws {
+    func start(writingTo url: URL? = nil) throws {
         let excludedProcesses = currentProcessAudioObject().map { [$0] } ?? []
         let description = CATapDescription(stereoGlobalTapButExcludeProcesses: excludedProcesses)
         description.name = "Beseda System Audio"
@@ -52,10 +52,10 @@ final class SystemAudioTap: @unchecked Sendable {
         format = try getTapFormat(tapID)
 
         let channelCount = max(1, Int(format.mChannelsPerFrame))
-        let recorder = PCMFloatRecorder(
+        let recorder = try PCMFloatRecorder(
+            url: url,
             sampleRate: format.mSampleRate,
             channelCount: channelCount,
-            expectedDuration: expectedDuration,
             activityTracker: activityTracker
         )
         self.recorder = recorder
@@ -99,7 +99,7 @@ final class SystemAudioTap: @unchecked Sendable {
         try CoreAudioStatus.check(AudioDeviceStart(aggregateID, ioProcID), "AudioDeviceStart")
     }
 
-    func stopAndWrite(to url: URL) throws -> AudioFileMetadata {
+    func stop() throws -> AudioFileMetadata {
         if aggregateID != kAudioObjectUnknown, let ioProcID {
             _ = AudioDeviceStop(aggregateID, ioProcID)
             _ = AudioDeviceDestroyIOProcID(aggregateID, ioProcID)
@@ -110,7 +110,7 @@ final class SystemAudioTap: @unchecked Sendable {
         guard let recorder else {
             throw AudioCaptureError.noFrames("System audio recorder was not started")
         }
-        return try recorder.writeWAV(to: url)
+        return try recorder.finish()
     }
 
     func cleanup() {

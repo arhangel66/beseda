@@ -54,7 +54,7 @@ final class PermissionsModel {
         let result = await Task.detached(priority: .userInitiated) { () -> String? in
             let tap = SystemAudioTap()
             do {
-                try tap.start(expectedDuration: 1)
+                try tap.start()
                 tap.cleanup()
                 return nil
             } catch {
