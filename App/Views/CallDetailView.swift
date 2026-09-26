@@ -44,6 +44,10 @@ struct CallDetailView: View {
                             FailureBanner(controller: controller, summary: detail.summary)
                         }
 
+                        if let previous = PreviousCallContent(controller.previousCallForSelected) {
+                            PreviousCallBlock(content: previous) { controller.selectCall(id: $0) }
+                        }
+
                         switch tab {
                         case .transcript:
                             TranscriptLines(

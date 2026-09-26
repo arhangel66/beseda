@@ -60,6 +60,9 @@ final class AppController {
     var recentCalls: [StoredCallSummary] = []
     var callBrowserCalls: [StoredCallSummary] = []
     var selectedCallDetail: StoredCallDetail?
+    /// looked up once per selection and per calendar refresh: each lookup scans the stored calls
+    var previousCallForSelected: PreviousRelatedCall?
+    var previousCallByEventID: [String: PreviousRelatedCall] = [:]
     var callBrowserError: String?
     var elapsedRecordingSeconds: TimeInterval = 0
     var isPaused = false
@@ -421,6 +424,9 @@ final class AppController {
             to: endOfTomorrow,
             identifiers: settings.calendarIdentifiers
         )
+        previousCallByEventID = upcomingEvents.prefix(5).reduce(into: [:]) { found, event in
+            found[event.id] = try? callStore.previousRelatedCall(to: event)
+        }
     }
 
     private func matchCalendarEvents() {
@@ -1338,6 +1344,7 @@ final class AppController {
             let detail = try makeCallDetail(call)
             appendLog("Loaded \(detail.segments.count) lines of \(call.id) in \(Int(Date().timeIntervalSince(startedAt) * 1000)) ms")
             selectedCallDetail = detail
+            previousCallForSelected = try? callStore.previousRelatedCall(toCallID: call.id)
             webhooks.showCall(id: call.id)
         } catch {
             callBrowserError = error.localizedDescription
