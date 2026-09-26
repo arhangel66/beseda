@@ -1,0 +1,53 @@
+{
+ "duration": 27.98,
+ "sources": [
+  "fleurs/ru_ru/dev/4330796435579770245.wav",
+  "fleurs/en_us/dev/3165540733904730243.wav",
+  "fleurs/ru_ru/dev/7856258512050419015.wav"
+ ],
+ "segments": [
+  {
+   "start": 0.83,
+   "end": 6.57,
+   "speaker": "spk1",
+   "channel": "system",
+   "text": "израиль требует постоянного военного присутствия в долине в течение десяти лет после подписания соглашения"
+  },
+  {
+   "start": 5.91,
+   "end": 9.05,
+   "speaker": "spk2",
+   "channel": "system",
+   "text": "robin uthappa made the innings highest score"
+  },
+  {
+   "start": 9.87,
+   "end": 13.01,
+   "speaker": "me",
+   "channel": "mic",
+   "text": "тысячи лет назад человек по имени аристарх сказал"
+  },
+  {
+   "start": 13.79,
+   "end": 18.51,
+   "speaker": "spk2",
+   "channel": "system",
+   "text": "70 runs in just 41 balls by hitting 11 fours and 2 sixes"
+  },
+  {
+   "start": 18.87,
+   "end": 23.87,
+   "speaker": "spk1",
+   "channel": "system",
+   "text": "в то время как пна согласна на сохранение такого присутствия в течение только пяти лет"
+  },
+  {
+   "start": 24.84,
+   "end": 27.48,
+   "speaker": "me",
+   "channel": "mic",
+   "text": "что солнечная система вращается вокруг солнца"
+  }
+ ],
+ "processing_seconds": null
+}

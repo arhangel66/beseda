@@ -1,0 +1,394 @@
+{
+ "duration": 360,
+ "sources": [
+  "https://raw.githubusercontent.com/pyannote/AMI-diarization-setup/67c2d539286e89f68952d5dcf83912bd9f01dfae/only_words/rttms/test/ES2004a.rttm"
+ ],
+ "segments": [
+  {
+   "start": 3.81,
+   "end": 6.33,
+   "speaker": "MEO015",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 11.95,
+   "end": 12.06,
+   "speaker": "MEO015",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 20.49,
+   "end": 34.62,
+   "speaker": "FEE013",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 20.5,
+   "end": 21.66,
+   "speaker": "MEO015",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 23.22,
+   "end": 24.03,
+   "speaker": "MEO015",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 35.68,
+   "end": 55.89,
+   "speaker": "FEE013",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 57.62,
+   "end": 100.95,
+   "speaker": "FEE013",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 102.31,
+   "end": 107.8,
+   "speaker": "FEE013",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 108.79,
+   "end": 108.88,
+   "speaker": "MEO015",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 110.38,
+   "end": 125.8,
+   "speaker": "FEE013",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 128.28,
+   "end": 128.43,
+   "speaker": "MEO015",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 128.83,
+   "end": 132.93,
+   "speaker": "FEE013",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 151.46,
+   "end": 151.97,
+   "speaker": "FEE013",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 183.22,
+   "end": 184.33,
+   "speaker": "FEE013",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 186.93,
+   "end": 190.6,
+   "speaker": "FEE013",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 192.48,
+   "end": 192.56,
+   "speaker": "MEO015",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 194.53,
+   "end": 197.24,
+   "speaker": "FEE013",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 195.91,
+   "end": 196.25,
+   "speaker": "MEO015",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 198.31,
+   "end": 198.64,
+   "speaker": "MEO015",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 199.89,
+   "end": 202.25,
+   "speaker": "FEE013",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 206.18,
+   "end": 206.97,
+   "speaker": "FEE013",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 208.71,
+   "end": 209.06,
+   "speaker": "FEE013",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 212.31,
+   "end": 215.8,
+   "speaker": "FEE013",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 215.09,
+   "end": 215.45,
+   "speaker": "MEO015",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 219.18,
+   "end": 219.75,
+   "speaker": "MEO015",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 225.15,
+   "end": 226.61,
+   "speaker": "MEO015",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 227.57,
+   "end": 230.1,
+   "speaker": "FEE013",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 229.09,
+   "end": 236.02,
+   "speaker": "MEO015",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 246.38,
+   "end": 247.2,
+   "speaker": "FEE016",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 249.22,
+   "end": 250.08,
+   "speaker": "MEO015",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 253.47,
+   "end": 261.86,
+   "speaker": "MEO015",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 255.85,
+   "end": 256.3,
+   "speaker": "FEE016",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 256.65,
+   "end": 257.4,
+   "speaker": "MEE014",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 257.9,
+   "end": 258.62,
+   "speaker": "FEE016",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 264.13,
+   "end": 291.47,
+   "speaker": "MEO015",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 284.91,
+   "end": 285.36,
+   "speaker": "FEE016",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 290.01,
+   "end": 291.09,
+   "speaker": "FEE013",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 293.48,
+   "end": 295.55,
+   "speaker": "MEE014",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 294.11,
+   "end": 294.82,
+   "speaker": "MEO015",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 296.33,
+   "end": 296.9,
+   "speaker": "MEO015",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 296.51,
+   "end": 302.14,
+   "speaker": "FEE016",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 296.98,
+   "end": 297.37,
+   "speaker": "MEE014",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 299.11,
+   "end": 307.65,
+   "speaker": "MEE014",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 304.81,
+   "end": 306.01,
+   "speaker": "FEE013",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 305.93,
+   "end": 307.84,
+   "speaker": "MEO015",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 311.43,
+   "end": 315.29,
+   "speaker": "MEE014",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 313.84,
+   "end": 316.83,
+   "speaker": "FEE013",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 315.08,
+   "end": 315.43,
+   "speaker": "MEO015",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 316.8,
+   "end": 318.94,
+   "speaker": "FEE016",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 319.6,
+   "end": 324.48,
+   "speaker": "MEE014",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 331.13,
+   "end": 331.74,
+   "speaker": "FEE016",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 333.99,
+   "end": 334.92,
+   "speaker": "FEE013",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 334.38,
+   "end": 346.27,
+   "speaker": "MEE014",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 336.31,
+   "end": 339.8,
+   "speaker": "FEE013",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 343.24,
+   "end": 343.35,
+   "speaker": "FEE016",
+   "channel": "system",
+   "text": ""
+  }
+ ],
+ "processing_seconds": null
+}

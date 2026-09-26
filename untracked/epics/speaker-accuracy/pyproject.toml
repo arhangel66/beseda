@@ -1,0 +1,11 @@
+[project]
+name = "speaker-accuracy-eval"
+version = "0.1.0"
+description = "Fixed speaker/ASR evaluation set and scorer for Beseda"
+requires-python = ">=3.12"
+dependencies = [
+    "jiwer>=4.0.0",
+    "numpy>=2.5.3",
+    "pyannote-metrics>=4.1",
+    "soundfile>=0.14.0",
+]

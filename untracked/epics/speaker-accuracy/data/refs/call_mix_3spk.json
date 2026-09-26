@@ -1,0 +1,82 @@
+{
+ "duration": 42.67,
+ "sources": [
+  "fleurs/ru_ru/dev/1050167374088424092.wav",
+  "fleurs/en_us/dev/8364006913180567866.wav",
+  "fleurs/ru_ru/dev/15868028326454185432.wav",
+  "fleurs/ru_ru/dev/10189896593749349276.wav"
+ ],
+ "segments": [
+  {
+   "start": 0.74,
+   "end": 7.84,
+   "speaker": "spk2",
+   "channel": "system",
+   "text": "technology offers the solution with virtual field trips students can look at museum artifacts"
+  },
+  {
+   "start": 7.55,
+   "end": 11.41,
+   "speaker": "me",
+   "channel": "mic",
+   "text": "робин утхаппа набрал рекордное количество очков в иннинге"
+  },
+  {
+   "start": 11.64,
+   "end": 16.22,
+   "speaker": "spk3",
+   "channel": "system",
+   "text": "она использует спутниковую технологию вместо старой технологии на основе наземных рлс"
+  },
+  {
+   "start": 16.74,
+   "end": 20.48,
+   "speaker": "spk1",
+   "channel": "system",
+   "text": "однако большинство знаков указываются только на каталанском языке"
+  },
+  {
+   "start": 20.02,
+   "end": 25.66,
+   "speaker": "spk3",
+   "channel": "system",
+   "text": "что позволит авиадиспетчерам точнее определять положение самолетов и давать пилотам более точную информацию"
+  },
+  {
+   "start": 26.26,
+   "end": 27.66,
+   "speaker": "spk2",
+   "channel": "system",
+   "text": "visit an aquarium"
+  },
+  {
+   "start": 27.89,
+   "end": 30.17,
+   "speaker": "me",
+   "channel": "mic",
+   "text": "70 ранов за всего 41 подачу"
+  },
+  {
+   "start": 29.38,
+   "end": 33.52,
+   "speaker": "spk2",
+   "channel": "system",
+   "text": "or admire beautiful art while sitting with their class"
+  },
+  {
+   "start": 34.27,
+   "end": 39.05,
+   "speaker": "spk1",
+   "channel": "system",
+   "text": "поскольку он по закону является первым официальным языком"
+  },
+  {
+   "start": 39.61,
+   "end": 42.17,
+   "speaker": "me",
+   "channel": "mic",
+   "text": "отбил 11 четвёрок и 2 шестёрки"
+  }
+ ],
+ "processing_seconds": null
+}

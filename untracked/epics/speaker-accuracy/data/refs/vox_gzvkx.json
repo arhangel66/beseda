@@ -1,0 +1,156 @@
+{
+ "duration": 225,
+ "sources": [
+  "https://raw.githubusercontent.com/joonson/voxconverse/24bf60be297701cd7e4ef18550c6d390c1b87365/dev/gzvkx.rttm"
+ ],
+ "segments": [
+  {
+   "start": 1.68,
+   "end": 30.76,
+   "speaker": "spk05",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 32.96,
+   "end": 47.04,
+   "speaker": "spk04",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 48.08,
+   "end": 52.88,
+   "speaker": "spk04",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 53.08,
+   "end": 54.52,
+   "speaker": "spk04",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 55.0,
+   "end": 71.32,
+   "speaker": "spk04",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 71.72,
+   "end": 77.72,
+   "speaker": "spk04",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 78.0,
+   "end": 82.4,
+   "speaker": "spk04",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 83.48,
+   "end": 88.12,
+   "speaker": "spk05",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 89.04,
+   "end": 169.68,
+   "speaker": "spk01",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 167.12,
+   "end": 178.16,
+   "speaker": "spk00",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 170.88,
+   "end": 171.76,
+   "speaker": "spk02",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 173.24,
+   "end": 175.92,
+   "speaker": "spk01",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 174.12,
+   "end": 175.24,
+   "speaker": "spk02",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 176.56,
+   "end": 178.24,
+   "speaker": "spk01",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 178.2,
+   "end": 181.0,
+   "speaker": "spk03",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 178.8,
+   "end": 180.32,
+   "speaker": "spk01",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 180.56,
+   "end": 183.04,
+   "speaker": "spk05",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 181.92,
+   "end": 212.76,
+   "speaker": "spk01",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 211.04,
+   "end": 212.2,
+   "speaker": "spk05",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 212.8,
+   "end": 225,
+   "speaker": "spk01",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 213.92,
+   "end": 215.0,
+   "speaker": "spk02",
+   "channel": "system",
+   "text": ""
+  }
+ ],
+ "processing_seconds": null
+}

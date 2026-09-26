@@ -1,0 +1,90 @@
+{
+ "duration": 42.46,
+ "sources": [
+  "fleurs/en_us/dev/5154139170448018903.wav",
+  "fleurs/ru_ru/dev/1058855104882293960.wav",
+  "fleurs/en_us/dev/7333859905385431862.wav",
+  "fleurs/ru_ru/dev/3765091626090272810.wav",
+  "fleurs/ru_ru/dev/5177958922580883031.wav"
+ ],
+ "segments": [
+  {
+   "start": 1.26,
+   "end": 4.04,
+   "speaker": "spk2",
+   "channel": "system",
+   "text": "в связи со своей относительной недоступностью"
+  },
+  {
+   "start": 3.72,
+   "end": 5.56,
+   "speaker": "spk4",
+   "channel": "system",
+   "text": "его планировали срубить во вторник"
+  },
+  {
+   "start": 6.13,
+   "end": 12.59,
+   "speaker": "spk3",
+   "channel": "system",
+   "text": "if you visit the arctic or antarctic areas in the winter you will experience the polar night"
+  },
+  {
+   "start": 12.95,
+   "end": 15.59,
+   "speaker": "spk1",
+   "channel": "system",
+   "text": "such things have become separate disciplines"
+  },
+  {
+   "start": 16.01,
+   "end": 19.09,
+   "speaker": "spk4",
+   "channel": "system",
+   "text": "но постановлением чрезвычайного суда оно было сохранено"
+  },
+  {
+   "start": 19.87,
+   "end": 23.45,
+   "speaker": "me",
+   "channel": "mic",
+   "text": "площадь парка — 19 500 км²;"
+  },
+  {
+   "start": 23.22,
+   "end": 26.68,
+   "speaker": "spk2",
+   "channel": "system",
+   "text": "тимбукту стал метафорой экзотической дальней земли"
+  },
+  {
+   "start": 27.42,
+   "end": 29.82,
+   "speaker": "me",
+   "channel": "mic",
+   "text": "в ней выделено 14 разных экозон"
+  },
+  {
+   "start": 30.48,
+   "end": 33.46,
+   "speaker": "spk3",
+   "channel": "system",
+   "text": "which means that the sun doesn't rise above the horizon"
+  },
+  {
+   "start": 33.72,
+   "end": 37.98,
+   "speaker": "spk1",
+   "channel": "system",
+   "text": "which focus on providing solutions to real life problems"
+  },
+  {
+   "start": 38.3,
+   "end": 41.96,
+   "speaker": "me",
+   "channel": "mic",
+   "text": "каждая из которых является зоной обитания разных диких животных"
+  }
+ ],
+ "processing_seconds": null
+}

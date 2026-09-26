@@ -1,0 +1,205 @@
+{
+ "duration": 194,
+ "sources": [
+  "https://raw.githubusercontent.com/joonson/voxconverse/24bf60be297701cd7e4ef18550c6d390c1b87365/dev/azisu.rttm"
+ ],
+ "segments": [
+  {
+   "start": 0.52,
+   "end": 8.64,
+   "speaker": "spk03",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 7.96,
+   "end": 13.68,
+   "speaker": "spk00",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 9.44,
+   "end": 10.76,
+   "speaker": "spk03",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 12.8,
+   "end": 37.0,
+   "speaker": "spk03",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 36.96,
+   "end": 44.32,
+   "speaker": "spk00",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 43.56,
+   "end": 57.28,
+   "speaker": "spk03",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 45.56,
+   "end": 47.16,
+   "speaker": "spk00",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 51.2,
+   "end": 53.44,
+   "speaker": "spk02",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 53.88,
+   "end": 54.96,
+   "speaker": "spk00",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 57.48,
+   "end": 87.84,
+   "speaker": "spk00",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 74.16,
+   "end": 74.68,
+   "speaker": "spk03",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 88.0,
+   "end": 102.28,
+   "speaker": "spk00",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 95.44,
+   "end": 96.44,
+   "speaker": "spk01",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 101.76,
+   "end": 102.96,
+   "speaker": "spk02",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 102.0,
+   "end": 138.6,
+   "speaker": "spk01",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 109.88,
+   "end": 112.0,
+   "speaker": "spk00",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 123.96,
+   "end": 124.84,
+   "speaker": "spk00",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 125.2,
+   "end": 125.64,
+   "speaker": "spk00",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 138.6,
+   "end": 152.44,
+   "speaker": "spk00",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 150.76,
+   "end": 158.12,
+   "speaker": "spk01",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 156.88,
+   "end": 163.36,
+   "speaker": "spk00",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 159.16,
+   "end": 171.72,
+   "speaker": "spk01",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 169.84,
+   "end": 174.76,
+   "speaker": "spk00",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 172.48,
+   "end": 175.28,
+   "speaker": "spk01",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 174.48,
+   "end": 177.72,
+   "speaker": "spk03",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 177.88,
+   "end": 194,
+   "speaker": "spk03",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 180.16,
+   "end": 182.12,
+   "speaker": "spk00",
+   "channel": "system",
+   "text": ""
+  },
+  {
+   "start": 190.84,
+   "end": 192.48,
+   "speaker": "spk02",
+   "channel": "system",
+   "text": ""
+  }
+ ],
+ "processing_seconds": null
+}
