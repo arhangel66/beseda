@@ -203,6 +203,9 @@ struct MenuBarPopover: View {
                 Text(live.keyPoints)
                     .font(.caption)
                     .textSelection(.enabled)
+                    // the window sizes to its content, and without this the bullets collapse into one truncated line
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.bottom, 4)
             }
             if live.lines.isEmpty {
                 Text("Черновик появится примерно через 20 секунд")
@@ -222,6 +225,10 @@ struct MenuBarPopover: View {
                         }
                     }
                     .frame(height: 140)
+                    // the popover reopens with lines already there, and onChange does not fire for them
+                    .onAppear {
+                        proxy.scrollTo(live.lines.last?.id, anchor: .bottom)
+                    }
                     .onChange(of: live.lines.last?.id) { _, id in
                         proxy.scrollTo(id, anchor: .bottom)
                     }
