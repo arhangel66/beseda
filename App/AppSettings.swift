@@ -62,6 +62,7 @@ final class AppSettings {
     /// only read, to carry an edited summary prompt into the first call type
     private let legacySummaryPromptKey = "beseda.summaryPrompt"
     private let callTypesKey = "beseda.callTypes"
+    private let classifyLocallyKey = "beseda.classifyLocally"
     private let autoProcessCallsKey = "beseda.autoProcessCalls"
     private let exportFolderKey = "beseda.exportFolder"
     private let webhookEnabledKey = "beseda.webhookEnabled"
@@ -163,11 +164,30 @@ final class AppSettings {
         }
     }
 
-    /// never empty: the classifier runs only when there are two or more
+    /// never empty, `[0]` is «Другое»: the classifier runs only when there are two or more
     var callTypes: [CallType] {
         didSet {
             defaults.set(try? JSONEncoder().encode(callTypes), forKey: callTypesKey)
         }
+    }
+
+    /// off: Jev classifies whenever an OpenRouter key is set (Mikhail's default, 2026-09-26)
+    var classifyLocally: Bool {
+        didSet {
+            defaults.set(classifyLocally, forKey: classifyLocallyKey)
+        }
+    }
+
+    /// «Другое» stays whatever is asked
+    func deleteCallType(id: CallType.ID) {
+        guard id != callTypes[0].id else {
+            return
+        }
+        callTypes.removeAll { $0.id == id }
+    }
+
+    var classifiesWithJev: Bool {
+        !classifyLocally && !openRouterAPIKey.isEmpty
     }
 
     /// off: a call is processed only from «Итоги»
@@ -242,7 +262,9 @@ final class AppSettings {
         self.summaryModel = defaults.string(forKey: summaryModelKey) ?? ""
         self.callTypes = defaults.data(forKey: callTypesKey)
             .flatMap { try? JSONDecoder().decode([CallType].self, from: $0) }
-            .flatMap { $0.isEmpty ? nil : $0 } ?? [AppSettings.defaultCallType(legacyPrompt: defaults.string(forKey: legacySummaryPromptKey))]
+            .flatMap { $0.isEmpty ? nil : AppSettings.renamingDefaultToOther($0) }
+            ?? [AppSettings.defaultCallType(legacyPrompt: defaults.string(forKey: legacySummaryPromptKey))]
+        self.classifyLocally = defaults.bool(forKey: classifyLocallyKey)
         self.autoProcessCalls = defaults.bool(forKey: autoProcessCallsKey)
         self.webhookEnabled = defaults.bool(forKey: webhookEnabledKey)
         self.exportFolder = defaults.string(forKey: exportFolderKey) ?? ""
@@ -264,7 +286,20 @@ final class AppSettings {
 
     static func defaultCallType(legacyPrompt: String?) -> CallType {
         let prompt = legacyPrompt.flatMap { $0.isEmpty ? nil : $0 } ?? ChatCompletionsProvider.defaultPrompt
-        return CallType(name: "Созвон", description: "любой разговор", prompt: prompt)
+        return CallType(name: CallType.otherName, description: "ни один другой тип не подходит", prompt: prompt)
+    }
+
+    /// BESEDA-46 seeded one type named «Созвон»; unrenamed, it becomes «Другое» with its prompt kept
+    static func renamingDefaultToOther(_ types: [CallType]) -> [CallType] {
+        guard types[0].name == "Созвон" else {
+            return types
+        }
+        var types = types
+        types[0].name = CallType.otherName
+        if types[0].description == "любой разговор" {
+            types[0].description = "ни один другой тип не подходит"
+        }
+        return types
     }
 
     private static func bool(_ defaults: UserDefaults, _ key: String, otherwise fallback: Bool) -> Bool {

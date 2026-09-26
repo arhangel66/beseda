@@ -73,20 +73,30 @@ struct CallType: Codable, Hashable, Identifiable, Sendable {
     var name: String
     var description: String
     var prompt: String
+
+    /// the built-in type, always `callTypes[0]`: undeletable, holds the general prompt
+    static let otherName = "Другое"
 }
 
 extension SummarizationService {
     /// ≈2k tokens: enough of the opening to tell a daily from a therapy session
     static let classifierCharacterLimit = 8000
 
-    /// Picks the call's type (skipped when `chosen` is given or only one type exists), then runs
-    /// that type's prompt. `provider` builds the model client for a given system prompt.
+    /// below this Jev's pick is not trusted and the call goes to «Другое»
+    // ponytail: a round guess, not tuned on labeled calls; tune it once real calls are classified
+    static let jevMinimumProbability = 0.5
+
+    /// Picks the call's type (skipped when `chosen` is given or only «Другое» exists), then runs
+    /// that type's prompt. `types[0]` is «Другое», the fallback for an unknown or unsure answer.
+    /// `provider` builds the model client for a given system prompt; `jev`, when given, classifies
+    /// first and falls back to `provider` on failure.
     static func process(
         _ detail: StoredCallDetail,
         types: [CallType],
         chosen: CallType? = nil,
         characterBudget: Int,
         provider: (String) -> SummarizationProvider,
+        jev: JevClassifier? = nil,
         log: (String) -> Void = { _ in },
         // runs on the caller's actor, so the closures need not be Sendable
         isolation: isolated (any Actor)? = #isolation
@@ -97,24 +107,49 @@ extension SummarizationService {
         } else if types.count == 1 {
             type = types[0]
         } else {
-            let opening = String(TranscriptCopy.render(detail, format: .clean).prefix(classifierCharacterLimit))
-            let answer = try await provider(classifierPrompt(types)).summarize(text: opening)
-            if let named = pickType(answer, from: types) {
-                type = named
-            } else {
-                log("Classifier answered «\(answer)», not a known type; using «\(types[0].name)»")
-                type = types[0]
-            }
+            type = try await classify(detail, types: types, provider: provider, jev: jev, log: log)
         }
         let text = try await SummarizationService(provider: provider(type.prompt), characterBudget: characterBudget)
             .summarize(detail)
         return (type, text)
     }
 
+    private static func classify(
+        _ detail: StoredCallDetail,
+        types: [CallType],
+        provider: (String) -> SummarizationProvider,
+        jev: JevClassifier?,
+        log: (String) -> Void,
+        isolation: isolated (any Actor)? = #isolation
+    ) async throws -> CallType {
+        let context = ClassifierContext(detail)
+        if let jev {
+            do {
+                let answer = try await jev.classify(context, types: types)
+                log("Jev picked «\(answer.choice)» at \(answer.probability), cost $\(answer.cost ?? 0)")
+                guard answer.probability >= jevMinimumProbability,
+                      let named = types.first(where: { $0.name == answer.choice }) ?? pickType(answer.choice, from: types)
+                else {
+                    return types[0]
+                }
+                return named
+            } catch {
+                log("Jev failed (\(error.localizedDescription)); classifying with the summary model")
+            }
+        }
+        let answer = try await provider(classifierPrompt(types)).summarize(text: context.asText)
+        if let named = pickType(answer, from: types) {
+            return named
+        }
+        log("Classifier answered «\(answer)», not a known type; using «\(types[0].name)»")
+        return types[0]
+    }
+
     static func classifierPrompt(_ types: [CallType]) -> String {
         let list = types.map { "- \($0.name): \($0.description)" }.joined(separator: "\n")
         return """
-            Определи тип созвона по началу расшифровки. Ответь только названием одного типа из списка, \
+            Определи тип созвона по времени, длительности и началу расшифровки. Если ни один тип \
+            явно не подходит, выбери «\(types[0].name)». Ответь только названием одного типа из списка, \
             без пояснений.
 
             \(list)

@@ -1227,6 +1227,7 @@ final class AppController {
                     typed.prompt = prompt
                     return typed
                 },
+                jev: settings.classifiesWithJev ? JevClassifier(apiKey: settings.openRouterAPIKey) : nil,
                 log: { [weak self] in self?.appendLog($0) }
             )
             appendLog("Processed \(detail.id) as «\(type.name)»")

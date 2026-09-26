@@ -25,9 +25,11 @@ What the code does today. Settings tabs are named as in the app: Основны�
   keep the text (`Storage/StorageJanitor.swift`).
 - **Summaries.** A summary of a call is written by one of three providers picked under Обработка: the
   built-in Gemma 4 E4B run by a downloaded llama.cpp server, OpenRouter with the user's key, or LM Studio
-  (`Summarization/`). The user defines call types (name, description, prompt) under Обработка; with two
-  or more, the same model first picks the type from the start of the transcript and that type's prompt
-  runs. Processing starts from «Итоги», or by itself after every call when «Обрабатывать созвоны
+  (`Summarization/`). The user defines call types (name, description, prompt) under Обработка; the
+  built-in «Другое» always exists, cannot be deleted and holds the general prompt. With another type
+  besides it, a classifier first picks the type from the call's weekday and time, duration and the start
+  of the transcript — Jev via OpenRouter when a key is set (the time, duration and excerpt leave the
+  Mac), else the summary model — and that type's prompt runs; an unsure or unknown pick is «Другое». Processing starts from «Итоги», or by itself after every call when «Обрабатывать созвоны
   автоматически» is on (off by default).
 - **Call screen result.** A processed call opens on «Итоги» with its type in the header; a call that was
   only transcribed opens on the transcript. «Тип: …» reruns the call as another configured type (no
