@@ -197,7 +197,7 @@ final class AppController {
         paths.callsDirectory
     }
 
-    typealias Summarize = (StoredCallDetail, CallType?) async throws -> (type: CallType, text: String)
+    typealias Summarize = (StoredCallDetail, CallType?) async throws -> (type: CallType, text: String, oneOtherPerson: Bool?)
 
     init(paths: AppPaths = .current, settings: AppSettings = AppSettings(), summarize: Summarize? = nil) {
         self.paths = paths
@@ -1426,7 +1426,7 @@ final class AppController {
         }
         defer { llamaServer.noteIdle() }
         do {
-            let (type, text) = if let summarize {
+            let (type, text, oneOtherPerson) = if let summarize {
                 try await summarize(detail, chosenType)
             } else {
                 try await summarizeWithSettings(detail, as: chosenType)
@@ -1434,6 +1434,9 @@ final class AppController {
             appendLog("Processed \(detail.id) as «\(type.name)»")
             try callStore.setSummary(callID: detail.id, text: text)
             try callStore.setCallType(callID: detail.id, name: type.name)
+            if let oneOtherPerson {
+                try callStore.setOneOtherPerson(callID: detail.id, oneOtherPerson)
+            }
             exportResult(detail, result: text, type: type.name)
             // the summary lives on the call row, which loadCallDetail takes as given: re-read it
             // or the text is stored and never shown. The guard keeps a slow summary from
@@ -1459,7 +1462,9 @@ final class AppController {
     }
 
     /// the call through the provider the settings point at, classifier first unless a type is given
-    private func summarizeWithSettings(_ detail: StoredCallDetail, as chosenType: CallType?) async throws -> (type: CallType, text: String) {
+    private func summarizeWithSettings(
+        _ detail: StoredCallDetail, as chosenType: CallType?
+    ) async throws -> (type: CallType, text: String, oneOtherPerson: Bool?) {
         let (provider, characterBudget) = try await makeSummaryProvider()
         return try await SummarizationService.process(
             detail,

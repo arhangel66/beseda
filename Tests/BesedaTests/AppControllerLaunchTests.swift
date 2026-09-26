@@ -62,13 +62,19 @@ private final class Harness {
 private final class StubSummarizer {
     var calls: [String] = []
     var heldCallID: String?
+    /// the classifier's «exactly one other person» answer the stub hands back
+    var oneOtherPerson: Bool?
+    var failure: Error?
 
-    func summarize(_ detail: StoredCallDetail, _ type: CallType?) async throws -> (type: CallType, text: String) {
+    func summarize(_ detail: StoredCallDetail, _ type: CallType?) async throws -> (type: CallType, text: String, oneOtherPerson: Bool?) {
         calls.append(detail.id)
         while heldCallID == detail.id {
             try await Task.sleep(for: .milliseconds(10))
         }
-        return (CallType(name: CallType.otherName, description: "", prompt: ""), "summary of \(detail.id)")
+        if let failure {
+            throw failure
+        }
+        return (CallType(name: CallType.otherName, description: "", prompt: ""), "summary of \(detail.id)", oneOtherPerson)
     }
 }
 
@@ -240,4 +246,72 @@ private func line(_ speaker: String) -> SpeakerTranscriptSegment {
 
     #expect(stub.calls == ["first", "second"])
     #expect(try harness.store.fetchCall(id: "second")?.summaryText == "summary of second")
+}
+
+// MARK: - BESEDA-104: the classifier's «one other person» folds the remote speakers
+
+/// a finished call with three remote speakers auto-processed through a stub answering `oneOtherPerson`;
+/// returns the speakers in the index and the transcript file afterwards
+@MainActor
+private func remoteSpeakersAfterProcessing(
+    oneOtherPerson: Bool?, failure: Error? = nil
+) async throws -> (indexed: [String], transcript: String) {
+    let harness = try Harness()
+    defer { harness.cleanUp() }
+    harness.settings.autoProcessCalls = true
+    let stub = StubSummarizer()
+    stub.oneOtherPerson = oneOtherPerson
+    stub.failure = failure
+    let controller = harness.controller(summarize: stub.summarize)
+    try harness.addCall("call", status: "transcribing")
+    let folder = try harness.folder("call")
+    let speakers = ["me", "them-1", "them-2", "them-3"]
+    let lines = speakers.map(line)
+    let dialogue = speakers.map { "**\(SpeakerNaming.defaultName(for: $0))** [00:00] Долгий разговор\n\n" }.joined()
+    try "# Beseda Dual Transcript\n\n## Dialogue\n\n\(dialogue)## Channels\n"
+        .write(to: folder.appendingPathComponent("transcript.md"), atomically: true, encoding: .utf8)
+
+    try controller.finishCall("call", in: folder, segments: lines, audio: [])
+    try await waitUntil { try harness.store.fetchProcessingPendingCallIDs().isEmpty && controller.summarizingCallID == nil }
+
+    return (
+        try harness.store.fetchSegments(callID: "call").map(\.speaker),
+        try String(contentsOf: folder.appendingPathComponent("transcript.md"), encoding: .utf8)
+    )
+}
+
+@MainActor
+@Test func theClassifierSayingOneOtherPersonLeavesOneRemoteSpeakerInTheIndexAndTheTranscriptFile() async throws {
+    let (indexed, transcript) = try await remoteSpeakersAfterProcessing(oneOtherPerson: true)
+
+    #expect(indexed == ["me", "them-1", "them-1", "them-1"])
+    #expect(transcript.contains("**Собеседник 1**"))
+    #expect(!transcript.contains("Собеседник 2"))
+    #expect(!transcript.contains("Собеседник 3"))
+}
+
+@MainActor
+@Test func theClassifierSayingSeveralPeopleKeepsTheDiarizerSpeakers() async throws {
+    let (indexed, transcript) = try await remoteSpeakersAfterProcessing(oneOtherPerson: false)
+
+    #expect(indexed == ["me", "them-1", "them-2", "them-3"])
+    #expect(transcript.contains("Собеседник 3"))
+}
+
+@MainActor
+@Test func noClassifierAnswerKeepsTheDiarizerSpeakers() async throws {
+    let (indexed, transcript) = try await remoteSpeakersAfterProcessing(oneOtherPerson: nil)
+
+    #expect(indexed == ["me", "them-1", "them-2", "them-3"])
+    #expect(transcript.contains("Собеседник 3"))
+}
+
+@MainActor
+@Test func aFailedClassificationKeepsTheDiarizerSpeakers() async throws {
+    let (indexed, transcript) = try await remoteSpeakersAfterProcessing(
+        oneOtherPerson: true, failure: SummarizationError.unavailable("down")
+    )
+
+    #expect(indexed == ["me", "them-1", "them-2", "them-3"])
+    #expect(transcript.contains("Собеседник 3"))
 }

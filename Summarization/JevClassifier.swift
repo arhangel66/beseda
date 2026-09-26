@@ -17,6 +17,8 @@ struct JevClassifier: Sendable {
         let probability: Double
         /// USD, as OpenRouter bills it
         let cost: Double?
+        /// «one other person besides Mikhail» at or above `jevMinimumProbability`; nil when Jev did not answer it
+        var oneOtherPerson: Bool? = nil
     }
 
     func classify(_ context: ClassifierContext, types: [CallType]) async throws -> Answer {
@@ -43,6 +45,14 @@ struct JevClassifier: Sendable {
                     instructions: "Which type is this call? Judge by when it happened, how long it lasted and how the transcript opens.",
                     // duplicate names collapse into one option; the first description wins
                     criteria: Dictionary(types.map { ($0.name, $0.description) }, uniquingKeysWith: { first, _ in first })
+                ),
+                "other_people": .init(
+                    type: "choice",
+                    instructions: "How many people besides Mikhail («Вы») speak on the call? Every remote line is labelled «Удалённо» whoever says it, so judge by what is said: names, greetings, who answers whom.",
+                    criteria: [
+                        "one": "exactly one other person talks with Mikhail",
+                        "several": "two or more other people talk"
+                    ]
                 )
             ]
         )
@@ -56,7 +66,13 @@ struct JevClassifier: Sendable {
         else {
             throw SummarizationError.unavailable("Jev вернул ответ без выбора типа")
         }
-        return Answer(choice: choice, probability: answer.probabilities?[choice] ?? 0, cost: response.usage?.cost)
+        let oneOtherPerson = response.answers["other_people"].map {
+            ($0.probabilities?["one"] ?? 0) >= SummarizationService.jevMinimumProbability
+        }
+        return Answer(
+            choice: choice, probability: answer.probabilities?[choice] ?? 0, cost: response.usage?.cost,
+            oneOtherPerson: oneOtherPerson
+        )
     }
 
     private struct RequestBody: Encodable {
@@ -101,6 +117,8 @@ struct ClassifierContext: Equatable, Sendable {
     let duration: String
     let opening: String
 
+    static let remoteLabel = "Удалённо"
+
     init(_ detail: StoredCallDetail, timeZone: TimeZone = .current) {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "ru_RU")
@@ -108,7 +126,16 @@ struct ClassifierContext: Equatable, Sendable {
         formatter.dateFormat = "EEEE, HH:mm"
         started = detail.summary.startedDate.map(formatter.string(from:)) ?? "неизвестно"
         duration = "\(max(1, Int((detail.summary.duration / 60).rounded()))) мин"
-        opening = String(TranscriptCopy.render(detail, format: .clean).prefix(SummarizationService.classifierCharacterLimit))
+        // every remote speaker under one label: the diarizer's extra `them-N` must not answer «how many people»
+        let transcript = detail.segments.isEmpty ? detail.markdownText ?? "" : detail.segments
+                .map { segment in
+                    let speaker = SpeakerNaming.remoteIndex(of: segment.speaker) == nil
+                        ? SpeakerNaming.name(for: segment.speaker, overrides: detail.speakerNames)
+                        : Self.remoteLabel
+                    return "\(speaker): \(segment.text)"
+                }
+                .joined(separator: "\n")
+        opening = String(transcript.prefix(SummarizationService.classifierCharacterLimit))
     }
 
     /// the same facts as a text block for the chat-model classifier

@@ -114,7 +114,8 @@ extension SummarizationService {
     /// Picks the call's type (skipped when `chosen` is given or only «Другое» exists), then runs
     /// that type's prompt. `types.other` is the fallback for an unknown or unsure answer.
     /// `provider` builds the model client for a given system prompt; `jev`, when given, classifies
-    /// first and falls back to `provider` on failure.
+    /// first and falls back to `provider` on failure. The classifier also answers whether exactly one
+    /// person besides Mikhail spoke: `oneOtherPerson`, nil when it did not run or could not tell.
     static func process(
         _ detail: StoredCallDetail,
         types: [CallType],
@@ -125,57 +126,73 @@ extension SummarizationService {
         log: (String) -> Void = { _ in },
         // runs on the caller's actor, so the closures need not be Sendable
         isolation: isolated (any Actor)? = #isolation
-    ) async throws -> (type: CallType, text: String) {
+    ) async throws -> (type: CallType, text: String, oneOtherPerson: Bool?) {
         let type: CallType
+        var oneOtherPerson: Bool?
         if let chosen {
             type = chosen
         } else if types.count == 1 {
             type = types[0]
         } else {
-            type = try await classify(detail, types: types, provider: provider, jev: jev, log: log)
+            (type, oneOtherPerson) = try await classify(detail, types: types, provider: provider, jev: jev, log: log)
         }
         let text = try await SummarizationService(provider: provider(type.prompt), characterBudget: characterBudget)
             .summarize(detail)
-        return (type, text)
+        return (type, text, oneOtherPerson)
     }
 
-    private static func classify(
+    static func classify(
         _ detail: StoredCallDetail,
         types: [CallType],
         provider: (String) -> SummarizationProvider,
         jev: JevClassifier?,
         log: (String) -> Void,
         isolation: isolated (any Actor)? = #isolation
-    ) async throws -> CallType {
+    ) async throws -> (CallType, oneOtherPerson: Bool?) {
         let context = ClassifierContext(detail)
         if let jev {
             do {
                 let answer = try await jev.classify(context, types: types)
-                log("Jev picked «\(answer.choice)» at \(answer.probability), cost $\(answer.cost ?? 0)")
+                log("Jev picked «\(answer.choice)» at \(answer.probability), one other person: \(answer.oneOtherPerson.map(String.init) ?? "no answer"), cost $\(answer.cost ?? 0)")
                 guard answer.probability >= jevMinimumProbability,
                       let named = types.first(where: { $0.name == answer.choice }) ?? pickType(answer.choice, from: types)
                 else {
-                    return types.other
+                    return (types.other, answer.oneOtherPerson)
                 }
-                return named
+                return (named, answer.oneOtherPerson)
             } catch {
                 log("Jev failed (\(error.localizedDescription)); classifying with the summary model")
             }
         }
         let answer = try await provider(classifierPrompt(types)).summarize(text: context.asText)
-        if let named = pickType(answer, from: types) {
-            return named
+        let lines = answer.split(separator: "\n").map(String.init).filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
+        let oneOtherPerson = lines.dropFirst().last.flatMap(parseOneOtherPerson)
+        if let named = lines.first.flatMap({ pickType($0, from: types) }) {
+            return (named, oneOtherPerson)
         }
         log("Classifier answered «\(answer)», not a known type; using «\(types.other.name)»")
-        return types.other
+        return (types.other, oneOtherPerson)
+    }
+
+    /// the local classifier's second line: «один» or «несколько», anything else is no answer
+    static func parseOneOtherPerson(_ line: String) -> Bool? {
+        let line = line.lowercased()
+        if line.contains("несколько") {
+            return false
+        }
+        return line.contains("один") ? true : nil
     }
 
     static func classifierPrompt(_ types: [CallType]) -> String {
         let list = types.map { "- \($0.name): \($0.description)" }.joined(separator: "\n")
         return """
             Определи тип созвона по времени, длительности и началу расшифровки. Если ни один тип \
-            явно не подходит, выбери «\(types.other.name)». Ответь только названием одного типа из списка, \
-            без пояснений.
+            явно не подходит, выбери «\(types.other.name)». Первой строкой ответь только названием одного \
+            типа из списка, без пояснений.
+
+            Второй строкой ответь одним словом, сколько людей кроме Михаила («Вы») говорит на созвоне: \
+            «один» или «несколько». Все чужие реплики помечены одинаково «\(ClassifierContext.remoteLabel)», \
+            поэтому суди по содержанию: имена, обращения, кто кому отвечает.
 
             \(list)
             """

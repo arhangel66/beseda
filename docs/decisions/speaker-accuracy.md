@@ -188,7 +188,9 @@ linked, so an event matched after diarization relabels too. Signals the app has:
 - calendar event with exactly one attendee besides Mikhail (`calls.participants`) — **used**;
 - a 1:1 call type — **not there**: the defaults hold only «Другое», Mikhail's own list only adds «Дейли»;
   types are user-defined names with no "1:1" meaning, so a later type change relabels nothing;
-- inferred participant count (BESEDA-70) — **not in the app**: it lives only in the research truth file.
+- inferred participant count — **used since BESEDA-104**: the call-type classification also answers «exactly
+  one other person?» on a transcript with every remote speaker labelled «Удалённо» (`calls.one_other_person`);
+  «yes» (Jev: `one` at ≥ 0.5) relabels like the calendar signal, and transcript.md's dialogue is rewritten.
 
 Unlinking the event or switching to a group event does not split the speakers back (re-transcribe to undo).
 
@@ -205,6 +207,12 @@ they are. The benchmark has no call metadata, so it equals t0.70 by construction
 
 **Caveat (critic finding 15).** The real counts are inferred from transcript text by an LLM, not hand-labelled,
 and counts cannot show a merge and a split that cancel out.
+
+**Inferred count measured (BESEDA-104), bundled model only.** 10 of 10 one-to-one calls answered «один» → one
+remote speaker, but 3 of 5 dailies also answered «один» and collapse to one remote speaker; a count-asking
+prompt was worse (9/10, 3 dailies) and was reverted. So with the bundled model the rule erases real people on
+dailies; the Jev path is unmeasured (no cloud in the harness). Open decision: relabel on the local answer at
+all, or only on Jev once it is measured.[^oneToOne]
 
 [^cause]: [results/extra-speaker-cause.md](../../untracked/epics/speaker-accuracy/results/extra-speaker-cause.md)
 [^merge]: [results/short-reply-merge.md](../../untracked/epics/speaker-accuracy/results/short-reply-merge.md), [results/app-merge.md](../../untracked/epics/speaker-accuracy/results/app-merge.md)

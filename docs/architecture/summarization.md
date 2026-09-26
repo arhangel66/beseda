@@ -29,16 +29,23 @@ to their first type, which was «Другое» by position then.
 - a type given by the caller (`generateSummary(as:)`, for a picker on the call screen) is used as is;
 - with only «Другое», it is used without asking any model;
 - otherwise the classifier gets a `ClassifierContext`: the call's weekday and local time, its duration in
-  minutes and the first 8000 chars (~2k tokens) of the clean transcript, plus type names and descriptions.
+  minutes and the first 8000 chars (~2k tokens) of the clean transcript with every remote speaker under one
+  label «Удалённо» (the diarizer's `them-N` must not answer the people question), plus type names and descriptions.
   - **Jev** (`JevClassifier`, when `AppSettings.classifiesWithJev`: an OpenRouter key is set and
     «Определение типа» is not «Локально»): `POST https://openrouter.ai/api/alpha/decisions`, model
     `typesafe/jev-1.13`, `state` = started / duration / transcript_opening, one `choice` question
     `call_type` whose criteria map name → description. The answer's `choice` and its entry in
     `probabilities` are read; below `jevMinimumProbability` (0.5, untuned) or an unknown name → «Другое».
+    A second `choice` question `other_people` (`one` / `several`): `one` at ≥ 0.5 means one other person.
     Any Jev error is logged and the summary model classifies instead.
   - **Summary model**: the same provider gets `classifierPrompt` (names + descriptions, «Другое» when
     nothing fits) and the context as text; `pickType` matches the answer case-insensitively by
-    containment, longest name first. An unknown answer falls back to «Другое» and is logged.
+    containment, longest name first, on the answer's first line. An unknown answer falls back to «Другое»
+    and is logged. The prompt's second line asks «один» or «несколько» people besides Mikhail
+    (`parseOneOtherPerson`; anything else is no answer).
+  - **One other person** (BESEDA-104): the answer is stored as `calls.one_other_person`; true folds the
+    remote speakers into one exactly as a one-attendee calendar event does ([ASR](asr.md)). No answer
+    (a given type, only «Другое», an unreadable line, a failed summary) leaves the call as it was.
   - Privacy is per app, not per type: the type is unknown before classification, so a private type
     cannot keep its call away from Jev. Settings say what leaves the Mac next to the picker.
   - «Только локально» (`AppSettings.localOnly`, off by default) turns Jev off, replaces OpenRouter or a
