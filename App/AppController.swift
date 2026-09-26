@@ -679,7 +679,7 @@ final class AppController {
 
     func refreshRecentCalls() {
         do {
-            recentCalls = try callStore.fetchRecentCalls(limit: 10)
+            recentCalls = try callStore.fetchCalls(limit: 10)
             if !callBrowserCalls.isEmpty {
                 callBrowserCalls = try callStore.fetchCalls(limit: 200)
             }
