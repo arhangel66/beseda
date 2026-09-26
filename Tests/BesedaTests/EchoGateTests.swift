@@ -41,13 +41,20 @@ private func makeCall() -> (mic: [Float], system: [Float]) {
     #expect(abs(kept[0].end - 3.6) < 0.15)
 }
 
-@Test func aSentenceGluingEchoAndOwnSpeechIsCutToTheOwnSpeech() {
+@Test func aSentenceGluingEchoAndOwnSpeechKeepsOnlyTheOwnWordsWithTheirBounds() {
     let call = makeCall()
-    let segments = [TranscriptSegment(start: 1.0, end: 3.8, text: "them and me", confidence: 1, words: nil)]
+    let words = [
+        TranscriptWord(start: 0.5, end: 1.0, text: "them"),
+        TranscriptWord(start: 1.2, end: 1.8, text: "echo"),
+        TranscriptWord(start: 2.6, end: 3.0, text: "me"),
+        TranscriptWord(start: 3.0, end: 3.4, text: "too")
+    ]
+    let segments = [TranscriptSegment(start: 0.5, end: 3.4, text: "them echo me too", confidence: 1, words: words)]
 
     let kept = EchoGate.ownSpeechSegments(segments, mic: call.mic, system: call.system)
 
-    #expect(kept.count == 1)
-    #expect(kept[0].start > 2.2 && kept[0].start < 2.6)
-    #expect(kept[0].end > 3.4 && kept[0].end < 3.8)
+    #expect(kept.map(\.text) == ["me too"])
+    #expect(kept[0].start == 2.6)
+    #expect(kept[0].end == 3.4)
+    #expect(kept[0].words == Array(words.suffix(2)))
 }

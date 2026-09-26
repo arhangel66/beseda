@@ -46,6 +46,8 @@ let package = Package(
         .executableTarget(
             name: "AppMerge",
             dependencies: [.product(name: "FluidAudio", package: "FluidAudio")]
-        )
+        ),
+        // BESEDA-95: echo gate before/after on the truth calls (app EchoGate.swift symlinked), ../echo_gate_real.sh
+        .executableTarget(name: "EchoGateReal")
     ]
 )
