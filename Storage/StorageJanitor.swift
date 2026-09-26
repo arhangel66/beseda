@@ -78,47 +78,26 @@ struct StorageJanitor: Sendable {
 
     /// how much the current rules would free if the sweep ran right now
     func expiredBytes(rules: RetentionRules, protecting protectedDirectories: Set<String> = [], now: Date = Date()) -> Int64 {
-        let protected = Self.standardized(protectedDirectories)
-        return files().reduce(into: Int64(0)) { total, file in
-            guard let kind = Self.kind(ofFileNamed: file.url.lastPathComponent),
-                  Self.isExpired(kind: kind, age: now.timeIntervalSince(file.modifiedAt), rules: rules),
-                  !Self.isProtected(file.url, by: protected) else {
-                return
-            }
-            total += file.size
-        }
+        expiredFiles(rules: rules, protecting: protectedDirectories, now: now).reduce(0) { $0 + $1.size }
     }
 
     @discardableResult
     func sweep(rules: RetentionRules, protecting protectedDirectories: Set<String> = [], now: Date = Date()) -> Int64 {
-        let protected = Self.standardized(protectedDirectories)
-        var freed: Int64 = 0
-        for file in files() {
-            guard let kind = Self.kind(ofFileNamed: file.url.lastPathComponent),
-                  Self.isExpired(kind: kind, age: now.timeIntervalSince(file.modifiedAt), rules: rules),
-                  !Self.isProtected(file.url, by: protected) else {
-                continue
-            }
-            do {
-                try FileManager.default.removeItem(at: file.url)
-                freed += file.size
-            } catch {
-                continue
-            }
+        expiredFiles(rules: rules, protecting: protectedDirectories, now: now).reduce(0) { freed, file in
+            (try? FileManager.default.removeItem(at: file.url)) == nil ? freed : freed + file.size
         }
-        return freed
-    }
-
-    private static func standardized(_ directories: Set<String>) -> Set<String> {
-        Set(directories.map { URL(fileURLWithPath: $0, isDirectory: true).standardizedFileURL.path })
     }
 
     /// a call keeps every file of its own folder; nothing else lives one level under the calls directory
-    private static func isProtected(_ url: URL, by protectedDirectories: Set<String>) -> Bool {
-        guard !protectedDirectories.isEmpty else {
-            return false
+    private func expiredFiles(rules: RetentionRules, protecting protectedDirectories: Set<String>, now: Date) -> [Entry] {
+        let protected = Set(protectedDirectories.map { URL(fileURLWithPath: $0, isDirectory: true).standardizedFileURL.path })
+        return files().filter { file in
+            guard let kind = Self.kind(ofFileNamed: file.url.lastPathComponent) else {
+                return false
+            }
+            return Self.isExpired(kind: kind, age: now.timeIntervalSince(file.modifiedAt), rules: rules)
+                && !protected.contains(file.url.deletingLastPathComponent().standardizedFileURL.path)
         }
-        return protectedDirectories.contains(url.deletingLastPathComponent().standardizedFileURL.path)
     }
 
     private struct Entry {
