@@ -34,7 +34,7 @@ struct PreviousCallBlock: View {
                     .buttonStyle(.link)
                     .font(.caption)
             }
-            Text(content.digest)
+            Text(CallSummaryView.rendered(content.digest))
                 .font(.callout)
                 .lineLimit(digestLineLimit)
                 .textSelection(.enabled)
