@@ -34,6 +34,8 @@ produces the transcript.
 - **Lifecycle** — `AppController.runDualRecording` starts `LiveTranscription` before the capture and
   stops and awaits it (a chunk in flight finishes) before normalization, so `transcribeDualCall` never
   shares the transcriber with it. Pause drops buffers, so the files stop growing and the loop idles.
+- **Preview** — `BESEDA_PREVIEW_POPOVER=live` opens the popover as recording with
+  `LiveTranscription.preview()`: canned lines and key points, no capture, model or LLM — for no-focus screenshots.
 
 ## Load
 

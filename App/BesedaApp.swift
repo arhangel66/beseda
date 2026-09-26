@@ -35,7 +35,11 @@ struct BesedaApp: App {
                     openWindow(id: "onboarding")
                     NSApplication.shared.activate(ignoringOtherApps: true)
                 }
-                if ProcessInfo.processInfo.environment["BESEDA_PREVIEW_POPOVER"] != nil {
+                if let preview = ProcessInfo.processInfo.environment["BESEDA_PREVIEW_POPOVER"] {
+                    if preview == "live" {
+                        controller.status = .callRecording
+                        controller.liveTranscription = .preview()
+                    }
                     openWindow(id: "popover-preview")
                 }
             }
@@ -91,7 +95,7 @@ struct BesedaApp: App {
         .windowResizability(.contentSize)
 
         // screenshots of the menu-bar window without clicking the status item;
-        // opened at launch when BESEDA_PREVIEW_POPOVER is set
+        // opened at launch when BESEDA_PREVIEW_POPOVER is set; `live` shows a recording with canned live text
         Window("Popover preview", id: "popover-preview") {
             MenuBarPopover(controller: controller, openConversations: { showConversations() })
         }

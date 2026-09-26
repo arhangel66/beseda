@@ -78,3 +78,32 @@ final class LiveTranscription {
         }
     }
 }
+
+extension LiveTranscription {
+    /// canned lines and key points for `BESEDA_PREVIEW_POPOVER=live` screenshots: no capture, model or LLM
+    static func preview() -> LiveTranscription {
+        let live = LiveTranscription(summarize: { _ in "" }, log: { _ in })
+        let said: [(TranscriptChannel, String)] = [
+            (.systemAudio, "Добрый день, слышно меня нормально?"),
+            (.microphone, "Да, всё отлично слышно. Давайте начнём с релиза."),
+            (.systemAudio, "Релиз переносим на четверг, тестировщики не успели пройти регресс."),
+            (.microphone, "Хорошо, а что с оплатой через новый шлюз?"),
+            (.systemAudio, "Шлюз подключили, но возвраты пока работают только вручную."),
+            (.microphone, "Тогда возвраты я беру на себя, сделаю к среде."),
+            (.systemAudio, "Отлично. Ещё клиент просил выгрузку отчётов в Excel."),
+            (.microphone, "Это можно, но не раньше следующего спринта."),
+            (.systemAudio, "Договорились, я ему так и передам."),
+            (.microphone, "И пришлите, пожалуйста, список багов после регресса."),
+        ]
+        live.lines = said.enumerated().map { index, line in
+            LiveLine(channel: line.0, start: Double(index) * 12, text: line.1)
+        }
+        live.keyPoints = """
+        • Релиз переносится на четверг из-за регресса
+        • Новый шлюз подключён, возвраты пока вручную
+        • Автоматические возвраты — на мне, срок среда
+        • Выгрузка в Excel — в следующем спринте
+        """
+        return live
+    }
+}
