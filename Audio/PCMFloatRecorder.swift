@@ -21,6 +21,7 @@ final class PCMFloatRecorder: @unchecked Sendable {
     private var file: AVAudioFile?
     private var frameCount = 0
     private var paused = false
+    private var failedWrites = 0
 
     /// opens `url` for writing at once: every appended buffer goes straight to disk; nil only meters levels
     init(url: URL?, sampleRate: Double, channelCount: Int, activityTracker: AudioActivityTracker?) throws {
@@ -44,6 +45,11 @@ final class PCMFloatRecorder: @unchecked Sendable {
     var isPaused: Bool {
         get { lock.withLock { paused } }
         set { lock.withLock { paused = newValue } }
+    }
+
+    /// buffers that did not reach the file: the live transcription backs off when this grows
+    var droppedBufferCount: Int {
+        lock.withLock { failedWrites }
     }
 
     func append(pcmBuffer: AVAudioPCMBuffer) throws {
@@ -165,7 +171,12 @@ final class PCMFloatRecorder: @unchecked Sendable {
             guard let file else {
                 return
             }
-            try file.write(from: buffer)
+            do {
+                try file.write(from: buffer)
+            } catch {
+                failedWrites += 1
+                throw error
+            }
             frameCount += frames
         }
     }

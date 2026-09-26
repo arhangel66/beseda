@@ -32,6 +32,10 @@ final class MicrophoneCapture: @unchecked Sendable {
         set { recorder?.isPaused = newValue }
     }
 
+    var droppedBufferCount: Int {
+        recorder?.droppedBufferCount ?? 0
+    }
+
     func start(writingTo url: URL? = nil) async throws {
         try await requestMicrophonePermission()
 

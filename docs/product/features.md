@@ -12,6 +12,10 @@ What the code does today. Settings tabs are named as in the app: Основны�
 - **Capture.** Microphone and system audio are recorded as two channels (`Audio/DualCapture.swift`,
   `Audio/SystemAudioTap.swift`); system audio needs macOS 14.2. Recording can be paused. After the call
   the audio is normalized to 16 kHz mono (`Audio/AudioNormalizer.swift`).
+- **Live transcription.** Optional, under Запись → «Расшифровывать во время звонка» (off by default):
+  while recording, the popover shows the last me/them lines, transcribed in 20 s chunks from the files on
+  disk, and 3–5 «Ключевые моменты» from the summary provider every 3 minutes. A preview only; it backs
+  off when it falls behind (`Transcription/LiveTranscriptionLoop.swift`).
 - **Automatic recording.** `Audio/CallDetector.swift` starts recording when an app from the list under
   Запись → Приложения (Zoom, Telegram, Chrome / Google Meet and others) uses the microphone, and posts a
   notification (`App/CallNotifications.swift`).
@@ -49,4 +53,4 @@ What the code does today. Settings tabs are named as in the app: Основны�
 - **Updates.** Sparkle checks hourly and installs when no call is being recorded; Основные → Обновления
   checks by hand (`Runtime/AppUpdater.swift`).
 
-Not in the code: MCP, cloud sync, real-time transcript.
+Not in the code: MCP, cloud sync.

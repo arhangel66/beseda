@@ -62,8 +62,12 @@ final class LocalTranscriber: @unchecked Sendable {
     }
 
     func transcribe(audioURL: URL) async throws -> ASRTranscription {
-        let samples = try Self.readSamples(at: audioURL)
-        return try await withCheckedThrowingContinuation { continuation in
+        try await transcribe(samples: Self.readSamples(at: audioURL))
+    }
+
+    /// 16 kHz mono already in memory: the live preview's chunks during a call
+    func transcribe(samples: [Float]) async throws -> ASRTranscription {
+        try await withCheckedThrowingContinuation { continuation in
             queue.async {
                 self.cancelIdleShutdown()
                 do {

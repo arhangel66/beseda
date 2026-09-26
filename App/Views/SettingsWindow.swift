@@ -227,6 +227,12 @@ private struct RecordingPane: View {
             }
 
             Section {
+                Toggle("Расшифровывать во время звонка", isOn: Bindable(settings).transcribesDuringCall)
+            } footer: {
+                Text("Черновик разговора и ключевые моменты в меню, пока идёт запись. Итоговая расшифровка всё равно делается после звонка.")
+            }
+
+            Section {
                 Label(processingNote, systemImage: "lock")
             }
         }

@@ -66,6 +66,8 @@ final class AppController {
     var callBrowserError: String?
     var elapsedRecordingSeconds: TimeInterval = 0
     var isPaused = false
+    /// the running recording's live preview, only while the setting is on
+    var liveTranscription: LiveTranscription?
     var microphoneLevel: Double = 0
     var systemAudioLevel: Double = 0
     var lastReadyCallID: String?
@@ -735,11 +737,22 @@ final class AppController {
                 updater.recordingDidStop()
             }
             startLiveTicker()
-            let captureOutput = try await capture.record(
-                duration: Self.maximumRecordingDuration,
-                sessionDirectory: sessionDir,
-                autoStopSilenceDuration: autoStopSilenceDuration
-            )
+            if settings.transcribesDuringCall {
+                startLiveTranscription(in: sessionDir, capture: capture)
+            }
+            let captureOutput: DualCaptureOutput
+            do {
+                captureOutput = try await capture.record(
+                    duration: Self.maximumRecordingDuration,
+                    sessionDirectory: sessionDir,
+                    autoStopSilenceDuration: autoStopSilenceDuration
+                )
+            } catch {
+                await stopLiveTranscription()
+                throw error
+            }
+            // before normalization: the post-call pipeline must never share the transcriber with it
+            await stopLiveTranscription()
             stopLiveTicker()
             callDetector.recordingEnded()
             appendLog(
@@ -786,6 +799,39 @@ final class AppController {
             )
             appendLog("Failed: \(error.localizedDescription)")
         }
+    }
+
+    private func startLiveTranscription(in sessionDir: URL, capture: DualCapture) {
+        let live = LiveTranscription(
+            summarize: { [unowned self] text in
+                defer { llamaServer.noteIdle() }
+                var (provider, characterBudget) = try await makeSummaryProvider()
+                provider.prompt = LiveTranscription.keyPointsPrompt
+                return try await provider.summarize(text: String(text.suffix(characterBudget)))
+            },
+            log: { [weak self] in self?.appendLog($0) }
+        )
+        let transcriber = transcriber
+        live.start(
+            microphoneURL: sessionDir.appendingPathComponent(DualFiles.microphoneRaw),
+            systemURL: sessionDir.appendingPathComponent(DualFiles.systemRaw),
+            transcribe: { samples in
+                try await transcriber.transcribe(samples: samples).segments.flatMap { $0.words ?? [] }
+            },
+            droppedBuffers: { capture.droppedBufferCount },
+            isPaused: { capture.isPaused }
+        )
+        liveTranscription = live
+        appendLog("Live transcription started")
+    }
+
+    private func stopLiveTranscription() async {
+        guard let live = liveTranscription else {
+            return
+        }
+        await live.stop()
+        liveTranscription = nil
+        appendLog("Live transcription stopped")
     }
 
     private func runRetry(for summary: StoredCallSummary) async {

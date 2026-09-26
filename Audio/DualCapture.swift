@@ -67,6 +67,12 @@ final class DualCapture: @unchecked Sendable {
         lock.withLock { _paused }
     }
 
+    /// buffers either channel failed to write; 0 before and after a recording
+    var droppedBufferCount: Int {
+        let (microphone, tap) = lock.withLock { (_microphone, _systemTap) }
+        return (microphone?.droppedBufferCount ?? 0) + (tap?.droppedBufferCount ?? 0)
+    }
+
     func setPaused(_ paused: Bool) {
         let (microphone, tap, trackers) = lock.withLock {
             _paused = paused
