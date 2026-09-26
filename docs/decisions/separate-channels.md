@@ -16,8 +16,10 @@ The [MVP phase plan](../archive/mvp-phase-plan.md) set the goal: record calls, "
 streams", transcribe both, write a merged transcript. The [capture spike](../archive/capture-spike.md)
 (2026-05-10) wrote `mic.raw.wav` from the microphone and `system.raw.wav` from a Core Audio process tap and chose
 native process taps over BlackHole, because the tap captured system audio without switching the default
-output device. Why separate files instead of one mixed track is not argued anywhere beyond the goal itself:
-the channel says who spoke ("me" vs "them") without diarization.
+output device. Separate files mean the channel says who spoke ("me" vs "them")
+without diarization.
+Rationale: incidental — how it was first built; open to change if a refactor improves quality or
+load (Mikhail, 2026-09-26). See [refactor for quality and load](refactor-for-quality-and-load.md).
 
 ## Decision
 `Audio/DualCapture.swift` records the microphone (`MicrophoneCapture`) and system audio (`SystemAudioTap`)

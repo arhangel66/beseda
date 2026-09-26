@@ -5,6 +5,9 @@ status: accepted
 generated:
   by: agent
   at: 2026-09-26T00:00:00Z
+sources:
+  - id: mikhail
+    title: Mikhail, 2026-09-26
 ---
 
 # Local on-device ASR
@@ -13,8 +16,9 @@ generated:
 
 ## Context
 The first plan ([MVP phase plan](../archive/mvp-phase-plan.md)) fixed the scope as "a personal local call
-recorder and transcriber": local speech recognition, local-only storage, cloud sync deferred. The plan does not
-say why cloud ASR was ruled out; no document records that trade-off.
+recorder and transcriber": local speech recognition, local-only storage, cloud sync deferred. Local ASR was
+chosen on purpose (Mikhail, 2026-09-26): it now works well enough and fast enough, and private calls —
+a psychologist's session, for example — can be processed without worry because nothing leaves the Mac.
 
 ## Decision
 Speech is transcribed on the Mac. Today through transcribe.cpp (`import TranscribeCpp` in
