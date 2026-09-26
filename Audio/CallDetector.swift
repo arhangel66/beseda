@@ -129,7 +129,7 @@ final class CallDetector {
     }
 }
 
-/// Reports which bundle ids hold the microphone, the way the B1 spike proved it works.
+/// Reports which bundle ids hold the microphone.
 private final class MicrophoneProcessWatcher: @unchecked Sendable {
     // Verified on macOS 26.2: coreaudiod never posts a change for kAudioProcessPropertyIsRunningInput —
     // that listener registers with noErr and stays silent forever. The flip is announced as
