@@ -8,17 +8,17 @@ private func makeSegment(_ text: String, _ start: Double, _ end: Double) -> Tran
 }
 
 @Test func turnsTakeTheDiarizerSpeakersAndKeepSentenceTimes() {
-    let segments = [makeSegment("Ready when you are.", 0.1, 1.4), makeSegment("Go ahead.", 2.0, 2.9)]
+    let segments = [makeSegment("Ready when you are.", 0.1, 1.4), makeSegment("Go ahead.", 7.0, 7.9)]
     let timeline = [
-        SpeakerInterval(speaker: "S7", start: 1.9, end: 3.0),
-        SpeakerInterval(speaker: "S2", start: 0, end: 1.5)
+        SpeakerInterval(speaker: "S7", start: 6.5, end: 13.0),
+        SpeakerInterval(speaker: "S2", start: 0, end: 6.0)
     ]
 
     let turns = SpeakerAssignment.remoteTurns(segments: segments, timeline: timeline)
 
     #expect(turns == [
         SpeakerTurn(speaker: "them-1", start: 0.1, end: 1.4, text: "Ready when you are."),
-        SpeakerTurn(speaker: "them-2", start: 2.0, end: 2.9, text: "Go ahead.")
+        SpeakerTurn(speaker: "them-2", start: 7.0, end: 7.9, text: "Go ahead.")
     ])
 }
 
@@ -48,20 +48,67 @@ private func makeSegment(_ text: String, _ start: Double, _ end: Double) -> Tran
 }
 
 @Test func aSentenceOutsideDiarizerSpeechKeepsItsTimesAndTheNearestSpeaker() {
-    let segments = [makeSegment("Hi", 0.1, 0.9), makeSegment("Ага", 2.0, 2.2)]
+    let segments = [makeSegment("Hi", 0.1, 0.9), makeSegment("Ага", 7.5, 7.7)]
     let timeline = [
-        SpeakerInterval(speaker: "S1", start: 0, end: 1.0),
-        SpeakerInterval(speaker: "S2", start: 2.5, end: 4.0)
+        SpeakerInterval(speaker: "S1", start: 0, end: 6.0),
+        SpeakerInterval(speaker: "S2", start: 8.5, end: 15.0)
     ]
 
     let turns = SpeakerAssignment.remoteTurns(segments: segments, timeline: timeline)
 
     #expect(turns == [
         SpeakerTurn(speaker: "them-1", start: 0.1, end: 0.9, text: "Hi"),
-        SpeakerTurn(speaker: "them-2", start: 2.0, end: 2.2, text: "Ага")
+        SpeakerTurn(speaker: "them-2", start: 7.5, end: 7.7, text: "Ага")
     ])
 }
 
 @Test func anEmptyTimelineProducesNoTurns() {
     #expect(SpeakerAssignment.remoteTurns(segments: [makeSegment("Hi", 0, 0.3)], timeline: []).isEmpty)
+}
+
+@Test func aSpeakerWithOnlyShortSegmentsJoinsTheNearestInTimeKeptSpeaker() {
+    let segments = [makeSegment("Long one.", 0, 8), makeSegment("Yeah.", 9, 10), makeSegment("Other long.", 20, 30)]
+    let timeline = [
+        SpeakerInterval(speaker: "S1", start: 0, end: 8),
+        SpeakerInterval(speaker: "S3", start: 9, end: 10),
+        SpeakerInterval(speaker: "S2", start: 20, end: 30)
+    ]
+
+    let turns = SpeakerAssignment.remoteTurns(segments: segments, timeline: timeline)
+
+    #expect(turns.map(\.speaker) == ["them-1", "them-1", "them-2"])
+}
+
+@Test func aSpeakerWithOneSegmentOfSixSecondsIsKept() {
+    let segments = [makeSegment("Long one.", 0, 8), makeSegment("Six seconds.", 9, 15)]
+    let timeline = [SpeakerInterval(speaker: "S1", start: 0, end: 8), SpeakerInterval(speaker: "S2", start: 9, end: 15)]
+
+    let turns = SpeakerAssignment.remoteTurns(segments: segments, timeline: timeline)
+
+    #expect(turns.map(\.speaker) == ["them-1", "them-2"])
+}
+
+@Test func withNoLongSegmentTheSpeakerWithTheMostSecondsTakesEverything() {
+    let segments = [makeSegment("A.", 0, 2), makeSegment("B.", 3, 8), makeSegment("C.", 9, 14)]
+    let timeline = [
+        SpeakerInterval(speaker: "S1", start: 0, end: 2),
+        SpeakerInterval(speaker: "S2", start: 3, end: 8),
+        SpeakerInterval(speaker: "S2", start: 9, end: 14)
+    ]
+
+    let turns = SpeakerAssignment.remoteTurns(segments: segments, timeline: timeline)
+
+    #expect(turns.map(\.speaker) == ["them-1", "them-1", "them-1"])
+}
+
+@Test func aOneSpeakerCallIsUnchanged() {
+    let segments = [makeSegment("Hi.", 0, 1), makeSegment("Bye.", 2, 3)]
+    let timeline = [SpeakerInterval(speaker: "S4", start: 0, end: 1), SpeakerInterval(speaker: "S4", start: 2, end: 3)]
+
+    let turns = SpeakerAssignment.remoteTurns(segments: segments, timeline: timeline)
+
+    #expect(turns == [
+        SpeakerTurn(speaker: "them-1", start: 0, end: 1, text: "Hi."),
+        SpeakerTurn(speaker: "them-1", start: 2, end: 3, text: "Bye.")
+    ])
 }

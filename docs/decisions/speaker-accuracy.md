@@ -155,6 +155,40 @@ the eval audio is not built in the checkout and scoring the app pipeline means a
 Cost of 1: no models, no size, ~1 ms per audio second for the gate. Not done: no cloud engine, no Python
 runtime in the app, no app change before Mikhail approves the direction.
 
+## Extra speakers on real calls (BESEDA-78)
+
+**Mechanism.** Every extra `them` speaker on the 10 one-to-one calls is the interlocutor's own **short
+replies** ("да / угу", first words after Mikhail spoke): 1–2 s turns, often over Mikhail's voice, whose
+embeddings are too short and distorted to join the main cluster. Longest diarizer segment ≤ 6.2 s on all 13
+extras, ≥ 10 s on 9 of 10 main speakers. Not echo of Mikhail (cosine to his voice ≤ 0.15), not music or
+notifications.[^cause]
+
+**Rule (implemented, BESEDA-84).** After FluidAudio clusters at 0.70 (unchanged), a `them` speaker whose longest
+diarizer segment is under 6 s is merged: each of its segments takes the speaker of the nearest-in-time
+segment of a kept speaker (one with a segment ≥ 6 s). If none has a segment ≥ 6 s, the one with the most
+seconds is kept. Sentence assignment then runs as before. See [ASR](../architecture/asr.md).
+
+| | now (t0.70) | merge < 6 s |
+|---|---|---|
+| real calls, total speaker-count error (15 calls) | 20 | 4 |
+| 1:1 calls exact (of 10) | 0 | 9 |
+| benchmark DER real (VoxConverse + AMI) | 0.119 | 0.118 |
+| benchmark real people glued | 0 | 0 |
+
+The app path gives the same counts on all 15 calls as the prototype.[^merge] The remaining errors: one 1:1
+call keeps an extra with a 6.2 s turn; 20260924-130017 shows 2 of 4 because the diarizer already put two
+people inside the other two before any merge; one daily shows 5 of 4.
+
+- **Why 6 s, not 7 s:** at 7 s daily 20260925-125945 loses a real person (a colleague whose longest turn is
+  6.6 s). 6.5 s scores one better but sits between two turns (6.2 and 6.6 s) — fitted, not chosen.
+- **Threshold 0.80 rejected:** alone it barely helps (|Δ| 20 → 16, no 1:1 fixed) and undercounts a daily
+  (4 → 3); with the merge it adds nothing (|Δ| 4–5).
+- **FluidAudio 0.17.4 rejected:** same models, identical counts and DER; no reason to bump.
+- Merge target by closest mean embedding gives identical counts; nearest in time is simpler. Adding a cosine
+  floor to the rule loses 1:1 calls fast.
+
+[^cause]: [results/extra-speaker-cause.md](../../untracked/epics/speaker-accuracy/results/extra-speaker-cause.md)
+[^merge]: [results/short-reply-merge.md](../../untracked/epics/speaker-accuracy/results/short-reply-merge.md), [results/app-merge.md](../../untracked/epics/speaker-accuracy/results/app-merge.md)
 [^harness]: [untracked/epics/speaker-accuracy/README.md](../../untracked/epics/speaker-accuracy/README.md)
 [^baseline]: [baseline/README.md](../../untracked/epics/speaker-accuracy/baseline/README.md), `results/baseline-*.md`
 [^diarization]: [diarization/README.md](../../untracked/epics/speaker-accuracy/diarization/README.md), `diarization/results.md`
