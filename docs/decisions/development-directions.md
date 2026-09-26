@@ -100,6 +100,23 @@ projects, on a Mac. Alternative, kept out of v1: private psychologists — diffe
 - **Success.** A published, reproducible WER table where Beseda is better on Russian and mixed speech.
 - **Not done.** No marketing on "has GigaAM" until the table exists.
 
+### E. Speaker accuracy, local
+
+- **What.** Tell "me" from "them" and the remote speakers apart reliably, and transcribe the remote side
+  better — all on the Mac. Record: [speaker-accuracy.md](speaker-accuracy.md).
+- **Why.** The card's "who promised what" (A) is only as right as the speaker labels. D measures words on
+  real calls for marketing; E fixes who said them and the remote channel, on a public benchmark.
+- **Today.** Me/them is the channel only, no echo cancellation: 68 % of remote words come back as "me" on
+  echoed calls. Speakers are labelled per ASR word, which doubles the diarizer's error (DER real 0.262 vs
+  0.119 for the diarizer alone). Mixed ru-en WER 0.39–0.45 vs 0.10–0.13 Russian.
+- **First step.** Run the benchmark in `untracked/epics/speaker-accuracy/` for the unmeasured rows; then the
+  two no-model fixes: an echo gate on the mic and the diarizer's timeline instead of per-word labels
+  (measured together: synthetic DER 0.938 → 0.282, echo duplicates 0.678 → 0.013, real DER 0.262 → 0.130).
+- **Success.** The echo gate holds on real room echo in the app; the benchmark table fills and a model choice
+  beats today's numbers by more than the ~2-point WER noise.
+- **Not done.** No cloud engine, not even for the benchmark; no Python runtime in the app; no model switch
+  before the benchmark.
+
 ## Cross-cutting
 
 - **Privacy.** Storage protection, backup and deletion that a user can trust. Recording consent is made
@@ -122,6 +139,9 @@ weeks, 3 ready to pay.** Price hypothesis: **$49–79 one-time.**
 5. After it, only if the targets hold: B (projects and "before the meeting"), D (WER benchmark), then one task
    hand-off, dev-task draft, MCP.
 
+E, the two no-model fixes, goes with A (step 1): it makes the call card's "who promised what" trustworthy.
+The rest of E (model choices) after the benchmark rerun.
+
 ## Decisions for Mikhail
 
 1. Adopt the positioning "private memory of work conversations" and the promise above.
@@ -134,6 +154,7 @@ weeks, 3 ready to pay.** Price hypothesis: **$49–79 one-time.**
 8. No Windows version now.
 9. Demand check with 8–12 people; success = 6 of 10 after two weeks, 3 ready to pay.
 10. Price hypothesis $49–79 one-time; the archive is never locked.
-11. The order above: A → export → privacy basics → demand check → the rest.
+11. E: echo gate and diarizer timeline alongside A; model choices only after the speaker-accuracy benchmark.
+12. The order above: A → export → privacy basics → demand check → the rest.
 
 [^analysis]: External product analysis pasted by Mikhail, competitors checked 2026-09-26.

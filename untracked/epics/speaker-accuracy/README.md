@@ -50,7 +50,22 @@ transcription. A fixed seed makes the mix byte-reproducible with the same ffmpeg
 Licences: VoxConverse CC BY 4.0, AMI CC BY 4.0, FLEURS CC BY 4.0. Audio is not committed; the manifest
 pins where to get it.
 
-## Rerun
+## Rerun the whole benchmark
+
+```
+untracked/epics/speaker-accuracy/run_all.sh
+```
+
+Baseline (both app engines) → diarization variants → ASR engines, each heavy run alone under
+`nice -n 19 lockf /tmp/beseda-speaker-accuracy.lock`. First run downloads ~6 GB of models; hours on a busy Mac.
+
+| part | measured (2026-09-26) | not measured yet |
+|---|---|---|
+| `baseline/` | Parakeet v3, GigaAM v3, raw diarizer timeline | — |
+| `diarization/` | echo gate, diarizer timeline, both, FluidAudio 0.17.4 t=0.5 | Sortformer, LS-EEND ×2, t=0.6/0.7/0.8, embedding min 0.3 s, known speaker count |
+| `asr/` | — (baseline engines only) | all 5 engines |
+
+## Rerun the eval set alone
 
 ```
 uv run score.py        # fetch + build if data/audio/ is missing, then score the dir set in `main(...)` at the bottom

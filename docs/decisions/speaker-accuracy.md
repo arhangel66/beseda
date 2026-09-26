@@ -1,0 +1,153 @@
+---
+type: Decision Record
+title: Speaker accuracy, local
+description: How to make Beseda tell speakers apart and transcribe the remote side better, all on the Mac — proposed; part measured, part waiting for the benchmark.
+status: proposed
+tags: [asr, diarization, research]
+generated:
+  by: agent
+  at: 2026-09-26T00:00:00Z
+sources:
+  - id: harness
+    title: Eval set, scorer and rerun command
+    resource: ../../untracked/epics/speaker-accuracy/README.md
+  - id: baseline
+    title: Beseda's current pipeline and its numbers
+    resource: ../../untracked/epics/speaker-accuracy/baseline/README.md
+  - id: diarization
+    title: Diarization and me/them alternatives
+    resource: ../../untracked/epics/speaker-accuracy/diarization/README.md
+  - id: asr
+    title: Remote-speech ASR alternatives
+    resource: ../../untracked/epics/speaker-accuracy/asr/README.md
+---
+
+# Speaker accuracy, local
+
+**Status: proposed.** Part of the table is measured, the rest waits for the benchmark rerun
+(`untracked/epics/speaker-accuracy/run_all.sh`); the Mac was overloaded when this was written.
+Everything stays local, the benchmark included. Direction E in [development directions](development-directions.md).
+
+## Today's pipeline
+
+Read from the code at `03dae95`.[^baseline]
+
+- **Diarization:** FluidAudio 0.15.6 offline (pyannote community-1 + WeSpeaker + VBx, 21 MB, threshold 0.70),
+  on the **system channel only**, after ASR. Speaker labels are given **per ASR word** (overlap, else nearest
+  within 0.4 s, else previous word), so a speaker exists only where ASR produced words.
+- **Me/them:** the channel and nothing else — mic is "me", system is "them". **No echo cancellation, no
+  bleed handling, no dedup between channels**: remote speech leaking into the mic is transcribed again as "me".
+- **ASR:** Parakeet v3 (485 MB, language autodetect) or GigaAM v3 RNNT (274 MB, Russian), via transcribe.cpp.
+
+## Eval set and its limits
+
+28 min, 13 recordings:[^harness] 5 real (3 VoxConverse, 2 AMI crops; system channel only, no reference text)
+and 8 synthetic two-channel calls mixed from FLEURS (mostly Russian, 3 mixed ru-en), degraded like a call
+(100–7000 Hz, libopus 20 kbps, noise), with the system channel echoed into the mic at −20 dB, 60 ms late.
+
+- Synthetic turns are short (1–6 s), shorter than real calls; this penalises the diarizer's 1 s embedding minimum.
+- The synthetic echo is one pure delay and gain, which the echo gate fits exactly: **its gain here is an upper
+  bound**; a real room smears and distorts echo.
+- **WER only on the 8 synthetic calls (~5 min): differences under ~2 points are noise.** No English-only call.
+- Speed was measured on a shared, overloaded Mac: ±30 %.
+
+## Metrics
+
+DER (pyannote.metrics, collar 0.25 s, overlap scored; also with overlap excluded and system channel only),
+speaker-count error (mean |Δ| per file), WER/CER (system channel, normalized), me/them error (share of speech
+time on the wrong channel), bleed (echo words transcribed twice as "me", per remote word), × realtime, model
+size.[^harness]
+
+## Candidates and why
+
+Diarization and me/them:[^diarization]
+
+| candidate | why |
+|---|---|
+| echo gate on the mic | cheapest cross-channel fix, no model: cut mic segments to where the mic beats the predicted echo |
+| diarizer timeline instead of per-word labels | no model: the diarizer alone is twice as good as what the app shows |
+| FluidAudio 0.17.4, thresholds 0.5–0.8 | same models, newer library; lower threshold for the undercounted speakers |
+| embedding minimum 0.3 s | short turns are skipped by the 1 s minimum |
+| known speaker count | oracle upper bound for the count error, not a product setting |
+| Sortformer (NVIDIA), LS-EEND | end-to-end diarizers FluidAudio already ships in CoreML, handle overlap |
+| dropped: pyannote in Python | gated weights, same pipeline as FluidAudio, would need a Python runtime in the app |
+| dropped: Apple voice-processing AEC | only on live I/O, cannot run on recorded files; to try in the app |
+
+Remote-speech ASR:[^asr]
+
+| candidate | why |
+|---|---|
+| Whisper large-v3-turbo (whole file) | multilingual model for mixed calls |
+| Whisper turbo per VAD chunk | language detected per chunk, for sentences Parakeet drops in mixed calls |
+| GigaAM v3 CTC | the other decoding of the app's Russian engine |
+| GigaAM CTC + loudnorm | cheap front-end trick |
+| route: Whisper language ID → GigaAM for ru, Parakeet for en | best engine per language, both already in the app |
+| dropped: T-one | 8 kHz Russian-only, conflicting numpy; cannot help mixed calls |
+| dropped: whisper.cpp / WhisperKit rows | same weights as MLX Whisper, same WER |
+| dropped: forcing Parakeet's language | Parakeet v3 has no language prompt; routing does it |
+
+## Baseline
+
+| | Parakeet v3 | GigaAM v3 | diarizer raw timeline |
+|---|---|---|---|
+| DER real (VoxConverse+AMI) | 0.262 | 0.311 | 0.119 |
+| DER synthetic, both channels | 0.938 | 0.810 | 0.767 |
+| DER synthetic, system only | 0.606 | 0.413 | 0.295 |
+| speaker-count error, all | 0.77 | 0.85 | 0.77 |
+| me/them error | 0.077 | 0.036 | 0.034 |
+| echo words transcribed twice | 0.678 | 0.620 | — |
+| WER / CER, ru calls (5) | 0.128 / 0.077 | 0.100 / 0.063 | — |
+| WER / CER, mixed ru-en (3) | 0.389 / 0.327 | 0.448 / 0.262 | — |
+| × realtime, whole pipeline | 13.3 | 48.1 | — |
+| model size | 485 MB + 21 MB | 274 MB + 21 MB | 21 MB |
+
+Source: `untracked/epics/speaker-accuracy/results/baseline-*.md`.[^baseline]
+
+## Alternatives
+
+Diarization, against baseline Parakeet (`results/diar-*.md`):[^diarization]
+
+| alternative | DER real | DER synthetic both channels | DER synthetic system only | count error real / synthetic | me/them | bleed | × realtime |
+|---|---|---|---|---|---|---|---|
+| baseline Parakeet | 0.262 | 0.938 | 0.606 | 0.60 / 0.88 | 0.077 | 0.678 | 13 |
+| echo gate | 0.262 | 0.481 | 0.606 | 0.60 / 1.00 | 0.031 | 0.013 | 803 (gate alone) |
+| diarizer timeline | 0.130 | 0.772 | 0.295 | 0.60 / 0.88 | 0.029 | 0.678 | no extra work |
+| timeline + echo gate | 0.130 | 0.282 | 0.295 | 0.60 / 1.00 | 0.001 | 0.013 | 803 (gate alone) |
+| FluidAudio 0.17.4 t=0.5 + both | 0.131 | 0.264 | 0.271 | 0.60 / 0.75 | 0.001 | 0.013 | 46 (diarizer alone) |
+| Sortformer | not measured yet | | | | | | |
+| LS-EEND dihard3 / callhome | not measured yet | | | | | | |
+| thresholds 0.6 / 0.7 / 0.8 | not measured yet | | | | | | |
+| embedding minimum 0.3 s | not measured yet | | | | | | |
+| known speaker count | not measured yet | | | | | | |
+
+ASR, system channel (`asr/results.md`):[^asr]
+
+| engine | WER ru | WER mixed | × realtime | size |
+|---|---|---|---|---|
+| Parakeet v3 (app) | 0.128 | 0.389 | — | 485 MB |
+| GigaAM v3 RNNT (app) | 0.100 | 0.448 | — | 274 MB |
+| Whisper turbo | not measured yet | | | ~1.6 GB |
+| Whisper turbo per chunk | not measured yet | | | ~1.6 GB |
+| GigaAM CTC | not measured yet | | | not checked |
+| GigaAM CTC + loudnorm | not measured yet | | | not checked |
+| route GigaAM ru / Parakeet en | not measured yet | | | both engines + Whisper for language ID |
+
+## Recommendation (provisional)
+
+1. **Two no-model fixes first**, native Swift, nothing to download:
+   - **echo gate on the mic** — echo words transcribed twice 0.678 → 0.013, me/them 0.077 → 0.031;
+     ~60 lines with vDSP. Gain measured on pure-delay echo, an upper bound: **verify on real room echo
+     in the app** before trusting it (fallback: Apple voice-processing AEC or WebRTC AEC3).
+   - **diarizer timeline instead of per-word labels** — DER real 0.262 → 0.130, a few dozen lines.
+   - Together: synthetic DER 0.938 → 0.282, me/them → 0.001.
+2. **Model choices wait for the benchmark**: FluidAudio 0.17.4 t=0.5 adds a little (0.282 → 0.264);
+   Sortformer / LS-EEND / other thresholds and all ASR engines are open until `run_all.sh` fills the rows.
+   The ASR target is the mixed calls (WER 0.39–0.45 vs 0.10–0.13 Russian).
+
+Cost of 1: no models, no size, ~1 ms per audio second for the gate. Not done: no cloud engine, no Python
+runtime in the app, no app change before Mikhail approves the direction.
+
+[^harness]: [untracked/epics/speaker-accuracy/README.md](../../untracked/epics/speaker-accuracy/README.md)
+[^baseline]: [baseline/README.md](../../untracked/epics/speaker-accuracy/baseline/README.md), `results/baseline-*.md`
+[^diarization]: [diarization/README.md](../../untracked/epics/speaker-accuracy/diarization/README.md), `diarization/results.md`
+[^asr]: [asr/README.md](../../untracked/epics/speaker-accuracy/asr/README.md), `asr/results.md`
