@@ -1224,6 +1224,7 @@ final class AppController {
             appendLog("Processed \(detail.id) as «\(type.name)»")
             try callStore.setSummary(callID: detail.id, text: text)
             try callStore.setCallType(callID: detail.id, name: type.name)
+            exportResult(detail, result: text, type: type.name)
             // the summary lives on the call row, which loadCallDetail takes as given: re-read it
             // or the text is stored and never shown. The guard keeps a slow summary from
             // dragging the user back to the call they left.
@@ -1241,6 +1242,28 @@ final class AppController {
                 )
             }
         }
+    }
+
+    /// a failed write is only logged: the result is already stored and shown
+    private func exportResult(_ detail: StoredCallDetail, result: String, type: String) {
+        guard !settings.exportFolder.isEmpty else {
+            return
+        }
+        do {
+            let url = try CallExport.write(detail, result: result, type: type, to: URL(fileURLWithPath: settings.exportFolder))
+            appendLog("Exported \(detail.id) to \(url.path)")
+        } catch {
+            appendLog("Export failed: \(error.localizedDescription)")
+        }
+    }
+
+    func copyResult() {
+        guard let text = selectedCallDetail?.summary.summaryText, !text.isEmpty else {
+            return
+        }
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(text, forType: .string)
+        flash("Результат скопирован")
     }
 
     /// an empty transcript has nothing to do with settings, so only «Повторить» stays for it;

@@ -53,6 +53,7 @@ struct CallDetailView: View {
                                 player: player
                             )
                         case .summary:
+                            ResultActions(controller: controller, detail: detail)
                             CallSummaryView(
                                 text: detail.summary.summaryText,
                                 isRunning: controller.summarizingCallID == detail.id,
@@ -82,13 +83,23 @@ struct CallDetailView: View {
         .onChange(of: controller.selectedCallDetail?.id) { _, _ in
             isLogOpen = false
             player.load(controller.selectedCallDetail?.summary)
-            if controller.selectedCallDetail?.summary.isFailed == true {
-                tab = .info
-            }
+            tab = openingTab
         }
         .onAppear {
             player.load(controller.selectedCallDetail?.summary)
+            tab = openingTab
         }
+    }
+
+    /// a processed call opens on its result; one that only went through transcription, on the transcript
+    private var openingTab: CallDetailTab {
+        guard let summary = controller.selectedCallDetail?.summary else {
+            return .transcript
+        }
+        if summary.isFailed {
+            return .info
+        }
+        return summary.summaryText?.isEmpty == false ? .summary : .transcript
     }
 
     private func header(_ detail: StoredCallDetail) -> some View {
@@ -105,7 +116,7 @@ struct CallDetailView: View {
                         .lineLimit(2)
                         .textSelection(.enabled)
                 }
-                Text("\(summary.whenHeadline) · \(summary.appLabel) · \(summary.isDual ? "микрофон и системный звук" : "только микрофон")")
+                Text(([summary.whenHeadline, summary.appLabel, summary.isDual ? "микрофон и системный звук" : "только микрофон"] + [summary.callType].compactMap { $0 }).joined(separator: " · "))
                     .font(.callout)
                     .foregroundStyle(.secondary)
             }
@@ -122,6 +133,38 @@ struct CallDetailView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 24)
         .padding(.top, 20)
+    }
+}
+
+/// The call type with a rerun under each other type, and the copy button for the stored result.
+struct ResultActions: View {
+    let controller: AppController
+    let detail: StoredCallDetail
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Menu {
+                Section("Обработать заново как") {
+                    ForEach(controller.settings.callTypes) { type in
+                        Button(type.name) {
+                            controller.generateSummary(as: type)
+                        }
+                    }
+                }
+            } label: {
+                // a renamed or deleted type still shows the name the call was processed under
+                Text("Тип: \(detail.summary.callType ?? "не выбран")")
+            }
+            .fixedSize()
+            .disabled(controller.summarizingCallID != nil)
+
+            if detail.summary.summaryText?.isEmpty == false {
+                Button("Скопировать результат", systemImage: "doc.on.doc") {
+                    controller.copyResult()
+                }
+            }
+        }
+        .controlSize(.small)
     }
 }
 

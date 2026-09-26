@@ -1,7 +1,7 @@
 ---
 type: Architecture
 title: Summarization
-description: How a call summary is produced through one chat-completions request to OpenRouter, LM Studio or the built-in llama-server.
+description: How a call summary is produced, shown and exported, through one chat-completions request to OpenRouter, LM Studio or the built-in llama-server.
 ---
 # Summarization
 
@@ -43,6 +43,17 @@ The chosen type's name is stored on the call (`callStore.setCallType`, column `c
 
 The default prompt (`ChatCompletionsProvider.defaultPrompt`, the starting prompt of every type) asks for four Russian
 sections with bold names only.
+
+## Call screen and export
+
+A call with a stored result opens on «Итоги» (`CallDetailView.openingTab`); `ResultActions` shows the
+stored type and reruns with a picked one through `generateSummary(as:)`, and copies the result.
+
+After `setSummary`/`setCallType`, `AppController.exportResult` writes `CallExport.markdown` into
+`AppSettings.exportFolder` when it is set, as `yyyy-MM-dd HH-mm <title>.md` (title stripped of
+`/\:*?"<>|` and newlines, max 120 chars). A write error is logged and does not fail processing. The folder
+is a plain path, not a security-scoped bookmark: the app is not sandboxed; sandboxing would need one.
+A title change (e.g. linking a calendar event) writes a new file rather than renaming the old one.
 
 ## Built-in runtime install
 

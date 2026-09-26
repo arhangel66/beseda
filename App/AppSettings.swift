@@ -63,6 +63,7 @@ final class AppSettings {
     private let legacySummaryPromptKey = "beseda.summaryPrompt"
     private let callTypesKey = "beseda.callTypes"
     private let autoProcessCallsKey = "beseda.autoProcessCalls"
+    private let exportFolderKey = "beseda.exportFolder"
     private let webhookEnabledKey = "beseda.webhookEnabled"
     private let webhookURLKey = "beseda.webhookURL"
     private let webhookSecretKey = "beseda.webhookSecret"
@@ -182,6 +183,13 @@ final class AppSettings {
         }
     }
 
+    /// a plain path, empty = no export; no security-scoped bookmark while the app is not sandboxed
+    var exportFolder: String {
+        didSet {
+            defaults.set(exportFolder, forKey: exportFolderKey)
+        }
+    }
+
     var webhookURL: String {
         didSet {
             defaults.set(webhookURL, forKey: webhookURLKey)
@@ -237,6 +245,7 @@ final class AppSettings {
             .flatMap { $0.isEmpty ? nil : $0 } ?? [AppSettings.defaultCallType(legacyPrompt: defaults.string(forKey: legacySummaryPromptKey))]
         self.autoProcessCalls = defaults.bool(forKey: autoProcessCallsKey)
         self.webhookEnabled = defaults.bool(forKey: webhookEnabledKey)
+        self.exportFolder = defaults.string(forKey: exportFolderKey) ?? ""
         self.webhookURL = defaults.string(forKey: webhookURLKey) ?? ""
         self.webhookSecret = defaults.string(forKey: webhookSecretKey) ?? ""
         self.speechModelID = defaults.string(forKey: speechModelKey) ?? SpeechModel.default.id

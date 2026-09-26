@@ -531,6 +531,35 @@ private struct StoragePane: View {
                 Text("Правила применяются раз в сутки. Исходное аудио — WAV с микрофона и системного звука, нормализованное — промежуточный файл для расшифровки.")
             }
 
+            Section {
+                LabeledContent("Экспорт") {
+                    Text(settings.exportFolder.isEmpty ? "не выбрана" : settings.exportFolder)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                        .textSelection(.enabled)
+                }
+                HStack {
+                    Spacer()
+                    Button("Очистить") {
+                        settings.exportFolder = ""
+                    }
+                    .disabled(settings.exportFolder.isEmpty)
+                    Button("Выбрать…") {
+                        let panel = NSOpenPanel()
+                        panel.canChooseDirectories = true
+                        panel.canChooseFiles = false
+                        panel.canCreateDirectories = true
+                        if panel.runModal() == .OK, let url = panel.url {
+                            settings.exportFolder = url.path
+                        }
+                    }
+                }
+            } header: {
+                Text("Экспорт результатов")
+            } footer: {
+                Text("Каждый готовый результат обработки ложится сюда Markdown-файлом: заголовок, дата, тип, результат и расшифровка.")
+            }
+
             Section("Папка") {
                 LabeledContent("Записи") {
                     Text(controller.callsDirectory.path)

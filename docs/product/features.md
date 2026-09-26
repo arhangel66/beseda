@@ -29,6 +29,12 @@ What the code does today. Settings tabs are named as in the app: Основны�
   or more, the same model first picks the type from the start of the transcript and that type's prompt
   runs. Processing starts from «Итоги», or by itself after every call when «Обрабатывать созвоны
   автоматически» is on (off by default).
+- **Call screen result.** A processed call opens on «Итоги» with its type in the header; a call that was
+  only transcribed opens on the transcript. «Тип: …» reruns the call as another configured type (no
+  classifier), «Скопировать результат» copies the result (`App/Views/CallDetailView.swift`).
+- **Export.** With a folder picked under Хранение → Экспорт результатов, every stored result (auto, manual
+  or rerun) is written there as Markdown: title, date, type, result, then the clean transcript. The file
+  is named by date and title, so a rerun overwrites it (`Storage/CallExport.swift`).
 - **Calendar.** With calendar access, a call is named after the matching calendar event from the calendars
   picked under Интеграции (`Calendar/CalendarService.swift`).
 - **Webhook.** A finished transcript is POSTed as JSON to a URL set under Интеграции, with an optional secret
