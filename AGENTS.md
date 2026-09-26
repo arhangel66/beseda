@@ -45,6 +45,13 @@ Agents in this repo do not use Serena/LSP tools (sourcekit-lsp indexing eats ten
 It builds the app and runs every test. `theInstalledModelTranscribesRealSpeech` is skipped unless the
 speech model is installed in Application Support and `samples/jfk.wav` (gitignored) is in the checkout.
 
+## No-focus, no-sound
+
+Someone works on this Mac. Never bring a window to the front and never play into the Mac's output device:
+launch Beseda only with `open -n -g -j --env CFFIXED_USER_HOME="$(mktemp -d)"` on a copy with its own bundle
+id, shoot windows with the kit's `scripts/window-shot.swift` (it never activates), and send audio to files or
+BlackHole only. See the kit's `docs/headless.md` and `docs/macos.md`.
+
 ## Kit
 
 This project is built with the ios kit at `/Users/mikhail/w/learning/ios-kit`: its `docs/index.md` is the

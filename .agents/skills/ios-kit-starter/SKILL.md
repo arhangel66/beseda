@@ -5,6 +5,10 @@ description: Generate a standalone iOS app from this kit, then run its explicit-
 
 # Kit starter
 
+**Someone works on this Mac.** Never activate an app, never open Simulator.app (`xcrun simctl boot`,
+`simctl io`, XCUITest are all headless), launch Mac apps with `open -g -j`, and keep simulator audio off
+the speakers (`scripts/silence-simulators.sh`). See `docs/headless.md` in the kit.
+
 Use the repository generator from its root:
 
 ```sh
