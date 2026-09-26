@@ -17,7 +17,7 @@ internet connection for the first launch (the speech model is downloaded then).
    system audio, pick a speech model, make a test recording.
 
 Installed copies update themselves through Sparkle. See `docs/product/install.md` for
-details and `docs/release.md` for publishing.
+details and `docs/architecture/build-release.md` for publishing.
 
 ## Building from source
 
