@@ -73,9 +73,34 @@ struct CallType: Codable, Hashable, Identifiable, Sendable {
     var name: String
     var description: String
     var prompt: String
+    /// the built-in «Другое»: undeletable, holds the general prompt, takes an unknown or unsure answer
+    var isOther = false
 
-    /// the built-in type, always `callTypes[0]`: undeletable, holds the general prompt
     static let otherName = "Другое"
+
+    init(name: String, description: String, prompt: String, isOther: Bool = false) {
+        self.name = name
+        self.description = description
+        self.prompt = prompt
+        self.isOther = isOther
+    }
+
+    // types stored before the flag have no `isOther` key; AppSettings then flags the first one
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        name = try container.decode(String.self, forKey: .name)
+        description = try container.decode(String.self, forKey: .description)
+        prompt = try container.decode(String.self, forKey: .prompt)
+        isOther = try container.decodeIfPresent(Bool.self, forKey: .isOther) ?? false
+    }
+}
+
+extension [CallType] {
+    /// the settings always hold one «Другое»; a list without it (a test's) falls back to its first type
+    var other: CallType {
+        first(where: \.isOther) ?? self[0]
+    }
 }
 
 extension SummarizationService {
@@ -87,7 +112,7 @@ extension SummarizationService {
     static let jevMinimumProbability = 0.5
 
     /// Picks the call's type (skipped when `chosen` is given or only «Другое» exists), then runs
-    /// that type's prompt. `types[0]` is «Другое», the fallback for an unknown or unsure answer.
+    /// that type's prompt. `types.other` is the fallback for an unknown or unsure answer.
     /// `provider` builds the model client for a given system prompt; `jev`, when given, classifies
     /// first and falls back to `provider` on failure.
     static func process(
@@ -130,7 +155,7 @@ extension SummarizationService {
                 guard answer.probability >= jevMinimumProbability,
                       let named = types.first(where: { $0.name == answer.choice }) ?? pickType(answer.choice, from: types)
                 else {
-                    return types[0]
+                    return types.other
                 }
                 return named
             } catch {
@@ -141,15 +166,15 @@ extension SummarizationService {
         if let named = pickType(answer, from: types) {
             return named
         }
-        log("Classifier answered «\(answer)», not a known type; using «\(types[0].name)»")
-        return types[0]
+        log("Classifier answered «\(answer)», not a known type; using «\(types.other.name)»")
+        return types.other
     }
 
     static func classifierPrompt(_ types: [CallType]) -> String {
         let list = types.map { "- \($0.name): \($0.description)" }.joined(separator: "\n")
         return """
             Определи тип созвона по времени, длительности и началу расшифровки. Если ни один тип \
-            явно не подходит, выбери «\(types[0].name)». Ответь только названием одного типа из списка, \
+            явно не подходит, выбери «\(types.other.name)». Ответь только названием одного типа из списка, \
             без пояснений.
 
             \(list)

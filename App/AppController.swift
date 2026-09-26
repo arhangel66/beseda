@@ -134,6 +134,8 @@ final class AppController {
     /// set by the app scene: a notification callback has no `openWindow` environment value
     @ObservationIgnored var showMainWindow: (() -> Void)?
 
+    /// the 4 GB WAV limit ends a 48 kHz stereo call first, but formats come from the device:
+    /// on a mono or lower-rate one the files would outgrow this, so the cap stays
     private static let maximumRecordingDuration: TimeInterval = 4 * 60 * 60
     /// an auto-started recording shorter than this is a misfire — a voice message or dictation, not a call
     private static let minimumAutoRecordingDuration: TimeInterval = 10
@@ -436,6 +438,10 @@ final class AppController {
             to: endOfTomorrow,
             identifiers: settings.calendarIdentifiers
         )
+        refreshPreviousCallsForEvents()
+    }
+
+    private func refreshPreviousCallsForEvents() {
         previousCallByEventID = upcomingEvents.prefix(5).reduce(into: [:]) { found, event in
             found[event.id] = try? callStore.previousRelatedCall(to: event)
         }
@@ -1298,7 +1304,11 @@ final class AppController {
             // dragging the user back to the call they left.
             if selectedCallDetail?.id == detail.id, let fresh = try callStore.fetchCall(id: detail.id) {
                 loadCallDetail(fresh)
+            } else if let selected = selectedCallDetail {
+                // the open call may be the next one after this call: its «В прошлый раз» shows this summary
+                previousCallForSelected = try? callStore.previousRelatedCall(toCallID: selected.id)
             }
+            refreshPreviousCallsForEvents()
         } catch {
             appendLog("Summary failed: \(error.localizedDescription)")
             if selectedCallDetail?.id == detail.id {
@@ -1319,6 +1329,7 @@ final class AppController {
         }
         do {
             let url = try CallExport.write(detail, result: result, type: type, to: URL(fileURLWithPath: settings.exportFolder))
+            try callStore.replaceExportCopy(callID: detail.id, with: url)
             appendLog("Exported \(detail.id) to \(url.path)")
         } catch {
             appendLog("Export failed: \(error.localizedDescription)")
@@ -1357,7 +1368,7 @@ final class AppController {
     /// The provider the settings point at, and how much transcript it can be given: the built-in
     /// model has a 64k context, the other two take the whole call.
     private func makeSummaryProvider() async throws -> (provider: ChatCompletionsProvider, characterBudget: Int) {
-        let prompt = settings.callTypes[0].prompt
+        let prompt = settings.callTypes.other.prompt
         switch settings.summaryProvider {
         case .openRouter:
             guard !settings.openRouterAPIKey.isEmpty else {
@@ -1468,6 +1479,8 @@ final class AppController {
         guard canDelete(call) else {
             return
         }
+        // a call waiting its turn would reach runSummary with its row gone
+        processingQueue.removeWaiting { $0.0.id == call.id }
         do {
             let exportFolder = settings.exportFolder.isEmpty ? nil : URL(fileURLWithPath: settings.exportFolder)
             try callStore.deleteCallAndFiles(id: call.id, exportFolder: exportFolder)
@@ -1556,17 +1569,19 @@ final class AppController {
     }
 
     /// a failed write (disk full, the 4 GB WAV limit) keeps what reached the disk and ends the call there
-    private func stopRecording(after writeError: String, capture: DualCapture) {
-        recordingWarning = Self.recordingWarning(forWriteError: writeError)
-        appendLog("Recording write failed: \(writeError)")
-        notifier.recordingStopped(reason: recordingWarning ?? writeError)
+    private func stopRecording(after writeError: any Error, capture: DualCapture) {
+        let warning = Self.recordingWarning(forWriteError: writeError)
+        recordingWarning = warning
+        appendLog("Recording write failed: \(writeError.localizedDescription)")
+        notifier.recordingStopped(reason: warning)
         capture.stop(reason: .writeFailed)
     }
 
-    nonisolated static func recordingWarning(forWriteError writeError: String) -> String {
-        writeError.contains("4 GB")
-            ? "Запись остановлена: файл дошёл до предела в 4 ГБ (около 3 часов). Сохранённое будет расшифровано."
-            : "Запись остановлена: не удалось записать звук на диск (\(writeError)). Сохранённое будет расшифровано."
+    nonisolated static func recordingWarning(forWriteError writeError: any Error) -> String {
+        if case AudioCaptureError.fileFull = writeError {
+            return "Запись остановлена: файл дошёл до предела в 4 ГБ (около 3 часов). Сохранённое будет расшифровано."
+        }
+        return "Запись остановлена: не удалось записать звук на диск (\(writeError.localizedDescription)). Сохранённое будет расшифровано."
     }
 
     private func stopLiveTicker() {

@@ -16,6 +16,16 @@ struct BesedaApp: App {
             ConversationsWindow(controller: controller)
                 .onAppear {
                     controller.showMainWindow = { showConversations() }
+                    #if DEBUG
+                    // SwiftUI opens the first window at launch; a popover shot has no use for it
+                    if ProcessInfo.processInfo.environment["BESEDA_PREVIEW_POPOVER"] != nil {
+                        DispatchQueue.main.async {
+                            NSApplication.shared.windows
+                                .first { $0.identifier?.rawValue.contains("conversations") == true }?
+                                .close()
+                        }
+                    }
+                    #endif
                 }
         }
         .defaultSize(width: 1100, height: 720)
@@ -35,6 +45,7 @@ struct BesedaApp: App {
                     openWindow(id: "onboarding")
                     NSApplication.shared.activate(ignoringOtherApps: true)
                 }
+                #if DEBUG
                 if let preview = ProcessInfo.processInfo.environment["BESEDA_PREVIEW_POPOVER"] {
                     if preview == "live" {
                         controller.status = .callRecording
@@ -42,6 +53,7 @@ struct BesedaApp: App {
                     }
                     openWindow(id: "popover-preview")
                 }
+                #endif
             }
         }
         .menuBarExtraStyle(.window)
@@ -94,12 +106,14 @@ struct BesedaApp: App {
         }
         .windowResizability(.contentSize)
 
-        // screenshots of the menu-bar window without clicking the status item;
+        #if DEBUG
+        // screenshots of the menu-bar window without clicking the status item, debug builds only;
         // opened at launch when BESEDA_PREVIEW_POPOVER is set; `live` shows a recording with canned live text
         Window("Popover preview", id: "popover-preview") {
             MenuBarPopover(controller: controller, openConversations: { showConversations() })
         }
         .windowResizability(.contentSize)
+        #endif
     }
 
     private func showConversations() {

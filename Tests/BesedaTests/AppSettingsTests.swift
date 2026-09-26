@@ -128,7 +128,28 @@ import Testing
 
     let settings = AppSettings(defaults: defaults)
 
-    #expect(settings.callTypes == [renamed])
+    #expect(settings.callTypes.map(\.name) == ["Рабочее"])
+    #expect(settings.callTypes[0].prompt == "p")
+}
+
+@MainActor
+@Test func storedTypesWithoutTheFlagMakeTheFirstOtherAndItKeepsTheFlagAnywhereInTheList() throws {
+    let suiteName = "beseda-test-\(UUID().uuidString)"
+    let defaults = UserDefaults(suiteName: suiteName)!
+    defer { defaults.removePersistentDomain(forName: suiteName) }
+    // the JSON a build before the flag wrote: no `isOther` key
+    defaults.set(Data("""
+        [{"id":"8C1E1A52-6F57-4C3C-9E0B-2B8D5B4E6A11","name":"Другое","description":"","prompt":"общий"},
+         {"id":"0B5D2E7A-1C4F-4B8E-8A3D-7E6F5A4B3C22","name":"Дейли","description":"","prompt":"p"}]
+        """.utf8), forKey: "beseda.callTypes")
+
+    let settings = AppSettings(defaults: defaults)
+    settings.callTypes.reverse()
+    let reloaded = AppSettings(defaults: defaults)
+    reloaded.deleteCallType(id: reloaded.callTypes[1].id)
+
+    #expect(reloaded.callTypes.map(\.name) == ["Дейли", "Другое"])
+    #expect(reloaded.callTypes.other.prompt == "общий")
 }
 
 @MainActor

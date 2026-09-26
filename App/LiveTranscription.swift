@@ -79,6 +79,7 @@ final class LiveTranscription {
     }
 }
 
+#if DEBUG
 extension LiveTranscription {
     /// canned lines and key points for `BESEDA_PREVIEW_POPOVER=live` screenshots: no capture, model or LLM
     static func preview() -> LiveTranscription {
@@ -107,3 +108,4 @@ extension LiveTranscription {
         return live
     }
 }
+#endif

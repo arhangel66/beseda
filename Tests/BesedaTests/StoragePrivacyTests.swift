@@ -73,3 +73,32 @@ private func permissions(_ url: URL) throws -> Int {
     #expect(try permissions(newFolder.appendingPathComponent("transcript.md")) == 0o600)
     #expect(try permissions(root.appendingPathComponent("calls.sqlite")) == 0o600)
 }
+
+@Test func renamedCallKeepsOneExportCopyAndDeletionRemovesIt() throws {
+    let root = try temporaryDirectory()
+    let exportFolder = root.appendingPathComponent("export", isDirectory: true)
+    try FileManager.default.createDirectory(at: exportFolder, withIntermediateDirectories: true)
+    let store = CallStore(dbURL: root.appendingPathComponent("calls.sqlite"))
+    try store.prepare()
+    try store.upsertCall(
+        id: "20260926-101500", kind: "dual", startedAt: Date(), endedAt: Date(), durationSec: 60, status: "ready",
+        transcriptURL: nil, audioDirectoryURL: root.appendingPathComponent("calls/none"), error: nil, appName: "Zoom"
+    )
+    func export() throws {
+        let call = try #require(try store.fetchCall(id: "20260926-101500"))
+        let detail = StoredCallDetail(summary: call, segments: [], speakerNames: [:], markdownText: nil, jobStats: nil)
+        let url = try CallExport.write(detail, result: "итоги", type: "Созвон", to: exportFolder)
+        try store.replaceExportCopy(callID: call.id, with: url)
+    }
+    try store.setEvent(callID: "20260926-101500", title: "Синк", eventID: nil, pinned: true)
+    try export()
+
+    try store.setEvent(callID: "20260926-101500", title: "Релиз 0.6", eventID: nil, pinned: true)
+    try export()
+    let copiesAfterRename = try FileManager.default.contentsOfDirectory(atPath: exportFolder.path)
+    try store.setEvent(callID: "20260926-101500", title: "Ретро", eventID: nil, pinned: true)
+    try store.deleteCallAndFiles(id: "20260926-101500", exportFolder: exportFolder)
+
+    #expect(copiesAfterRename.count == 1 && copiesAfterRename[0].hasSuffix(" Релиз 0.6.md"))
+    #expect(try FileManager.default.contentsOfDirectory(atPath: exportFolder.path).isEmpty)
+}

@@ -386,7 +386,7 @@ private struct ProcessingPane: View {
                             Button("Удалить тип", role: .destructive) {
                                 settings.deleteCallType(id: type.id)
                             }
-                            .disabled(type.id == settings.callTypes[0].id)
+                            .disabled(type.isOther)
                         }
                         .controlSize(.small)
                     } label: {

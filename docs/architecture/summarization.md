@@ -13,11 +13,13 @@ Both go through one `SerialQueue` in `AppController`: a call that finishes while
 waits its turn and is processed after it, in order. The queue lives in memory only — a quit drops it.
 
 **Call types.** `AppSettings.callTypes` (`[CallType]`, JSON under `beseda.callTypes`) — name, description
-for the classifier, prompt; never empty. `callTypes[0]` is the built-in «Другое» (`CallType.otherName`):
+for the classifier, prompt; never empty. The one type with `isOther` is the built-in «Другое» (`CallType.otherName`,
+found by `callTypes.other`, not by position):
 editable, but `deleteCallType` refuses it; it holds the general prompt and is the fallback. On a fresh
 install it is seeded with the old `beseda.summaryPrompt` if that was edited, else
 `ChatCompletionsProvider.defaultPrompt`. Migration: a first type still named «Созвон» (the BESEDA-46
-default) is renamed «Другое» on load, prompt and id kept.
+default) is renamed «Другое» on load, prompt and id kept; types stored before the `isOther` flag give it
+to their first type, which was «Другое» by position then.
 `SummarizationService.process` picks the type and then summarizes with its prompt:
 - a type given by the caller (`generateSummary(as:)`, for a picker on the call screen) is used as is;
 - with only «Другое», it is used without asking any model;
@@ -67,7 +69,12 @@ After `setSummary`/`setCallType`, `AppController.exportResult` writes `CallExpor
 `AppSettings.exportFolder` when it is set, as `yyyy-MM-dd HH-mm <title>.md` (title stripped of
 `/\:*?"<>|` and newlines, max 120 chars). A write error is logged and does not fail processing. The folder
 is a plain path, not a security-scoped bookmark: the app is not sandboxed; sandboxing would need one.
-A title change (e.g. linking a calendar event) writes a new file rather than renaming the old one.
+`CallStore.replaceExportCopy` keeps the written path in `calls.export_path`: after a title change (e.g.
+linking a calendar event) the new file is written and the one under the old title removed, so a call has
+one copy.
+
+When the open call's result arrives, `CallDetailView` switches to «Итоги». A finished summary also
+re-reads «В прошлый раз» for the open call and the upcoming events, since that call may be the one shown.
 
 ## Built-in runtime install
 
