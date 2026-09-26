@@ -20,9 +20,11 @@ the vendored Swift wrapper in `Vendor/TranscribeCpp`). No audio leaves the machi
   once and writes a marker naming the model. Switching models re-runs both. Models live in
   `Application Support/Beseda/runtime/models`.
 - **Transcription** — `LocalTranscriber` loads the selected model on its serial queue, reads the 16 kHz
-  mono file as Float32, cuts it with `UtteranceSplitter` (at the quietest moment in the window tail;
-  GigaAM windows, 120 s pieces otherwise just to move the progress bar), and runs each piece with word
-  timestamps. The model is unloaded after 10 minutes idle and on quit (`shutdown`).
+  mono file as Float32 through `SampleSource` one window at a time, cuts it with
+  `UtteranceSplitter.forEachPiece` (at the quietest moment in the window tail; GigaAM windows, 120 s pieces
+  otherwise), and runs each piece with word timestamps. A cut looks only inside its window, so reading the
+  window plus one sample gives exactly the pieces of the whole-array `split`; only words stay in memory.
+  The model is unloaded after 10 minutes idle and on quit (`shutdown`).
 - **Timestamps** — Parakeet returns word times; GigaAM only token times, so `WordAssembler` rebuilds
   words from SentencePiece tokens (U+2581 starts a word). Piece offsets are added back to absolute time.
   `SentenceBuilder` groups words into sentence segments (punctuation or a long pause).
@@ -44,14 +46,20 @@ the vendored Swift wrapper in `Vendor/TranscribeCpp`). No audio leaves the machi
   `me.asr.json` keeps everything. One delay and one gain: a real room's smeared echo will get through more
   often. On Mikhail's real calls (headphones) there is no echo to remove and the gate keeps every word
   ([echo gate on real calls](../decisions/speaker-accuracy.md#echo-gate-on-real-calls-beseda-95)).
-- **Merge** — `DualTranscriptResult.speakerSegments` interleaves `me` segments with the remote turns by
+  Both channels are read in 8 s windows: one pass for the lag, one for the gain and frame energies; only
+  per-frame numbers (~9 bytes per 20 ms) are kept.
+- **Memory on long calls (BESEDA-102)** — measured by `peakMemoryOnASyntheticLongCall`
+  (`BESEDA_LONG_CALL_MEMORY=echo|asr`, synthetic 4-hour two-channel call in a temp dir, model not run),
+  peak RSS of the test process: echo gate 3576 MB before, 62 MB after; reading and cutting for ASR
+  1772 MB before, 77 MB after. `noReadGrowsWithTheLengthOfTheCall` checks the largest read is the same
+  for a 5 and a 20 minute call (120 s + 1 sample).- **Merge** — `DualTranscriptResult.speakerSegments` interleaves `me` segments with the remote turns by
   start time. `TranscriptMerger.writeDualTranscript` writes `transcript.md` with a `## Dialogue` block
   and a `## Channels` block (per-channel text and segments). `SpeakerNaming` turns keys into display
   names; renames rewrite only the dialogue block (`rewriteDialogue`).
 
 ## Main files
 
-`Transcription/LocalTranscriber.swift`, `SpeechModel.swift`, `UtteranceSplitter.swift`,
+`Transcription/LocalTranscriber.swift`, `SampleSource.swift`, `SpeechModel.swift`, `UtteranceSplitter.swift`,
 `WordAssembler.swift`, `SentenceBuilder.swift`, `EchoGate.swift`, `Diarizer.swift`, `SpeakerAssignment.swift`,
 `SpeakerNaming.swift`, `TranscriptMerger.swift`, `TranscriptModels.swift`; `Runtime/RuntimeInstaller.swift`;
 the pipeline order is in `AppController.transcribeDualCall`.

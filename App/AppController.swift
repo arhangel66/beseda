@@ -1093,10 +1093,10 @@ final class AppController {
 
     /// the mic transcript without the remote side it picked up from the speakers; me.asr.json keeps it all
     private func echoGated(_ microphone: TranscriptResult, system: TranscriptResult) throws -> TranscriptResult {
-        let segments = EchoGate.ownSpeechSegments(
+        let segments = try EchoGate.ownSpeechSegments(
             microphone.segments,
-            mic: try LocalTranscriber.readSamples(at: microphone.normalizedAudioURL),
-            system: try LocalTranscriber.readSamples(at: system.normalizedAudioURL)
+            mic: .file(at: microphone.normalizedAudioURL),
+            system: .file(at: system.normalizedAudioURL)
         )
         appendLog("Echo gate kept \(segments.count) of \(microphone.segments.count) microphone sentences")
         return TranscriptResult(
