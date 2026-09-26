@@ -81,7 +81,7 @@ struct CallSummaryView: View {
 
     private func ready(_ text: String) -> some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text(rendered(text))
+            Text(Self.rendered(text))
                 .font(.body)
                 .lineSpacing(5)
                 .textSelection(.enabled)
@@ -102,7 +102,7 @@ struct CallSummaryView: View {
 
     /// inline-only markdown: `**bold**` and the line breaks survive, `#` headers would not,
     /// which is why the summaries are written without them
-    private func rendered(_ text: String) -> AttributedString {
+    static func rendered(_ text: String) -> AttributedString {
         (try? AttributedString(
             markdown: text,
             options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)
