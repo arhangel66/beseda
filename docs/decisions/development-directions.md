@@ -94,7 +94,7 @@ projects, on a Mac. Alternative, kept out of v1: private psychologists — diffe
 - **What.** Make the Russian / Russian-English quality a number, not a claim.
 - **Why.** It is the one engine-level advantage over the Parakeet/Whisper-based competitors — if it holds.
 - **Today.** GigaAM v3 and Parakeet v3 selectable (`Transcription/SpeechModel.swift`); an earlier bakeoff
-  in `docs/asr-bakeoff.md`.
+  in `docs/archive/asr-bakeoff.md`.
 - **First step.** A small fixed set of real work calls (Russian, mixed, English terms) with reference text;
   WER for Beseda's engines and the competitors' engines.
 - **Success.** A published, reproducible WER table where Beseda is better on Russian and mixed speech.
