@@ -22,7 +22,8 @@ rm -rf "$INSTALL_DIR"
 
 mv "$APP_DIR" "$INSTALL_DIR"
 
-# the script killed a possibly running instance at the start; leave it running again
-open "$INSTALL_DIR"
+# the script killed a possibly running instance at the start; leave it running again,
+# in the background: never take the focus of whoever works on this Mac
+open -g -j "$INSTALL_DIR"
 
 echo "$INSTALL_DIR"

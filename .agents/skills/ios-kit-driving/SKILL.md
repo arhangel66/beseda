@@ -5,6 +5,10 @@ description: Drive and verify the kit's expense journey with AXe or XCUITest usi
 
 # Kit UI driving
 
+**Someone works on this Mac.** Never activate an app, never open Simulator.app (`xcrun simctl boot`,
+`simctl io`, XCUITest are all headless), launch Mac apps with `open -g -j`, and keep simulator audio off
+the speakers (`scripts/silence-simulators.sh`). See `docs/headless.md` in the kit.
+
 AXe 1.5.2 was the measured shell-driver winner on the earlier Xcode setup.
 With Xcode 26.6 on 2026-09-21 it failed before reading the UI because its
 private `SimulatorKit` dependency had no compatible architecture. Treat AXe as
@@ -103,12 +107,12 @@ Mockup left, app right, both scaled to 390 pt at 2x, a label over each half (`--
 
 ## Recording simulator audio
 
-The simulator plays through the Mac's default output, so route that to BlackHole for the run and record
-BlackHole with the kit recorder. Never `ffmpeg -f avfoundation`: its capture adds clicks on a 256-sample grid
+The kit's `check.sh` and `run.sh` already route the simulator's own output to BlackHole
+(`scripts/silence-simulators.sh`); the Mac's output device is never touched. Record BlackHole with the kit recorder. Never `ffmpeg -f avfoundation`: its capture adds clicks on a 256-sample grid
 that are not in the app (proved in WholeBook FAB-81).
 
 ```bash
-SwitchAudioSource -t output -s "BlackHole 2ch"   # or System Settings > Sound; switch back after
+scripts/silence-simulators.sh "$UDID"            # after every boot; never switch the Mac's output
 swiftc scripts/record-blackhole.swift -o /tmp/rec && /tmp/rec 25 out.caf   # lossless, default input untouched
 python3 scripts/find-clicks.py out.caf           # needs ffmpeg and numpy
 ```
