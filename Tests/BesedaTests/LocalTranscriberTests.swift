@@ -18,13 +18,15 @@ import Testing
     }
 }
 
-@Test func theInstalledModelTranscribesRealSpeech() async throws {
+private let jfkSample = AppPaths.sourceRoot.appendingPathComponent("samples/jfk.wav")
+
+// the model is installed and samples/ is gitignored; a fresh checkout or worktree has neither, so it skips
+@Test(.enabled(if: SpeechModel.default.isDownloaded(in: AppPaths.current.modelsDirectory)
+    && FileManager.default.fileExists(atPath: jfkSample.path)))
+func theInstalledModelTranscribesRealSpeech() async throws {
     let paths = AppPaths.current
     let model = SpeechModel.default
-    // the model is installed, not vendored; without it there is nothing to assert against
-    try #require(model.isDownloaded(in: paths.modelsDirectory))
-    let sample = AppPaths.sourceRoot.appendingPathComponent("samples/jfk.wav")
-    try #require(FileManager.default.fileExists(atPath: sample.path))
+    let sample = jfkSample
 
     let transcriber = LocalTranscriber(paths: paths, model: model)
     let ready = try await transcriber.start()

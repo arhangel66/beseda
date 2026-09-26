@@ -80,10 +80,13 @@ private let openRouter = URL(string: "https://openrouter.ai/api/v1")!
 @Test func parseTellsARefusedKeyApartFromAnyOtherFailure() {
     for status in [401, 402, 403] {
         do {
-            _ = try ChatCompletionsProvider.parse(Data("{}".utf8), status: status, serviceName: "OpenRouter")
+            let response = Data("""
+                {"error": {"message": "remote implementation detail"}}
+                """.utf8)
+            _ = try ChatCompletionsProvider.parse(response, status: status, serviceName: "OpenRouter")
             Issue.record("ожидалась ошибка unauthorized для \(status)")
         } catch SummarizationError.unauthorized(let message) {
-            #expect(message == "OpenRouter не принял ключ")
+            #expect(message == "Ключ OpenRouter не принят")
         } catch {
             Issue.record("неожиданная ошибка: \(error)")
         }

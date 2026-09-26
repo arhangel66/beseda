@@ -183,7 +183,7 @@ private struct Harness {
 }
 
 @MainActor
-@Test func removingTakesBackBothTheModelAndTheEngine() async throws {
+@Test func removingTakesBackTheModelAndKeepsTheEngine() async throws {
     let harness = try Harness()
     defer { harness.tearDown() }
 
@@ -194,7 +194,8 @@ private struct Harness {
 
     #expect(!installer.isReady)
     #expect(!FileManager.default.fileExists(atPath: harness.artifacts.modelFile(harness.paths).path))
-    #expect(!FileManager.default.fileExists(atPath: harness.artifacts.buildDirectory(harness.paths).path))
+    #expect(harness.artifacts.isRuntimeInstalled(harness.paths))
+    #expect(!FileManager.default.fileExists(atPath: harness.artifacts.warmUpMarker(harness.paths).path))
 }
 
 @MainActor

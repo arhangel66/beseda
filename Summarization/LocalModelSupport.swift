@@ -71,17 +71,8 @@ enum LocalModelSupport {
 
     /// settles on a server and a model from the settings values, falling back to discovery when they are unset
     static func resolve(serverURL: String, model: String) async throws -> SummaryConnection {
-        let baseURL: URL
-        if !serverURL.isEmpty {
-            guard let url = URL(string: serverURL) else {
-                throw SummarizationError.unavailable("Адрес сервера не похож на URL")
-            }
-            baseURL = url
-        } else if let discovered = try await discoverServer() {
-            baseURL = discovered
-        } else {
-            throw SummarizationError.unavailable("LM Studio не запущен")
-        }
+        let discovered = serverURL.isEmpty ? try await discoverServer() : nil
+        let baseURL = try resolvedBaseURL(serverURL: serverURL, discovered: discovered)
 
         if !model.isEmpty {
             return SummaryConnection(baseURL: baseURL, model: model)
@@ -93,6 +84,21 @@ enum LocalModelSupport {
             throw SummarizationError.unavailable("В LM Studio не загружено ни одной чат-модели")
         }
         return SummaryConnection(baseURL: baseURL, model: chosen)
+    }
+
+    /// Pure part of server resolution, kept separate so the stopped-server recovery stays tested
+    /// without requiring LM Studio on the test machine.
+    static func resolvedBaseURL(serverURL: String, discovered: URL?) throws -> URL {
+        if !serverURL.isEmpty {
+            guard let url = URL(string: serverURL) else {
+                throw SummarizationError.unavailable("Адрес сервера не похож на URL")
+            }
+            return url
+        }
+        guard let discovered else {
+            throw SummarizationError.serverDown("LM Studio не запущен")
+        }
+        return discovered
     }
 
     private struct ServerStatus: Decodable {

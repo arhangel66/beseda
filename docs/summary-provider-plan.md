@@ -49,7 +49,7 @@ New keys in `AppSettings`, plain `UserDefaults` like everything else:
 ```
 beseda.summaryProvider     "openrouter" | "builtin" | "lmstudio", default "builtin"
 beseda.openRouterAPIKey    string, default ""
-beseda.openRouterModel     string, default "anthropic/claude-opus-5" (the one measured)
+beseda.openRouterModel     string, default "google/gemini-3.8-flash"
 ```
 
 `summaryServerURL` and `summaryModel` keep their meaning for LM Studio only.
