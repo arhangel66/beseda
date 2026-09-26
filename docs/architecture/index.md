@@ -5,6 +5,7 @@ explain how the parts fit and what constrains them.
 
 - [Audio capture](audio-capture.md) — microphone and system audio as separate channels, call detection, levels.
 - [ASR](asr.md) — local speech recognition (Parakeet, GigaAM), timestamps, diarization, transcript merge.
+- [Live transcription](live-transcription.md) — the optional me/them preview and key points during a call.
 - [Storage](storage.md) — the SQLite call index, the archive on disk, search and audio retention.
 - [Integrations](integrations.md) — the webhook and other ways calls leave the app.
 - [Summarization](summarization.md) — how a call summary is produced, shown on the call screen and exported to Markdown.

@@ -18,7 +18,8 @@ and keeps the app alive when the last window closes; `applicationWillTerminate` 
 
 **Transcription pipeline** (dual call):
 
-1. `runDualRecording` creates the call folder and saves the call as `recording`, runs `DualCapture`, then
+1. `runDualRecording` creates the call folder and saves the call as `recording`, runs `DualCapture` (with
+   the optional [live transcription](live-transcription.md), stopped and awaited when capture ends), then
    normalizes both channels in parallel (`AudioNormalizer`, stage 1 of 5).
 2. `transcribeDualCall` starts the transcriber, runs `transcribeChannel` for the microphone and then the
    system audio, diarizes the system channel (`diarizedTurns`; a failure only skips it), and writes

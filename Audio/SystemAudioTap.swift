@@ -40,6 +40,10 @@ final class SystemAudioTap: @unchecked Sendable {
         set { recorder?.isPaused = newValue }
     }
 
+    var droppedBufferCount: Int {
+        recorder?.droppedBufferCount ?? 0
+    }
+
     func start(writingTo url: URL? = nil) throws {
         let excludedProcesses = currentProcessAudioObject().map { [$0] } ?? []
         let description = CATapDescription(stereoGlobalTapButExcludeProcesses: excludedProcesses)

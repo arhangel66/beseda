@@ -154,6 +154,9 @@ struct MenuBarPopover: View {
                 meterRow(icon: "mic", level: controller.microphoneLevel, color: .green, label: "микрофон")
                 meterRow(icon: "speaker.wave.2", level: controller.systemAudioLevel, color: .accentColor, label: "собеседник")
             }
+            if let live = controller.liveTranscription {
+                liveTranscript(live)
+            }
             HStack(spacing: 8) {
                 Button(controller.isPaused ? "Продолжить" : "Пауза") {
                     controller.togglePause()
@@ -187,6 +190,42 @@ struct MenuBarPopover: View {
                 Text("Разговор уже сохранён. Окно можно закрыть: расшифровка допишется в фоне.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    /// the live preview: key points above, the last lines below, scrolled to the newest
+    private func liveTranscript(_ live: LiveTranscription) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            if !live.keyPoints.isEmpty {
+                Text("Ключевые моменты")
+                    .font(.caption.weight(.semibold))
+                Text(live.keyPoints)
+                    .font(.caption)
+                    .textSelection(.enabled)
+            }
+            if live.lines.isEmpty {
+                Text("Черновик появится примерно через 20 секунд")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } else {
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        LazyVStack(alignment: .leading, spacing: 4) {
+                            ForEach(live.lines.suffix(40)) { line in
+                                (Text(line.channel == .microphone ? "Я: " : "Собеседник: ").bold() + Text(line.text))
+                                    .font(.caption)
+                                    .foregroundStyle(line.channel == .microphone ? .primary : .secondary)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .id(line.id)
+                            }
+                        }
+                    }
+                    .frame(height: 140)
+                    .onChange(of: live.lines.last?.id) { _, id in
+                        proxy.scrollTo(id, anchor: .bottom)
+                    }
+                }
             }
         }
     }

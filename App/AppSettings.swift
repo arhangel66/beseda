@@ -50,6 +50,7 @@ final class AppSettings {
     private let normalizedRetentionKey = "beseda.normalizedAudioRetention"
     private let stopOnSilenceKey = "beseda.stopOnSilence"
     private let notifyWhenReadyKey = "beseda.notifyWhenReady"
+    private let transcribesDuringCallKey = "beseda.transcribesDuringCall"
     private let onboardingDoneKey = "beseda.onboardingDone"
     private let copyFormatKey = "beseda.copyFormat"
     private let calendarEnabledKey = "beseda.calendarEnabled"
@@ -97,6 +98,13 @@ final class AppSettings {
     var stopOnSilence: Bool {
         didSet {
             defaults.set(stopOnSilence, forKey: stopOnSilenceKey)
+        }
+    }
+
+    /// the live preview in the menu bar while recording; the post-call transcript is still the result
+    var transcribesDuringCall: Bool {
+        didSet {
+            defaults.set(transcribesDuringCall, forKey: transcribesDuringCallKey)
         }
     }
 
@@ -248,6 +256,7 @@ final class AppSettings {
             .flatMap(RetentionRule.init(rawValue:)) ?? .days30
         self.stopOnSilence = AppSettings.bool(defaults, stopOnSilenceKey, otherwise: true)
         self.notifyWhenReady = AppSettings.bool(defaults, notifyWhenReadyKey, otherwise: true)
+        self.transcribesDuringCall = defaults.bool(forKey: transcribesDuringCallKey)
         self.onboardingDone = defaults.bool(forKey: onboardingDoneKey)
         self.copyFormat = defaults.string(forKey: copyFormatKey)
             .flatMap(TranscriptCopyFormat.init(rawValue:)) ?? .timestamped

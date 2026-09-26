@@ -47,7 +47,9 @@ per buffer; the level checks pass no file and write nothing).
 Out, into the call folder (see [storage](storage.md)): `me.raw.wav`, `them.raw.wav` at the device
 rate and channel count, and `session.json` (start/end, duration, stop reason, file metadata).
 `AudioNormalizer` then converts each raw file with `AVAudioConverter` to 16 kHz mono Int16
-`me.asr.wav` / `them.asr.wav` — the input of [ASR](asr.md).
+`me.asr.wav` / `them.asr.wav` — the input of [ASR](asr.md). While recording, the optional
+[live transcription](live-transcription.md) reads the growing raw files; `PCMFloatRecorder` counts buffers it
+failed to write (`droppedBufferCount`) so that loop can back off.
 
 ## Constraints
 
