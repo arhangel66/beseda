@@ -27,6 +27,7 @@ sources:
 **Status: proposed; the two no-model fixes (echo gate, diarizer timeline) are implemented** in the app
 (BESEDA-45, see [ASR](../architecture/asr.md)), not rescored through the app pipeline yet. Part of the table is measured, the rest waits for the benchmark rerun
 (`untracked/epics/speaker-accuracy/run_all.sh`); the Mac was overloaded when this was written.
+A manual merge of two remote speakers exists in the call view (BESEDA-80, see [Storage](../architecture/storage.md)).
 Everything stays local, the benchmark included. Direction E in [development directions](development-directions.md).
 
 ## Today's pipeline

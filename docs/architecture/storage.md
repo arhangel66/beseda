@@ -35,6 +35,12 @@ folder is moved here once by `LegacyDataMigration`.
   the user, lowercased emails, newline-joined) are nullable TEXT written by `setEvent` whenever an event
   is matched or picked; calls linked before them stay null. They feed [related calls](related-calls.md). On launch `failInterruptedCalls` marks calls
   left in `recording`/`normalizing`/`transcribing` as failed.
+- **Speaker merge** — the diarizer can split one remote person into several `them-N`. In the call view a
+  line's context menu «Объединить с» folds its speaker into another remote one: `mergeSpeaker` rewrites
+  `transcript_segments.speaker` and drops the merged key's rename in one transaction, then
+  `transcript.md` is rewritten. `me` is never offered. The speaker count is not stored anywhere; lanes and
+  names are derived from the segments, so they follow. A retry re-diarizes and undoes the merge.
+  Before/after: [evidence/beseda-80-before-merge.png](evidence/beseda-80-before-merge.png), [evidence/beseda-80-after-merge.png](evidence/beseda-80-after-merge.png).
 - **Search** — the sidebar filters loaded calls by `StoredCallSummary.searchableText` (title, app, date,
   preview, error). From two characters on, `searchCallIDs` also matches transcript text with an escaped
   `LIKE '%query%'` over `transcript_segments`. No full-text index.

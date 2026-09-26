@@ -821,6 +821,22 @@ final class CallStore {
         }
     }
 
+    /// relabels every segment of `speakerKey` as `targetKey`; the merged speaker's name goes with it
+    func mergeSpeaker(callID: String, speakerKey: String, into targetKey: String) throws {
+        try database { db in
+            try execute(db, "BEGIN IMMEDIATE TRANSACTION")
+            do {
+                try run(db, "UPDATE transcript_segments SET speaker = ? WHERE call_id = ? AND speaker = ?",
+                        targetKey, callID, speakerKey)
+                try run(db, "DELETE FROM call_speakers WHERE call_id = ? AND speaker_key = ?", callID, speakerKey)
+                try execute(db, "COMMIT")
+            } catch {
+                try? execute(db, "ROLLBACK")
+                throw error
+            }
+        }
+    }
+
     func fetchSpeakerNames(callID: String) throws -> [String: String] {
         try database { db in
             let pairs = try query(db, "SELECT speaker_key, display_name FROM call_speakers WHERE call_id = ?", callID) {
