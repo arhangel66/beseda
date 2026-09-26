@@ -110,9 +110,12 @@ struct StoredCallSummary: Identifiable, Hashable {
         "\(whenDescription.prefix(1).uppercased())\(whenDescription.dropFirst()) · \(durationDescription)"
     }
 
-    /// the sidebar's leading column: just the start time
+    /// the sidebar's leading column: the time under «Сегодня» and «Вчера», date and time further back
     var clockDescription: String {
-        startedDate.map { CallFormatting.clock($0) } ?? ""
+        guard let startedDate else {
+            return ""
+        }
+        return dayGroup <= .yesterday ? CallFormatting.clock(startedDate) : CallFormatting.when(startedDate)
     }
 
     var durationDescription: String {
@@ -303,7 +306,8 @@ final class CallStore {
                 ("summary_text", "TEXT"),
                 ("call_type", "TEXT"),
                 ("event_series_id", "TEXT"),
-                ("participants", "TEXT")
+                ("participants", "TEXT"),
+                ("export_path", "TEXT")
             ] where !callColumns.contains(column) {
                 try execute(db, "ALTER TABLE calls ADD COLUMN \(column) \(type)")
             }
@@ -434,7 +438,12 @@ final class CallStore {
             return
         }
         // files go first: if one cannot be removed, the row stays and the user can try again
-        var urls = [call.transcriptURL, exportFolder?.appendingPathComponent(CallExport.fileName(call))]
+        // the stored path finds a copy written under an older title; the current name covers
+        // copies written before the path was stored
+        var urls = [
+            call.transcriptURL, exportFolder?.appendingPathComponent(CallExport.fileName(call)),
+            try exportPath(callID: id).map { URL(fileURLWithPath: $0) }
+        ]
         if !call.audioDirectoryPath.isEmpty {
             urls.append(call.audioDirectoryURL)
         }
@@ -622,6 +631,24 @@ final class CallStore {
         try database { db in
             try run(db, "UPDATE calls SET call_type = ?, updated_at = ? WHERE id = ?",
                     name, Date().iso8601WithFractions, callID)
+        }
+    }
+
+    /// where the call's Markdown copy was last written; nil when it was never exported
+    func exportPath(callID: String) throws -> String? {
+        try database { db in
+            try query(db, "SELECT export_path FROM calls WHERE id = ?", callID) { columnString($0, 0) }.first ?? nil
+        }
+    }
+
+    /// a renamed call is written under a new name: the copy under the old one goes, or it lingers
+    func replaceExportCopy(callID: String, with url: URL) throws {
+        if let oldPath = try exportPath(callID: callID), oldPath != url.path,
+           FileManager.default.fileExists(atPath: oldPath) {
+            try FileManager.default.removeItem(atPath: oldPath)
+        }
+        try database { db in
+            try run(db, "UPDATE calls SET export_path = ? WHERE id = ?", url.path, callID)
         }
     }
 

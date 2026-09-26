@@ -109,7 +109,7 @@ private let call = StoredCallDetail(
     #expect(try store.fetchCall(id: "old")?.callType == "Личный 1:1")
 }
 
-private let other = CallType(name: "Другое", description: "ни один другой тип не подходит", prompt: "промпт другого")
+private let other = CallType(name: "Другое", description: "ни один другой тип не подходит", prompt: "промпт другого", isOther: true)
 
 /// the recorded response from OpenRouter's Jev tutorial, with its `team` question renamed to ours
 private let recordedJevResponse = """
@@ -137,11 +137,11 @@ private func jev(answering choice: String, probability: Double) -> JevClassifier
     })
 }
 
-@Test func aGarbageAnswerFromTheLocalModelFallsBackToOther() async throws {
+@Test func aGarbageAnswerFromTheLocalModelFallsBackToOtherWhereverItIsListed() async throws {
     let model = StubModel(answer: "не знаю")
 
     let (type, _) = try await SummarizationService.process(
-        call, types: [other, work], characterBudget: 1000, provider: model.provider
+        call, types: [work, other], characterBudget: 1000, provider: model.provider
     )
 
     #expect(type == other)

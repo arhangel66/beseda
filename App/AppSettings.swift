@@ -172,7 +172,7 @@ final class AppSettings {
         }
     }
 
-    /// never empty, `[0]` is «Другое»: the classifier runs only when there are two or more
+    /// never empty, exactly one `isOther`: the classifier runs only when there are two or more
     var callTypes: [CallType] {
         didSet {
             defaults.set(try? JSONEncoder().encode(callTypes), forKey: callTypesKey)
@@ -188,7 +188,7 @@ final class AppSettings {
 
     /// «Другое» stays whatever is asked
     func deleteCallType(id: CallType.ID) {
-        guard id != callTypes[0].id else {
+        guard id != callTypes.other.id else {
             return
         }
         callTypes.removeAll { $0.id == id }
@@ -271,7 +271,7 @@ final class AppSettings {
         self.summaryModel = defaults.string(forKey: summaryModelKey) ?? ""
         self.callTypes = defaults.data(forKey: callTypesKey)
             .flatMap { try? JSONDecoder().decode([CallType].self, from: $0) }
-            .flatMap { $0.isEmpty ? nil : AppSettings.renamingDefaultToOther($0) }
+            .flatMap { $0.isEmpty ? nil : AppSettings.migratingStoredCallTypes($0) }
             ?? [AppSettings.defaultCallType(legacyPrompt: defaults.string(forKey: legacySummaryPromptKey))]
         self.classifyLocally = defaults.bool(forKey: classifyLocallyKey)
         self.autoProcessCalls = defaults.bool(forKey: autoProcessCallsKey)
@@ -295,15 +295,19 @@ final class AppSettings {
 
     static func defaultCallType(legacyPrompt: String?) -> CallType {
         let prompt = legacyPrompt.flatMap { $0.isEmpty ? nil : $0 } ?? ChatCompletionsProvider.defaultPrompt
-        return CallType(name: CallType.otherName, description: "ни один другой тип не подходит", prompt: prompt)
+        return CallType(name: CallType.otherName, description: "ни один другой тип не подходит", prompt: prompt, isOther: true)
     }
 
-    /// BESEDA-46 seeded one type named «Созвон»; unrenamed, it becomes «Другое» with its prompt kept
-    static func renamingDefaultToOther(_ types: [CallType]) -> [CallType] {
+    /// Types stored before `isOther` meant «Другое» by position: the first one gets the flag.
+    /// BESEDA-46 seeded one type named «Созвон»; unrenamed, it becomes «Другое» with its prompt kept.
+    static func migratingStoredCallTypes(_ types: [CallType]) -> [CallType] {
+        var types = types
+        if !types.contains(where: \.isOther) {
+            types[0].isOther = true
+        }
         guard types[0].name == "Созвон" else {
             return types
         }
-        var types = types
         types[0].name = CallType.otherName
         if types[0].description == "любой разговор" {
             types[0].description = "ни один другой тип не подходит"

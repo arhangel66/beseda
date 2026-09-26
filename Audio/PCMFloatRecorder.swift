@@ -22,7 +22,7 @@ final class PCMFloatRecorder: @unchecked Sendable {
     private var frameCount = 0
     private var paused = false
     private var failedWrites = 0
-    private var firstWriteError: String?
+    private var firstWriteError: (any Error)?
     private let maximumDataBytes: Int
 
     /// a WAV header holds 32-bit sizes: past 4 GiB (~3 h of 48 kHz stereo) the file is unreadable,
@@ -66,7 +66,7 @@ final class PCMFloatRecorder: @unchecked Sendable {
     }
 
     /// the first write that failed (disk full, the file size limit), kept for the user to see
-    var writeError: String? {
+    var writeError: (any Error)? {
         lock.withLock { firstWriteError }
     }
 
@@ -196,7 +196,7 @@ final class PCMFloatRecorder: @unchecked Sendable {
                 try file.write(from: buffer)
             } catch {
                 failedWrites += 1
-                firstWriteError = firstWriteError ?? error.localizedDescription
+                firstWriteError = firstWriteError ?? error
                 throw error
             }
             frameCount += frames

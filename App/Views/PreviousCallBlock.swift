@@ -29,7 +29,7 @@ struct PreviousCallBlock: View {
                 Label("В прошлый раз · \(content.dateLine)", systemImage: "clock.arrow.circlepath")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
-                Spacer(minLength: 0)
+                // right beside the label: on a wide pane a trailing button drifts far from what it opens
                 Button("Открыть") { open(content.callID) }
                     .buttonStyle(.link)
                     .font(.caption)

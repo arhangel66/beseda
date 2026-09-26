@@ -49,9 +49,11 @@ folder is moved here once by `LegacyDataMigration`.
   bits kept, so built binaries stay executable) and setting `completeUntilFirstUserAuthentication` file
   protection where the volume supports it.
 - **Deletion** — `CallStore.deleteCallAndFiles` removes the transcript file, the call folder and the
-  export copy named by `CallExport.fileName` first, then the row; segments, jobs, speakers and webhook
-  deliveries go by `ON DELETE CASCADE`. `deleteCall` turns on `secure_delete` and truncates the WAL, so
-  deleted text is not left in free pages. An export copy written under an older title is not found.
+  export copy first — the one at the stored `calls.export_path` (the last written, whatever the title was
+  then) and the one named by `CallExport.fileName` (copies written before the path was stored) — then the
+  row; segments, jobs, speakers and webhook deliveries go by `ON DELETE CASCADE`. `deleteCall` turns on
+  `secure_delete` and truncates the WAL, so deleted text is not left in free pages. A call still waiting
+  in the processing queue is dropped from it first.
 
 ## Main files
 

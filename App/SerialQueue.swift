@@ -9,6 +9,11 @@ final class SerialQueue<Job> {
         self.run = run
     }
 
+    /// drops jobs not started yet; the running one is not touched
+    func removeWaiting(where shouldRemove: (Job) -> Bool) {
+        waiting.removeAll(where: shouldRemove)
+    }
+
     func enqueue(_ job: Job) {
         waiting.append(job)
         guard !isRunning else {

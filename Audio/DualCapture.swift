@@ -75,7 +75,7 @@ final class DualCapture: @unchecked Sendable {
     }
 
     /// the first write either channel failed, e.g. disk full or the 4 GB WAV limit; nil while all is well
-    var writeError: String? {
+    var writeError: (any Error)? {
         let (microphone, tap) = lock.withLock { (_microphone, _systemTap) }
         return microphone?.recorder?.writeError ?? tap?.recorder?.writeError
     }

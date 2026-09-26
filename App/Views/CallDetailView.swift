@@ -89,6 +89,12 @@ struct CallDetailView: View {
             player.load(controller.selectedCallDetail?.summary)
             tab = openingTab
         }
+        // processing finished on the open call: its result is what the user is waiting for
+        .onChange(of: detail?.summary.summaryText?.isEmpty == false) { hadResult, hasResult in
+            if !hadResult, hasResult {
+                tab = .summary
+            }
+        }
         .onAppear {
             player.load(controller.selectedCallDetail?.summary)
             tab = openingTab

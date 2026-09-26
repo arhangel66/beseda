@@ -52,6 +52,15 @@ excerpt leave the Mac when Jev is used. A Jev failure falls back to the summary 
 Per-type privacy is impossible: the type is unknown until the classifier has seen the call. How it is
 wired: [summarization](../architecture/summarization.md).
 
+### The 0.5 confidence threshold
+Below `SummarizationService.jevMinimumProbability` (0.5) Jev's pick is not trusted and the call goes to
+«Другое». 0.5 is a round guess, kept on purpose (BESEDA-74): the test fixtures hold no labeled calls — only
+one recorded Jev response — so there is nothing to measure a better value on, and a changed number would be
+just another guess. Revisit when real calls have been classified and the user corrected some of them.
+
+«Другое» is found by the `CallType.isOther` flag, not by list position; settings stored before the flag
+give it to their first type on load.
+
 ## Original recommendation (superseded on the default)
 1. **Default: the bundled llama-server** picks the type from the user's list (first ~2k tokens plus the
    type descriptions). Local, private, no new dependency.

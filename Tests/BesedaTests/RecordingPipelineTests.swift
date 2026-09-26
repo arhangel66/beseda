@@ -24,6 +24,28 @@ import Testing
     #expect(processed == ["first", "second"])
 }
 
+@MainActor
+@Test func aDeletedCallWaitingInTheQueueIsNotProcessed() async {
+    var processed: [String] = []
+    var release: CheckedContinuation<Void, Never>?
+    let queue = SerialQueue<String> { callID in
+        if callID == "running" {
+            await withCheckedContinuation { release = $0 }
+        }
+        processed.append(callID)
+    }
+
+    queue.enqueue("running")
+    while release == nil { await Task.yield() }
+    queue.enqueue("deleted")
+    queue.enqueue("kept")
+    queue.removeWaiting { $0 == "deleted" }
+    release?.resume()
+    while processed.count < 2 { await Task.yield() }
+
+    #expect(processed == ["running", "kept"])
+}
+
 @Test func writePastTheLimitSurfacesAsARecordingWarning() throws {
     let directory = FileManager.default.temporaryDirectory
         .appendingPathComponent("beseda-limit-\(UUID().uuidString)", isDirectory: true)
@@ -44,6 +66,6 @@ import Testing
     let writeError = try #require(recorder.writeError)
     #expect(recorder.droppedBufferCount == 1)
     #expect(AppController.recordingWarning(forWriteError: writeError).contains("4 ГБ"))
-    #expect(AppController.recordingWarning(forWriteError: "No space left").contains("не удалось записать"))
+    #expect(AppController.recordingWarning(forWriteError: CocoaError(.fileWriteOutOfSpace)).contains("не удалось записать"))
     #expect(try recorder.finish().frameCount == 1_000)
 }

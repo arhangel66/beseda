@@ -18,7 +18,8 @@ track.
   unmuted), wraps it in a private aggregate device and reads it through an IO proc block on its own
   dispatch queue.
 - **Both** — `DualCapture.record` starts the tap, then the microphone, sleeps until the maximum
-  duration (4 h, set in `AppController`), a manual `stop()`, or silence auto-stop. Auto-stop fires when
+  duration (4 h, set in `AppController`; the 4 GB limit ends a 48 kHz stereo call first, but the formats
+  come from the devices, so on a mono or lower-rate one the cap still matters), a manual `stop()`, or silence auto-stop. Auto-stop fires when
   *both* channels have been quiet for the configured time, checked every 2 s. Pause drops buffers on
   both channels so the files stay aligned.
 - **Call detection** — `CallDetector` watches which processes hold the microphone
@@ -54,7 +55,8 @@ failed to write (`droppedBufferCount`) so that loop can back off.
 A failed write (disk full, the 4 GB limit below) is not only logged: `PCMFloatRecorder.writeError` keeps
 the first one, the live ticker in `AppController` sees it through `DualCapture.writeError`, stops the
 recording (`stopReason` `writeFailed`), sets `recordingWarning` (shown in the popover until the next
-recording) and posts a «Запись остановлена» notification. What reached the disk is transcribed as usual.
+recording; the 4 GB text is picked by the `AudioCaptureError.fileFull` case) and posts a «Запись
+остановлена» notification. What reached the disk is transcribed as usual.
 
 ## Constraints
 
