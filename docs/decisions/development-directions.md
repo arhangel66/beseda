@@ -1,160 +1,125 @@
 ---
 type: Decision Record
 title: Development directions
-description: Where Beseda goes next and what it deliberately does not do — proposed, awaiting Mikhail's approval.
-status: proposed
-tags: [product, strategy]
+description: Where Beseda goes next — Mikhail's answers to the twelve decisions and the phased plan the next epics follow.
+status: approved with changes
+tags: [product, strategy, plan]
 generated:
   by: agent
   at: 2026-09-26T00:00:00Z
 sources:
+  - id: mikhail
+    title: Mikhail's answers to the twelve decisions, 2026-09-26
   - id: analysis
     title: External product analysis pasted by Mikhail (competitors checked 2026-09-26)
 ---
 
 # Development directions
 
-**Status: proposed — awaiting Mikhail's approval. No feature below is built before it is approved.**
+**Status: approved with changes. Source: Mikhail, 2026-09-26.**[^mikhail] The plan at the end is what the
+next epics follow.
 
 ## Context
 
-Beseda records calls on the Mac with separate mic and system channels, transcribes locally (Parakeet v3,
-GigaAM v3), keeps an archive with search, summarises with a local model, and sends a webhook.
+Beseda records calls on the Mac with separate mic and system channels, transcribes locally, keeps an
+archive with search, summarises with a user-editable prompt and sends a webhook. "No bot", "local", "has a
+summary" and "has MCP" are already sold by others — MacWhisper, Meetily, Weeve (closest: Parakeet,
+FluidAudio, local summaries), Granola, Fathom.[^analysis] The risk is an archive nobody opens, so the product
+serves three moments: after the call, before the next one, and during it.
 
-"No bot", "local", "has a summary" and "has MCP" are not differentiators: every one is already sold.[^analysis]
+## Decisions
 
-| Local | Price | Cloud | Note |
-|---|---|---|---|
-| MacWhisper | free / Pro €64 once | Granola | cross-meeting chat, prep, follow-up, MCP |
-| Meetily | free / Pro $120/yr; MCP, CLI, webhooks | Krisp, Jamie | |
-| Weeve | €12.99/mo; Parakeet, FluidAudio, local summaries — closest | Fathom | free, unlimited |
-| Anarlog | free / Pro $15/mo | ChatGPT Record | on Mac |
-| Buzz | free, open source | | |
+1. **Positioning** — "private memory of work conversations" is accepted as a working line, not final.
+   Today Mikhail uses Beseda mainly as transcription during work calls; a reminder of what was said on the
+   previous call is what he values most.
+2. **First users** — two groups, both in: people who don't want to forget what was said at dailies and
+   work calls, and psychologists.
+3. **No fixed call card.** The post-call screen shows whatever processing ran: the transcript alone if only
+   transcription ran, the summary if a summary ran. Summaries come from the user-editable prompt that exists
+   today (`AppSettings.summaryPrompt`). New direction: a cheap local classifier first picks the call type
+   (work meeting, daily, personal 1:1, psychology session, … — types defined by the user), then that type's
+   prompt runs and its result is shown. The user configures what is collected and how it is shown.
+4. **Speaker errors** — yes: the echo gate on the mic and the diarizer's timeline instead of per-word
+   labels, as in [speaker-accuracy.md](speaker-accuracy.md).
+5. **Recording to disk first** — yes, stream audio to disk while recording (today `PCMFloatRecorder` keeps
+   the whole call in memory until stop). New optional mode: live transcription during the call, with key
+   points of what was just discussed on screen; later contextual hints (e.g. who does what).
+6. **Export is mandatory** — results into one chosen folder now; routed by call type later.
+7. **Privacy basics** — yes: storage protection and deletion. Notifying the other side about recording is
+   dropped entirely, by Mikhail's decision; the legal responsibility for recording stays with the user.
+8. **Before handing it to people** — several polish rounds (cleanup, proofreading of UI copy, UI quality)
+   and the features above. Users today: Mikhail and Irochka. A demand check comes later, with no fixed bar.
+9. **Price** — one-time $49, everything included. Payment channel open: no Stripe (Russia), so crypto or
+   the Mac App Store (Apple Developer enrollment in progress). See [App Store sandbox](#app-store-sandbox).
+10. **"Before the meeting" block** — yes, and not deferred behind a demand check: where we stopped and what
+    was agreed on the previous related call. See [Related calls](#related-calls).
+11. **ASR benchmark and model choice** — skipped for now. Open question: Mikhail praises a local
+    transcription app he dictates with (unnamed); what it runs and whether Beseda should match it.
+12. **Windows** — only if it can come from one shared core. See [Windows](#windows).
 
-**Main risk.** People admire the first transcript, pile up calls and stop opening the archive. The product
-has to serve three moments: *after the call* (what do I do, what did they promise), *before the next call*
-(where we stopped, what is open), *during work* (why and where did we decide this).
+## App Store sandbox
 
-## Positioning
+What the Mac App Store demands against what the code does today:
 
-> Beseda — private memory of work conversations: what was decided, what was promised, what to do next.
-> All on your Mac.
+| Part | Today | In the sandbox |
+|---|---|---|
+| System audio (`Audio/SystemAudioTap.swift`, `AudioHardwareCreateProcessTap`, macOS 14.2+) | works | Process taps ask the user through `NSAudioCaptureUsageDescription`, not an entitlement; expected to work sandboxed, **to verify on a sandboxed build first** — it is the whole product. |
+| Microphone (`Audio/MicrophoneCapture.swift`) | works | Needs `com.apple.security.device.audio-input`. Fine. |
+| Calendar (`Calendar/CalendarService.swift`, EventKit) | works | Needs `com.apple.security.personal-information.calendars`. Fine. |
+| llama-server (`Summarization/LlamaServer.swift`) | downloaded into Application Support by `BundledSummaryInstaller`, then run with `Process` | **Breaks**: review guideline 2.5.2 forbids downloading executable code. It must ship inside the bundle (signed, sandbox-inherited helper) or be linked as a library. |
+| Speech and summary models | downloaded, hash-checked | Allowed — models are data. Needs `com.apple.security.network.client`. |
+| Updates (Sparkle, `Runtime/AppUpdater.swift`) | appcast | Removed in the store build; the store updates. |
+| Signing (`scripts/lib/bundle_app.sh`) | no hardened runtime, no entitlements | Hardened runtime and an entitlements file become required for both channels (notarization also needs them). |
+| OpenRouter / LM Studio, webhook | HTTP | Network client entitlement. Fine. |
+| Export folder (decision 6) | — | A user-picked folder kept through a security-scoped bookmark. |
 
-The promise: *Call ended — you have verifiable decisions, commitments and a ready summary. Before the next
-call Beseda reminds you where you stopped.*
+**Verdict.** The store is possible once llama-server ships inside the bundle and the process tap is
+confirmed sandboxed; everything else is an entitlement. **Alternative:** direct sale outside the store —
+Developer ID signed and notarized DMG, Sparkle as today, payment in crypto with a licence key. It keeps the
+downloaded runtime as is but still needs the hardened runtime.
 
-**First segment (hypothesis):** independent technical consultants and developers with several client
-projects, on a Mac. Alternative, kept out of v1: private psychologists — different needs, not mixed in.
+## Related calls
 
-## Directions
+No project model. A previous call is related when, simplest first:
 
-### A. The call card — decisions, actions, open questions
+1. same calendar series (EventKit recurring event) — or the same event title;
+2. same call type (decision 3) and the same participants;
+3. picked by hand from the list, when the first two find nothing.
 
-- **What.** A finished call's main screen is an editable card: *Decided* / *Next actions* (who; a deadline
-  only if said, otherwise "deadline not named") / *Still open* / *Draft follow-up message*. Every item links to
-  the transcript segments it came from. The model proposes, the person confirms or edits.
-- **Why.** It is the "after the call" moment and the answer to the archive nobody opens. Summary text alone
-  is what every competitor has; checkable items with sources are not.
-- **Today.** One free-text `summaryText` per call (`Storage/CallStore.swift`) from a local model
-  (`Summarization/`); segments with timestamps and speakers exist.
-- **First step.** Store items as structured entities with segment IDs (Markdown only for view and export);
-  show the card for one call, with click-through to the segment.
-- **Success.** In the demand check, most items are confirmed without heavy edits, and users open the card
-  after their calls without being told.
-- **Not done.** No invented deadlines or owners; no auto-send of the follow-up; no free-text summary as the
-  stored truth.
+The block shows that call's summary result — nothing inferred beyond it.
 
-### B. Project / client level above calls
+## Windows
 
-- **What.** Calls grouped by project or client; a project page with its current state and a compact
-  "before the meeting" block: where we stopped, what is open, what each side promised.
-- **Why.** The "before the next call" and "during work" moments; this is what makes the archive worth
-  opening.
-- **Today.** A flat call list with search (`App/Views/ConversationsWindow.swift`); no projects or clients.
-- **First step.** Assign a call to a project by hand; the block lists the confirmed open items and actions
-  from that project's cards (A). Plain text search first, no semantic search or chat.
-- **Success.** Users open the block before a call with the same client.
-- **Not done.** Never turn an assumption into a fact — only confirmed items feed the block. Links keep
-  opening the text after the audio is deleted. No cross-meeting AI chat in v1.
+Platform-bound today: system audio (Core Audio process taps), microphone and playback (AVFoundation),
+diarizer and VAD (FluidAudio on CoreML), the whole UI (SwiftUI `MenuBarExtra`), calendar (EventKit),
+Sparkle. Shareable in principle: transcribe.cpp (C++, cross-platform), llama-server, the SQLite store,
+the transcript assembly (`Transcription/` merging and sentence building, pure Swift), prompts and webhook.
 
-### C. Results where people work
+**Verdict: separate product → postponed.** Capture, diarization and UI — most of the app — would be
+rewritten; a shared core means porting the Swift logic to C++ or Swift-on-Windows first, which is not worth
+it before the Mac version has users.
 
-- **What.** Markdown export to a chosen folder; "copy meeting summary"; one task hand-off scenario; a
-  verifiable dev-task draft from a requirements call.
-- **Why.** Decisions are useless trapped in the app; the segment works in notes, trackers and editors.
-- **Today.** Transcript copy (`Storage/TranscriptCopy.swift`) and a webhook (`Webhooks/`). No MCP server in the
-  code yet.
-- **First step.** Markdown export of the card (A) to a chosen folder, plus "copy meeting summary".
-- **Success.** Exports and copies per confirmed card in the demand check.
-- **Not done.** MCP is transport, not a reason to buy — built only after the above. When a cloud agent is
-  connected, Beseda warns that data leaves the Mac. One tracker scenario, not a catalogue of integrations.
+## Plan
 
-### D. Russian and mixed-language speech, measured
+Ordered phases; each line is its definition of done. What needs no new UI and protects data goes first.
 
-- **What.** Make the Russian / Russian-English quality a number, not a claim.
-- **Why.** It is the one engine-level advantage over the Parakeet/Whisper-based competitors — if it holds.
-- **Today.** GigaAM v3 and Parakeet v3 selectable (`Transcription/SpeechModel.swift`); an earlier bakeoff
-  in `docs/archive/asr-bakeoff.md`.
-- **First step.** A small fixed set of real work calls (Russian, mixed, English terms) with reference text;
-  WER for Beseda's engines and the competitors' engines.
-- **Success.** A published, reproducible WER table where Beseda is better on Russian and mixed speech.
-- **Not done.** No marketing on "has GigaAM" until the table exists.
+0. **Stream to disk, macOS 14.2 minimum.** Both channels are written to disk while recording, a crash
+   loses at most seconds; `Package.swift` and the 14.2 `#available` branches collapse to macOS 14.2.
+1. **Speaker fixes.** Echo gate on the mic and the diarizer timeline ship in the app; the
+   speaker-accuracy numbers hold on a real echoed call.
+2. **Processing pipeline.** User-defined call types; a local classifier picks one; that type's prompt runs;
+   the post-call screen shows what ran; results export as Markdown to one chosen folder.
+3. **"Before the meeting" block.** For a call with a related previous call, the block shows where it
+   stopped and what was agreed.
+4. **Live transcription mode.** Optional; the transcript and key points of the last minutes appear during
+   the call.
+5. **Polish rounds.** UI copy proofread, a UI review applied, storage protection and deletion in place.
+6. **Distribution.** Sandbox check done; App Store or direct build shipped with a $49 payment path.
 
-### E. Speaker accuracy, local
+**In parallel without sharing files:** 0 (`Audio/` recorder, `Package.swift`) and 1 (`Transcription/`
+speaker code, mic gate at the capture boundary — coordinate if the gate lands in `Audio/`) and the sandbox
+check of 6 (`scripts/`, a throwaway build). 2 and 3 share the post-call screen and `Storage/`, so 3 follows
+2; 4 needs 0's streaming. 5 runs last over everything.
 
-- **What.** Tell "me" from "them" and the remote speakers apart reliably, and transcribe the remote side
-  better — all on the Mac. Record: [speaker-accuracy.md](speaker-accuracy.md).
-- **Why.** The card's "who promised what" (A) is only as right as the speaker labels. D measures words on
-  real calls for marketing; E fixes who said them and the remote channel, on a public benchmark.
-- **Today.** Me/them is the channel only, no echo cancellation: 68 % of remote words come back as "me" on
-  echoed calls. Speakers are labelled per ASR word, which doubles the diarizer's error (DER real 0.262 vs
-  0.119 for the diarizer alone). Mixed ru-en WER 0.39–0.45 vs 0.10–0.13 Russian.
-- **First step.** Run the benchmark in `untracked/epics/speaker-accuracy/` for the unmeasured rows; then the
-  two no-model fixes: an echo gate on the mic and the diarizer's timeline instead of per-word labels
-  (measured together: synthetic DER 0.938 → 0.282, echo duplicates 0.678 → 0.013, real DER 0.262 → 0.130).
-- **Success.** The echo gate holds on real room echo in the app; the benchmark table fills and a model choice
-  beats today's numbers by more than the ~2-point WER noise.
-- **Not done.** No cloud engine, not even for the benchmark; no Python runtime in the app; no model switch
-  before the benchmark.
-
-## Cross-cutting
-
-- **Privacy.** Storage protection, backup and deletion that a user can trust. Recording consent is made
-  convenient (a ready notice, a reminder) — never "nobody will know" (see e.g. UK ICO guidance).
-- **No Windows version now.**
-- **Never lock users out of their own archive,** whatever the pricing.
-
-## Demand check
-
-The current version to 8–12 people of the one segment, plus one complete scenario: a client-call summary
-with decisions, actions and source links (A + export from C). Target: **6 of 10 still using after two
-weeks, 3 ready to pay.** Price hypothesis: **$49–79 one-time.**
-
-## Proposed order
-
-1. A — the call card, minimal (structured items, segment links, confirm/edit).
-2. C, first step only — Markdown export and "copy meeting summary".
-3. Privacy basics needed to hand the app to strangers (protection, deletion, consent notice).
-4. **Demand check.**
-5. After it, only if the targets hold: B (projects and "before the meeting"), D (WER benchmark), then one task
-   hand-off, dev-task draft, MCP.
-
-E, the two no-model fixes, goes with A (step 1): it makes the call card's "who promised what" trustworthy.
-The rest of E (model choices) after the benchmark rerun.
-
-## Decisions for Mikhail
-
-1. Adopt the positioning "private memory of work conversations" and the promise above.
-2. First segment: independent technical consultants/developers; psychologists kept out of v1.
-3. A: the call card replaces free-text summary as the main screen; items stored as entities with segment IDs.
-4. B: projects above calls, confirmed items only, plain search first, no cross-meeting chat in v1.
-5. C: Markdown export and copy first; MCP only as transport, later, with a data-leaves-the-Mac warning.
-6. D: benchmark Russian/mixed WER before claiming it.
-7. Consent made convenient, never hidden recording.
-8. No Windows version now.
-9. Demand check with 8–12 people; success = 6 of 10 after two weeks, 3 ready to pay.
-10. Price hypothesis $49–79 one-time; the archive is never locked.
-11. E: echo gate and diarizer timeline alongside A; model choices only after the speaker-accuracy benchmark.
-12. The order above: A → export → privacy basics → demand check → the rest.
-
+[^mikhail]: Mikhail's answers to the twelve decisions, 2026-09-26.
 [^analysis]: External product analysis pasted by Mikhail, competitors checked 2026-09-26.

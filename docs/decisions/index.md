@@ -1,6 +1,6 @@
 # Decisions
 
-- [Development directions](development-directions.md) — where Beseda goes next; proposed, awaiting Mikhail's approval.
+- [Development directions](development-directions.md) — where Beseda goes next: Mikhail's answers and the phased plan; approved with changes.
 - [Speaker accuracy, local](speaker-accuracy.md) — echo gate and diarizer timeline first, models pending the benchmark; proposed.
 - [Local on-device ASR](local-asr.md) — speech is transcribed on the Mac, no cloud ASR.
 - [Separate microphone and system channels](separate-channels.md) — "me" and "them" recorded to separate files.
