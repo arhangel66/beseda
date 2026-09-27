@@ -16,6 +16,10 @@ NOTARY_PROFILE="beseda-notary"
 # Apple Development build still goes out as before
 REQUIRE_NOTARIZATION="${REQUIRE_NOTARIZATION:-0}"
 
+published() {
+    echo "published $TAG: https://github.com/$REPO/releases/tag/$TAG"
+}
+
 # the feed Sparkle reads lives on main, and the commit below lands on the current
 # branch: a release cut anywhere else publishes a tag and a zip while leaving every
 # installed copy on the old version, without a single command failing
@@ -36,7 +40,7 @@ if [ -n "$(git -C "$ROOT" status --porcelain)" ]; then
     git -C "$ROOT" add appcast.xml
     git -C "$ROOT" commit -q -m "Beseda $VERSION"
     git -C "$ROOT" push -q origin main
-    echo "published $TAG: https://github.com/$REPO/releases/tag/$TAG"
+    published
     exit 0
 fi
 if [ ! -f "$NOTES" ]; then
@@ -57,7 +61,7 @@ FEED_URL="https://github.com/$REPO/releases/download/$TAG/Beseda-$VERSION.zip"
 # the feed commit is the last step; pushing it is all a rerun has left to do
 if grep -qF "$FEED_URL" "$ROOT/appcast.xml"; then
     git -C "$ROOT" push -q origin main
-    echo "published $TAG: https://github.com/$REPO/releases/tag/$TAG"
+    published
     exit 0
 fi
 
@@ -141,4 +145,4 @@ git -C "$ROOT" add appcast.xml
 git -C "$ROOT" commit -q -m "Beseda $VERSION"
 git -C "$ROOT" push -q origin main
 
-echo "published $TAG: https://github.com/$REPO/releases/tag/$TAG"
+published

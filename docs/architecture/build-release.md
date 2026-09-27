@@ -37,6 +37,7 @@ build: fast 27.2 → 11.0 s, full 102.6 s.
   none. Only the `release` flavour adds the Sparkle feed, public EdDSA key and hourly automatic checks.
 - `scripts/Beseda.entitlements` — the app's hardened-runtime entitlements.
 - `scripts/release.sh` — publishes a release (below); runs `full_check.sh` before the release build.
+  `scripts/test_release.sh` checks its syntax and exercises the step-6 recovery path with local command stubs.
 - `scripts/screenshot_copy.sh` — builds a copy with a random bundle id `app.beseda.shot.<random>` per run from this checkout's own
   `.build` into `.build/Beseda-shot.app` (including Sparkle, ad-hoc signed without a timestamp or keychain access) and opens it hidden with a fresh
   `CFFIXED_USER_HOME` and `BESEDA_CLEAN_DEFAULTS=1`; the latter prevents the isolated copy importing the old

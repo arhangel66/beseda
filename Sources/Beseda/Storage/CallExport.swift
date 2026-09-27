@@ -7,7 +7,7 @@ enum CallExport {
         return """
             # \(summary.displayTitle)
 
-            \(summary.startedDate.map(dateLine) ?? summary.startedAt)
+            \(summary.startedDate.map(dateLine) ?? "—")
             Тип: \(type)
 
             \(result.trimmingCharacters(in: .whitespacesAndNewlines))
@@ -21,7 +21,7 @@ enum CallExport {
 
     /// date + title, so a rerun of the same call overwrites its file
     static func fileName(_ summary: StoredCallSummary) -> String {
-        let date = summary.startedDate.map(fileDate) ?? summary.startedAt
+        let date = summary.startedDate.map(fileDate) ?? "—"
         let forbidden = CharacterSet(charactersIn: "/\\:*?\"<>|").union(.newlines).union(.controlCharacters)
         let title = summary.displayTitle
             .components(separatedBy: forbidden)

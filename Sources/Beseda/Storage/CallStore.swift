@@ -102,7 +102,7 @@ struct StoredCallSummary: Identifiable, Hashable {
     }
 
     var whenDescription: String {
-        startedDate.map { CallFormatting.when($0) } ?? startedAt
+        startedDate.map { CallFormatting.when($0) } ?? "—"
     }
 
     /// the detail header's big line: "Сегодня, 18:31 · 31 мин"
@@ -113,7 +113,7 @@ struct StoredCallSummary: Identifiable, Hashable {
     /// the sidebar's leading column: the time under «Сегодня» and «Вчера», date and time further back
     var clockDescription: String {
         guard let startedDate else {
-            return ""
+            return "—"
         }
         return dayGroup <= .yesterday ? CallFormatting.clock(startedDate) : CallFormatting.when(startedDate)
     }
@@ -278,7 +278,7 @@ enum CallStoreError: LocalizedError {
     }
 }
 
-final class CallStore {
+final class CallStore: @unchecked Sendable {
     private let dbURL: URL
     private let queue = DispatchQueue(label: "app.beseda.call-store")
 
@@ -770,10 +770,17 @@ final class CallStore {
         }
     }
 
-    func fetchCalls(limit: Int = 200, offset: Int = 0) throws -> [StoredCallSummary] {
+    func fetchCalls(limit: Int = 200, before: StoredCallSummary? = nil) throws -> [StoredCallSummary] {
         try database { db in
-            try query(db, "\(Self.callSelect) ORDER BY c.started_at DESC LIMIT ? OFFSET ?", limit, offset,
-                      row: makeSummary)
+            if let before {
+                return try query(db, """
+                    \(Self.callSelect)
+                    WHERE c.started_at < ? OR (c.started_at = ? AND c.id < ?)
+                    ORDER BY c.started_at DESC, c.id DESC LIMIT ?
+                    """, before.startedAt, before.startedAt, before.id, limit, row: makeSummary)
+            }
+            return try query(db, "\(Self.callSelect) ORDER BY c.started_at DESC, c.id DESC LIMIT ?", limit,
+                             row: makeSummary)
         }
     }
 
@@ -1018,7 +1025,7 @@ final class CallStore {
                    OR unicode_lower(c.summary_text) LIKE ?1 ESCAPE '\\' OR unicode_lower(c.participants) LIKE ?1 ESCAPE '\\'
                    OR unicode_lower(c.error) LIKE ?1 ESCAPE '\\'
                    OR c.id IN (SELECT call_id FROM transcript_segments WHERE unicode_lower(text) LIKE ?1 ESCAPE '\\')
-                ORDER BY c.started_at DESC
+                ORDER BY c.started_at DESC, c.id DESC
                 """, pattern, row: makeSummary)
         }
     }

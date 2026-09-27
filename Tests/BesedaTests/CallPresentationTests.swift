@@ -64,12 +64,13 @@ private func makeCall(
     kind: String,
     appName: String?,
     previewText: String?,
-    eventTitle: String? = nil
+    eventTitle: String? = nil,
+    startedAt: String = "2026-08-29T16:20:00.000Z"
 ) -> StoredCallSummary {
     StoredCallSummary(
         id: "20260829-162000",
         kind: kind,
-        startedAt: "2026-08-29T16:20:00.000Z",
+        startedAt: startedAt,
         endedAt: nil,
         durationSec: 214,
         status: "ready",
@@ -85,6 +86,13 @@ private func makeCall(
     )
 }
 
+
+@Test func anUnparseableStoredDateIsNotShownAsData() {
+    let call = makeCall(kind: "dual", appName: "Zoom", previewText: nil, startedAt: "not-a-date")
+
+    #expect(call.whenDescription == "—")
+    #expect(call.clockDescription == "—")
+}
 
 @Test func aCalendarEventOutranksTheTitleGuessedFromTheTranscript() {
     let call = makeCall(
