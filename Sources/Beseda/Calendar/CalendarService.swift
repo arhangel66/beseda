@@ -39,6 +39,26 @@ final class CalendarService {
         authorization = EKEventStore.authorizationStatus(for: .event)
     }
 
+    /// why calls cannot be linked to events right now, or nil when nothing is broken
+    func linkingProblem(selected: Set<String>) -> String? {
+        Self.linkingProblem(
+            authorization: authorization,
+            selected: selected,
+            available: isAuthorized ? store.calendars(for: .event).map(\.calendarIdentifier) : []
+        )
+    }
+
+    nonisolated static func linkingProblem(authorization: EKAuthorizationStatus, selected: Set<String>,
+                                           available: [String]) -> String? {
+        if authorization != .fullAccess {
+            return "Нет доступа к календарю"
+        }
+        if !selected.isSubset(of: available) {
+            return "Выбранный календарь не найден — выберите другой"
+        }
+        return nil
+    }
+
     /// title and identifier of every calendar the user could pick from
     func availableCalendars() -> [(id: String, title: String)] {
         guard isAuthorized else {

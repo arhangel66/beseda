@@ -661,6 +661,15 @@ private struct IntegrationsPane: View {
                     }
                 }
                 .disabled(!settings.calendarEnabled)
+                if settings.calendarEnabled,
+                   let problem = controller.calendarService.linkingProblem(selected: settings.calendarIdentifiers) {
+                    LabeledContent(problem) {
+                        Button("Открыть настройки…") {
+                            PermissionsModel.openPrivacySettings(pane: "Privacy_Calendars")
+                        }
+                    }
+                    .foregroundStyle(.red)
+                }
             } header: {
                 Text("Календарь")
             } footer: {

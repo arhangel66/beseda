@@ -39,6 +39,11 @@ There are two: an outgoing webhook and the macOS calendar. There is no MCP code 
 outcome classification), `Sources/Beseda/Webhooks/WebhookPayload.swift`. Settings: `webhookEnabled`, `webhookURL`,
 `webhookSecret` in `AppSettings`; the journal is shown in Settings → «Интеграции» and on the call.
 
+When the switch is on but linking cannot work — access is not `.fullAccess`, or a chosen calendar
+identifier is gone from EventKit — `CalendarService.linkingProblem` returns a reason: it is logged once at
+launch (`Calendar linking off: …`) and shown in red in Settings → Интеграции → Календарь with a button to the
+Calendars privacy pane. Without it a lost calendar silently stopped every match (BESEDA-130).
+
 ### Constraints
 
 - The `X-Podushka-Event`/`-Delivery` header names and the `podushka_test` event are the receiver's contract, kept from
