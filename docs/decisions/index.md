@@ -12,3 +12,4 @@
 - [Call-type classifier](call-type-classifier.md) — Jev via OpenRouter by default when a key is set, the summary model otherwise; accepted.
 - [Refactor for quality and load](refactor-for-quality-and-load.md) — which incidental decisions to refactor; proposed.
 - [Ponytail cleanup (BESEDA-4)](ponytail-cleanup.md) — what the cleanup removed; no behaviour changed.
+- [At-rest encryption](at-rest-encryption.md) — threat model and options beyond FileVault; recommends FileVault warning, backup exclusion and «Строгий режим», no SQLCipher; proposed.

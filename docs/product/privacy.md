@@ -80,4 +80,4 @@ points to the built-in model.
 - Use the built-in model (or «Только локально»); no OpenRouter key, no webhook.
 - Exclude `~/Library/Application Support/Beseda` from Time Machine, or encrypt the backup disk.
 
-Not done: the index and the exports are not encrypted with a key of their own.
+Not done: the index and the exports are not encrypted with a key of their own; see [At-rest encryption](../decisions/at-rest-encryption.md).
