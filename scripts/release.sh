@@ -10,6 +10,11 @@ VERSION="$(tr -d '[:space:]' < "$ROOT/VERSION")"
 TAG="v$VERSION"
 SPARKLE_BIN="$ROOT/.build/artifacts/sparkle/Sparkle/bin"
 NOTES="$ROOT/docs/release-notes/$VERSION.md"
+# made once with `xcrun notarytool store-credentials beseda-notary`, see docs/architecture/build-release.md
+NOTARY_PROFILE="beseda-notary"
+# REQUIRE_NOTARIZATION=1 refuses to publish a build Gatekeeper would reject; without it an
+# Apple Development build still goes out as before
+REQUIRE_NOTARIZATION="${REQUIRE_NOTARIZATION:-0}"
 
 # the feed Sparkle reads lives on main, and the commit below lands on the current
 # branch: a release cut anywhere else publishes a tag and a zip while leaving every
@@ -36,6 +41,12 @@ if [ -n "$(git -C "$ROOT" status --porcelain)" ]; then
 fi
 if [ ! -f "$NOTES" ]; then
     echo "no $NOTES; an update has to say what changed" >&2
+    exit 1
+fi
+
+if [ "$REQUIRE_NOTARIZATION" = "1" ] \
+    && ! security find-identity -v -p codesigning | grep -q '"Developer ID Application: '; then
+    echo "REQUIRE_NOTARIZATION=1 but no Developer ID Application identity in the keychain" >&2
     exit 1
 fi
 
@@ -76,6 +87,17 @@ if [ "$HAS_ASSET" != "true" ]; then
     mkdir -p "$DIST"
     APP_DIR="$DIST/Beseda.app"
     "$ROOT/scripts/lib/bundle_app.sh" "$BIN_DIR" "$APP_DIR" release
+    # notarytool takes a zip, but the ticket is stapled to the .app, so the shipped zip is made after
+    if codesign -dv --verbose=2 "$APP_DIR" 2>&1 | grep -q '^Authority=Developer ID Application: '; then
+        ditto -c -k --keepParent "$APP_DIR" "$DIST/notarize.zip"
+        xcrun notarytool submit "$DIST/notarize.zip" --keychain-profile "$NOTARY_PROFILE" --wait
+        xcrun stapler staple "$APP_DIR"
+        spctl --assess --type execute -vv "$APP_DIR"
+        rm "$DIST/notarize.zip"
+    elif [ "$REQUIRE_NOTARIZATION" = "1" ]; then
+        echo "the bundle is not signed with Developer ID; refusing to publish it unnotarized" >&2
+        exit 1
+    fi
     ditto -c -k --keepParent "$APP_DIR" "$DIST/Beseda-$VERSION.zip"
     rm -rf "$APP_DIR"
     if [ "$IS_DRAFT" = "missing" ]; then
