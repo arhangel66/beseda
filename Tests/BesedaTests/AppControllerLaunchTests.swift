@@ -347,3 +347,153 @@ private func storedOneOtherPerson(_ dbURL: URL, callID: String) -> Bool? {
     #expect(indexed == ["me", "them-1", "them-2", "them-3"])
     #expect(transcript.contains("Собеседник 3"))
 }
+
+
+// Critic item 22: a recording killed mid-call and a disk that refuses writes, each played in a child
+// process — the same test binary re-run on one test — so a SIGKILL or a file size limit hits only the child.
+
+private let childDirectoryKey = "BESEDA_CHILD_DIRECTORY"
+private let childDirectory = ProcessInfo.processInfo.environment[childDirectoryKey].map { URL(fileURLWithPath: $0) }
+
+/// runs one test of this binary in a child process with `childDirectoryKey` pointing at `directory`
+private func startChildTest(named name: String, directory: URL) throws -> Process {
+    // swift test runs `swiftpm-testing-helper --test-bundle-path <binary> … <binary> --testing-library swift-testing`
+    let arguments = CommandLine.arguments
+    let bundleIndex = try #require(arguments.firstIndex(of: "--test-bundle-path"), "run through swift test")
+    let binary = arguments[bundleIndex + 1]
+    let child = Process()
+    child.executableURL = URL(fileURLWithPath: arguments[0])
+    child.arguments = ["--test-bundle-path", binary, "--filter", name, binary, "--testing-library", "swift-testing"]
+    child.environment = ProcessInfo.processInfo.environment.merging([childDirectoryKey: directory.path]) { $1 }
+    child.standardOutput = FileHandle(forWritingAtPath: "/dev/null")
+    try child.run()
+    return child
+}
+
+private func stereoBuffer(frames: Int, value: Float) -> AVAudioPCMBuffer {
+    let format = AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: 48_000, channels: 2, interleaved: false)!
+    let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: AVAudioFrameCount(frames))!
+    buffer.frameLength = AVAudioFrameCount(frames)
+    for frame in 0..<frames {
+        buffer.floatChannelData![0][frame] = value
+        buffer.floatChannelData![1][frame] = -value
+    }
+    return buffer
+}
+
+// MARK: - kill mid-recording
+
+private let killedCallID = "20260105-100000"
+
+/// the child: indexes a call as recording, as `runDualRecording` does, and streams both channels until killed
+@Test(.enabled(if: childDirectory != nil))
+func childRecordsUntilKilled() throws {
+    let paths = AppPaths(dataDirectory: try #require(childDirectory))
+    let folder = paths.callsDirectory.appendingPathComponent(killedCallID, isDirectory: true)
+    let store = CallStore(dbURL: paths.callIndexURL)
+    try store.prepare()
+    try store.upsertCall(
+        id: killedCallID, kind: "dual", startedAt: Date(), endedAt: nil, durationSec: nil, status: "recording",
+        transcriptURL: nil, audioDirectoryURL: folder, error: nil, appName: "Zoom"
+    )
+    let recorders = try ["me.raw.wav", "them.raw.wav"].map {
+        try PCMFloatRecorder(url: folder.appendingPathComponent($0), sampleRate: 48_000, channelCount: 2, activityTracker: nil)
+    }
+    var frames = 0
+    while true {
+        for recorder in recorders {
+            try recorder.append(pcmBuffer: stereoBuffer(frames: 4_800, value: 0.25))
+            recorder.waitUntilWritten()
+        }
+        frames += 4_800
+        if frames == 48_000 {
+            try Data("\(frames)".utf8).write(to: paths.dataDirectory.appendingPathComponent("written"))
+        }
+        Thread.sleep(forTimeInterval: 0.01)
+    }
+}
+
+@MainActor
+@Test(.enabled(if: childDirectory == nil))
+func aRecordingKilledMidCallIsReadableAndFailedAfterRelaunch() async throws {
+    let harness = try Harness()
+    defer { harness.cleanUp() }
+    let marker = harness.root.appendingPathComponent("written")
+    let child = try startChildTest(named: "childRecordsUntilKilled", directory: harness.root)
+    defer { if child.isRunning { kill(child.processIdentifier, SIGKILL) } }
+    for _ in 0..<1_200 where !FileManager.default.fileExists(atPath: marker.path) && child.isRunning {
+        try await Task.sleep(for: .milliseconds(50))
+    }
+    let writtenFrames = try #require(Int(String(decoding: try Data(contentsOf: marker), as: UTF8.self)))
+
+    kill(child.processIdentifier, SIGKILL)
+    child.waitUntilExit()
+    #expect(child.terminationReason == .uncaughtSignal)
+
+    let controller = harness.controller()
+
+    let call = try #require(try harness.store.fetchCall(id: killedCallID))
+    #expect(call.status == "failed")
+    #expect(call.error?.contains("Interrupted") == true)
+    #expect(call.error?.contains(".raw.wav") == false)
+    #expect(controller.recentCalls.map(\.id) == [killedCallID])
+    for name in ["me.raw.wav", "them.raw.wav"] {
+        let file = try AVAudioFile(forReading: harness.paths.callsDirectory
+            .appendingPathComponent(killedCallID).appendingPathComponent(name))
+        #expect(file.length >= Int64(writtenFrames))
+        let readBack = AVAudioPCMBuffer(pcmFormat: file.processingFormat, frameCapacity: 4_800)!
+        try file.read(into: readBack)
+        #expect(readBack.floatChannelData![1][4_799] == -0.25)
+    }
+}
+
+// MARK: - disk full
+
+/// the child: a file size limit makes the OS refuse the WAV's growth, as a full disk does
+@MainActor
+@Test(.enabled(if: childDirectory != nil))
+func childHitsAFileSizeLimitWhileRecording() throws {
+    let harness = try Harness()
+    defer { harness.cleanUp() }
+    let controller = harness.controller()
+    let url = try #require(childDirectory).appendingPathComponent("me.raw.wav")
+    let recorder = try PCMFloatRecorder(url: url, sampleRate: 48_000, channelCount: 2, activityTracker: nil)
+    signal(SIGXFSZ, SIG_IGN)
+    var limit = rlimit()
+    getrlimit(RLIMIT_FSIZE, &limit)
+    limit.rlim_cur = 256 * 1024
+    #expect(setrlimit(RLIMIT_FSIZE, &limit) == 0)
+
+    for _ in 0..<100 where recorder.writeError == nil {
+        try recorder.append(pcmBuffer: stereoBuffer(frames: 4_800, value: 0.5))
+        recorder.waitUntilWritten()
+    }
+    // what the live ticker does with a capture whose recorder failed
+    let writeError = try #require(recorder.writeError)
+    controller.stopRecording(after: writeError, capture: DualCapture())
+    let metadata = try recorder.finish()
+
+    #expect(controller.recordingWarning?.hasPrefix("Запись остановлена: не удалось записать звук на диск") == true)
+    #expect(controller.recordingWarning?.contains("Всё записанное до этого будет расшифровано") == true)
+    #expect(metadata.frameCount > 0)
+    let file = try AVAudioFile(forReading: url)
+    // the refused write can take the tail of the one before it, so the count may run a few hundred frames ahead
+    #expect(file.length > 0 && file.length <= Int64(metadata.frameCount))
+    let readBack = AVAudioPCMBuffer(pcmFormat: file.processingFormat, frameCapacity: AVAudioFrameCount(file.length))!
+    try file.read(into: readBack)
+    #expect(readBack.floatChannelData![0][Int(file.length) - 1] == 0.5)
+}
+
+@Test(.enabled(if: childDirectory == nil))
+func aDiskThatRefusesWritesStopsTheRecordingVisiblyAndKeepsWhatWasWritten() throws {
+    let directory = FileManager.default.temporaryDirectory.appendingPathComponent("beseda-full-\(UUID().uuidString)")
+    try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: directory) }
+
+    let child = try startChildTest(named: "childHitsAFileSizeLimitWhileRecording", directory: directory)
+    child.waitUntilExit()
+
+    // the child's own expectations decide its exit status
+    #expect(child.terminationReason == .exit)
+    #expect(child.terminationStatus == 0)
+}

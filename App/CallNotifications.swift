@@ -67,6 +67,9 @@ final class CallNotifier: NSObject, @preconcurrency UNUserNotificationCenterDele
     }
 
     private func post(_ content: UNMutableNotificationContent) {
+        guard Bundle.main.bundleURL.pathExtension == "app" else {
+            return
+        }
         let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
         Task {
             do {
