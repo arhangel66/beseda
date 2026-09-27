@@ -1,0 +1,2310 @@
+Fetching https://github.com/sparkle-project/Sparkle from cache
+Fetching https://github.com/FluidInference/FluidAudio.git from cache
+Fetched https://github.com/sparkle-project/Sparkle from cache (1.34s)
+Fetched https://github.com/FluidInference/FluidAudio.git from cache (1.39s)
+Computing version for https://github.com/FluidInference/FluidAudio.git
+Computed https://github.com/FluidInference/FluidAudio.git at 0.17.4 (2.14s)
+Creating working copy for https://github.com/FluidInference/FluidAudio.git
+Working copy of https://github.com/FluidInference/FluidAudio.git resolved at 0.17.4
+Fetching binary artifact https://github.com/FluidInference/text-processing-rs/releases/download/v0.3.1/NemoTextProcessing.xcframework.zip from cache
+Fetching binary artifact https://github.com/handy-computer/transcribe.cpp/releases/download/v0.2.3/TranscribeCpp.xcframework.zip from cache
+Fetched https://github.com/handy-computer/transcribe.cpp/releases/download/v0.2.3/TranscribeCpp.xcframework.zip from cache (1.28s)
+Fetched https://github.com/FluidInference/text-processing-rs/releases/download/v0.3.1/NemoTextProcessing.xcframework.zip from cache (2.52s)
+Building for debugging...
+[0/20] /Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/.build/store/arm64-apple-macosx/debug/BesedaPackageTests.derived/runner.swift
+[1/20] Copying libtext_processing_rs.a
+[2/20] Write sources
+[3/20] Write swift-version--58304C5D6DBC2206.txt
+[4/20] Copying luxtts_en_us_lexicon.tsv.zz
+[5/20] Copying luxtts_en_us_g2p_aux.json
+[6/20] Write sources
+[7/20] Compiling MachTaskSelfWrapper MachTaskSelf.c
+[8/20] Copying CTranscribe.framework
+[9/20] Copying Resources
+[10/28] Compiling FastClusterWrapper FastClusterWrapper.cpp
+[11/28] Write sources
+[11/28] Write Beseda-entitlement.plist
+[16/54] Compiling FluidAudio CanaryConfig.swift
+[17/54] Compiling FluidAudio CanaryKeywordBooster.swift
+[18/54] Compiling FluidAudio CanaryManager.swift
+[19/54] Compiling FluidAudio CanaryModels.swift
+[20/54] Compiling FluidAudio CohereAsrConfig.swift
+[21/54] Compiling FluidAudio CoherePipeline.swift
+[22/54] Compiling FluidAudio ParaformerCif.swift
+[23/54] Emitting module TranscribeCpp
+[24/60] Compiling TranscribeCpp Options.swift
+[25/60] Compiling TranscribeCpp Session.swift
+[26/60] Compiling TranscribeCpp Streaming.swift
+[27/60] Compiling TranscribeCpp TranscribeCpp.swift
+[28/60] Compiling TranscribeCpp TranscribeError.swift
+[29/60] Compiling TranscribeCpp Transcript.swift
+[43/60] Compiling FluidAudio ARPALanguageModel.swift
+[44/60] Compiling FluidAudio CtcDecoder.swift
+[45/60] Compiling FluidAudio BKTree.swift
+[46/60] Compiling FluidAudio VocabularyRescorer+CandidateMatching.swift
+[47/60] Compiling FluidAudio ContextBiasingConstants.swift
+[48/60] Compiling FluidAudio CustomVocabularyContext.swift
+[49/60] Compiling FluidAudio VocabularyRescorer+TokenEvaluation.swift
+[50/60] Compiling FluidAudio VocabularyRescorer+TokenRescoring.swift
+[51/60] Compiling FluidAudio VocabularyRescorer+Utilities.swift
+[52/60] Compiling FluidAudio VocabularyRescorer.swift
+[53/60] Compiling FluidAudio VocabularyBoostingSession.swift
+[54/60] Compiling FluidAudio BpeTokenizer.swift
+[55/60] Emitting module FluidAudio
+[56/109] Compiling FluidAudio DualDecodeArbitration.swift
+[57/109] Compiling FluidAudio StreamingEouAsrManager.swift
+[58/109] Compiling FluidAudio EncoderCacheManager.swift
+[59/109] Compiling FluidAudio NemotronChunkSize.swift
+[60/109] Compiling FluidAudio NemotronMelExtractor.swift
+[61/109] Compiling FluidAudio NemotronMultilingualStreamingConfig.swift
+[62/109] Compiling FluidAudio NemotronMultilingualTokenizer.swift
+[63/109] Compiling FluidAudio NemotronStreamingConfig.swift
+[64/109] Compiling FluidAudio NemotronVocabularyBias.swift
+[65/109] Compiling FluidAudio StreamingNemotronAsrManager+Pipeline.swift
+[66/109] Compiling FluidAudio StreamingNemotronAsrManager.swift
+[67/109] Compiling FluidAudio StreamingNemotronMultilingualAsrManager+BlankRescue.swift
+[68/109] Compiling FluidAudio StreamingNemotronMultilingualAsrManager+Buffers.swift
+[69/109] Compiling FluidAudio StreamingNemotronMultilingualAsrManager+Decode.swift
+[70/109] Compiling FluidAudio StreamingNemotronMultilingualAsrManager+Pipeline.swift
+[71/109] Compiling FluidAudio StreamingNemotronMultilingualAsrManager+Shared.swift
+[72/109] Compiling FluidAudio StreamingNemotronMultilingualAsrManager.swift
+[73/109] Compiling FluidAudio ParakeetModelVariant.swift
+[74/109] Compiling FluidAudio RnntDecoder.swift
+[75/109] Compiling FluidAudio StreamingAsrManager.swift
+[76/109] Compiling FluidAudio StreamingAsrUtils.swift
+[77/109] Compiling FluidAudio Tokenizer.swift
+[78/109] Compiling FluidAudio SequenceMatch.swift
+[79/109] Compiling FluidAudio SequenceMatcher.swift
+[80/109] Compiling FluidAudio CtcDPAlgorithm.swift
+[81/109] Compiling FluidAudio CtcKeywordSpotter+Inference.swift
+[82/109] Compiling FluidAudio CtcKeywordSpotter.swift
+[83/109] Compiling FluidAudio CtcModels.swift
+[84/109] Compiling FluidAudio CtcTokenizer.swift
+[85/109] Compiling FluidAudio SlidingWindowAsrManager.swift
+[86/109] Compiling FluidAudio SlidingWindowAsrSession.swift
+[87/109] Compiling FluidAudio AsrManager+Pipeline.swift
+[88/109] Compiling FluidAudio AsrManager+TokenProcessing.swift
+[89/109] Compiling FluidAudio AsrManager+Transcription.swift
+[90/109] Compiling FluidAudio AsrManager.swift
+[91/109] Compiling FluidAudio AsrModels.swift
+[92/109] Compiling FluidAudio ChunkProcessor.swift
+[93/109] Compiling FluidAudio BlasIndex.swift
+[94/109] Compiling FluidAudio EncoderFrameView.swift
+[95/109] Compiling FluidAudio TdtConfig.swift
+[96/109] Compiling FluidAudio TdtDecoderState.swift
+[97/109] Compiling FluidAudio TdtDecoderV2.swift
+[98/109] Compiling FluidAudio TdtDecoderV3.swift
+[99/109] Compiling FluidAudio TdtDurationMapping.swift
+[100/109] Compiling FluidAudio TdtFrameNavigation.swift
+[101/109] Compiling FluidAudio TdtHypothesis.swift
+[102/109] Compiling FluidAudio TdtJointDecision.swift
+[103/109] Compiling FluidAudio TdtJointInputProvider.swift
+[104/109] Compiling FluidAudio TdtModelInference.swift
+[105/157] Compiling FluidAudio StreamingUnifiedAsrManager.swift
+[106/157] Compiling FluidAudio UnifiedAsrManager.swift
+[107/157] Compiling FluidAudio UnifiedConfig.swift
+[108/157] Compiling FluidAudio UnifiedFeatureProviders.swift
+[109/157] Compiling FluidAudio UnifiedMelExtractor.swift
+[110/157] Compiling FluidAudio UnifiedRnntDecoder.swift
+[111/157] Compiling FluidAudio UnifiedStreamingWindower.swift
+[112/157] Compiling FluidAudio SenseVoiceConfig.swift
+[113/157] Compiling FluidAudio SenseVoiceManager.swift
+[114/157] Compiling FluidAudio SenseVoiceModels.swift
+[115/157] Compiling FluidAudio LogitsArgmax.swift
+[116/157] Compiling FluidAudio PunctuationCommitLayer.swift
+[117/157] Compiling FluidAudio CuaS1FormsInput.swift
+[118/157] Compiling FluidAudio CuaS1FormsManager.swift
+[119/157] Compiling FluidAudio CuaS1FormsOutput.swift
+[120/157] Compiling FluidAudio CuaS1FormsPackage.swift
+[121/157] Compiling FluidAudio CuaS1FormsTypes.swift
+[122/157] Compiling FluidAudio SpeakerManager.swift
+[123/157] Compiling FluidAudio SpeakerOperations.swift
+[124/157] Compiling FluidAudio SpeakerTypes.swift
+[125/157] Compiling FluidAudio DiarizerManager.swift
+[126/157] Compiling FluidAudio DiarizerModels.swift
+[127/157] Compiling FluidAudio DiarizerTypes.swift
+[128/157] Compiling FluidAudio DiarizationDER.swift
+[129/181] Compiling FluidAudio DiarizerProtocol.swift
+[130/181] Compiling FluidAudio DiarizerTimeline.swift
+[131/181] Compiling FluidAudio EmbeddingExtractor.swift
+[132/181] Compiling FluidAudio HungarianAssignment.swift
+[133/181] Compiling FluidAudio LSEENDDiarizer.swift
+[134/181] Compiling FluidAudio LSEENDInference.swift
+[135/181] Compiling FluidAudio LSEENDPreprocessor.swift
+[136/181] Compiling FluidAudio LSEENDTypes.swift
+[137/181] Compiling FluidAudio Nemotron3Diarizer.swift
+[138/181] Compiling FluidAudio Nemotron3Models.swift
+[139/181] Compiling FluidAudio Nemotron3StateUpdater.swift
+[140/181] Compiling FluidAudio Nemotron3Types.swift
+[141/181] Compiling FluidAudio AHCClustering.swift
+[142/181] Compiling FluidAudio ConstrainedClusterAssignment.swift
+[143/181] Compiling FluidAudio KMeansClustering.swift
+[144/181] Compiling FluidAudio SpeakerCountConstraints.swift
+[145/181] Compiling FluidAudio VBxClustering.swift
+[146/181] Compiling FluidAudio OfflineDiarizerManager.swift
+[147/181] Compiling FluidAudio OfflineDiarizerModels.swift
+[148/181] Compiling FluidAudio OfflineDiarizerTypes.swift
+[149/181] Compiling FluidAudio PreparedDiarization.swift
+[150/181] Compiling FluidAudio OfflineEmbeddingExtractor.swift
+[151/181] Compiling FluidAudio PLDATransform.swift
+[152/181] Compiling FluidAudio WeightInterpolation.swift
+[153/205] Compiling FluidAudio AudioSampleSource.swift
+[154/205] Compiling FluidAudio AudioSource.swift
+[155/205] Compiling FluidAudio AudioSourceFactory.swift
+[156/205] Compiling FluidAudio AudioStream.swift
+[157/205] Compiling FluidAudio DownloadTypes.swift
+[158/205] Compiling FluidAudio FileDownloader.swift
+[159/205] Compiling FluidAudio HFClient.swift
+[160/205] Compiling FluidAudio HFTreeLister.swift
+[161/205] Compiling FluidAudio ModelCache.swift
+[162/205] Compiling FluidAudio ModelHub.swift
+[163/205] Compiling FluidAudio ProgressReporter.swift
+[164/205] Compiling FluidAudio RetryPolicy.swift
+[165/205] Compiling FluidAudio Float16Conversion.swift
+[166/205] Compiling FluidAudio MLArrayCache.swift
+[167/205] Compiling FluidAudio MLModel+Prediction.swift
+[168/205] Compiling FluidAudio MLModelConfigurationUtils.swift
+[169/205] Compiling FluidAudio MLMultiArray+Extensions.swift
+[170/205] Compiling FluidAudio ModelWarmup.swift
+[171/205] Compiling FluidAudio PerformanceMetrics.swift
+[172/205] Compiling FluidAudio ProgressEmitter.swift
+[173/205] Compiling FluidAudio StringUtils.swift
+[174/205] Compiling FluidAudio SystemInfo.swift
+[175/205] Compiling FluidAudio TokenLanguageFilter.swift
+[176/205] Compiling FluidAudio ZeroCopyFeatureProvider.swift
+[177/229] Compiling FluidAudio OfflineSegmentationProcessor.swift
+[178/229] Compiling FluidAudio OfflineReconstruction.swift
+[179/229] Compiling FluidAudio VDSPOperations.swift
+[180/229] Compiling FluidAudio ZeroVoteReembedder.swift
+[181/229] Compiling FluidAudio AudioValidation.swift
+[182/229] Compiling FluidAudio SegmentationProcessor.swift
+[183/229] Compiling FluidAudio SlidingWindow.swift
+[184/229] Compiling FluidAudio OfflineSortformerDiarizer.swift
+[185/229] Compiling FluidAudio SortformerSpeakerStitcher.swift
+[186/229] Compiling FluidAudio SortformerDiarizer.swift
+[187/229] Compiling FluidAudio SortformerModelInference.swift
+[188/229] Compiling FluidAudio SortformerStateUpdater.swift
+[189/229] Compiling FluidAudio SortformerTypes.swift
+[190/229] Compiling FluidAudio FluidAudioSwift.swift
+[191/229] Compiling FluidAudio TextNormalizer.swift
+[192/229] Compiling FluidAudio ModelNames.swift
+[193/229] Compiling FluidAudio ModelRegistry.swift
+[194/229] Compiling FluidAudio ANEMemoryOptimizer.swift
+[195/229] Compiling FluidAudio ANEMemoryUtils.swift
+[196/229] Compiling FluidAudio ASRConstants.swift
+[197/229] Compiling FluidAudio AppLogger.swift
+[198/229] Compiling FluidAudio AssetDownloader.swift
+[199/229] Compiling FluidAudio AudioConverter.swift
+[200/229] Compiling FluidAudio AudioMelSpectrogram.swift
+[201/253] Compiling FluidAudio CampPlusEmbedder.swift
+[202/253] Compiling FluidAudio CampPlusModels.swift
+[203/253] Compiling FluidAudio ChatterboxTables.swift
+[204/253] Compiling FluidAudio ChatterboxConstants.swift
+[205/253] Compiling FluidAudio ChatterboxError.swift
+[206/253] Compiling FluidAudio ChatterboxManager.swift
+[207/253] Compiling FluidAudio ChatterboxModels.swift
+[208/253] Compiling FluidAudio ChatterboxNanoConstants.swift
+[209/253] Compiling FluidAudio ChatterboxNanoManager.swift
+[210/253] Compiling FluidAudio ChatterboxNanoModels.swift
+[211/253] Compiling FluidAudio ChatterboxNanoSynthesizer.swift
+[212/253] Compiling FluidAudio ChatterboxNanoTokenizer.swift
+[213/253] Compiling FluidAudio ChatterboxAlignmentAnalyzer.swift
+[214/253] Compiling FluidAudio ChatterboxMLSupport.swift
+[215/253] Compiling FluidAudio ChatterboxSynthesizer.swift
+[216/253] Compiling FluidAudio ChatterboxTokenizer.swift
+[217/253] Compiling FluidAudio G2PModel.swift
+[218/253] Compiling FluidAudio MultilingualG2PError.swift
+[219/253] Compiling FluidAudio MultilingualG2PLanguage.swift
+[220/253] Compiling FluidAudio MultilingualG2PModel.swift
+[221/253] Compiling FluidAudio InflectModelStore.swift
+[222/253] Compiling FluidAudio InflectResourceDownloader.swift
+[223/253] Compiling FluidAudio InflectConstants.swift
+[224/253] Compiling FluidAudio InflectError.swift
+[225/277] Compiling FluidAudio InflectManager.swift
+[226/277] Compiling FluidAudio InflectSymbols.swift
+[227/277] Compiling FluidAudio InflectVariant.swift
+[228/277] Compiling FluidAudio InflectNoise.swift
+[229/277] Compiling FluidAudio InflectSynthesizer.swift
+[230/277] Compiling FluidAudio KokoroAneModelCacheMigration.swift
+[231/277] Compiling FluidAudio KokoroAneResourceDownloader.swift
+[232/277] Compiling FluidAudio KokoroAneVocab.swift
+[233/277] Compiling FluidAudio KokoroAneEnglishPhonemizer.swift
+[234/277] Compiling FluidAudio FrenchG2P.swift
+[235/277] Compiling FluidAudio JapaneseCutlet.swift
+[236/277] Compiling FluidAudio JapaneseG2P.swift
+[237/277] Compiling FluidAudio JapaneseMecabDictionary.swift
+[238/277] Compiling FluidAudio JapaneseTokenizer.swift
+[239/277] Compiling FluidAudio KokoroAneLexicon.swift
+[240/277] Compiling FluidAudio MandarinBertTokenizer.swift
+[241/277] Compiling FluidAudio MandarinBopomofoMap.swift
+[242/277] Compiling FluidAudio MandarinCustomLexicon.swift
+[243/277] Compiling FluidAudio MandarinErhua.swift
+[244/277] Compiling FluidAudio MandarinG2P.swift
+[245/277] Compiling FluidAudio MandarinG2pwModel.swift
+[246/277] Compiling FluidAudio MandarinJiebaHmm.swift
+[247/277] Compiling FluidAudio MandarinJiebaTables.swift
+[248/277] Compiling FluidAudio MandarinNumberNormalizer.swift
+[249/301] Compiling FluidAudio MandarinPinyinDict.swift
+[250/301] Compiling FluidAudio MandarinPinyinNormalizer.swift
+[251/301] Compiling FluidAudio MandarinPolyphoneCatalog.swift
+[252/301] Compiling FluidAudio MandarinToneSandhi.swift
+[253/301] Compiling FluidAudio MandarinToneSandhiPOS.swift
+[254/301] Compiling FluidAudio RomanceNumberNormalizer.swift
+[255/301] Compiling FluidAudio SpanishG2P.swift
+[256/301] Compiling FluidAudio KokoroAneConstants.swift
+[257/301] Compiling FluidAudio KokoroAneError.swift
+[258/301] Compiling FluidAudio KokoroAneManager.swift
+[259/301] Compiling FluidAudio KokoroAneModelStore.swift
+[260/301] Compiling FluidAudio KokoroAneSynthesizer+Conversion.swift
+[261/301] Compiling FluidAudio KokoroAneSynthesizer+Types.swift
+[262/301] Compiling FluidAudio KokoroAneSynthesizer.swift
+[263/301] Compiling FluidAudio KokoroAneVoicePack.swift
+[264/301] Compiling FluidAudio LuxTtsEnglishNormalizer.swift
+[265/301] Compiling FluidAudio LuxTtsG2p.swift
+[266/301] Compiling FluidAudio LuxTtsConstants.swift
+[267/301] Compiling FluidAudio LuxTtsError.swift
+[268/301] Compiling FluidAudio LuxTtsManager.swift
+[269/301] Compiling FluidAudio LuxTtsMelExtractor.swift
+[270/301] Compiling FluidAudio LuxTtsModelStore.swift
+[271/301] Compiling FluidAudio LuxTtsSolver.swift
+[272/301] Compiling FluidAudio LuxTtsSynthesizer.swift
+[273/325] Compiling FluidAudio PocketTtsManager.swift
+[274/325] Compiling FluidAudio SentencePieceProto.swift
+[275/325] Compiling FluidAudio SentencePieceTokenizer.swift
+[276/325] Compiling FluidAudio SSMLProcessor.swift
+[277/325] Compiling FluidAudio SSMLTagParser.swift
+[278/325] Compiling FluidAudio SSMLTypes.swift
+[279/325] Compiling FluidAudio SayAsInterpreter.swift
+[280/325] Compiling FluidAudio AudioPostProcessor.swift
+[281/325] Compiling FluidAudio EnglishInitialisms.swift
+[282/325] Compiling FluidAudio EnglishTextNormalizer.swift
+[283/325] Compiling FluidAudio LexiconAssetCache.swift
+[284/325] Compiling FluidAudio NemoTextNormalizer.swift
+[285/325] Compiling FluidAudio PhonemeChunker.swift
+[286/325] Compiling FluidAudio TTSError.swift
+[287/325] Compiling FluidAudio TtsCacheDirectory.swift
+[288/325] Compiling FluidAudio TtsComputeUnitPreset.swift
+[289/325] Compiling FluidAudio StyleTTS2ModelStore.swift
+[290/325] Compiling FluidAudio StyleTTS2ResourceDownloader.swift
+[291/325] Compiling FluidAudio StyleTTS2MelExtractor.swift
+[292/325] Compiling FluidAudio StyleTTS2DiffusionSchedule.swift
+[293/325] Compiling FluidAudio StyleTTS2GlueOps.swift
+[294/325] Compiling FluidAudio StyleTTS2MultiArray.swift
+[295/325] Compiling FluidAudio StyleTTS2Synthesizer.swift
+[296/325] Compiling FluidAudio StyleTTS2Phonemizer.swift
+[297/349] Compiling FluidAudio LuxTtsTokenizer.swift
+[298/349] Compiling FluidAudio NeuTtsConstants.swift
+[299/349] Compiling FluidAudio NeuTtsManager.swift
+[300/349] Compiling FluidAudio NeuTtsModels.swift
+[301/349] Compiling FluidAudio NeuTtsPrompt.swift
+[302/349] Compiling FluidAudio NeuTtsSynthesizer.swift
+[303/349] Compiling FluidAudio NeuTtsBpeTokenizer.swift
+[304/349] Compiling FluidAudio PocketTtsConstantsLoader.swift
+[305/349] Compiling FluidAudio PocketTtsResourceDownloader.swift
+[306/349] Compiling FluidAudio PocketTtsLayerKeys.swift
+[307/349] Compiling FluidAudio PocketTtsMimiKeys.swift
+[308/349] Compiling FluidAudio PocketTtsModelStore.swift
+[309/349] Compiling FluidAudio PocketTtsSession.swift
+[310/349] Compiling FluidAudio PocketTtsStateEngine.swift
+[311/349] Compiling FluidAudio PocketTtsSynthesizer+Flow.swift
+[312/349] Compiling FluidAudio PocketTtsSynthesizer+KVCache.swift
+[313/349] Compiling FluidAudio PocketTtsSynthesizer+Mimi.swift
+[314/349] Compiling FluidAudio PocketTtsSynthesizer+State.swift
+[315/349] Compiling FluidAudio PocketTtsSynthesizer+Types.swift
+[316/349] Compiling FluidAudio PocketTtsSynthesizer.swift
+[317/349] Compiling FluidAudio PocketTtsVoiceCloner.swift
+[318/349] Compiling FluidAudio PocketTTSError.swift
+[319/349] Compiling FluidAudio PocketTtsComputeUnits.swift
+[320/349] Compiling FluidAudio PocketTtsConstants.swift
+[321/349] Compiling FluidAudio StyleTTS2TextCleaner.swift
+[322/349] Compiling FluidAudio StyleTTS2Constants.swift
+[323/349] Compiling FluidAudio StyleTTS2Error.swift
+[324/349] Compiling FluidAudio StyleTTS2Manager.swift
+[325/349] Compiling FluidAudio Supertonic3ModelStore.swift
+[326/349] Compiling FluidAudio Supertonic3ResourceDownloader.swift
+[327/349] Compiling FluidAudio Supertonic3TextChunker.swift
+[328/349] Compiling FluidAudio Supertonic3UnicodeProcessor.swift
+[329/349] Compiling FluidAudio Supertonic3LatentSampler.swift
+[330/349] Compiling FluidAudio Supertonic3MultiArray.swift
+[331/349] Compiling FluidAudio Supertonic3Synthesizer.swift
+[332/349] Compiling FluidAudio Supertonic3Constants.swift
+[333/349] Compiling FluidAudio Supertonic3Error.swift
+[334/349] Compiling FluidAudio Supertonic3Manager.swift
+[335/349] Compiling FluidAudio Supertonic3Types.swift
+[336/349] Compiling FluidAudio TtsBackend.swift
+[337/349] Compiling FluidAudio TtsConstants.swift
+[338/349] Compiling FluidAudio FsmnVadManager.swift
+[339/349] Compiling FluidAudio FsmnVadModels.swift
+[340/349] Compiling FluidAudio VadManager+SpeechSegmentation.swift
+[341/349] Compiling FluidAudio VadManager+Streaming.swift
+[342/349] Compiling FluidAudio VadManager.swift
+[343/349] Compiling FluidAudio VadTypes.swift
+[344/349] Compiling FluidAudio resource_bundle_accessor.swift
+[345/370] Compiling Beseda AppController.swift
+[346/370] Compiling Beseda AppPaths.swift
+[347/370] Compiling Beseda AppSettings.swift
+[348/370] Compiling Beseda ArchiveText.swift
+[349/370] Compiling Beseda BesedaApp.swift
+[350/370] Compiling Beseda CallNotifications.swift
+[351/370] Compiling Beseda DesignSystem.swift
+[352/370] Compiling Beseda ExecutableResolver.swift
+[353/370] Compiling Beseda FirstRunText.swift
+[354/370] Compiling Beseda IsolatedCopy.swift
+[355/370] Compiling Beseda JobStage.swift
+[356/370] Compiling Beseda Keychain.swift
+[357/370] Compiling Beseda LiveTranscription.swift
+[358/370] Compiling Beseda MenuText.swift
+[359/370] Compiling Beseda PermissionChecks.swift
+[360/370] Compiling Beseda SerialQueue.swift
+[361/370] Compiling Beseda SettingsText.swift
+[362/370] Compiling Beseda UIJourneyContract.swift
+[363/370] Compiling Beseda CallDetailView.swift
+[364/370] Compiling Beseda CallSidebar.swift
+[365/370] Emitting module Beseda
+[366/408] Compiling Beseda CalendarService.swift
+[367/408] Compiling Beseda RuntimeInstaller.swift
+[368/408] Compiling Beseda StoreResources.swift
+[369/408] Compiling Beseda StoreUpdater.swift
+[370/408] Compiling Beseda CallExport.swift
+[371/408] Compiling Beseda CallFormatting.swift
+[372/408] Compiling Beseda CallStore.swift
+[373/408] Compiling Beseda ExportText.swift
+[374/408] Compiling Beseda RelatedCalls.swift
+[375/408] Compiling Beseda StorageJanitor.swift
+[376/408] Compiling Beseda TranscriptCopy.swift
+[377/408] Compiling Beseda BundledSummaryInstaller.swift
+[378/408] Compiling Beseda ChatCompletionsProvider.swift
+[379/408] Compiling Beseda JevClassifier.swift
+[380/408] Compiling Beseda LlamaServer.swift
+[381/408] Compiling Beseda LocalModelSupport.swift
+[382/408] Compiling Beseda SummarizationService.swift
+[383/408] Compiling Beseda SummaryProvider.swift
+[384/408] Compiling Beseda DiarizationQueue.swift
+[385/427] Compiling Beseda Diarizer.swift
+[386/427] Compiling Beseda EchoGate.swift
+[387/427] Compiling Beseda LiveTranscriptPolicy.swift
+[388/427] Compiling Beseda LiveTranscriptionLoop.swift
+[389/427] Compiling Beseda LocalTranscriber.swift
+[390/427] Compiling Beseda SampleSource.swift
+[391/427] Compiling Beseda SentenceBuilder.swift
+[392/427] Compiling Beseda SpeakerAssignment.swift
+[393/427] Compiling Beseda SpeakerNaming.swift
+[394/427] Compiling Beseda SpeakerResplitter.swift
+[395/427] Compiling Beseda SpeechModel.swift
+[396/427] Compiling Beseda TranscriptMerger.swift
+[397/427] Compiling Beseda TranscriptModels.swift
+[398/427] Compiling Beseda UtteranceSplitter.swift
+[399/427] Compiling Beseda WordAssembler.swift
+[400/427] Compiling Beseda WebhookPayload.swift
+[401/427] Compiling Beseda WebhookSender.swift
+[402/427] Compiling Beseda WebhookService.swift
+[403/427] Compiling Beseda resource_bundle_accessor.swift
+[404/427] Compiling Beseda CallSummaryView.swift
+[405/427] Compiling Beseda Controls.swift
+[406/427] Compiling Beseda ConversationsWindow.swift
+[407/427] Compiling Beseda MenuBarPopover.swift
+[408/427] Compiling Beseda OnboardingWindow.swift
+[409/427] Compiling Beseda PlayerBar.swift
+[410/427] Compiling Beseda PreviousCallBlock.swift
+[411/427] Compiling Beseda SettingsWindow.swift
+[412/427] Compiling Beseda SpeechModelList.swift
+[413/427] Compiling Beseda AudioActivityTracker.swift
+[414/427] Compiling Beseda AudioNormalizer.swift
+[415/427] Compiling Beseda CallDetector.swift
+[416/427] Compiling Beseda CallPlayer.swift
+[417/427] Compiling Beseda CallRecordingPolicy.swift
+[418/427] Compiling Beseda DualCapture.swift
+[419/427] Compiling Beseda LevelMonitor.swift
+[420/427] Compiling Beseda MicrophoneCapture.swift
+[421/427] Compiling Beseda PCMFloatRecorder.swift
+[422/427] Compiling Beseda SystemAudioTap.swift
+[422/427] Write Objects.LinkFileList
+[423/427] Linking Beseda
+[424/427] Applying Beseda
+[426/450] Emitting module BesedaTests
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/AppSettingsTests.swift:216:21: warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+214 | }
+215 | 
+216 | private final class FailingKeychain: Keychain {
+    |                     `- warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+217 |     override func save(_ value: String, account: String) -> Bool {
+218 |         false
+[427/450] Compiling BesedaTests AppControllerLaunchTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/AppSettingsTests.swift:216:21: warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+214 | }
+215 | 
+216 | private final class FailingKeychain: Keychain {
+    |                     `- warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+217 |     override func save(_ value: String, account: String) -> Bool {
+218 |         false
+[428/450] Compiling BesedaTests AppPathsTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/AppSettingsTests.swift:216:21: warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+214 | }
+215 | 
+216 | private final class FailingKeychain: Keychain {
+    |                     `- warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+217 |     override func save(_ value: String, account: String) -> Bool {
+218 |         false
+[429/450] Compiling BesedaTests AppSettingsTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/AppSettingsTests.swift:216:21: warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+214 | }
+215 | 
+216 | private final class FailingKeychain: Keychain {
+    |                     `- warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+217 |     override func save(_ value: String, account: String) -> Bool {
+218 |         false
+[430/450] Compiling BesedaTests ArchiveDetailLocalizationTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/AppSettingsTests.swift:216:21: warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+214 | }
+215 | 
+216 | private final class FailingKeychain: Keychain {
+    |                     `- warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+217 |     override func save(_ value: String, account: String) -> Bool {
+218 |         false
+[431/450] Compiling BesedaTests ArchiveDurationLocaleTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/AppSettingsTests.swift:216:21: warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+214 | }
+215 | 
+216 | private final class FailingKeychain: Keychain {
+    |                     `- warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+217 |     override func save(_ value: String, account: String) -> Bool {
+218 |         false
+[432/450] Compiling BesedaTests ArchiveLocalizationTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/AppSettingsTests.swift:216:21: warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+214 | }
+215 | 
+216 | private final class FailingKeychain: Keychain {
+    |                     `- warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+217 |     override func save(_ value: String, account: String) -> Bool {
+218 |         false
+[433/450] Compiling BesedaTests AudioNormalizerTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/AppSettingsTests.swift:216:21: warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+214 | }
+215 | 
+216 | private final class FailingKeychain: Keychain {
+    |                     `- warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+217 |     override func save(_ value: String, account: String) -> Bool {
+218 |         false
+[434/450] Compiling BesedaTests BundledSummaryInstallerTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/AppSettingsTests.swift:216:21: warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+214 | }
+215 | 
+216 | private final class FailingKeychain: Keychain {
+    |                     `- warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+217 |     override func save(_ value: String, account: String) -> Bool {
+218 |         false
+[435/450] Compiling BesedaTests CalendarMatchTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/AppSettingsTests.swift:216:21: warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+214 | }
+215 | 
+216 | private final class FailingKeychain: Keychain {
+    |                     `- warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+217 |     override func save(_ value: String, account: String) -> Bool {
+218 |         false
+[436/450] Compiling BesedaTests CallArchivePagingTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/AppSettingsTests.swift:216:21: warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+214 | }
+215 | 
+216 | private final class FailingKeychain: Keychain {
+    |                     `- warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+217 |     override func save(_ value: String, account: String) -> Bool {
+218 |         false
+[437/450] Compiling BesedaTests CallExportTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/AppSettingsTests.swift:216:21: warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+214 | }
+215 | 
+216 | private final class FailingKeychain: Keychain {
+    |                     `- warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+217 |     override func save(_ value: String, account: String) -> Bool {
+218 |         false
+[438/450] Compiling BesedaTests CallPresentationTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/AppSettingsTests.swift:216:21: warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+214 | }
+215 | 
+216 | private final class FailingKeychain: Keychain {
+    |                     `- warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+217 |     override func save(_ value: String, account: String) -> Bool {
+218 |         false
+[439/450] Compiling BesedaTests CallRecordingPolicyTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/AppSettingsTests.swift:216:21: warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+214 | }
+215 | 
+216 | private final class FailingKeychain: Keychain {
+    |                     `- warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+217 |     override func save(_ value: String, account: String) -> Bool {
+218 |         false
+[440/450] Compiling BesedaTests CallStoreProtectedAudioTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/AppSettingsTests.swift:216:21: warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+214 | }
+215 | 
+216 | private final class FailingKeychain: Keychain {
+    |                     `- warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+217 |     override func save(_ value: String, account: String) -> Bool {
+218 |         false
+[441/450] Compiling BesedaTests CallStoreSafetyTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/AppSettingsTests.swift:216:21: warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+214 | }
+215 | 
+216 | private final class FailingKeychain: Keychain {
+    |                     `- warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+217 |     override func save(_ value: String, account: String) -> Bool {
+218 |         false
+[442/450] Compiling BesedaTests CallStoreSummaryTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/AppSettingsTests.swift:216:21: warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+214 | }
+215 | 
+216 | private final class FailingKeychain: Keychain {
+    |                     `- warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+217 |     override func save(_ value: String, account: String) -> Bool {
+218 |         false
+[443/450] Compiling BesedaTests CallStoreTranscriptTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/AppSettingsTests.swift:216:21: warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+214 | }
+215 | 
+216 | private final class FailingKeychain: Keychain {
+    |                     `- warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+217 |     override func save(_ value: String, account: String) -> Bool {
+218 |         false
+[444/450] Compiling BesedaTests CallStoreWebhookTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/AppSettingsTests.swift:216:21: warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+214 | }
+215 | 
+216 | private final class FailingKeychain: Keychain {
+    |                     `- warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+217 |     override func save(_ value: String, account: String) -> Bool {
+218 |         false
+[445/450] Compiling BesedaTests CallTypeProcessingTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/AppSettingsTests.swift:216:21: warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+214 | }
+215 | 
+216 | private final class FailingKeychain: Keychain {
+    |                     `- warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+217 |     override func save(_ value: String, account: String) -> Bool {
+218 |         false
+[446/450] Compiling BesedaTests ChatCompletionsProviderTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/AppSettingsTests.swift:216:21: warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+214 | }
+215 | 
+216 | private final class FailingKeychain: Keychain {
+    |                     `- warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+217 |     override func save(_ value: String, account: String) -> Bool {
+218 |         false
+[447/450] Compiling BesedaTests DeletionRetryTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/AppSettingsTests.swift:216:21: warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+214 | }
+215 | 
+216 | private final class FailingKeychain: Keychain {
+    |                     `- warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+217 |     override func save(_ value: String, account: String) -> Bool {
+218 |         false
+[448/450] Compiling BesedaTests DiarizerTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/AppSettingsTests.swift:216:21: warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+214 | }
+215 | 
+216 | private final class FailingKeychain: Keychain {
+    |                     `- warning: class 'FailingKeychain' must restate inherited '@unchecked Sendable' conformance
+217 |     override func save(_ value: String, account: String) -> Bool {
+218 |         false
+[449/493] Compiling BesedaTests EchoGateTests.swift
+[450/493] Compiling BesedaTests ExportBookmarkTests.swift
+[451/493] Compiling BesedaTests ExportLocalizationTests.swift
+[452/493] Compiling BesedaTests FirstRunLocalizationTests.swift
+[453/493] Compiling BesedaTests IsolatedCopyTests.swift
+[454/493] Compiling BesedaTests JobStageTests.swift
+[455/493] Compiling BesedaTests LiveLoadHarness.swift
+[456/493] Compiling BesedaTests LiveTranscriptionTests.swift
+[457/493] Compiling BesedaTests LocalModelSupportTests.swift
+[458/493] Compiling BesedaTests LocalTranscriberTests.swift
+[459/493] Compiling BesedaTests LongCallMemoryTests.swift
+[460/493] Compiling BesedaTests MenuLocalizationTests.swift
+[461/493] Compiling BesedaTests PCMFloatRecorderTests.swift
+[462/493] Compiling BesedaTests PreviousCallContentTests.swift
+[463/493] Compiling BesedaTests RecorderCallbackTests.swift
+[464/493] Compiling BesedaTests RecordingArchiveSearchPathTests.swift
+[465/493] Compiling BesedaTests RecordingPipelineTests.swift
+[466/493] Compiling BesedaTests RelatedCallsTests.swift
+[467/493] Compiling BesedaTests RuntimeInstallerTests.swift
+[468/493] Compiling BesedaTests RussianUINameTests.swift
+[469/493] Compiling BesedaTests SentenceBuilderTests.swift
+[470/493] Compiling BesedaTests SettingsDynamicLocalizationTests.swift
+[471/493] Compiling BesedaTests SettingsLocalizationTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/SpeakerResplitterTests.swift:98:9: warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 96 |     defer { try? FileManager.default.removeItem(at: root) }
+ 97 |     let before = try store.fetchSegments(callID: "silent")
+ 98 |     let calls = Calls()
+    |         `- warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 99 |     let resplitter = SpeakerResplitter(
+100 |         store: store, timeline: { _ in [] }, isPaused: { false }, log: { _ in }, progress: { _, _ in }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:28:66: warning: expression implicitly coerced from 'NSView?' to 'Any'
+26 |     public var elements: [NSObject] {
+27 |         var visited = Set<ObjectIdentifier>()
+28 |         return Self.walk(NSAccessibility.unignoredDescendant(of: window.contentView) as? NSObject, visited: &visited)
+   |                                                                  |      |- note: provide a default value to avoid this warning
+   |                                                                  |      |- note: force-unwrap the value to avoid this warning
+   |                                                                  |      `- note: explicitly cast to 'Any' with 'as Any' to silence this warning
+   |                                                                  `- warning: expression implicitly coerced from 'NSView?' to 'Any'
+29 |     }
+30 | 
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:34:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+32 |         elements.first {
+33 |             ($0 as? NSView)?.accessibilityIdentifier() == identifier
+34 |                 || $0.accessibilityAttributeValue(.identifier) as? String == identifier
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+35 |         }
+36 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:41:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+39 |         elements.first {
+40 |             ($0 as? NSView)?.accessibilityLabel() == label
+41 |                 || $0.accessibilityAttributeValue(.title) as? String == label
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+42 |         }
+43 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:55:24: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+53 |         guard let element, visited.insert(ObjectIdentifier(element)).inserted else { return [] }
+54 |         let accessibilityChildren = (element as? NSView)?.accessibilityChildren()
+55 |             ?? element.accessibilityAttributeValue(.children) as? [Any]
+   |                        `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+56 |             ?? []
+57 |         let viewChildren = (element as? NSView)?.subviews ?? []
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[472/493] Compiling BesedaTests SettingsServiceMessagesTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/SpeakerResplitterTests.swift:98:9: warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 96 |     defer { try? FileManager.default.removeItem(at: root) }
+ 97 |     let before = try store.fetchSegments(callID: "silent")
+ 98 |     let calls = Calls()
+    |         `- warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 99 |     let resplitter = SpeakerResplitter(
+100 |         store: store, timeline: { _ in [] }, isPaused: { false }, log: { _ in }, progress: { _, _ in }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:28:66: warning: expression implicitly coerced from 'NSView?' to 'Any'
+26 |     public var elements: [NSObject] {
+27 |         var visited = Set<ObjectIdentifier>()
+28 |         return Self.walk(NSAccessibility.unignoredDescendant(of: window.contentView) as? NSObject, visited: &visited)
+   |                                                                  |      |- note: provide a default value to avoid this warning
+   |                                                                  |      |- note: force-unwrap the value to avoid this warning
+   |                                                                  |      `- note: explicitly cast to 'Any' with 'as Any' to silence this warning
+   |                                                                  `- warning: expression implicitly coerced from 'NSView?' to 'Any'
+29 |     }
+30 | 
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:34:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+32 |         elements.first {
+33 |             ($0 as? NSView)?.accessibilityIdentifier() == identifier
+34 |                 || $0.accessibilityAttributeValue(.identifier) as? String == identifier
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+35 |         }
+36 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:41:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+39 |         elements.first {
+40 |             ($0 as? NSView)?.accessibilityLabel() == label
+41 |                 || $0.accessibilityAttributeValue(.title) as? String == label
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+42 |         }
+43 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:55:24: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+53 |         guard let element, visited.insert(ObjectIdentifier(element)).inserted else { return [] }
+54 |         let accessibilityChildren = (element as? NSView)?.accessibilityChildren()
+55 |             ?? element.accessibilityAttributeValue(.children) as? [Any]
+   |                        `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+56 |             ?? []
+57 |         let viewChildren = (element as? NSView)?.subviews ?? []
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[473/493] Compiling BesedaTests SpeakerAssignmentTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/SpeakerResplitterTests.swift:98:9: warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 96 |     defer { try? FileManager.default.removeItem(at: root) }
+ 97 |     let before = try store.fetchSegments(callID: "silent")
+ 98 |     let calls = Calls()
+    |         `- warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 99 |     let resplitter = SpeakerResplitter(
+100 |         store: store, timeline: { _ in [] }, isPaused: { false }, log: { _ in }, progress: { _, _ in }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:28:66: warning: expression implicitly coerced from 'NSView?' to 'Any'
+26 |     public var elements: [NSObject] {
+27 |         var visited = Set<ObjectIdentifier>()
+28 |         return Self.walk(NSAccessibility.unignoredDescendant(of: window.contentView) as? NSObject, visited: &visited)
+   |                                                                  |      |- note: provide a default value to avoid this warning
+   |                                                                  |      |- note: force-unwrap the value to avoid this warning
+   |                                                                  |      `- note: explicitly cast to 'Any' with 'as Any' to silence this warning
+   |                                                                  `- warning: expression implicitly coerced from 'NSView?' to 'Any'
+29 |     }
+30 | 
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:34:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+32 |         elements.first {
+33 |             ($0 as? NSView)?.accessibilityIdentifier() == identifier
+34 |                 || $0.accessibilityAttributeValue(.identifier) as? String == identifier
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+35 |         }
+36 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:41:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+39 |         elements.first {
+40 |             ($0 as? NSView)?.accessibilityLabel() == label
+41 |                 || $0.accessibilityAttributeValue(.title) as? String == label
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+42 |         }
+43 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:55:24: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+53 |         guard let element, visited.insert(ObjectIdentifier(element)).inserted else { return [] }
+54 |         let accessibilityChildren = (element as? NSView)?.accessibilityChildren()
+55 |             ?? element.accessibilityAttributeValue(.children) as? [Any]
+   |                        `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+56 |             ?? []
+57 |         let viewChildren = (element as? NSView)?.subviews ?? []
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[474/493] Compiling BesedaTests SpeakerLaneTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/SpeakerResplitterTests.swift:98:9: warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 96 |     defer { try? FileManager.default.removeItem(at: root) }
+ 97 |     let before = try store.fetchSegments(callID: "silent")
+ 98 |     let calls = Calls()
+    |         `- warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 99 |     let resplitter = SpeakerResplitter(
+100 |         store: store, timeline: { _ in [] }, isPaused: { false }, log: { _ in }, progress: { _, _ in }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:28:66: warning: expression implicitly coerced from 'NSView?' to 'Any'
+26 |     public var elements: [NSObject] {
+27 |         var visited = Set<ObjectIdentifier>()
+28 |         return Self.walk(NSAccessibility.unignoredDescendant(of: window.contentView) as? NSObject, visited: &visited)
+   |                                                                  |      |- note: provide a default value to avoid this warning
+   |                                                                  |      |- note: force-unwrap the value to avoid this warning
+   |                                                                  |      `- note: explicitly cast to 'Any' with 'as Any' to silence this warning
+   |                                                                  `- warning: expression implicitly coerced from 'NSView?' to 'Any'
+29 |     }
+30 | 
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:34:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+32 |         elements.first {
+33 |             ($0 as? NSView)?.accessibilityIdentifier() == identifier
+34 |                 || $0.accessibilityAttributeValue(.identifier) as? String == identifier
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+35 |         }
+36 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:41:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+39 |         elements.first {
+40 |             ($0 as? NSView)?.accessibilityLabel() == label
+41 |                 || $0.accessibilityAttributeValue(.title) as? String == label
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+42 |         }
+43 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:55:24: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+53 |         guard let element, visited.insert(ObjectIdentifier(element)).inserted else { return [] }
+54 |         let accessibilityChildren = (element as? NSView)?.accessibilityChildren()
+55 |             ?? element.accessibilityAttributeValue(.children) as? [Any]
+   |                        `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+56 |             ?? []
+57 |         let viewChildren = (element as? NSView)?.subviews ?? []
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[475/493] Compiling BesedaTests SpeakerNamingTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/SpeakerResplitterTests.swift:98:9: warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 96 |     defer { try? FileManager.default.removeItem(at: root) }
+ 97 |     let before = try store.fetchSegments(callID: "silent")
+ 98 |     let calls = Calls()
+    |         `- warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 99 |     let resplitter = SpeakerResplitter(
+100 |         store: store, timeline: { _ in [] }, isPaused: { false }, log: { _ in }, progress: { _, _ in }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:28:66: warning: expression implicitly coerced from 'NSView?' to 'Any'
+26 |     public var elements: [NSObject] {
+27 |         var visited = Set<ObjectIdentifier>()
+28 |         return Self.walk(NSAccessibility.unignoredDescendant(of: window.contentView) as? NSObject, visited: &visited)
+   |                                                                  |      |- note: provide a default value to avoid this warning
+   |                                                                  |      |- note: force-unwrap the value to avoid this warning
+   |                                                                  |      `- note: explicitly cast to 'Any' with 'as Any' to silence this warning
+   |                                                                  `- warning: expression implicitly coerced from 'NSView?' to 'Any'
+29 |     }
+30 | 
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:34:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+32 |         elements.first {
+33 |             ($0 as? NSView)?.accessibilityIdentifier() == identifier
+34 |                 || $0.accessibilityAttributeValue(.identifier) as? String == identifier
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+35 |         }
+36 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:41:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+39 |         elements.first {
+40 |             ($0 as? NSView)?.accessibilityLabel() == label
+41 |                 || $0.accessibilityAttributeValue(.title) as? String == label
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+42 |         }
+43 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:55:24: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+53 |         guard let element, visited.insert(ObjectIdentifier(element)).inserted else { return [] }
+54 |         let accessibilityChildren = (element as? NSView)?.accessibilityChildren()
+55 |             ?? element.accessibilityAttributeValue(.children) as? [Any]
+   |                        `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+56 |             ?? []
+57 |         let viewChildren = (element as? NSView)?.subviews ?? []
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[476/493] Compiling BesedaTests SpeakerResplitterTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/SpeakerResplitterTests.swift:98:9: warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 96 |     defer { try? FileManager.default.removeItem(at: root) }
+ 97 |     let before = try store.fetchSegments(callID: "silent")
+ 98 |     let calls = Calls()
+    |         `- warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 99 |     let resplitter = SpeakerResplitter(
+100 |         store: store, timeline: { _ in [] }, isPaused: { false }, log: { _ in }, progress: { _, _ in }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:28:66: warning: expression implicitly coerced from 'NSView?' to 'Any'
+26 |     public var elements: [NSObject] {
+27 |         var visited = Set<ObjectIdentifier>()
+28 |         return Self.walk(NSAccessibility.unignoredDescendant(of: window.contentView) as? NSObject, visited: &visited)
+   |                                                                  |      |- note: provide a default value to avoid this warning
+   |                                                                  |      |- note: force-unwrap the value to avoid this warning
+   |                                                                  |      `- note: explicitly cast to 'Any' with 'as Any' to silence this warning
+   |                                                                  `- warning: expression implicitly coerced from 'NSView?' to 'Any'
+29 |     }
+30 | 
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:34:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+32 |         elements.first {
+33 |             ($0 as? NSView)?.accessibilityIdentifier() == identifier
+34 |                 || $0.accessibilityAttributeValue(.identifier) as? String == identifier
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+35 |         }
+36 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:41:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+39 |         elements.first {
+40 |             ($0 as? NSView)?.accessibilityLabel() == label
+41 |                 || $0.accessibilityAttributeValue(.title) as? String == label
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+42 |         }
+43 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:55:24: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+53 |         guard let element, visited.insert(ObjectIdentifier(element)).inserted else { return [] }
+54 |         let accessibilityChildren = (element as? NSView)?.accessibilityChildren()
+55 |             ?? element.accessibilityAttributeValue(.children) as? [Any]
+   |                        `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+56 |             ?? []
+57 |         let viewChildren = (element as? NSView)?.subviews ?? []
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[477/493] Compiling BesedaTests SpeechModelTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/SpeakerResplitterTests.swift:98:9: warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 96 |     defer { try? FileManager.default.removeItem(at: root) }
+ 97 |     let before = try store.fetchSegments(callID: "silent")
+ 98 |     let calls = Calls()
+    |         `- warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 99 |     let resplitter = SpeakerResplitter(
+100 |         store: store, timeline: { _ in [] }, isPaused: { false }, log: { _ in }, progress: { _, _ in }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:28:66: warning: expression implicitly coerced from 'NSView?' to 'Any'
+26 |     public var elements: [NSObject] {
+27 |         var visited = Set<ObjectIdentifier>()
+28 |         return Self.walk(NSAccessibility.unignoredDescendant(of: window.contentView) as? NSObject, visited: &visited)
+   |                                                                  |      |- note: provide a default value to avoid this warning
+   |                                                                  |      |- note: force-unwrap the value to avoid this warning
+   |                                                                  |      `- note: explicitly cast to 'Any' with 'as Any' to silence this warning
+   |                                                                  `- warning: expression implicitly coerced from 'NSView?' to 'Any'
+29 |     }
+30 | 
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:34:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+32 |         elements.first {
+33 |             ($0 as? NSView)?.accessibilityIdentifier() == identifier
+34 |                 || $0.accessibilityAttributeValue(.identifier) as? String == identifier
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+35 |         }
+36 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:41:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+39 |         elements.first {
+40 |             ($0 as? NSView)?.accessibilityLabel() == label
+41 |                 || $0.accessibilityAttributeValue(.title) as? String == label
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+42 |         }
+43 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:55:24: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+53 |         guard let element, visited.insert(ObjectIdentifier(element)).inserted else { return [] }
+54 |         let accessibilityChildren = (element as? NSView)?.accessibilityChildren()
+55 |             ?? element.accessibilityAttributeValue(.children) as? [Any]
+   |                        `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+56 |             ?? []
+57 |         let viewChildren = (element as? NSView)?.subviews ?? []
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[478/493] Compiling BesedaTests StorageJanitorTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/SpeakerResplitterTests.swift:98:9: warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 96 |     defer { try? FileManager.default.removeItem(at: root) }
+ 97 |     let before = try store.fetchSegments(callID: "silent")
+ 98 |     let calls = Calls()
+    |         `- warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 99 |     let resplitter = SpeakerResplitter(
+100 |         store: store, timeline: { _ in [] }, isPaused: { false }, log: { _ in }, progress: { _, _ in }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:28:66: warning: expression implicitly coerced from 'NSView?' to 'Any'
+26 |     public var elements: [NSObject] {
+27 |         var visited = Set<ObjectIdentifier>()
+28 |         return Self.walk(NSAccessibility.unignoredDescendant(of: window.contentView) as? NSObject, visited: &visited)
+   |                                                                  |      |- note: provide a default value to avoid this warning
+   |                                                                  |      |- note: force-unwrap the value to avoid this warning
+   |                                                                  |      `- note: explicitly cast to 'Any' with 'as Any' to silence this warning
+   |                                                                  `- warning: expression implicitly coerced from 'NSView?' to 'Any'
+29 |     }
+30 | 
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:34:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+32 |         elements.first {
+33 |             ($0 as? NSView)?.accessibilityIdentifier() == identifier
+34 |                 || $0.accessibilityAttributeValue(.identifier) as? String == identifier
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+35 |         }
+36 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:41:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+39 |         elements.first {
+40 |             ($0 as? NSView)?.accessibilityLabel() == label
+41 |                 || $0.accessibilityAttributeValue(.title) as? String == label
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+42 |         }
+43 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:55:24: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+53 |         guard let element, visited.insert(ObjectIdentifier(element)).inserted else { return [] }
+54 |         let accessibilityChildren = (element as? NSView)?.accessibilityChildren()
+55 |             ?? element.accessibilityAttributeValue(.children) as? [Any]
+   |                        `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+56 |             ?? []
+57 |         let viewChildren = (element as? NSView)?.subviews ?? []
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[479/493] Compiling BesedaTests StoragePrivacyTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/SpeakerResplitterTests.swift:98:9: warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 96 |     defer { try? FileManager.default.removeItem(at: root) }
+ 97 |     let before = try store.fetchSegments(callID: "silent")
+ 98 |     let calls = Calls()
+    |         `- warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 99 |     let resplitter = SpeakerResplitter(
+100 |         store: store, timeline: { _ in [] }, isPaused: { false }, log: { _ in }, progress: { _, _ in }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:28:66: warning: expression implicitly coerced from 'NSView?' to 'Any'
+26 |     public var elements: [NSObject] {
+27 |         var visited = Set<ObjectIdentifier>()
+28 |         return Self.walk(NSAccessibility.unignoredDescendant(of: window.contentView) as? NSObject, visited: &visited)
+   |                                                                  |      |- note: provide a default value to avoid this warning
+   |                                                                  |      |- note: force-unwrap the value to avoid this warning
+   |                                                                  |      `- note: explicitly cast to 'Any' with 'as Any' to silence this warning
+   |                                                                  `- warning: expression implicitly coerced from 'NSView?' to 'Any'
+29 |     }
+30 | 
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:34:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+32 |         elements.first {
+33 |             ($0 as? NSView)?.accessibilityIdentifier() == identifier
+34 |                 || $0.accessibilityAttributeValue(.identifier) as? String == identifier
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+35 |         }
+36 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:41:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+39 |         elements.first {
+40 |             ($0 as? NSView)?.accessibilityLabel() == label
+41 |                 || $0.accessibilityAttributeValue(.title) as? String == label
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+42 |         }
+43 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:55:24: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+53 |         guard let element, visited.insert(ObjectIdentifier(element)).inserted else { return [] }
+54 |         let accessibilityChildren = (element as? NSView)?.accessibilityChildren()
+55 |             ?? element.accessibilityAttributeValue(.children) as? [Any]
+   |                        `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+56 |             ?? []
+57 |         let viewChildren = (element as? NSView)?.subviews ?? []
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[480/493] Compiling BesedaTests StrictModeTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/SpeakerResplitterTests.swift:98:9: warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 96 |     defer { try? FileManager.default.removeItem(at: root) }
+ 97 |     let before = try store.fetchSegments(callID: "silent")
+ 98 |     let calls = Calls()
+    |         `- warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 99 |     let resplitter = SpeakerResplitter(
+100 |         store: store, timeline: { _ in [] }, isPaused: { false }, log: { _ in }, progress: { _, _ in }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:28:66: warning: expression implicitly coerced from 'NSView?' to 'Any'
+26 |     public var elements: [NSObject] {
+27 |         var visited = Set<ObjectIdentifier>()
+28 |         return Self.walk(NSAccessibility.unignoredDescendant(of: window.contentView) as? NSObject, visited: &visited)
+   |                                                                  |      |- note: provide a default value to avoid this warning
+   |                                                                  |      |- note: force-unwrap the value to avoid this warning
+   |                                                                  |      `- note: explicitly cast to 'Any' with 'as Any' to silence this warning
+   |                                                                  `- warning: expression implicitly coerced from 'NSView?' to 'Any'
+29 |     }
+30 | 
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:34:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+32 |         elements.first {
+33 |             ($0 as? NSView)?.accessibilityIdentifier() == identifier
+34 |                 || $0.accessibilityAttributeValue(.identifier) as? String == identifier
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+35 |         }
+36 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:41:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+39 |         elements.first {
+40 |             ($0 as? NSView)?.accessibilityLabel() == label
+41 |                 || $0.accessibilityAttributeValue(.title) as? String == label
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+42 |         }
+43 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:55:24: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+53 |         guard let element, visited.insert(ObjectIdentifier(element)).inserted else { return [] }
+54 |         let accessibilityChildren = (element as? NSView)?.accessibilityChildren()
+55 |             ?? element.accessibilityAttributeValue(.children) as? [Any]
+   |                        `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+56 |             ?? []
+57 |         let viewChildren = (element as? NSView)?.subviews ?? []
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[481/493] Compiling BesedaTests SummarizationTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/SpeakerResplitterTests.swift:98:9: warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 96 |     defer { try? FileManager.default.removeItem(at: root) }
+ 97 |     let before = try store.fetchSegments(callID: "silent")
+ 98 |     let calls = Calls()
+    |         `- warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 99 |     let resplitter = SpeakerResplitter(
+100 |         store: store, timeline: { _ in [] }, isPaused: { false }, log: { _ in }, progress: { _, _ in }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:28:66: warning: expression implicitly coerced from 'NSView?' to 'Any'
+26 |     public var elements: [NSObject] {
+27 |         var visited = Set<ObjectIdentifier>()
+28 |         return Self.walk(NSAccessibility.unignoredDescendant(of: window.contentView) as? NSObject, visited: &visited)
+   |                                                                  |      |- note: provide a default value to avoid this warning
+   |                                                                  |      |- note: force-unwrap the value to avoid this warning
+   |                                                                  |      `- note: explicitly cast to 'Any' with 'as Any' to silence this warning
+   |                                                                  `- warning: expression implicitly coerced from 'NSView?' to 'Any'
+29 |     }
+30 | 
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:34:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+32 |         elements.first {
+33 |             ($0 as? NSView)?.accessibilityIdentifier() == identifier
+34 |                 || $0.accessibilityAttributeValue(.identifier) as? String == identifier
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+35 |         }
+36 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:41:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+39 |         elements.first {
+40 |             ($0 as? NSView)?.accessibilityLabel() == label
+41 |                 || $0.accessibilityAttributeValue(.title) as? String == label
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+42 |         }
+43 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:55:24: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+53 |         guard let element, visited.insert(ObjectIdentifier(element)).inserted else { return [] }
+54 |         let accessibilityChildren = (element as? NSView)?.accessibilityChildren()
+55 |             ?? element.accessibilityAttributeValue(.children) as? [Any]
+   |                        `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+56 |             ?? []
+57 |         let viewChildren = (element as? NSView)?.subviews ?? []
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[482/493] Compiling BesedaTests AccessibilityHarness.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/SpeakerResplitterTests.swift:98:9: warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 96 |     defer { try? FileManager.default.removeItem(at: root) }
+ 97 |     let before = try store.fetchSegments(callID: "silent")
+ 98 |     let calls = Calls()
+    |         `- warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 99 |     let resplitter = SpeakerResplitter(
+100 |         store: store, timeline: { _ in [] }, isPaused: { false }, log: { _ in }, progress: { _, _ in }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:28:66: warning: expression implicitly coerced from 'NSView?' to 'Any'
+26 |     public var elements: [NSObject] {
+27 |         var visited = Set<ObjectIdentifier>()
+28 |         return Self.walk(NSAccessibility.unignoredDescendant(of: window.contentView) as? NSObject, visited: &visited)
+   |                                                                  |      |- note: provide a default value to avoid this warning
+   |                                                                  |      |- note: force-unwrap the value to avoid this warning
+   |                                                                  |      `- note: explicitly cast to 'Any' with 'as Any' to silence this warning
+   |                                                                  `- warning: expression implicitly coerced from 'NSView?' to 'Any'
+29 |     }
+30 | 
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:34:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+32 |         elements.first {
+33 |             ($0 as? NSView)?.accessibilityIdentifier() == identifier
+34 |                 || $0.accessibilityAttributeValue(.identifier) as? String == identifier
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+35 |         }
+36 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:41:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+39 |         elements.first {
+40 |             ($0 as? NSView)?.accessibilityLabel() == label
+41 |                 || $0.accessibilityAttributeValue(.title) as? String == label
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+42 |         }
+43 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:55:24: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+53 |         guard let element, visited.insert(ObjectIdentifier(element)).inserted else { return [] }
+54 |         let accessibilityChildren = (element as? NSView)?.accessibilityChildren()
+55 |             ?? element.accessibilityAttributeValue(.children) as? [Any]
+   |                        `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+56 |             ?? []
+57 |         let viewChildren = (element as? NSView)?.subviews ?? []
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[483/493] Compiling BesedaTests TranscriptCopyTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/SpeakerResplitterTests.swift:98:9: warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 96 |     defer { try? FileManager.default.removeItem(at: root) }
+ 97 |     let before = try store.fetchSegments(callID: "silent")
+ 98 |     let calls = Calls()
+    |         `- warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 99 |     let resplitter = SpeakerResplitter(
+100 |         store: store, timeline: { _ in [] }, isPaused: { false }, log: { _ in }, progress: { _, _ in }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:28:66: warning: expression implicitly coerced from 'NSView?' to 'Any'
+26 |     public var elements: [NSObject] {
+27 |         var visited = Set<ObjectIdentifier>()
+28 |         return Self.walk(NSAccessibility.unignoredDescendant(of: window.contentView) as? NSObject, visited: &visited)
+   |                                                                  |      |- note: provide a default value to avoid this warning
+   |                                                                  |      |- note: force-unwrap the value to avoid this warning
+   |                                                                  |      `- note: explicitly cast to 'Any' with 'as Any' to silence this warning
+   |                                                                  `- warning: expression implicitly coerced from 'NSView?' to 'Any'
+29 |     }
+30 | 
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:34:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+32 |         elements.first {
+33 |             ($0 as? NSView)?.accessibilityIdentifier() == identifier
+34 |                 || $0.accessibilityAttributeValue(.identifier) as? String == identifier
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+35 |         }
+36 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:41:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+39 |         elements.first {
+40 |             ($0 as? NSView)?.accessibilityLabel() == label
+41 |                 || $0.accessibilityAttributeValue(.title) as? String == label
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+42 |         }
+43 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:55:24: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+53 |         guard let element, visited.insert(ObjectIdentifier(element)).inserted else { return [] }
+54 |         let accessibilityChildren = (element as? NSView)?.accessibilityChildren()
+55 |             ?? element.accessibilityAttributeValue(.children) as? [Any]
+   |                        `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+56 |             ?? []
+57 |         let viewChildren = (element as? NSView)?.subviews ?? []
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[484/493] Compiling BesedaTests TranscriptMergerTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/SpeakerResplitterTests.swift:98:9: warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 96 |     defer { try? FileManager.default.removeItem(at: root) }
+ 97 |     let before = try store.fetchSegments(callID: "silent")
+ 98 |     let calls = Calls()
+    |         `- warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 99 |     let resplitter = SpeakerResplitter(
+100 |         store: store, timeline: { _ in [] }, isPaused: { false }, log: { _ in }, progress: { _, _ in }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:28:66: warning: expression implicitly coerced from 'NSView?' to 'Any'
+26 |     public var elements: [NSObject] {
+27 |         var visited = Set<ObjectIdentifier>()
+28 |         return Self.walk(NSAccessibility.unignoredDescendant(of: window.contentView) as? NSObject, visited: &visited)
+   |                                                                  |      |- note: provide a default value to avoid this warning
+   |                                                                  |      |- note: force-unwrap the value to avoid this warning
+   |                                                                  |      `- note: explicitly cast to 'Any' with 'as Any' to silence this warning
+   |                                                                  `- warning: expression implicitly coerced from 'NSView?' to 'Any'
+29 |     }
+30 | 
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:34:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+32 |         elements.first {
+33 |             ($0 as? NSView)?.accessibilityIdentifier() == identifier
+34 |                 || $0.accessibilityAttributeValue(.identifier) as? String == identifier
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+35 |         }
+36 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:41:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+39 |         elements.first {
+40 |             ($0 as? NSView)?.accessibilityLabel() == label
+41 |                 || $0.accessibilityAttributeValue(.title) as? String == label
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+42 |         }
+43 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:55:24: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+53 |         guard let element, visited.insert(ObjectIdentifier(element)).inserted else { return [] }
+54 |         let accessibilityChildren = (element as? NSView)?.accessibilityChildren()
+55 |             ?? element.accessibilityAttributeValue(.children) as? [Any]
+   |                        `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+56 |             ?? []
+57 |         let viewChildren = (element as? NSView)?.subviews ?? []
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[485/493] Compiling BesedaTests UIJourneyContractTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/SpeakerResplitterTests.swift:98:9: warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 96 |     defer { try? FileManager.default.removeItem(at: root) }
+ 97 |     let before = try store.fetchSegments(callID: "silent")
+ 98 |     let calls = Calls()
+    |         `- warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 99 |     let resplitter = SpeakerResplitter(
+100 |         store: store, timeline: { _ in [] }, isPaused: { false }, log: { _ in }, progress: { _, _ in }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:28:66: warning: expression implicitly coerced from 'NSView?' to 'Any'
+26 |     public var elements: [NSObject] {
+27 |         var visited = Set<ObjectIdentifier>()
+28 |         return Self.walk(NSAccessibility.unignoredDescendant(of: window.contentView) as? NSObject, visited: &visited)
+   |                                                                  |      |- note: provide a default value to avoid this warning
+   |                                                                  |      |- note: force-unwrap the value to avoid this warning
+   |                                                                  |      `- note: explicitly cast to 'Any' with 'as Any' to silence this warning
+   |                                                                  `- warning: expression implicitly coerced from 'NSView?' to 'Any'
+29 |     }
+30 | 
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:34:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+32 |         elements.first {
+33 |             ($0 as? NSView)?.accessibilityIdentifier() == identifier
+34 |                 || $0.accessibilityAttributeValue(.identifier) as? String == identifier
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+35 |         }
+36 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:41:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+39 |         elements.first {
+40 |             ($0 as? NSView)?.accessibilityLabel() == label
+41 |                 || $0.accessibilityAttributeValue(.title) as? String == label
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+42 |         }
+43 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:55:24: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+53 |         guard let element, visited.insert(ObjectIdentifier(element)).inserted else { return [] }
+54 |         let accessibilityChildren = (element as? NSView)?.accessibilityChildren()
+55 |             ?? element.accessibilityAttributeValue(.children) as? [Any]
+   |                        `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+56 |             ?? []
+57 |         let viewChildren = (element as? NSView)?.subviews ?? []
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[486/493] Compiling BesedaTests UpdateInstallGateTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/SpeakerResplitterTests.swift:98:9: warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 96 |     defer { try? FileManager.default.removeItem(at: root) }
+ 97 |     let before = try store.fetchSegments(callID: "silent")
+ 98 |     let calls = Calls()
+    |         `- warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 99 |     let resplitter = SpeakerResplitter(
+100 |         store: store, timeline: { _ in [] }, isPaused: { false }, log: { _ in }, progress: { _, _ in }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:28:66: warning: expression implicitly coerced from 'NSView?' to 'Any'
+26 |     public var elements: [NSObject] {
+27 |         var visited = Set<ObjectIdentifier>()
+28 |         return Self.walk(NSAccessibility.unignoredDescendant(of: window.contentView) as? NSObject, visited: &visited)
+   |                                                                  |      |- note: provide a default value to avoid this warning
+   |                                                                  |      |- note: force-unwrap the value to avoid this warning
+   |                                                                  |      `- note: explicitly cast to 'Any' with 'as Any' to silence this warning
+   |                                                                  `- warning: expression implicitly coerced from 'NSView?' to 'Any'
+29 |     }
+30 | 
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:34:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+32 |         elements.first {
+33 |             ($0 as? NSView)?.accessibilityIdentifier() == identifier
+34 |                 || $0.accessibilityAttributeValue(.identifier) as? String == identifier
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+35 |         }
+36 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:41:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+39 |         elements.first {
+40 |             ($0 as? NSView)?.accessibilityLabel() == label
+41 |                 || $0.accessibilityAttributeValue(.title) as? String == label
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+42 |         }
+43 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:55:24: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+53 |         guard let element, visited.insert(ObjectIdentifier(element)).inserted else { return [] }
+54 |         let accessibilityChildren = (element as? NSView)?.accessibilityChildren()
+55 |             ?? element.accessibilityAttributeValue(.children) as? [Any]
+   |                        `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+56 |             ?? []
+57 |         let viewChildren = (element as? NSView)?.subviews ?? []
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[487/493] Compiling BesedaTests UtteranceSplitterTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/SpeakerResplitterTests.swift:98:9: warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 96 |     defer { try? FileManager.default.removeItem(at: root) }
+ 97 |     let before = try store.fetchSegments(callID: "silent")
+ 98 |     let calls = Calls()
+    |         `- warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 99 |     let resplitter = SpeakerResplitter(
+100 |         store: store, timeline: { _ in [] }, isPaused: { false }, log: { _ in }, progress: { _, _ in }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:28:66: warning: expression implicitly coerced from 'NSView?' to 'Any'
+26 |     public var elements: [NSObject] {
+27 |         var visited = Set<ObjectIdentifier>()
+28 |         return Self.walk(NSAccessibility.unignoredDescendant(of: window.contentView) as? NSObject, visited: &visited)
+   |                                                                  |      |- note: provide a default value to avoid this warning
+   |                                                                  |      |- note: force-unwrap the value to avoid this warning
+   |                                                                  |      `- note: explicitly cast to 'Any' with 'as Any' to silence this warning
+   |                                                                  `- warning: expression implicitly coerced from 'NSView?' to 'Any'
+29 |     }
+30 | 
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:34:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+32 |         elements.first {
+33 |             ($0 as? NSView)?.accessibilityIdentifier() == identifier
+34 |                 || $0.accessibilityAttributeValue(.identifier) as? String == identifier
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+35 |         }
+36 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:41:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+39 |         elements.first {
+40 |             ($0 as? NSView)?.accessibilityLabel() == label
+41 |                 || $0.accessibilityAttributeValue(.title) as? String == label
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+42 |         }
+43 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:55:24: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+53 |         guard let element, visited.insert(ObjectIdentifier(element)).inserted else { return [] }
+54 |         let accessibilityChildren = (element as? NSView)?.accessibilityChildren()
+55 |             ?? element.accessibilityAttributeValue(.children) as? [Any]
+   |                        `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+56 |             ?? []
+57 |         let viewChildren = (element as? NSView)?.subviews ?? []
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[488/493] Compiling BesedaTests WebhookPayloadTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/SpeakerResplitterTests.swift:98:9: warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 96 |     defer { try? FileManager.default.removeItem(at: root) }
+ 97 |     let before = try store.fetchSegments(callID: "silent")
+ 98 |     let calls = Calls()
+    |         `- warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 99 |     let resplitter = SpeakerResplitter(
+100 |         store: store, timeline: { _ in [] }, isPaused: { false }, log: { _ in }, progress: { _, _ in }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:28:66: warning: expression implicitly coerced from 'NSView?' to 'Any'
+26 |     public var elements: [NSObject] {
+27 |         var visited = Set<ObjectIdentifier>()
+28 |         return Self.walk(NSAccessibility.unignoredDescendant(of: window.contentView) as? NSObject, visited: &visited)
+   |                                                                  |      |- note: provide a default value to avoid this warning
+   |                                                                  |      |- note: force-unwrap the value to avoid this warning
+   |                                                                  |      `- note: explicitly cast to 'Any' with 'as Any' to silence this warning
+   |                                                                  `- warning: expression implicitly coerced from 'NSView?' to 'Any'
+29 |     }
+30 | 
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:34:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+32 |         elements.first {
+33 |             ($0 as? NSView)?.accessibilityIdentifier() == identifier
+34 |                 || $0.accessibilityAttributeValue(.identifier) as? String == identifier
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+35 |         }
+36 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:41:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+39 |         elements.first {
+40 |             ($0 as? NSView)?.accessibilityLabel() == label
+41 |                 || $0.accessibilityAttributeValue(.title) as? String == label
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+42 |         }
+43 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:55:24: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+53 |         guard let element, visited.insert(ObjectIdentifier(element)).inserted else { return [] }
+54 |         let accessibilityChildren = (element as? NSView)?.accessibilityChildren()
+55 |             ?? element.accessibilityAttributeValue(.children) as? [Any]
+   |                        `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+56 |             ?? []
+57 |         let viewChildren = (element as? NSView)?.subviews ?? []
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[489/493] Compiling BesedaTests WebhookSenderTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/SpeakerResplitterTests.swift:98:9: warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 96 |     defer { try? FileManager.default.removeItem(at: root) }
+ 97 |     let before = try store.fetchSegments(callID: "silent")
+ 98 |     let calls = Calls()
+    |         `- warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 99 |     let resplitter = SpeakerResplitter(
+100 |         store: store, timeline: { _ in [] }, isPaused: { false }, log: { _ in }, progress: { _, _ in }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:28:66: warning: expression implicitly coerced from 'NSView?' to 'Any'
+26 |     public var elements: [NSObject] {
+27 |         var visited = Set<ObjectIdentifier>()
+28 |         return Self.walk(NSAccessibility.unignoredDescendant(of: window.contentView) as? NSObject, visited: &visited)
+   |                                                                  |      |- note: provide a default value to avoid this warning
+   |                                                                  |      |- note: force-unwrap the value to avoid this warning
+   |                                                                  |      `- note: explicitly cast to 'Any' with 'as Any' to silence this warning
+   |                                                                  `- warning: expression implicitly coerced from 'NSView?' to 'Any'
+29 |     }
+30 | 
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:34:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+32 |         elements.first {
+33 |             ($0 as? NSView)?.accessibilityIdentifier() == identifier
+34 |                 || $0.accessibilityAttributeValue(.identifier) as? String == identifier
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+35 |         }
+36 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:41:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+39 |         elements.first {
+40 |             ($0 as? NSView)?.accessibilityLabel() == label
+41 |                 || $0.accessibilityAttributeValue(.title) as? String == label
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+42 |         }
+43 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:55:24: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+53 |         guard let element, visited.insert(ObjectIdentifier(element)).inserted else { return [] }
+54 |         let accessibilityChildren = (element as? NSView)?.accessibilityChildren()
+55 |             ?? element.accessibilityAttributeValue(.children) as? [Any]
+   |                        `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+56 |             ?? []
+57 |         let viewChildren = (element as? NSView)?.subviews ?? []
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[490/493] Compiling BesedaTests WebhookServiceTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/SpeakerResplitterTests.swift:98:9: warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 96 |     defer { try? FileManager.default.removeItem(at: root) }
+ 97 |     let before = try store.fetchSegments(callID: "silent")
+ 98 |     let calls = Calls()
+    |         `- warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 99 |     let resplitter = SpeakerResplitter(
+100 |         store: store, timeline: { _ in [] }, isPaused: { false }, log: { _ in }, progress: { _, _ in }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:28:66: warning: expression implicitly coerced from 'NSView?' to 'Any'
+26 |     public var elements: [NSObject] {
+27 |         var visited = Set<ObjectIdentifier>()
+28 |         return Self.walk(NSAccessibility.unignoredDescendant(of: window.contentView) as? NSObject, visited: &visited)
+   |                                                                  |      |- note: provide a default value to avoid this warning
+   |                                                                  |      |- note: force-unwrap the value to avoid this warning
+   |                                                                  |      `- note: explicitly cast to 'Any' with 'as Any' to silence this warning
+   |                                                                  `- warning: expression implicitly coerced from 'NSView?' to 'Any'
+29 |     }
+30 | 
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:34:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+32 |         elements.first {
+33 |             ($0 as? NSView)?.accessibilityIdentifier() == identifier
+34 |                 || $0.accessibilityAttributeValue(.identifier) as? String == identifier
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+35 |         }
+36 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:41:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+39 |         elements.first {
+40 |             ($0 as? NSView)?.accessibilityLabel() == label
+41 |                 || $0.accessibilityAttributeValue(.title) as? String == label
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+42 |         }
+43 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:55:24: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+53 |         guard let element, visited.insert(ObjectIdentifier(element)).inserted else { return [] }
+54 |         let accessibilityChildren = (element as? NSView)?.accessibilityChildren()
+55 |             ?? element.accessibilityAttributeValue(.children) as? [Any]
+   |                        `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+56 |             ?? []
+57 |         let viewChildren = (element as? NSView)?.subviews ?? []
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[491/493] Compiling BesedaTests WordAssemblerTests.swift
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/SpeakerResplitterTests.swift:98:9: warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 96 |     defer { try? FileManager.default.removeItem(at: root) }
+ 97 |     let before = try store.fetchSegments(callID: "silent")
+ 98 |     let calls = Calls()
+    |         `- warning: initialization of immutable value 'calls' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+ 99 |     let resplitter = SpeakerResplitter(
+100 |         store: store, timeline: { _ in [] }, isPaused: { false }, log: { _ in }, progress: { _, _ in }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:28:66: warning: expression implicitly coerced from 'NSView?' to 'Any'
+26 |     public var elements: [NSObject] {
+27 |         var visited = Set<ObjectIdentifier>()
+28 |         return Self.walk(NSAccessibility.unignoredDescendant(of: window.contentView) as? NSObject, visited: &visited)
+   |                                                                  |      |- note: provide a default value to avoid this warning
+   |                                                                  |      |- note: force-unwrap the value to avoid this warning
+   |                                                                  |      `- note: explicitly cast to 'Any' with 'as Any' to silence this warning
+   |                                                                  `- warning: expression implicitly coerced from 'NSView?' to 'Any'
+29 |     }
+30 | 
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:34:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+32 |         elements.first {
+33 |             ($0 as? NSView)?.accessibilityIdentifier() == identifier
+34 |                 || $0.accessibilityAttributeValue(.identifier) as? String == identifier
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+35 |         }
+36 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:41:23: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+39 |         elements.first {
+40 |             ($0 as? NSView)?.accessibilityLabel() == label
+41 |                 || $0.accessibilityAttributeValue(.title) as? String == label
+   |                       `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+42 |         }
+43 |     }
+
+/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-306/Tests/BesedaTests/Support/AccessibilityHarness.swift:55:24: warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+53 |         guard let element, visited.insert(ObjectIdentifier(element)).inserted else { return [] }
+54 |         let accessibilityChildren = (element as? NSView)?.accessibilityChildren()
+55 |             ?? element.accessibilityAttributeValue(.children) as? [Any]
+   |                        `- warning: 'accessibilityAttributeValue' was deprecated in macOS 10.10: Use the NSAccessibility protocol methods instead (see NSAccessibilityProtocols.h) [#DeprecatedDeclaration]
+56 |             ?? []
+57 |         let viewChildren = (element as? NSView)?.subviews ?? []
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[492/495] Emitting module BesedaPackageTests
+[493/495] Compiling BesedaPackageTests runner.swift
+[493/495] Write Objects.LinkFileList
+[494/495] Linking BesedaPackageTests
+Build complete! (67.11s)
+Test Suite 'All tests' started at 2026-09-28 01:16:37.489.
+Test Suite 'All tests' passed at 2026-09-28 01:16:37.498.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.009) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test aServerThatIsNotInstalledIsReportedAsAMissingModel() started.
+◇ Test aFailedEngineDownloadStopsBeforeTheFourGigabyteModel() started.
+◇ Test aTimedOutTransportBecomesARetryableFailure() started.
+◇ Test immediateRetentionDeletesTheAudioRightAfterTheCallIsMarkedReady() started.
+◇ Test datedRuleExpiresOnlyPastItsDeadline() started.
+◇ Test aGarbageAnswerFallsBackToTheFirstTypeWhateverItIsNamed() started.
+◇ Test isolatedCopyNeverReachesAPermissionDialog() started.
+◇ Test anExistingBesedaFolderIsLeftAlone() started.
+◇ Test anUnavailableCallIndexIsShownToTheUser() started.
+◇ Test theWebhookSettingsDefaultToOffAndRoundTripThroughUserDefaults() started.
+◇ Test jevClassifiesByDefaultOnlyWhenAnOpenRouterKeyIsSet() started.
+◇ Test renamingRewritesTheDialogueAndLeavesTheChannelsAlone() started.
+◇ Test anotherAppTakingTheMicrophoneStartsItsOwnRecording() started.
+◇ Test doesNotStartWhileAManualRecordingIsRunning() started.
+◇ Test theCutLandsInTheSilenceNotOnTheHardBoundary() started.
+◇ Test aFiveOhThreeIsAFailureWorthRetrying() started.
+◇ Test theSummarySettingsDefaultToEmptyAndRoundTripThroughUserDefaults() started.
+◇ Test onlyCallsThatStillNeedTheirAudioProtectTheirFolder() started.
+◇ Test aLaunchBeforeAnySpeechModelIsDownloadedLeavesTheDiarizerModelAlone() started.
+◇ Suite SettingsDynamicLocalizationTests started.
+◇ Test aManualSendBypassesTheAutomaticFilter() started.
+◇ Test withoutAnEventTheTitleStillComesFromTheTranscript() started.
+◇ Test twoCallsFinishingBackToBackAreBothProcessed() started.
+◇ Test writePastTheLimitSurfacesAsARecordingWarning() started.
+◇ Test jevsConfidentPickIsUsedWithoutAskingTheSummaryModel() started.
+◇ Test launchDoesNotWaitOnTheKeychainAndTheKeyAppearsOnceTheReadReturns() started.
+◇ Test nextChunkWaitsForAFullChunkOnDisk() started.
+◇ Test aCustomPromptResultIsShownWhole() started.
+◇ Test installDownloadsTheModelAndMarksTheWarmUp() started.
+◇ Suite SettingsLocalizationTests started.
+◇ Test downloadStateFollowsTheFileSize() started.
+◇ Test sentencePiecesBecomeWords() started.
+◇ Test theBackupExclusionIsAppliedToTheDataFolderAtLaunchAndCleared() started.
+◇ Suite SettingsServiceMessagesTests started.
+◇ Test bookmarksPersistRecoverAndBalanceScopes() started.
+◇ Test anEmptyTimelineProducesNoTurns() started.
+◇ Test transcriptionLanguageMatchesModelCapabilities() started.
+◇ Test endpointAcceptsOnlyHttpAddressesWithAHost() started.
+◇ Test releaseBeforeTheDebounceRecordsNothing() started.
+◇ Test aBrokenURLStillQueuesNothing() started.
+◇ Test theEstimateComesFromHowLongTheFinishedPartTook() started.
+◇ Test downloadURLsPinARevision() started.
+◇ Test aGivenTypeSkipsTheClassifier() started.
+◇ Test aReleasedSchemaMigratesToCurrentKeepingItsData(schema:) started.
+◇ Test parseReturnsTrimmedContentFromANormalAnswer() started.
+◇ Test nothingRelatedGivesNil() started.
+◇ Test aServerThatDoesNotAnswerIsReportedAsDownAndNamed() started.
+◇ Test removingTakesBackTheModelAndKeepsTheEngine() started.
+◇ Test deletionFailuresAndOldExportLocation() started.
+◇ Test slowChunksWidenTheRestAndCleanOnesNarrowIt() started.
+◇ Test remoteSpeechMustReachThirtySecondsForOneParticipant() started.
+◇ Test deniedOldExportKeepsNewPathAndRetries() started.
+◇ Test anEventStartingSixMinutesLaterDoesNot() started.
+◇ Test trailingWordsWithoutPunctuationStillBecomeASegment() started.
+◇ Test linkingIsBrokenWhenTheSelectedCalendarIsGone() started.
+◇ Test aRejectionQueuesNothing() started.
+◇ Test aZoomLinkInTheEventCountsAsACall() started.
+◇ Test recordingTranscriptArchiveAndSearchRoundTrip() started.
+◇ Test withTwoEventsStartingNearbyTheNearerOneWins() started.
+◇ Test localOnlyIsOffByDefaultAndKeepsSummariesJevAndWebhooksOnTheMac() started.
+◇ Test directLegacyDeletionRemovesAuthorizedOldCopy() started.
+◇ Test theDiarizerDownloadStopsBeforeADiskThatCannotHoldIt() started.
+◇ Test anUnknownJevChoiceFallsBackToOther() started.
+◇ Test transcribingWithoutTheModelFileFailsWithTheTypedError() started.
+◇ Test aCallWithOnlyMarkdownStillGoesToTheProvider() started.
+◇ Test theDigestKeepsAgreementsNextStepsAndOpenQuestions() started.
+◇ Test resplitWithNoDiarizerSpeechIsNotRepeated() started.
+◇ Test liveLoopTranscribesChunksOfTheGrowingFilesUntilCancelled() started.
+◇ Test laterAndUnreadyCallsAreIgnored() started.
+◇ Test theBarCountsFinishedStepsAndThePartOfTheRunningOne() started.
+◇ Test aFailedDownloadStopsTheChainAndKeepsItsMessage() started.
+◇ Test exportWritesTheFileAndARerunOverwritesIt() started.
+◇ Test aStoppedDiscoveredServerUsesTheTypedRecoveryError() started.
+◇ Test storedTypesWithoutTheFlagMakeTheFirstOtherAndItKeepsTheFlagAnywhereInTheList() started.
+◇ Test stopsWhenTheMicrophoneIsReleased() started.
+◇ Test parseTellsARefusedKeyApartFromAnyOtherFailure() started.
+◇ Test secretsInUserDefaultsMoveToTheKeychainAndLeaveDefaults() started.
+◇ Test aShortEventIsNotTheName() started.
+◇ Test journeyAccessibilityCanBeReadAndActedWithoutAFrontWindow() started.
+◇ Test justOverFortyMinutesWithExactlyThirtySecondsPerSideIsDelivered() started.
+◇ Test anEventStartingFourMinutesLaterStillCounts() started.
+◇ Test aStoredSummaryIsReadBackFromTheDatabase() started.
+◇ Test theOldestSchemaMigratesToCurrentKeepingItsData() started.
+◇ Test onlyGigaamNeedsSplitting() started.
+◇ Test theRequestGoesOutWithoutAnAuthorizationHeaderToALocalServer() started.
+◇ Test theMissingBuiltInModelErrorSaysWhereToDownloadIt() started.
+◇ Test thePreviousVersionMigratesToCurrentKeepingItsData() started.
+◇ Test aBarelyStartedStepGivesNoEstimate() started.
+◇ Test anUnknownSpeakerKeyNeverShowsUpAsItsName() started.
+◇ Test aFailedSegmentWriteInFinishCallKeepsTheAudioAndSendsNoWebhook() started.
+◇ Test deletingTheCallDropsItsDeliveries() started.
+◇ Test menuRecordingAndRecoveryCopyFollowsLocale() started.
+◇ Test sentenceEndingWordClosesASegment() started.
+◇ Test resplitWaitsWhileTheAppIsBusy() started.
+◇ Test aWriterThatCannotKeepUpStopsTheRecordingVisibly() started.
+◇ Test sweepLeavesTheAudioOfAProtectedCallAlone() started.
+◇ Test deletingACallLeavesNothingOfItOnDisk() started.
+◇ Test exportEnglishCopyKeepsAuthoredTextAndStableFileName() started.
+◇ Test aCallWithoutSummaryHasNothingToShow() started.
+◇ Test aTwoHundredWithAnActionIsDelivered() started.
+◇ Test measureSplitsTheFolderByKind() started.
+◇ Test overlappingAndInvalidSegmentsDoNotInflateRecognizedSpeech() started.
+◇ Test aLegacyDatabaseMissingSpeakerMergeTableIsRepairedWithoutLosingCalls() started.
+◇ Test aMissingSummaryLeavesTheKeyOut() started.
+◇ Test callWithoutATranscriptFallsBackToTheAppAndDate() started.
+◇ Test progressFractionsReachTheStage() started.
+◇ Test numberedSpeakersCarryTheirNumberIntoTheAvatar() started.
+◇ Test theClassifierContextHasTheWeekdayLocalTimeAndDuration() started.
+◇ Test aFailedKeychainWriteKeepsTheSecretInDefaults() started.
+◇ Test aCurrentStoreIsNeitherMigratedNorBackedUpAgain() started.
+◇ Test normalisingYieldsSixteenKilohertzMonoInt16() started.
+◇ Test failedResplitLeavesTheCallUntouched() started.
+◇ Test renamedSpeakersReachBothTheTextAndTheParticipants() started.
+◇ Test seriesAndParticipantsSurviveTheDatabase() started.
+◇ Test recorderLeavesARepairableFileWithoutStop() started.
+◇ Test withoutSegmentsTheStoredMarkdownIsCopiedAsItIs() started.
+◇ Test stateLabelDependsOnlyOnTheSelectedModelFile() started.
+◇ Test bookmarkRecoveryStringsExistInBothLanguages() started.
+◇ Test theDigestKeepsTheCurrentDefaultSections() started.
+◇ Test onlyQueuedRowsWhoseTimeHasComeAreDue() started.
+◇ Test titleIsNilForAnEmptyTranscript() started.
+◇ Test theRetryScheduleStopsAfterTheFourthAttempt() started.
+◇ Test immediateRuleExpiresAFreshFile() started.
+◇ Test thePodushkaFolderBecomesTheBesedaFolderOnce() started.
+◇ Test lessThanThirtySecondsFromMeIsNotAutomaticallyQueued() started.
+◇ Test echoOnlySentencesAreDroppedAndOwnSpeechIsKept() started.
+◇ Test aFailingJevFallsBackToTheLocalModelAndIsLogged() started.
+◇ Test anEmptyCalendarMatchesNothing() started.
+◇ Test seededJourneyCannotModifyARealAppRun() started.
+◇ Test aManualMergeIsDroppedWhenAnotherDiarizerRelabelsTheCall() started.
+◇ Test parseThrowsTheServerMessageOnAnErrorBody() started.
+◇ Test strictModeOverridesItsSettingsAndTurningItOffRestoresThem() started.
+◇ Test aDiskThatRefusesWritesStopsTheRecordingVisiblyAndKeepsWhatWasWritten() started.
+◇ Test successiveDeniedExportsSurviveRelaunch() started.
+◇ Test aFailedResumeAtLaunchIsNotReportedAsAnUnavailableIndex() started.
+◇ Test anEditedSummaryPromptBecomesTheFirstCallTypesPrompt() started.
+◇ Test aCallRecordedBeforeDiarizationKeepsTheUnnumberedName() started.
+◇ Test theOldestOfMoreThanAPageOfCallsIsFoundBySearchAndByPaging() started.
+➜ Test theInstalledModelTranscribesRealSpeech() skipped.
+◇ Test theJevRequestIsOneChoiceOverTheTypesWithTheCallInState() started.
+◇ Test aOneSpeakerCallIsUnchanged() started.
+◇ Test theResponseBodyIsCutAtTwoKilobytes() started.
+◇ Test aSentenceOutsideDiarizerSpeechKeepsItsTimesAndTheNearestSpeaker() started.
+◇ Test anUnrenamedCallTypeFromBESEDA46BecomesOtherWithItsPrompt() started.
+◇ Test titleSkipsTheFillerOpenerForTheFirstSentenceThatCarriesSomething() started.
+◇ Test titleCutsALongFirstSentenceOnAWordBoundary() started.
+◇ Test timestampedFormatPutsTheClockBeforeTheSpeaker() started.
+◇ Test startsOnlyAfterTheDebounceElapsed() started.
+◇ Test aRetryableFailureQueuesTheNextAttempt() started.
+◇ Test aTranscriptOpeningWithoutTheMarkerKeepsItsFirstWord() started.
+◇ Test aLongWaitIsRoundedUpToMinutes() started.
+➜ Test liveLoopLogsOnceAndStopsWhenTheSpeechModelIsMissing() skipped.
+◇ Test aShortDiskDownloadsNeitherTheEngineNorTheModel() started.
+◇ Test archiveDurationUsesExplicitLocale() started.
+◇ Test plainHttpIsRefusedExceptToThisMac() started.
+◇ Test theRequestCarriesTheKeyAsABearerHeaderWhenThereIsOne() started.
+◇ Test aWordStraddlingTheCutIsNotRepeated() started.
+◇ Test aLowConfidenceJevPickFallsBackToOther() started.
+◇ Test theSameTypeWithASharedParticipantIsRelated() started.
+◇ Test aLaunchWithTheSpeechModelOnDiskPrefetchesTheDiarizerModel() started.
+◇ Test sharesStillAddUpOnACallWithHundredsOfShortLines() started.
+◇ Test microphoneNoteWithoutATranscriptGetsItsOwnTitle() started.
+◇ Test generatedExportLabelsAndNamesFollowExplicitLocale() started.
+◇ Test titleFallsBackToTheFirstSentenceWhenEveryLineIsShort() started.
+◇ Test aModelThatArrivesCorruptedLeavesNoFileBehind() started.
+◇ Test anInterruptedCallWithABrokenChannelSaysSo() started.
+◇ Test parseTreatsEmptyChoicesAsAnUnavailableModel() started.
+◇ Test piecesReadWindowByWindowFromAFileMatchTheWholeArraySplit() started.
+◇ Test installingLeavesTheServerTheModelAndTheWarmUpMarkerOnDisk() started.
+◇ Test aTranscriptWithoutADialogueBlockIsLeftUntouched() started.
+◇ Test aCustomResultWithOnlyOpenQuestionsIsShownWhole() started.
+◇ Test markdownFormatOpensWithTheConversationName() started.
+◇ Test turnsTakeTheDiarizerSpeakersAndKeepSentenceTimes() started.
+◇ Test legacyDeletionWithoutFolderScopeRetainsCallAndCopy() started.
+◇ Test aRenamedSpeakerReachesTheProviderUnderTheNewName() started.
+◇ Test aSentenceGluingEchoAndOwnSpeechKeepsOnlyTheOwnWordsWithTheirBounds() started.
+◇ Test eachDeniedExportFolderRetriesOnlyUnderItsOwnScope() started.
+◇ Test exactlyFortyMinutesIsNotAutomaticallyQueued() started.
+◇ Test aCallWithNeitherLinesNorMarkdownNeverReachesTheProvider() started.
+➜ Test jevClassifiesATinySyntheticExcerptLive() skipped.
+◇ Test resplitSkipsRenamedSpeakers() started.
+◇ Test previousCallContentIsHiddenWithoutCallOrDigest() started.
+◇ Test theAttemptCountCountsEveryRowOfTheCall() started.
+◇ Test firstRunCopyIsLocalizedWithoutRequestingPermissions() started.
+➜ Test peakMemoryOnASyntheticLongCall() skipped.
+◇ Test audioShorterThanTheLimitIsNotSplit() started.
+◇ Test aShortDiskFailsTheStageWithoutDownloading() started.
+◇ Test aValidSelectedModelIsUsableWithoutAWarmUpMarker() started.
+◇ Test aCallFolderMissingFromTheIndexAppearsAsFailedAndRetryable() started.
+◇ Test aDiarizerFileWithTheWrongHashIsNeverInstalled() started.
+◇ Test aDeletedCallWaitingInTheQueueIsNotProcessed() started.
+◇ Test storeInstallNeverFetchesAnExecutableEvenWhenDirectRuntimeExists() started.
+◇ Test aLongSingleSpeakerSegmentKeepsOneLinePerSentence() started.
+◇ Test storeServerIgnoresApplicationSupportExecutable() started.
+◇ Test oneTypeRunsItsPromptWithoutAskingTheClassifier() started.
+◇ Test renamedSpeakersReplaceTheDefaultNamesEverywhere() started.
+◇ Test sweepRemovesExpiredAudioAndKeepsTheTranscript() started.
+◇ Test doesNotStartTwiceWhileAlreadyRecording() started.
+➜ Test callbackTimeUnderCPUAndDiskLoad() skipped.
+◇ Test aFailedSegmentWriteLeavesTheCallNotReady() started.
+◇ Test anInvalidSelectedModelIsNotUsable() started.
+◇ Test thePayloadCarriesTheKrispKeysNextToBesedasOwn() started.
+◇ Test aRenameReplacesBothTheNameAndTheAvatarLetter() started.
+◇ Test theEventStartingWithTheCallWins() started.
+◇ Test aTranscriptOverBudgetIsCutAtTheLastNewlineAndFlagged() started.
+◇ Test theEchoLagIsFound() started.
+◇ Test sha256MatchesTheKnownDigestOfAFile() started.
+◇ Test theSameTitleIgnoringCaseAndSpacesIsRelated() started.
+◇ Test testsNeverReachTheLoginKeychain() started.
+◇ Test onlyTheServerAndItsLibrariesSurviveTheUnpacking() started.
+◇ Test aFailedRowDeleteKeepsTheRowAndTheFiles() started.
+◇ Test aSentenceTakesTheSpeakerOfTheSegmentItOverlapsMost() started.
+◇ Test case passing 1 argument schema → "CREATE TABLE calls (
+    id TEXT PRIMARY KEY, kind TEXT NOT NULL, started_at TEXT NOT NULL, ended_at TEXT, duration_sec REAL,
+    status TEXT NOT NULL, transcript_path TEXT, audio_dir TEXT NOT NULL, error TEXT, app_name TEXT,
+    summary_text TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL,
+    event_title TEXT, event_id TEXT, event_pinned INTEGER NOT NULL DEFAULT 0
+);
+CREATE TABLE transcript_segments (
+    id TEXT PRIMARY KEY, call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE, speaker TEXT NOT NULL,
+    start_sec REAL NOT NULL, end_sec REAL, text TEXT NOT NULL, order_idx INTEGER NOT NULL
+);
+CREATE INDEX idx_transcript_segments_call_order ON transcript_segments(call_id, order_idx);
+CREATE TABLE transcript_jobs (
+    id TEXT PRIMARY KEY, call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE, speaker TEXT NOT NULL,
+    status TEXT NOT NULL, audio_path TEXT NOT NULL, asr_json_path TEXT, audio_duration_sec REAL,
+    wall_time_sec REAL, real_time_factor REAL, model TEXT, error TEXT, created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+);
+CREATE INDEX idx_transcript_jobs_call ON transcript_jobs(call_id, speaker);
+CREATE TABLE call_speakers (
+    call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE, speaker_key TEXT NOT NULL,
+    display_name TEXT NOT NULL, PRIMARY KEY (call_id, speaker_key)
+);
+CREATE TABLE webhook_deliveries (
+    id TEXT PRIMARY KEY, call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE,
+    call_title TEXT NOT NULL, attempt INTEGER NOT NULL, event TEXT NOT NULL, url TEXT NOT NULL,
+    state TEXT NOT NULL, http_status INTEGER, response_action TEXT, response_body TEXT, error TEXT,
+    created_at TEXT NOT NULL, sent_at TEXT, finished_at TEXT, next_retry_at TEXT
+);
+INSERT INTO calls (id, kind, started_at, status, audio_dir, app_name, summary_text, created_at, updated_at,
+                   event_title, event_pinned)
+VALUES ('old', 'dual', '2026-01-10T10:00:00.000Z', 'ready', '/calls/old', 'Zoom', 'итоги',
+        '2026-01-10T10:00:00.000Z', '2026-01-10T10:00:00.000Z', 'Планёрка', 1);
+INSERT INTO transcript_segments VALUES ('old-0', 'old', 'them-1', 0, 2, 'старая строка', 0);
+INSERT INTO call_speakers VALUES ('old', 'them-1', 'Анна');" to aReleasedSchemaMigratesToCurrentKeepingItsData(schema:) started.
+◇ Test aModelAlreadyOnDiskIsNotDownloadedAgain() started.
+◇ Test aTranscriptUnderBudgetReachesTheProviderUntouched() started.
+➜ Test noReadGrowsWithTheLengthOfTheCall() skipped.
+◇ Test archiveSearchDeletionAndAccessibilityCopyAreLocalized() started.
+◇ Test parseLoadedKeepsOnlyLlmEntriesAndReturnsTheirIdentifiers() started.
+◇ Test case passing 1 argument schema → "CREATE TABLE calls (
+    id TEXT PRIMARY KEY, kind TEXT NOT NULL, started_at TEXT NOT NULL, ended_at TEXT, duration_sec REAL,
+    status TEXT NOT NULL, transcript_path TEXT, audio_dir TEXT NOT NULL, error TEXT, app_name TEXT,
+    summary_text TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL,
+    event_title TEXT, event_id TEXT, event_pinned INTEGER NOT NULL DEFAULT 0, keep_audio INTEGER
+);
+CREATE TABLE transcript_segments (
+    id TEXT PRIMARY KEY, call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE, speaker TEXT NOT NULL,
+    start_sec REAL NOT NULL, end_sec REAL, text TEXT NOT NULL, order_idx INTEGER NOT NULL
+);
+CREATE INDEX idx_transcript_segments_call_order ON transcript_segments(call_id, order_idx);
+CREATE TABLE transcript_jobs (
+    id TEXT PRIMARY KEY, call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE, speaker TEXT NOT NULL,
+    status TEXT NOT NULL, audio_path TEXT NOT NULL, asr_json_path TEXT, audio_duration_sec REAL,
+    wall_time_sec REAL, real_time_factor REAL, model TEXT, error TEXT, created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+);
+CREATE INDEX idx_transcript_jobs_call ON transcript_jobs(call_id, speaker);
+CREATE TABLE call_speakers (
+    call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE, speaker_key TEXT NOT NULL,
+    display_name TEXT NOT NULL, PRIMARY KEY (call_id, speaker_key)
+);
+CREATE TABLE webhook_deliveries (
+    id TEXT PRIMARY KEY, call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE,
+    call_title TEXT NOT NULL, attempt INTEGER NOT NULL, event TEXT NOT NULL, url TEXT NOT NULL,
+    state TEXT NOT NULL, http_status INTEGER, response_action TEXT, response_body TEXT, error TEXT,
+    created_at TEXT NOT NULL, sent_at TEXT, finished_at TEXT, next_retry_at TEXT
+);
+INSERT INTO calls (id, kind, started_at, status, audio_dir, app_name, summary_text, created_at, updated_at,
+                   event_title, event_pinned)
+VALUES ('old', 'dual', '2026-01-10T10:00:00.000Z', 'ready', '/calls/old', 'Zoom', 'итоги',
+        '2026-01-10T10:00:00.000Z', '2026-01-10T10:00:00.000Z', 'Планёрка', 1);
+INSERT INTO transcript_segments VALUES ('old-0', 'old', 'them-1', 0, 2, 'старая строка', 0);
+INSERT INTO call_speakers VALUES ('old', 'them-1', 'Анна');" to aReleasedSchemaMigratesToCurrentKeepingItsData(schema:) started.
+◇ Test theSameCalendarSeriesIsRelated() started.
+◇ Test aStepThatCannotReportShowsOnlyTheStepsBeforeIt() started.
+➜ Test childRecordsUntilKilled() skipped.
+◇ Test silenceStopDoesNotRestartUntilTheMicrophoneIsTakenAgain() started.
+◇ Test aFailingMigrationRollsBackAndLeavesTheBackup() started.
+◇ Test aRenameSurvivesARerunOfTheSameDiarizerAndReachesTheFile() started.
+➜ Test childHitsAFileSizeLimitWhileRecording() skipped.
+◇ Test onlyAFolderInsideMobileDocumentsCountsAsICloudDrive() started.
+◇ Test humanDurationReadsAsTheProtoypeWritesIt() started.
+◇ Test fileVaultIsReadFromTheIsActiveAnswerAndUnknownOtherwise() started.
+◇ Test aUserDiarizationJumpsAheadOfWaitingBackgroundWork() started.
+◇ Test cleanFormatDropsTheClock() started.
+✔ Test datedRuleExpiresOnlyPastItsDeadline() passed after 0.007 seconds.
+◇ Test aWrongHashFailsTheStageAndLeavesNoFile() started.
+◇ Test emptyInputYieldsNoSegments() started.
+◇ Test markReadyWritesSegmentsAndStatusTogether() started.
+◇ Test onlyCallTypesWithTheUneditedPreviousDefaultPromptGetTheNewOne() started.
+◇ Test anUnparseableStoredDateIsNotShownAsData() started.
+◇ Test failedRowDeletionRestoresMovedCallFolder() started.
+◇ Test aFourOhOneIsRejectedWithoutRetry() started.
+◇ Test namedFindsCatalogueEntries() started.
+◇ Test aRowLeftSendingIsFailedOnLaunchAndReturned() started.
+◇ Test lanesSplitTheCallBetweenTheTwoSides() started.
+◇ Test aCallWithOnlyOneChannelDrawsOneLane() started.
+◇ Test renamedCallKeepsOneExportCopyAndDeletionRemovesIt() started.
+◇ Test sendGoesThroughTheInjectedTransport() started.
+◇ Test aLongEventTheCallMerelyFallsInsideIsNotTheName() started.
+◇ Test aKeyOnlyInTheLegacyServiceIsCopiedIntoTheNewOneAndKept() started.
+◇ Test lessThanThirtySecondsFromRemoteIsNotAutomaticallyQueued() started.
+◇ Test aManualMergeIsReappliedWhenARerunWritesTheSameSpeakersAgain() started.
+◇ Test theRequestCarriesTheSecretAndDeliveryHeaders() started.
+◇ Test aSpeakerWithOnlyShortSegmentsStaysItsOwnSpeaker() started.
+◇ Test resplitRedoesOnlyOldCallsWithAudioAndWithoutMerges() started.
+◇ Test keyPointsSkipARoundWhileThePreviousRuns() started.
+◇ Test interleavedInt16FromTheSystemTapIsConvertedAsBefore() started.
+◇ Test growingFileReadsTheOpenRecordingAt16kMono() started.
+◇ Test theClassifierPicksTheTypeTheModelNamesAndRunsItsPrompt() started.
+◇ Test aChunkAfterASkipKeepsAllItsWords() started.
+◇ Test theErrorCardOffersTheWayOutThatMatchesTheFailure() started.
+◇ Test backToBackLinesOfOneSpeakerMergeIntoOneBar() started.
+◇ Test aPendingProcessingJobResumesOnceAfterRelaunch() started.
+✔ Test doesNotStartWhileAManualRecordingIsRunning() passed after 0.018 seconds.
+✔ Test aFiveOhThreeIsAFailureWorthRetrying() passed after 0.018 seconds.
+◇ Test aCorruptWAVThatCannotBeRepairedIsRecordedOnTheCall() started.
+◇ Test piecesCoverTheOriginalWithoutGapsOrOverlap() started.
+◇ Test seededHeadlessJourneyCoversArchiveSearchSummaryCopySpeakerMergeAndDelete() started.
+✔ Test anotherAppTakingTheMicrophoneStartsItsOwnRecording() passed after 0.019 seconds.
+◇ Test everyRemoteSpeakerGetsItsOwnLane() started.
+2026-09-28 01:16:37.562 swiftpm-testing-helper[91394:32823814] Audio files cannot be non-interleaved. Ignoring setting AVLinearPCMIsNonInterleaved YES.
+◇ Test theRequestAsksForTheWholeSummaryAtOnce() started.
+◇ Test anOldDatabaseWithoutTheTypeColumnOpensAndTheTypeRoundTrips() started.
+◇ Test everyPieceStaysWithinTheLimit() started.
+✔ Test aTimedOutTransportBecomesARetryableFailure() passed after 0.029 seconds.
+◇ Test calendarAuthorizationMapsToTheRightAction() started.
+◇ Test switchingModelsReopensTheStages() started.
+◇ Test aQuarterHourEventIsAlreadyTooShort() started.
+◇ Test nothingIsQueuedWhileTheWebhookIsOff() started.
+◇ Test segmentBoundsFollowTheFirstAndLastWord() started.
+◇ Test resplitIsNotRepeatedAfterARestart() started.
+◇ Test minimumGapSuppressesAnImmediateRestart() started.
+◇ Test previousCallContentShowsDateAndDigestAsStored() started.
+◇ Test everyFileLivesUnderTheDataDirectory() started.
+◇ Test overlappingChunksKeepEachWordOnce() started.
+◇ Test mergingASpeakerRelabelsItsSegmentsAndPersists() started.
+◇ Test queueProcessesTwoCallsFinishingBackToBackInOrder() started.
+◇ Test catalogueEntriesAreDistinct() started.
+◇ Test wordLimitClosesASegment() started.
+◇ Test pipelineSpeakerIdsMapToDistinctNamesAndColours() started.
+◇ Test displayDatesFollowLocaleWhileFileDatesRemainStable() started.
+◇ Test theTestPayloadStillHasAMeetingStartTime() started.
+◇ Test russianUILiteralsUseTheCyrillicProductName() started.
+◇ Test buffersThroughTheCallbackPathLandOnDiskAsTheOldPathWroteThem() started.
+recorder write failed: fileFull("Запись достигла предела WAV в 4 ГБ")
+◇ Test otherCannotBeDeletedButOtherTypesCan() started.
+◇ Test aRecordingKilledMidCallIsReadableAndFailedAfterRelaunch() started.
+◇ Test theSummaryProviderDefaultsToTheBuiltInModelAndRoundTripsThroughUserDefaults() started.
+◇ Test exportFileNameDropsCharactersTheFileSystemRejects() started.
+◇ Test aPendingJobResumedAtLaunchWaitsForTheKeychainKey() started.
+◇ Test keyPointsRunEveryIntervalOnlyWithNewText() started.
+◇ Test theRecordedJevResponseParsesToTheChoiceItsProbabilityAndCost() started.
+◇ Test linkingWorksWithFullAccessAndExistingCalendars() started.
+◇ Test aGarbageAnswerFromTheLocalModelFallsBackToOtherWhereverItIsListed() started.
+◇ Test dynamicFailuresAndPrivacy() started.
+◇ Test linkingIsBrokenWithoutFullAccess() started.
+◇ Test removingAModelDropsItsFileAndTheWarmUp() started.
+◇ Test podushkaValuesAreImportedUnlessAlreadySetUnderTheNewName() started.
+◇ Test longPauseClosesASegmentWithoutPunctuation() started.
+2026-09-28 01:16:37.654 swiftpm-testing-helper[91394:32823813] Audio files cannot be non-interleaved. Ignoring setting AVLinearPCMIsNonInterleaved YES.
+◇ Test aBacklogOfMoreThanAChunkIsSkipped() started.
+◇ Test journeyAccessibilityNamesAreStableAndUnique() started.
+recorder write failed: writerBehind("Запись не успевала на диск: потеряно 8192 кадров звука")
+◇ Test droppedBuffersWidenTheRestOnlyWhenTheyGrow() started.
+◇ Test aCalendarEventOutranksTheTitleGuessedFromTheTranscript() started.
+➜ Test liveModeLoadOfATenMinuteCall() skipped.
+◇ Test fileNamesMapToTheThreeStorageKinds() started.
+◇ Test aRenamedFirstTypeIsNotMigrated() started.
+◇ Test aRenameIsDroppedWhenAnotherDiarizerRelabelsTheCall() started.
+◇ Test dayGroupSplitsTodayYesterdayThisWeekAndEarlier() started.
+◇ Test protectedStorageIsOwnerOnlyForOldAndNewFiles() started.
+◇ Test segmentsNamesAndSearchRoundTripThroughTheDatabase() started.
+◇ Test markReadyFailsForACallWithNoRow() started.
+◇ Test aDeliveryRoundTripsThroughItsThreeStates() started.
+◇ Test archiveDetailAndRecoveryLabelsAreLocalized() started.
+◇ Test aFailedFileRemovalLeavesNoBrokenCallAndIsCleanedLater() started.
+◇ Test aFreshDirectoryHasEveryStagePending() started.
+◇ Test noTokensMeanNoWords() started.
+2026-09-28 01:16:37.675 swiftpm-testing-helper[91394:32823807] Audio files cannot be non-interleaved. Ignoring setting AVLinearPCMIsNonInterleaved YES.
+◇ Test aBareMarkerStillOpensAWord() started.
+◇ Test exportPutsTitleDateTypeResultThenTranscript() started.
+◇ Test textIsNeverSweptWhateverTheAudioRulesSay() started.
+2026-09-28 01:16:37.681 swiftpm-testing-helper[91394:32823811] Audio files cannot be non-interleaved. Ignoring setting AVLinearPCMIsNonInterleaved YES.
+✔ Test anExistingBesedaFolderIsLeftAlone() passed after 0.156 seconds.
+✔ Test withoutAnEventTheTitleStillComesFromTheTranscript() passed after 0.161 seconds.
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test childHitsAFileSizeLimitWhileRecording() started.
+✔ Test aGarbageAnswerFallsBackToTheFirstTypeWhateverItIsNamed() passed after 0.222 seconds.
+◇ Test privacyDestructionAndAccessibility() started.
+◇ Test modelStatesAndLanguageChoices() started.
+✔ Test renamingRewritesTheDialogueAndLeavesTheChannelsAlone() passed after 0.223 seconds.
+✔ Test jevsConfidentPickIsUsedWithoutAskingTheSummaryModel() passed after 0.223 seconds.
+✔ Test nextChunkWaitsForAFullChunkOnDisk() passed after 0.223 seconds.
+◇ Test formattedResponsesAndFailures() started.
+✔ Test sentencePiecesBecomeWords() passed after 0.227 seconds.
+✔ Test aCustomPromptResultIsShownWhole() passed after 0.237 seconds.
+✔ Test anEmptyTimelineProducesNoTurns() passed after 0.237 seconds.
+✔ Test transcriptionLanguageMatchesModelCapabilities() passed after 0.246 seconds.
+✔ Test endpointAcceptsOnlyHttpAddressesWithAHost() passed after 0.246 seconds.
+2026-09-28 01:16:37.836 swiftpm-testing-helper[91396:32823833] Audio files cannot be non-interleaved. Ignoring setting AVLinearPCMIsNonInterleaved YES.
+✔ Test releaseBeforeTheDebounceRecordsNothing() passed after 0.349 seconds.
+✔ Test downloadURLsPinARevision() passed after 0.350 seconds.
+✔ Test downloadStateFollowsTheFileSize() passed after 0.372 seconds.
+✔ Test aGivenTypeSkipsTheClassifier() passed after 0.373 seconds.
+✔ Test parseReturnsTrimmedContentFromANormalAnswer() passed after 0.373 seconds.
+✔ Test aServerThatDoesNotAnswerIsReportedAsDownAndNamed() passed after 0.373 seconds.
+✔ Test slowChunksWidenTheRestAndCleanOnesNarrowIt() passed after 0.408 seconds.
+✔ Test nothingRelatedGivesNil() passed after 0.408 seconds.
+✔ Test trailingWordsWithoutPunctuationStillBecomeASegment() passed after 0.408 seconds.
+✔ Test linkingIsBrokenWhenTheSelectedCalendarIsGone() passed after 0.408 seconds.
+✔ Test anEventStartingSixMinutesLaterDoesNot() passed after 0.408 seconds.
+recorder write failed: Error Domain=com.apple.coreaudio.avfaudio Code=-40 "(null)" UserInfo={failed call=ExtAudioFileWrite(_impl->_extAudioFile, buffer.frameLength, buffer.audioBufferList)}
+✔ Test childHitsAFileSizeLimitWhileRecording() passed after 0.230 seconds.
+✔ Test run with 1 test in 0 suites passed after 0.230 seconds.
+✔ Test aZoomLinkInTheEventCountsAsACall() passed after 0.476 seconds.
+✔ Test withTwoEventsStartingNearbyTheNearerOneWins() passed after 0.476 seconds.
+✔ Test anUnknownJevChoiceFallsBackToOther() passed after 0.511 seconds.
+2026-09-28 01:16:38.052 swiftpm-testing-helper[91394:32823810] Audio files cannot be non-interleaved. Ignoring setting AVLinearPCMIsNonInterleaved YES.
+✔ Test aCallWithOnlyMarkdownStillGoesToTheProvider() passed after 0.523 seconds.
+✔ Test theDigestKeepsAgreementsNextStepsAndOpenQuestions() passed after 0.523 seconds.
+✔ Test theEstimateComesFromHowLongTheFinishedPartTook() passed after 0.523 seconds.
+✔ Test theDiarizerDownloadStopsBeforeADiskThatCannotHoldIt() passed after 0.523 seconds.
+✔ Test laterAndUnreadyCallsAreIgnored() passed after 0.523 seconds.
+✔ Test theBarCountsFinishedStepsAndThePartOfTheRunningOne() passed after 0.523 seconds.
+2026-09-28 01:16:38.067 swiftpm-testing-helper[91394:32823812] Audio files cannot be non-interleaved. Ignoring setting AVLinearPCMIsNonInterleaved YES.
+✔ Test exportWritesTheFileAndARerunOverwritesIt() passed after 0.544 seconds.
+✔ Test aStoppedDiscoveredServerUsesTheTypedRecoveryError() passed after 0.545 seconds.
+✔ Test stopsWhenTheMicrophoneIsReleased() passed after 0.570 seconds.
+✔ Test parseTellsARefusedKeyApartFromAnyOtherFailure() passed after 0.570 seconds.
+✔ Test aShortEventIsNotTheName() passed after 0.629 seconds.
+2026-09-28 01:16:38.203 swiftpm-testing-helper[91394:32823816] Audio files cannot be non-interleaved. Ignoring setting AVLinearPCMIsNonInterleaved YES.
+2026-09-28 01:16:38.204 swiftpm-testing-helper[91394:32823816] Audio files cannot be non-interleaved. Ignoring setting AVLinearPCMIsNonInterleaved YES.
+✔ Test anEventStartingFourMinutesLaterStillCounts() passed after 0.664 seconds.
+✔ Test writePastTheLimitSurfacesAsARecordingWarning() passed after 0.666 seconds.
+✔ Test onlyCallsThatStillNeedTheirAudioProtectTheirFolder() passed after 0.666 seconds.
+✔ Test onlyGigaamNeedsSplitting() passed after 0.664 seconds.
+✔ Test theRequestGoesOutWithoutAnAuthorizationHeaderToALocalServer() passed after 0.665 seconds.
+✔ Test theMissingBuiltInModelErrorSaysWhereToDownloadIt() passed after 0.666 seconds.
+✔ Test aStoredSummaryIsReadBackFromTheDatabase() passed after 0.666 seconds.
+✔ Test aBarelyStartedStepGivesNoEstimate() passed after 0.666 seconds.
+✔ Test anUnknownSpeakerKeyNeverShowsUpAsItsName() passed after 0.666 seconds.
+✔ Test recordingTranscriptArchiveAndSearchRoundTrip() passed after 0.666 seconds.
+✔ Test sentenceEndingWordClosesASegment() passed after 0.668 seconds.
+✔ Test deniedOldExportKeepsNewPathAndRetries() passed after 0.668 seconds.
+✔ Test menuRecordingAndRecoveryCopyFollowsLocale() passed after 0.667 seconds.
+✔ Test directLegacyDeletionRemovesAuthorizedOldCopy() passed after 0.668 seconds.
+✔ Test aReleasedSchemaMigratesToCurrentKeepingItsData(schema:) with 2 test cases passed after 0.669 seconds.
+✔ Test resplitWithNoDiarizerSpeechIsNotRepeated() passed after 0.668 seconds.
+✔ Test exportEnglishCopyKeepsAuthoredTextAndStableFileName() passed after 0.668 seconds.
+✔ Test aTwoHundredWithAnActionIsDelivered() passed after 0.668 seconds.
+✔ Test aCallWithoutSummaryHasNothingToShow() passed after 0.668 seconds.
+✔ Test sweepLeavesTheAudioOfAProtectedCallAlone() passed after 0.668 seconds.
+✔ Test aMissingSummaryLeavesTheKeyOut() passed after 0.668 seconds.
+✔ Test callWithoutATranscriptFallsBackToTheAppAndDate() passed after 0.668 seconds.
+✔ Test numberedSpeakersCarryTheirNumberIntoTheAvatar() passed after 0.693 seconds.
+✔ Test measureSplitsTheFolderByKind() passed after 0.695 seconds.
+✔ Test theClassifierContextHasTheWeekdayLocalTimeAndDuration() passed after 0.700 seconds.
+✔ Test theOldestSchemaMigratesToCurrentKeepingItsData() passed after 0.705 seconds.
+✔ Test renamedSpeakersReachBothTheTextAndTheParticipants() passed after 0.704 seconds.
+✔ Test deletingTheCallDropsItsDeliveries() passed after 0.705 seconds.
+✔ Test thePreviousVersionMigratesToCurrentKeepingItsData() passed after 0.706 seconds.
+✔ Test withoutSegmentsTheStoredMarkdownIsCopiedAsItIs() passed after 0.706 seconds.
+✔ Test stateLabelDependsOnlyOnTheSelectedModelFile() passed after 0.706 seconds.
+✔ Test deletionFailuresAndOldExportLocation() passed after 0.707 seconds.
+✔ Test bookmarkRecoveryStringsExistInBothLanguages() passed after 0.705 seconds.
+✔ Test theDigestKeepsTheCurrentDefaultSections() passed after 0.705 seconds.
+✔ Test titleIsNilForAnEmptyTranscript() passed after 0.705 seconds.
+✔ Test theRetryScheduleStopsAfterTheFourthAttempt() passed after 0.705 seconds.
+✔ Test immediateRuleExpiresAFreshFile() passed after 0.705 seconds.
+✔ Test thePodushkaFolderBecomesTheBesedaFolderOnce() passed after 0.705 seconds.
+✔ Test aFailingJevFallsBackToTheLocalModelAndIsLogged() passed after 0.714 seconds.
+✔ Test anEmptyCalendarMatchesNothing() passed after 0.715 seconds.
+✔ Test aCurrentStoreIsNeitherMigratedNorBackedUpAgain() passed after 0.716 seconds.
+✔ Test recorderLeavesARepairableFileWithoutStop() passed after 0.716 seconds.
+✔ Test parseThrowsTheServerMessageOnAnErrorBody() passed after 0.715 seconds.
+✔ Test seededJourneyCannotModifyARealAppRun() passed after 0.715 seconds.
+✔ Test aLegacyDatabaseMissingSpeakerMergeTableIsRepairedWithoutLosingCalls() passed after 0.716 seconds.
+✔ Test aCallRecordedBeforeDiarizationKeepsTheUnnumberedName() passed after 0.715 seconds.
+✔ Test failedResplitLeavesTheCallUntouched() passed after 0.716 seconds.
+✔ Test theJevRequestIsOneChoiceOverTheTypesWithTheCallInState() passed after 0.715 seconds.
+✔ Test aOneSpeakerCallIsUnchanged() passed after 0.715 seconds.
+✔ Test theResponseBodyIsCutAtTwoKilobytes() passed after 0.715 seconds.
+✔ Test aSentenceOutsideDiarizerSpeechKeepsItsTimesAndTheNearestSpeaker() passed after 0.715 seconds.
+✔ Test titleSkipsTheFillerOpenerForTheFirstSentenceThatCarriesSomething() passed after 0.715 seconds.
+✔ Test titleCutsALongFirstSentenceOnAWordBoundary() passed after 0.715 seconds.
+✔ Test timestampedFormatPutsTheClockBeforeTheSpeaker() passed after 0.716 seconds.
+✔ Test startsOnlyAfterTheDebounceElapsed() passed after 0.715 seconds.
+✔ Test aTranscriptOpeningWithoutTheMarkerKeepsItsFirstWord() passed after 0.716 seconds.
+✔ Test aLongWaitIsRoundedUpToMinutes() passed after 0.715 seconds.
+✔ Test archiveDurationUsesExplicitLocale() passed after 0.715 seconds.
+✔ Test plainHttpIsRefusedExceptToThisMac() passed after 0.715 seconds.
+✔ Test theRequestCarriesTheKeyAsABearerHeaderWhenThereIsOne() passed after 0.715 seconds.
+✔ Test aWordStraddlingTheCutIsNotRepeated() passed after 0.715 seconds.
+✔ Test aLowConfidenceJevPickFallsBackToOther() passed after 0.716 seconds.
+✔ Test theSameTypeWithASharedParticipantIsRelated() passed after 0.716 seconds.
+✔ Test sharesStillAddUpOnACallWithHundredsOfShortLines() passed after 0.716 seconds.
+✔ Test microphoneNoteWithoutATranscriptGetsItsOwnTitle() passed after 0.716 seconds.
+✔ Test generatedExportLabelsAndNamesFollowExplicitLocale() passed after 0.716 seconds.
+✔ Test titleFallsBackToTheFirstSentenceWhenEveryLineIsShort() passed after 0.716 seconds.
+✔ Test parseTreatsEmptyChoicesAsAnUnavailableModel() passed after 0.716 seconds.
+✔ Test seriesAndParticipantsSurviveTheDatabase() passed after 0.718 seconds.
+✔ Test aTranscriptWithoutADialogueBlockIsLeftUntouched() passed after 0.716 seconds.
+✔ Test aCustomResultWithOnlyOpenQuestionsIsShownWhole() passed after 0.716 seconds.
+✔ Test markdownFormatOpensWithTheConversationName() passed after 0.716 seconds.
+✔ Test turnsTakeTheDiarizerSpeakersAndKeepSentenceTimes() passed after 0.716 seconds.
+✔ Test deletingACallLeavesNothingOfItOnDisk() passed after 0.719 seconds.
+✔ Test aRenamedSpeakerReachesTheProviderUnderTheNewName() passed after 0.716 seconds.
+✔ Test onlyQueuedRowsWhoseTimeHasComeAreDue() passed after 0.718 seconds.
+✔ Test aManualMergeIsDroppedWhenAnotherDiarizerRelabelsTheCall() passed after 0.717 seconds.
+✔ Test echoOnlySentencesAreDroppedAndOwnSpeechIsKept() passed after 0.718 seconds.
+✔ Test aCallWithNeitherLinesNorMarkdownNeverReachesTheProvider() passed after 0.716 seconds.
+✔ Test previousCallContentIsHiddenWithoutCallOrDigest() passed after 0.716 seconds.
+✔ Test successiveDeniedExportsSurviveRelaunch() passed after 0.717 seconds.
+✔ Test firstRunCopyIsLocalizedWithoutRequestingPermissions() passed after 0.716 seconds.
+✔ Test resplitSkipsRenamedSpeakers() passed after 0.716 seconds.
+✔ Test aDiarizerFileWithTheWrongHashIsNeverInstalled() passed after 0.716 seconds.
+✔ Test aLongSingleSpeakerSegmentKeepsOneLinePerSentence() passed after 0.715 seconds.
+✔ Test oneTypeRunsItsPromptWithoutAskingTheClassifier() passed after 0.715 seconds.
+✔ Test renamedSpeakersReplaceTheDefaultNamesEverywhere() passed after 0.716 seconds.
+✔ Test aWriterThatCannotKeepUpStopsTheRecordingVisibly() passed after 0.719 seconds.
+✔ Test doesNotStartTwiceWhileAlreadyRecording() passed after 0.716 seconds.
+✔ Test sweepRemovesExpiredAudioAndKeepsTheTranscript() passed after 0.715 seconds.
+✔ Test thePayloadCarriesTheKrispKeysNextToBesedasOwn() passed after 0.715 seconds.
+✔ Test aRenameReplacesBothTheNameAndTheAvatarLetter() passed after 0.715 seconds.
+✔ Test theEventStartingWithTheCallWins() passed after 0.715 seconds.
+✔ Test aTranscriptOverBudgetIsCutAtTheLastNewlineAndFlagged() passed after 0.715 seconds.
+✔ Test legacyDeletionWithoutFolderScopeRetainsCallAndCopy() passed after 0.716 seconds.
+✔ Test sha256MatchesTheKnownDigestOfAFile() passed after 0.715 seconds.
+✔ Test audioShorterThanTheLimitIsNotSplit() passed after 0.716 seconds.
+✔ Test testsNeverReachTheLoginKeychain() passed after 0.715 seconds.
+✔ Test theSameTitleIgnoringCaseAndSpacesIsRelated() passed after 0.715 seconds.
+✔ Test aSentenceTakesTheSpeakerOfTheSegmentItOverlapsMost() passed after 0.715 seconds.
+✔ Test aTranscriptUnderBudgetReachesTheProviderUntouched() passed after 0.715 seconds.
+✔ Test archiveSearchDeletionAndAccessibilityCopyAreLocalized() passed after 0.715 seconds.
+✔ Test parseLoadedKeepsOnlyLlmEntriesAndReturnsTheirIdentifiers() passed after 0.715 seconds.
+✔ Test theSameCalendarSeriesIsRelated() passed after 0.715 seconds.
+✔ Test aStepThatCannotReportShowsOnlyTheStepsBeforeIt() passed after 0.715 seconds.
+✔ Test silenceStopDoesNotRestartUntilTheMicrophoneIsTakenAgain() passed after 0.715 seconds.
+✔ Test aSentenceGluingEchoAndOwnSpeechKeepsOnlyTheOwnWordsWithTheirBounds() passed after 0.717 seconds.
+✔ Test eachDeniedExportFolderRetriesOnlyUnderItsOwnScope() passed after 0.717 seconds.
+✔ Test onlyAFolderInsideMobileDocumentsCountsAsICloudDrive() passed after 0.715 seconds.
+✔ Test fileVaultIsReadFromTheIsActiveAnswerAndUnknownOtherwise() passed after 0.714 seconds.
+✔ Test cleanFormatDropsTheClock() passed after 0.714 seconds.
+✔ Test emptyInputYieldsNoSegments() passed after 0.714 seconds.
+✔ Test humanDurationReadsAsTheProtoypeWritesIt() passed after 0.715 seconds.
+✔ Test theAttemptCountCountsEveryRowOfTheCall() passed after 0.717 seconds.
+✔ Test anUnparseableStoredDateIsNotShownAsData() passed after 0.714 seconds.
+✔ Test aDiskThatRefusesWritesStopsTheRecordingVisiblyAndKeepsWhatWasWritten() passed after 0.718 seconds.
+✔ Test aFourOhOneIsRejectedWithoutRetry() passed after 0.714 seconds.
+✔ Test namedFindsCatalogueEntries() passed after 0.714 seconds.
+✔ Test aFailedSegmentWriteLeavesTheCallNotReady() passed after 0.716 seconds.
+✔ Test lanesSplitTheCallBetweenTheTwoSides() passed after 0.714 seconds.
+✔ Test aCallWithOnlyOneChannelDrawsOneLane() passed after 0.714 seconds.
+✔ Test theEchoLagIsFound() passed after 0.716 seconds.
+✔ Test sendGoesThroughTheInjectedTransport() passed after 0.714 seconds.
+✔ Test aLongEventTheCallMerelyFallsInsideIsNotTheName() passed after 0.714 seconds.
+✔ Test theRequestCarriesTheSecretAndDeliveryHeaders() passed after 0.713 seconds.
+✔ Test aFailingMigrationRollsBackAndLeavesTheBackup() passed after 0.715 seconds.
+✔ Test aSpeakerWithOnlyShortSegmentsStaysItsOwnSpeaker() passed after 0.713 seconds.
+✔ Test markReadyWritesSegmentsAndStatusTogether() passed after 0.715 seconds.
+✔ Test keyPointsSkipARoundWhileThePreviousRuns() passed after 0.712 seconds.
+✔ Test interleavedInt16FromTheSystemTapIsConvertedAsBefore() passed after 0.712 seconds.
+✔ Test theCutLandsInTheSilenceNotOnTheHardBoundary() passed after 0.722 seconds.
+✔ Test theClassifierPicksTheTypeTheModelNamesAndRunsItsPrompt() passed after 0.712 seconds.
+✔ Test aChunkAfterASkipKeepsAllItsWords() passed after 0.712 seconds.
+✔ Test theErrorCardOffersTheWayOutThatMatchesTheFailure() passed after 0.712 seconds.
+✔ Test backToBackLinesOfOneSpeakerMergeIntoOneBar() passed after 0.707 seconds.
+✔ Test failedRowDeletionRestoresMovedCallFolder() passed after 0.715 seconds.
+✔ Test aFailedRowDeleteKeepsTheRowAndTheFiles() passed after 0.716 seconds.
+✔ Test everyRemoteSpeakerGetsItsOwnLane() passed after 0.703 seconds.
+✔ Test theRequestAsksForTheWholeSummaryAtOnce() passed after 0.693 seconds.
+✔ Test aRenameSurvivesARerunOfTheSameDiarizerAndReachesTheFile() passed after 0.715 seconds.
+✔ Test aRowLeftSendingIsFailedOnLaunchAndReturned() passed after 0.715 seconds.
+✔ Test calendarAuthorizationMapsToTheRightAction() passed after 0.693 seconds.
+✔ Test aQuarterHourEventIsAlreadyTooShort() passed after 0.692 seconds.
+✔ Test segmentBoundsFollowTheFirstAndLastWord() passed after 0.692 seconds.
+✔ Test aManualMergeIsReappliedWhenARerunWritesTheSameSpeakersAgain() passed after 0.714 seconds.
+✔ Test minimumGapSuppressesAnImmediateRestart() passed after 0.692 seconds.
+✔ Test previousCallContentShowsDateAndDigestAsStored() passed after 0.692 seconds.
+✔ Test everyFileLivesUnderTheDataDirectory() passed after 0.692 seconds.
+✔ Test anOldDatabaseWithoutTheTypeColumnOpensAndTheTypeRoundTrips() passed after 0.693 seconds.
+✔ Test catalogueEntriesAreDistinct() passed after 0.692 seconds.
+✔ Test overlappingChunksKeepEachWordOnce() passed after 0.692 seconds.
+✔ Test wordLimitClosesASegment() passed after 0.692 seconds.
+✔ Test displayDatesFollowLocaleWhileFileDatesRemainStable() passed after 0.692 seconds.
+✔ Test pipelineSpeakerIdsMapToDistinctNamesAndColours() passed after 0.692 seconds.
+✔ Test theTestPayloadStillHasAMeetingStartTime() passed after 0.692 seconds.
+✔ Test russianUILiteralsUseTheCyrillicProductName() passed after 0.692 seconds.
+✔ Test renamedCallKeepsOneExportCopyAndDeletionRemovesIt() passed after 0.715 seconds.
+✔ Test exportFileNameDropsCharactersTheFileSystemRejects() passed after 0.646 seconds.
+✔ Test theRecordedJevResponseParsesToTheChoiceItsProbabilityAndCost() passed after 0.646 seconds.
+✔ Test linkingWorksWithFullAccessAndExistingCalendars() passed after 0.646 seconds.
+✔ Test keyPointsRunEveryIntervalOnlyWithNewText() passed after 0.646 seconds.
+✔ Test aGarbageAnswerFromTheLocalModelFallsBackToOtherWhereverItIsListed() passed after 0.619 seconds.
+✔ Test linkingIsBrokenWithoutFullAccess() passed after 0.619 seconds.
+✔ Test mergingASpeakerRelabelsItsSegmentsAndPersists() passed after 0.692 seconds.
+✔ Test dynamicFailuresAndPrivacy() passed after 0.619 seconds.
+✔ Test longPauseClosesASegmentWithoutPunctuation() passed after 0.609 seconds.
+✔ Test aBacklogOfMoreThanAChunkIsSkipped() passed after 0.597 seconds.
+✔ Test journeyAccessibilityNamesAreStableAndUnique() passed after 0.597 seconds.
+✔ Test droppedBuffersWidenTheRestOnlyWhenTheyGrow() passed after 0.595 seconds.
+✔ Test resplitIsNotRepeatedAfterARestart() passed after 0.693 seconds.
+✔ Test aCalendarEventOutranksTheTitleGuessedFromTheTranscript() passed after 0.595 seconds.
+✔ Test fileNamesMapToTheThreeStorageKinds() passed after 0.595 seconds.
+✔ Test dayGroupSplitsTodayYesterdayThisWeekAndEarlier() passed after 0.591 seconds.
+✔ Test seededHeadlessJourneyCoversArchiveSearchSummaryCopySpeakerMergeAndDelete() passed after 0.704 seconds.
+✔ Test protectedStorageIsOwnerOnlyForOldAndNewFiles() passed after 0.591 seconds.
+✔ Test markReadyFailsForACallWithNoRow() passed after 0.591 seconds.
+✔ Test archiveDetailAndRecoveryLabelsAreLocalized() passed after 0.591 seconds.
+✔ Test noTokensMeanNoWords() passed after 0.588 seconds.
+✔ Test resplitRedoesOnlyOldCallsWithAudioAndWithoutMerges() passed after 0.714 seconds.
+✔ Test aBareMarkerStillOpensAWord() passed after 0.583 seconds.
+✔ Test exportPutsTitleDateTypeResultThenTranscript() passed after 0.583 seconds.
+✔ Test textIsNeverSweptWhateverTheAudioRulesSay() passed after 0.581 seconds.
+✔ Test aRenameIsDroppedWhenAnotherDiarizerRelabelsTheCall() passed after 0.592 seconds.
+✔ Test immediateRetentionDeletesTheAudioRightAfterTheCallIsMarkedReady() passed after 0.723 seconds.
+✔ Test modelStatesAndLanguageChoices() passed after 0.500 seconds.
+✔ Test privacyDestructionAndAccessibility() passed after 0.500 seconds.
+✔ Test anUnavailableCallIndexIsShownToTheUser() passed after 0.723 seconds.
+✔ Test formattedResponsesAndFailures() passed after 0.498 seconds.
+✔ Test jevClassifiesByDefaultOnlyWhenAnOpenRouterKeyIsSet() passed after 0.723 seconds.
+✔ Test theSummarySettingsDefaultToEmptyAndRoundTripThroughUserDefaults() passed after 0.723 seconds.
+✔ Test aLaunchBeforeAnySpeechModelIsDownloadedLeavesTheDiarizerModelAlone() passed after 0.723 seconds.
+✔ Test normalisingYieldsSixteenKilohertzMonoInt16() passed after 0.721 seconds.
+✔ Test transcribingWithoutTheModelFileFailsWithTheTypedError() passed after 0.722 seconds.
+✔ Suite SettingsDynamicLocalizationTests passed after 0.723 seconds.
+✔ Suite SettingsLocalizationTests passed after 0.723 seconds.
+✔ Suite SettingsServiceMessagesTests passed after 0.723 seconds.
+✔ Test aUserDiarizationJumpsAheadOfWaitingBackgroundWork() passed after 0.717 seconds.
+✔ Test segmentsNamesAndSearchRoundTripThroughTheDatabase() passed after 0.597 seconds.
+✔ Test resplitWaitsWhileTheAppIsBusy() passed after 0.737 seconds.
+✔ Test aDeliveryRoundTripsThroughItsThreeStates() passed after 0.614 seconds.
+✔ Test theBackupExclusionIsAppliedToTheDataFolderAtLaunchAndCleared() passed after 0.747 seconds.
+✔ Test aFailedFileRemovalLeavesNoBrokenCallAndIsCleanedLater() passed after 0.617 seconds.
+✔ Test bookmarksPersistRecoverAndBalanceScopes() passed after 0.753 seconds.
+✔ Test growingFileReadsTheOpenRecordingAt16kMono() passed after 0.758 seconds.
+✔ Test buffersThroughTheCallbackPathLandOnDiskAsTheOldPathWroteThem() passed after 0.907 seconds.
+✔ Test localOnlyIsOffByDefaultAndKeepsSummariesJevAndWebhooksOnTheMac() passed after 0.953 seconds.
+✔ Test storedTypesWithoutTheFlagMakeTheFirstOtherAndItKeepsTheFlagAnywhereInTheList() passed after 0.956 seconds.
+✔ Test everyPieceStaysWithinTheLimit() passed after 1.091 seconds.
+✔ Test piecesCoverTheOriginalWithoutGapsOrOverlap() passed after 1.153 seconds.
+✔ Test piecesReadWindowByWindowFromAFileMatchTheWholeArraySplit() passed after 1.181 seconds.
+✔ Test journeyAccessibilityCanBeReadAndActedWithoutAFrontWindow() passed after 1.190 seconds.
+✔ Test aFailedSegmentWriteInFinishCallKeepsTheAudioAndSendsNoWebhook() passed after 1.268 seconds.
+2026-09-28 01:16:38.833 swiftpm-testing-helper[91394:32823814] Audio files cannot be non-interleaved. Ignoring setting AVLinearPCMIsNonInterleaved YES.
+✔ Test theOldestOfMoreThanAPageOfCallsIsFoundBySearchAndByPaging() passed after 1.312 seconds.
+✔ Test strictModeOverridesItsSettingsAndTurningItOffRestoresThem() passed after 1.313 seconds.
+✔ Test aFailedResumeAtLaunchIsNotReportedAsAnUnavailableIndex() passed after 1.335 seconds.
+✔ Test anEditedSummaryPromptBecomesTheFirstCallTypesPrompt() passed after 1.340 seconds.
+✔ Test anUnrenamedCallTypeFromBESEDA46BecomesOtherWithItsPrompt() passed after 1.344 seconds.
+✔ Test anInterruptedCallWithABrokenChannelSaysSo() passed after 1.579 seconds.
+✔ Test aValidSelectedModelIsUsableWithoutAWarmUpMarker() passed after 1.667 seconds.
+✔ Test aCallFolderMissingFromTheIndexAppearsAsFailedAndRetryable() passed after 1.685 seconds.
+✔ Test anInvalidSelectedModelIsNotUsable() passed after 1.833 seconds.
+✔ Test onlyCallTypesWithTheUneditedPreviousDefaultPromptGetTheNewOne() passed after 1.906 seconds.
+✔ Test aCorruptWAVThatCannotBeRepairedIsRecordedOnTheCall() passed after 1.962 seconds.
+✔ Test otherCannotBeDeletedButOtherTypesCan() passed after 1.925 seconds.
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test childRecordsUntilKilled() started.
+✔ Test podushkaValuesAreImportedUnlessAlreadySetUnderTheNewName() passed after 1.920 seconds.
+✔ Test aRenamedFirstTypeIsNotMigrated() passed after 1.904 seconds.
+✔ Test aFreshDirectoryHasEveryStagePending() passed after 1.905 seconds.
+2026-09-28 01:16:39.597 swiftpm-testing-helper[91414:32823922] Audio files cannot be non-interleaved. Ignoring setting AVLinearPCMIsNonInterleaved YES.
+✔ Test aBrokenURLStillQueuesNothing() passed after 2.058 seconds.
+✔ Test remoteSpeechMustReachThirtySecondsForOneParticipant() passed after 2.058 seconds.
+2026-09-28 01:16:39.599 swiftpm-testing-helper[91414:32823922] Audio files cannot be non-interleaved. Ignoring setting AVLinearPCMIsNonInterleaved YES.
+✔ Test lessThanThirtySecondsFromMeIsNotAutomaticallyQueued() passed after 2.061 seconds.
+✔ Test aServerThatIsNotInstalledIsReportedAsAMissingModel() passed after 2.065 seconds.
+✔ Test exactlyFortyMinutesIsNotAutomaticallyQueued() passed after 2.062 seconds.
+✔ Test lessThanThirtySecondsFromRemoteIsNotAutomaticallyQueued() passed after 2.061 seconds.
+✔ Test nothingIsQueuedWhileTheWebhookIsOff() passed after 2.040 seconds.
+✔ Test isolatedCopyNeverReachesAPermissionDialog() passed after 2.071 seconds.
+✔ Test aShortDiskDownloadsNeitherTheEngineNorTheModel() passed after 2.069 seconds.
+✔ Test aShortDiskFailsTheStageWithoutDownloading() passed after 2.069 seconds.
+✔ Test aDeletedCallWaitingInTheQueueIsNotProcessed() passed after 2.069 seconds.
+✔ Test storeInstallNeverFetchesAnExecutableEvenWhenDirectRuntimeExists() passed after 2.069 seconds.
+✔ Test storeServerIgnoresApplicationSupportExecutable() passed after 2.069 seconds.
+✔ Test aModelAlreadyOnDiskIsNotDownloadedAgain() passed after 2.070 seconds.
+✔ Test queueProcessesTwoCallsFinishingBackToBackInOrder() passed after 2.047 seconds.
+✔ Test launchDoesNotWaitOnTheKeychainAndTheKeyAppearsOnceTheReadReturns() passed after 2.077 seconds.
+✔ Test aFailedEngineDownloadStopsBeforeTheFourGigabyteModel() passed after 2.078 seconds.
+✔ Test installDownloadsTheModelAndMarksTheWarmUp() passed after 2.078 seconds.
+✔ Test theWebhookSettingsDefaultToOffAndRoundTripThroughUserDefaults() passed after 2.079 seconds.
+✔ Test aFailedDownloadStopsTheChainAndKeepsItsMessage() passed after 2.079 seconds.
+✔ Test aLaunchWithTheSpeechModelOnDiskPrefetchesTheDiarizerModel() passed after 2.076 seconds.
+✔ Test aFailedKeychainWriteKeepsTheSecretInDefaults() passed after 2.143 seconds.
+✔ Test aWrongHashFailsTheStageAndLeavesNoFile() passed after 2.140 seconds.
+✔ Test switchingModelsReopensTheStages() passed after 2.119 seconds.
+✔ Test removingAModelDropsItsFileAndTheWarmUp() passed after 2.054 seconds.
+✔ Test twoCallsFinishingBackToBackAreBothProcessed() passed after 2.322 seconds.
+✔ Test aKeyOnlyInTheLegacyServiceIsCopiedIntoTheNewOneAndKept() passed after 2.314 seconds.
+✔ Test theSummaryProviderDefaultsToTheBuiltInModelAndRoundTripsThroughUserDefaults() passed after 2.277 seconds.
+✔ Test onlyTheServerAndItsLibrariesSurviveTheUnpacking() passed after 2.563 seconds.
+✔ Test removingTakesBackTheModelAndKeepsTheEngine() passed after 2.570 seconds.
+✔ Test aRejectionQueuesNothing() passed after 2.571 seconds.
+✔ Test progressFractionsReachTheStage() passed after 2.570 seconds.
+✔ Test aRetryableFailureQueuesTheNextAttempt() passed after 2.570 seconds.
+✔ Test aModelThatArrivesCorruptedLeavesNoFileBehind() passed after 2.570 seconds.
+✔ Test installingLeavesTheServerTheModelAndTheWarmUpMarkerOnDisk() passed after 2.572 seconds.
+✔ Test aRecordingKilledMidCallIsReadableAndFailedAfterRelaunch() passed after 2.591 seconds.
+✔ Test aManualSendBypassesTheAutomaticFilter() passed after 2.667 seconds.
+✔ Test justOverFortyMinutesWithExactlyThirtySecondsPerSideIsDelivered() passed after 2.666 seconds.
+✔ Test overlappingAndInvalidSegmentsDoNotInflateRecognizedSpeech() passed after 2.666 seconds.
+✔ Test secretsInUserDefaultsMoveToTheKeychainAndLeaveDefaults() passed after 2.667 seconds.
+✔ Test aPendingProcessingJobResumesOnceAfterRelaunch() passed after 2.668 seconds.
+✔ Test aPendingJobResumedAtLaunchWaitsForTheKeychainKey() passed after 2.761 seconds.
+✔ Test liveLoopTranscribesChunksOfTheGrowingFilesUntilCancelled() passed after 3.008 seconds.
+✔ Test run with 317 tests in 3 suites passed after 3.009 seconds.
