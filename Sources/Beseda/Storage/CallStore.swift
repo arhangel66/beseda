@@ -525,7 +525,9 @@ final class CallStore: @unchecked Sendable {
     }
 
     /// the row with its transcript, the call folder and the Markdown copy in the export folder
-    func deleteCallAndFiles(id: String, exportFolder: URL?, requireExportScope: Bool = false) throws {
+    func deleteCallAndFiles(id: String, exportFolder: URL?, requireExportScope: Bool = false,
+                            deleteRow: ((String) throws -> Void)? = nil,
+                            remove: (URL) throws -> Void = { try FileManager.default.removeItem(at: $0) }) throws {
         guard let call = try fetchCall(id: id) else {
             return
         }
@@ -544,12 +546,8 @@ final class CallStore: @unchecked Sendable {
             try fileManager.createDirectory(at: trashedFolder.deletingLastPathComponent(), withIntermediateDirectories: true)
             try fileManager.copyItem(at: folder, to: trashedFolder)
         }
-        // the stored path finds a copy written under an older title; the current name covers
-        // copies written before the path was stored
-        let looseFiles = [
-            call.transcriptURL, exportFolder?.appendingPathComponent(CallExport.fileName(call)),
-            previousExport
-        ]
+        // Legacy rows have no authoritative external path: the current selection may be unrelated.
+        let looseFiles = [call.transcriptURL, previousExport]
         var movedFiles: [(from: URL, to: URL)] = []
         do {
             for url in looseFiles.compactMap({ $0 }) where fileManager.fileExists(atPath: url.path)
@@ -560,20 +558,13 @@ final class CallStore: @unchecked Sendable {
                 try fileManager.copyItem(at: url, to: destination)
                 movedFiles.append((url, destination))
             }
-            try deleteCall(id: id)
+            let pending = movedFiles.map(\.from) + (folderExists ? [folder!] : [])
+            try savePendingCleanup(pending, id: id)
+            try (deleteRow ?? deleteCall)(id)
         } catch {
             throw error
         }
-        // Keep the staged copies until every original is gone. A failed removal leaves a
-        // recoverable copy in trash and reports the residual path to the caller.
-        for moved in movedFiles {
-            do { try fileManager.removeItem(at: moved.from) }
-            catch { throw ExportDeletionError.residual(moved.from.path) }
-        }
-        if let folder, folderExists {
-            do { try fileManager.removeItem(at: folder) }
-            catch { throw ExportDeletionError.residual(folder.path) }
-        }
+        try retryPendingCleanup(remove: remove)
         try emptyTrash()
     }
 
@@ -584,6 +575,37 @@ final class CallStore: @unchecked Sendable {
             case .oldFolder: "Previous export folder needs access / Требуется доступ к прежней папке экспорта"
             case .residual(let path): "Deletion incomplete; copy remains at \(path). Retry after granting access / Удаление не завершено; копия осталась в \(path). Повторите после предоставления доступа"
             }
+        }
+    }
+
+    private var pendingCleanupURL: URL {
+        dbURL.deletingLastPathComponent().appendingPathComponent("pending-deletions.json")
+    }
+
+    private func savePendingCleanup(_ paths: [URL], id: String) throws {
+        var pending = try loadPendingCleanup()
+        pending[id] = paths.map(\.path)
+        try JSONEncoder().encode(pending).write(to: pendingCleanupURL, options: .atomic)
+    }
+
+    private func loadPendingCleanup() throws -> [String: [String]] {
+        guard FileManager.default.fileExists(atPath: pendingCleanupURL.path) else { return [:] }
+        return try JSONDecoder().decode([String: [String]].self, from: Data(contentsOf: pendingCleanupURL))
+    }
+
+    /// A record is written before the row is removed. Never clean originals while its row exists.
+    func retryPendingCleanup(remove: (URL) throws -> Void = { try FileManager.default.removeItem(at: $0) }) throws {
+        var pending = try loadPendingCleanup()
+        for (id, paths) in pending {
+            guard try fetchCall(id: id) == nil else { continue }
+            for path in paths {
+                let url = URL(fileURLWithPath: path)
+                guard FileManager.default.fileExists(atPath: path) else { continue }
+                do { try remove(url) }
+                catch { throw ExportDeletionError.residual(path) }
+            }
+            pending.removeValue(forKey: id)
+            try JSONEncoder().encode(pending).write(to: pendingCleanupURL, options: .atomic)
         }
     }
 
