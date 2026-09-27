@@ -307,11 +307,11 @@ final class AppController {
             do {
                 try resumePendingProcessing()
             } catch {
-                status = .failed("Не удалось возобновить обработку звонков: \(error.localizedDescription)")
+                status = .failed(MenuText.format("Не удалось возобновить обработку звонков: %@", error.localizedDescription))
                 appendLog("Could not resume pending processing: \(error.localizedDescription)")
             }
         } catch {
-            status = .failed("Индекс звонков недоступен: \(error.localizedDescription)")
+            status = .failed(MenuText.format("Индекс звонков недоступен: %@", error.localizedDescription))
             appendLog("Call index unavailable: \(error.localizedDescription)")
         }
         do {
@@ -361,7 +361,7 @@ final class AppController {
             try saveCall(
                 folder.lastPathComponent, kind: kind, in: folder, startedAt: startedAt, endedAt: endedAt,
                 durationSec: session?.durationSec ?? endedAt.timeIntervalSince(startedAt), status: "failed",
-                error: "Найдена на диске без записи в индексе"
+                error: MenuText.get("Найдена на диске без записи в индексе")
             )
             appendLog("Indexed orphan call folder \(folder.lastPathComponent)")
             orphans.append(folder)
@@ -392,7 +392,7 @@ final class AppController {
             let url = folder.appendingPathComponent(name)
             do {
                 guard fileManager.fileExists(atPath: url.path) else {
-                    throw BesedaError.processFailed("\(name): файла нет")
+                    throw BesedaError.processFailed(MenuText.format("%@: файла нет", name))
                 }
                 try PCMFloatRecorder.repairWAVHeader(at: url)
                 _ = try AVAudioFile(forReading: url)
@@ -403,7 +403,7 @@ final class AppController {
         guard !problems.isEmpty, let call = try callStore.fetchCall(id: folder.lastPathComponent) else {
             return
         }
-        let message = "Запись повреждена: \(problems.joined(separator: "; "))"
+        let message = MenuText.format("Запись повреждена: %@", problems.joined(separator: "; "))
         appendLog("Audio repair failed for \(call.id): \(message)")
         try callStore.setError(callID: call.id, error: [call.error, message].compactMap { $0 }.joined(separator: ". "))
     }
@@ -505,8 +505,8 @@ final class AppController {
     }
 
     var storageLine: String {
-        let calls = CallFormatting.plural(storedCallCount, "разговор", "разговора", "разговоров")
-        return "Локально · \(calls) · \(storageUsage.audioBytes.byteSizeDescription) аудио"
+        let calls = MenuText.format("%d calls", storedCallCount)
+        return MenuText.format("Local · %@ · %@ audio", calls, storageUsage.audioBytes.byteSizeDescription)
     }
 
     func selectCall(_ call: StoredCallSummary) {
@@ -523,12 +523,12 @@ final class AppController {
         }
         let text = TranscriptCopy.render(detail, format: settings.copyFormat)
         guard !text.isEmpty else {
-            flash("Расшифровки пока нет")
+            flash(MenuText.get("Расшифровки пока нет"))
             return
         }
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(text, forType: .string)
-        flash("Скопировано: \(settings.copyFormat.title.lowercased())")
+        flash(MenuText.format("Скопировано: %@", settings.copyFormat.title.lowercased()))
     }
 
     // MARK: - Calendar
@@ -664,13 +664,13 @@ final class AppController {
     func runCleanupNow() {
         guard let protected = protectedAudioDirectories() else {
             appendLog("Cleanup skipped: the call index is unavailable")
-            flash("Очистка не удалась: не открылся список разговоров")
+            flash(MenuText.get("Очистка не удалась: не открылся список разговоров"))
             return
         }
         let freed = janitor.sweep(rules: settings.retentionRules, protecting: protected)
         refreshStorageUsage()
         appendLog("Cleanup freed \(freed.byteSizeDescription)")
-        flash(freed > 0 ? "Освободилось \(freed.byteSizeDescription)" : "Удалять нечего")
+        flash(freed > 0 ? MenuText.format("Освободилось %@", freed.byteSizeDescription) : MenuText.get("Удалять нечего"))
     }
 
     /// nil means we could not tell which calls still need their audio, and then nothing may be swept
@@ -683,7 +683,7 @@ final class AppController {
     /// Makes a model the active one, downloading it first when it is not on disk yet.
     func selectSpeechModel(_ model: SpeechModel) {
         guard !isBusy else {
-            flash("Дождитесь конца расшифровки")
+            flash(MenuText.get("Дождитесь конца расшифровки"))
             return
         }
         settings.speechModelID = model.id
@@ -702,7 +702,7 @@ final class AppController {
             return
         }
         let diarizer = diarizer
-        diarizerPrefetchStatus = "Скачивается модель разбора голосов…"
+        diarizerPrefetchStatus = MenuText.get("Скачивается модель разбора голосов…")
         diarizerPrefetch = Task(priority: .background) { [weak self] in
             defer { self?.diarizerPrefetchStatus = nil }
             do {
@@ -743,14 +743,14 @@ final class AppController {
 
     func removeSpeechModel(_ model: SpeechModel) {
         guard !isBusy else {
-            flash("Дождитесь конца расшифровки")
+            flash(MenuText.get("Дождитесь конца расшифровки"))
             return
         }
         transcriber.stop()
         do {
             try runtime.remove(model)
         } catch {
-            flash("Не получилось удалить: \(error.localizedDescription)")
+            flash(MenuText.format("Не получилось удалить: %@", error.localizedDescription))
         }
     }
 
@@ -1011,7 +1011,7 @@ final class AppController {
             try persist("normalizing", nil)
 
             processingCallID = callID
-            beginStage("Подготовка записи", 1, of: 5)
+            beginStage(MenuText.get("Подготовка записи"), 1, of: 5)
             async let microphoneNormalized = AudioNormalizer.normalize(
                 inputURL: sessionDir.appendingPathComponent(DualFiles.microphoneRaw),
                 outputURL: sessionDir.appendingPathComponent(DualFiles.microphoneASR)
@@ -1026,7 +1026,7 @@ final class AppController {
             try await transcribeDualCall(callID, in: sessionDir, stages: 5, persist: persist)
             lastReadyCallID = callID
             if settings.notifyWhenReady {
-                notifier.transcriptReady(callDescription: autoStartedApp.map { "Звонок · \($0)" } ?? "Разговор записан")
+                notifier.transcriptReady(callDescription: autoStartedApp.map { MenuText.format("Звонок · %@", $0) } ?? MenuText.get("Разговор записан"))
             }
         } catch {
             callDetector.recordingEnded()
@@ -1102,7 +1102,7 @@ final class AppController {
                 try await startTranscriber(stage: 1, of: 2)
                 try persist("transcribing", nil)
 
-                beginStage("Расшифровка записи", 2, of: 2)
+                beginStage(MenuText.get("Расшифровка записи"), 2, of: 2)
                 let result = try await transcribeChannel(
                     .microphone, callID, in: sessionDir,
                     audioURL: normalizedURL, rawAudioURL: rawURL,
@@ -1127,7 +1127,7 @@ final class AppController {
                 try await transcribeDualCall(callID, in: sessionDir, stages: 4, persist: persist)
 
             default:
-                throw BesedaError.processFailed("Неизвестный вид записи: \(summary.kind)")
+                throw BesedaError.processFailed(MenuText.format("Неизвестный вид записи: %@", summary.kind))
             }
             appendLog("Retry succeeded for \(callID)")
         } catch {
@@ -1164,7 +1164,7 @@ final class AppController {
         try await startTranscriber(stage: total - 3, of: total)
         try persist("transcribing", nil)
 
-        beginStage("Расшифровка вашего голоса", total - 2, of: total)
+        beginStage(MenuText.get("Расшифровка вашего голоса"), total - 2, of: total)
         appendLog("Transcribing microphone")
         let microphoneWithEcho = try await transcribeChannel(
             .microphone, callID, in: sessionDir,
@@ -1172,7 +1172,7 @@ final class AppController {
             rawAudioURL: sessionDir.appendingPathComponent(DualFiles.microphoneRaw),
             asrJSONURL: sessionDir.appendingPathComponent("me.asr.json")
         )
-        beginStage("Расшифровка собеседников", total - 1, of: total)
+        beginStage(MenuText.get("Расшифровка собеседников"), total - 1, of: total)
         appendLog("Transcribing system audio")
         let systemAudio = try await transcribeChannel(
             .systemAudio, callID, in: sessionDir,
@@ -1231,7 +1231,7 @@ final class AppController {
     }
 
     private func startTranscriber(stage: Int, of total: Int) async throws {
-        beginStage("Запуск распознавания", stage, of: total)
+        beginStage(MenuText.get("Запуск распознавания"), stage, of: total)
         let ready = try await transcriber.start()
         appendLog("ASR ready: \(ready.model) \(ready.version)")
     }
@@ -1331,7 +1331,7 @@ final class AppController {
 
     private func requireFile(at url: URL) throws {
         guard fileManager.fileExists(atPath: url.path) else {
-            throw BesedaError.processFailed("Нет файла записи: \(url.lastPathComponent)")
+            throw BesedaError.processFailed(MenuText.format("Нет файла записи: %@", url.lastPathComponent))
         }
     }
 
@@ -1346,7 +1346,7 @@ final class AppController {
             appendLog("Diarizing system audio")
             let started = Date()
             // the first run downloads the model: the longest wait of them all
-            beginStage("Подготовка разбора голосов", step, of: total)
+            beginStage(MenuText.get("Подготовка разбора голосов"), step, of: total)
             // two downloads would write the same partial files
             await diarizerPrefetch?.value
             let diarizer = diarizer
@@ -1356,7 +1356,7 @@ final class AppController {
                         self?.advanceStage(to: fraction)
                     }
                 }
-                await self?.beginStage("Разбор голосов", step, of: total)
+                await self?.beginStage(MenuText.get("Разбор голосов"), step, of: total)
                 return try await diarizer.timeline(for: audioURL)
             }
             let turns = SpeakerAssignment.remoteTurns(segments: segments, timeline: timeline)
@@ -1481,11 +1481,11 @@ final class AppController {
             guard serverURL.isEmpty else {
                 self.isServerDown = false
                 guard let baseURL = URL(string: serverURL) else {
-                    self.summaryServerStatus = "Адрес сервера не похож на URL"
+                    self.summaryServerStatus = MenuText.get("Адрес сервера не похож на URL")
                     self.summaryModels = []
                     return
                 }
-                self.summaryServerStatus = "Сервер: \(Self.hostAndPort(baseURL))"
+                self.summaryServerStatus = MenuText.format("Сервер: %@", Self.hostAndPort(baseURL))
                 do {
                     self.summaryModels = try await LocalModelSupport.chatModels(at: baseURL)
                 } catch {
@@ -1497,12 +1497,12 @@ final class AppController {
             do {
                 guard let baseURL = try await LocalModelSupport.discoverServer() else {
                     self.isServerDown = true
-                    self.summaryServerStatus = "LM Studio не запущен"
+                    self.summaryServerStatus = MenuText.get("LM Studio не запущен")
                     self.summaryModels = []
                     return
                 }
                 self.isServerDown = false
-                self.summaryServerStatus = "LM Studio запущен на порту \(baseURL.port ?? 1234)"
+                self.summaryServerStatus = MenuText.format("LM Studio запущен на порту %d", baseURL.port ?? 1234)
                 self.summaryModels = try await LocalModelSupport.chatModels(at: baseURL)
             } catch {
                 self.isServerDown = false
@@ -1534,7 +1534,7 @@ final class AppController {
                 let provider = try await self.makeSummaryProvider().provider
                 _ = try await provider.summarize(text: "Скажи «готово»")
                 let elapsed = Date().timeIntervalSince(startedAt)
-                self.summaryCheckResult = "Ответила за \(String(format: "%.1f", elapsed).replacingOccurrences(of: ".", with: ",")) с"
+                self.summaryCheckResult = MenuText.format("Ответила за %@ с", String(format: "%.1f", locale: .current, elapsed))
             } catch {
                 self.summaryCheckResult = error.localizedDescription
             }
@@ -1620,7 +1620,7 @@ final class AppController {
         }
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(text, forType: .string)
-        flash("Результат скопирован")
+        flash(MenuText.get("Результат скопирован"))
     }
 
     /// an empty transcript has nothing to do with settings, so only «Повторить» stays for it;
@@ -1651,7 +1651,7 @@ final class AppController {
         switch settings.effectiveSummaryProvider {
         case .openRouter:
             guard !settings.openRouterAPIKey.isEmpty else {
-                throw SummarizationError.unauthorized("Ключ OpenRouter не введён")
+                throw SummarizationError.unauthorized(MenuText.get("Ключ OpenRouter не введён"))
             }
             let provider = ChatCompletionsProvider(
                 baseURL: OpenRouter.baseURL,
@@ -1667,7 +1667,7 @@ final class AppController {
                 baseURL: baseURL,
                 model: BundledSummary.current.modelID,
                 prompt: prompt,
-                serviceName: "Встроенная модель",
+                serviceName: MenuText.get("Встроенная модель"),
                 timeout: Self.localTimeout
             )
             return (provider, Self.builtInCharacterBudget)
@@ -1680,7 +1680,7 @@ final class AppController {
                 baseURL: connection.baseURL,
                 model: connection.model,
                 prompt: prompt,
-                serviceName: "LM Studio на \(Self.hostAndPort(connection.baseURL))",
+                serviceName: MenuText.format("LM Studio на %@", Self.hostAndPort(connection.baseURL)),
                 timeout: Self.localTimeout
             )
             return (provider, Self.cloudCharacterBudget)
@@ -1862,14 +1862,14 @@ final class AppController {
     }
 
     nonisolated static func recordingWarning(forWriteError writeError: any Error) -> String {
-        "Запись остановлена: " + recordingStopReason(forWriteError: writeError)
+        MenuText.format("Запись остановлена: %@", recordingStopReason(forWriteError: writeError))
     }
 
     nonisolated static func recordingStopReason(forWriteError writeError: any Error) -> String {
         if case AudioCaptureError.fileFull = writeError {
-            return "файл достиг предела в 4 ГБ (около 3 часов). Всё записанное до этого будет расшифровано."
+            return MenuText.get("файл достиг предела в 4 ГБ (около 3 часов). Всё записанное до этого будет расшифровано.")
         }
-        return "не удалось записать звук на диск (\(writeError.localizedDescription)). Всё записанное до этого будет расшифровано."
+        return MenuText.format("не удалось записать звук на диск (%@). Всё записанное до этого будет расшифровано.", writeError.localizedDescription)
     }
 
     private func stopLiveTicker() {

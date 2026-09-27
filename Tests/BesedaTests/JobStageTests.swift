@@ -26,7 +26,7 @@ import Testing
     )
 
     #expect(stage.remainingSec(now: now) == 30)
-    #expect(stage.caption(now: now) == "Шаг 1 из 2 · осталось 30 сек")
+    #expect(stage.caption(now: now) == "Step 1 of 2 · 30 sec left")
 }
 
 @Test func aBarelyStartedStepGivesNoEstimate() {
@@ -40,7 +40,7 @@ import Testing
     )
 
     #expect(stage.remainingSec(now: now) == nil)
-    #expect(stage.caption(now: now) == "Шаг 1 из 2")
+    #expect(stage.caption(now: now) == "Step 1 of 2")
 }
 
 @Test func aLongWaitIsRoundedUpToMinutes() {
@@ -53,5 +53,5 @@ import Testing
         startedAt: now.addingTimeInterval(-30)
     )
 
-    #expect(stage.caption(now: now) == "Шаг 4 из 4 · осталось 2 мин")
+    #expect(stage.caption(now: now) == "Step 4 of 4 · 2 min left")
 }
