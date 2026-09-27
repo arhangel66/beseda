@@ -16,8 +16,13 @@ SU_PUBLIC_ED_KEY="tR1eNuK7eLy8yy+rAC+mXLGoQqNlwbj1dXktcF5C64U="
 rm -rf "$APP_DIR"
 mkdir -p "$APP_DIR/Contents/MacOS" "$APP_DIR/Contents/Resources"
 cp "$BIN_DIR/Beseda" "$APP_DIR/Contents/MacOS/Beseda"
-# SwiftPM's generated Bundle.module accessor looks beside the .app bundle root.
-cp -R "$BIN_DIR/Beseda_Beseda.bundle" "$APP_DIR/"
+if [ "$FLAVOR" = "store" ]; then
+    mkdir -p "$APP_DIR/Contents/Resources/Beseda_Beseda.bundle"
+    cp -R "$ROOT/Sources/Beseda/Resources" "$APP_DIR/Contents/Resources/Beseda_Beseda.bundle/"
+else
+    # Preserve SwiftPM's generated accessor location for direct distribution.
+    cp -R "$BIN_DIR/Beseda_Beseda.bundle" "$APP_DIR/"
+fi
 cp "$ROOT/Sources/Beseda/Resources/Info.plist" "$APP_DIR/Contents/Info.plist"
 VERSION="$(tr -d '[:space:]' < "$ROOT/VERSION")"
 PLIST="$APP_DIR/Contents/Info.plist"
