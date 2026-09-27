@@ -324,6 +324,7 @@ private struct ProcessingPane: View {
                 .pickerStyle(.segmented)
 
                 Toggle("Только локально", isOn: Bindable(settings).localOnly)
+                    .disabled(settings.strictMode)
                 Label(privacyNote, systemImage: privacySinks.isEmpty ? "lock" : "icloud.and.arrow.up")
                     .foregroundStyle(.secondary)
                 if settings.effectiveSummaryProvider != settings.summaryProvider {
@@ -533,6 +534,9 @@ private struct BundledSummaryRow: View {
 private struct StoragePane: View {
     let controller: AppController
 
+    @State private var fileVaultIsOn: Bool?
+    @State private var isConfirmingStrictMode = false
+
     private var settings: AppSettings {
         controller.settings
     }
@@ -540,16 +544,56 @@ private struct StoragePane: View {
     var body: some View {
         Form {
             Section {
+                Toggle("Строгий режим", isOn: Binding(
+                    get: { settings.strictMode },
+                    set: { on in
+                        if on, !settings.strictModeConfirmed {
+                            isConfirmingStrictMode = true
+                        } else {
+                            setStrictMode(on)
+                        }
+                    }
+                ))
+                Toggle("Не включать записи в резервные копии (Time Machine и др.)", isOn: Binding(
+                    get: { settings.excludesFromBackup },
+                    set: { excluded in
+                        settings.excludesFromBackup = excluded
+                        controller.applyBackupExclusion()
+                    }
+                ))
+                .disabled(settings.strictMode)
+                Text("Уже сделанные копии и снимки Time Machine не удаляются. Выключите, чтобы записи снова попадали в копии: без копии сломанный диск унесёт все записи.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                if fileVaultIsOn == false {
+                    HStack {
+                        Label("FileVault выключен: при краже Mac записи можно прочитать.", systemImage: "exclamationmark.triangle")
+                            .foregroundStyle(.orange)
+                        Spacer()
+                        Button("Открыть настройки FileVault") {
+                            NSWorkspace.shared.open(FileVault.settingsURL)
+                        }
+                    }
+                }
+            } header: {
+                Text("Приватность")
+            } footer: {
+                Text("Строгий режим удаляет аудио сразу после расшифровки, выключает экспорт, включает «Только локально» и не пускает записи в резервные копии. Пока он включён, эти настройки заблокированы; выключение вернёт прежние значения.")
+            }
+
+            Section {
                 retentionPicker(
                     "Исходное аудио",
                     size: controller.storageUsage.rawAudioBytes,
                     selection: Bindable(settings).rawAudioRetention
                 )
+                .disabled(settings.strictMode)
                 retentionPicker(
                     "Подготовленное аудио",
                     size: controller.storageUsage.normalizedAudioBytes,
                     selection: Bindable(settings).normalizedAudioRetention
                 )
+                .disabled(settings.strictMode)
                 LabeledContent("Расшифровки, \(controller.storageUsage.textBytes.byteSizeDescription)", value: "всегда")
                 HStack {
                     Text(cleanupHint)
@@ -589,6 +633,11 @@ private struct StoragePane: View {
                         }
                     }
                 }
+                .disabled(settings.strictMode)
+                if ICloudDrive.contains(settings.exportFolder) {
+                    Label("Папка в iCloud Drive: экспорт уходит в облако Apple.", systemImage: "icloud")
+                        .foregroundStyle(.orange)
+                }
             } header: {
                 Text("Экспорт результатов")
             } footer: {
@@ -611,6 +660,29 @@ private struct StoragePane: View {
             }
         }
         .formStyle(.grouped)
+        .task {
+            #if DEBUG
+            if ProcessInfo.processInfo.environment["BESEDA_PREVIEW_FILEVAULT_OFF"] != nil {
+                fileVaultIsOn = false
+                return
+            }
+            #endif
+            fileVaultIsOn = await Task.detached { FileVault.isOn() }.value
+        }
+        .confirmationDialog("Включить строгий режим?", isPresented: $isConfirmingStrictMode) {
+            Button("Включить и удалять аудио", role: .destructive) {
+                settings.strictModeConfirmed = true
+                setStrictMode(true)
+            }
+        } message: {
+            Text("Аудио уже расшифрованных записей удалится при следующей очистке, а новое — сразу после расшифровки. Удалённое аудио не вернуть, даже если выключить режим.")
+        }
+    }
+
+    private func setStrictMode(_ on: Bool) {
+        settings.setStrictMode(on)
+        controller.applyBackupExclusion()
+        controller.refreshStorageUsage()
     }
 
     private func retentionPicker(_ title: String, size: Int64, selection: Binding<RetentionRule>) -> some View {

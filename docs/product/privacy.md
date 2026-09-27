@@ -37,6 +37,14 @@ processed call.
   export copies; SQLite `secure_delete` keeps the text out of free pages.
 - Audio retention (Настройки → Хранение) deletes WAVs after the chosen period; the
   transcript and summary stay.
+- Настройки → Хранение shows a line with a button to the FileVault pane when
+  `fdesetup isactive` says FileVault is off (nothing when the state is unknown).
+- «Не включать записи в резервные копии» (off by default) sets `isExcludedFromBackup` on the
+  data folder, again at every launch. Time Machine and most backup tools skip it; backups
+  already made are not deleted. A one-line warning shows when the export folder is in iCloud Drive.
+- «Строгий режим» sets audio retention to «Сразу», clears the export folder, turns on
+  «Только локально» and the backup exclusion, and locks them; turning it off restores the
+  previous values. Deleted audio does not come back; the first switch-on asks to confirm.
 
 ## What it does not protect against
 
@@ -45,8 +53,8 @@ processed call.
   Access, and an admin, who can read any file.
 - **A Mac without FileVault.** Without disk encryption a removed or stolen disk is
   readable; file protection adds little on its own.
-- **Backups.** Time Machine copies Application Support, with every call, unless it is
-  excluded; an unencrypted backup disk holds them in the clear. Application Support is
+- **Backups.** Time Machine copies Application Support, with every call, unless the
+  backup exclusion above is on; an unencrypted backup disk holds them in the clear. Application Support is
   not synced by iCloud Drive, but a full-Mac backup tool may copy it.
 - **The export folder.** It lives outside the managed folder: its files keep the
   permissions of wherever it is, retention never touches them, and if it is inside
@@ -74,10 +82,11 @@ points to the built-in model.
 
 ## For sensitive calls
 
+- Turn on «Строгий режим»; it covers the audio, export, local-only and backup points below.
 - Turn FileVault on and lock the Mac when away.
 - Keep the export folder out of iCloud Drive and other synced folders, or leave export off.
 - Pick short audio retention.
 - Use the built-in model (or «Только локально»); no OpenRouter key, no webhook.
-- Exclude `~/Library/Application Support/Beseda` from Time Machine, or encrypt the backup disk.
+- Turn on the backup exclusion, or encrypt the backup disk.
 
 Not done: the index and the exports are not encrypted with a key of their own; see [At-rest encryption](../decisions/at-rest-encryption.md).

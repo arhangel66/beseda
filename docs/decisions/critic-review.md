@@ -199,6 +199,10 @@ Effort is S (hours), M (days), or L (weeks). Priority is P0 (blocks safe sale or
     product documents FileVault/backup/export exposure, offers a strict-local profile, supports short
     retention defaults, and encrypts the index and exported sensitive fields with a Keychain-held key.
     Docs part addressed in BESEDA-90: [privacy.md](../product/privacy.md); encryption of the index and exports is not done.
+    Addressed in BESEDA-142 by decision ([At-rest encryption](at-rest-encryption.md), accepted): a FileVault
+    warning, an opt-in backup exclusion with an iCloud Drive export warning, and «Строгий режим» (audio deleted
+    after transcription, no export, local only, no backups). Encrypting the index and exports with an app key is
+    rejected for now.
 
 ## Docs, tests and release
 
