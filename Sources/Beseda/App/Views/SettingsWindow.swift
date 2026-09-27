@@ -733,25 +733,28 @@ private struct IntegrationsPane: View {
                     get: { settings.calendarEnabled },
                     set: { controller.setCalendarEnabled($0) }
                 ))
-                // one row: a broken link replaces the access line, and its button fixes that very problem
-                let problem = settings.calendarEnabled
-                    ? controller.calendarService.linkingProblem(selected: settings.calendarIdentifiers) : nil
-                LabeledContent(problem ?? accessLine) {
-                    if controller.calendarService.isAuthorized {
+                let accessAction = CalendarService.accessAction(for: controller.calendarService.authorization)
+                LabeledContent(accessLine(for: accessAction)) {
+                    switch accessAction {
+                    case .requestAccess:
+                        Button("Разрешить доступ к календарю") {
+                            controller.requestCalendarAccess()
+                        }
+                    case .openSettings:
+                        Button("Открыть настройки…") {
+                            PermissionsModel.openPrivacySettings(pane: "Privacy_Calendars")
+                        }
+                    case .chooseCalendars:
                         Button("Выбрать календари…") {
                             isCalendarPickerOpen = true
                         }
                         .popover(isPresented: $isCalendarPickerOpen, arrowEdge: .bottom) {
                             CalendarPicker(controller: controller)
                         }
-                    } else {
-                        Button("Открыть доступ…") {
-                            PermissionsModel.openPrivacySettings(pane: "Privacy_Calendars")
-                        }
+                        .disabled(!settings.calendarEnabled)
                     }
                 }
-                .foregroundStyle(problem == nil ? Color.primary : Color.red)
-                .disabled(!settings.calendarEnabled)
+                .foregroundStyle(accessAction == .openSettings ? Color.red : Color.primary)
             } header: {
                 Text("Календарь")
             } footer: {
@@ -795,8 +798,17 @@ private struct IntegrationsPane: View {
         .formStyle(.grouped)
     }
 
-    private var accessLine: String {
-        controller.calendarService.isAuthorized ? "Календари этого Mac" : "Доступ к календарю не выдан"
+    private func accessLine(for action: CalendarAccessAction) -> String {
+        switch action {
+        case .requestAccess:
+            "Beseda запросит доступ только после нажатия кнопки"
+        case .openSettings:
+            "Включите Beseda в разделе «Календари» в настройках конфиденциальности"
+        case .chooseCalendars:
+            settings.calendarEnabled
+                ? (controller.calendarService.linkingProblem(selected: settings.calendarIdentifiers) ?? "Календари этого Mac")
+                : "Доступ к календарю разрешён"
+        }
     }
 
     private var coverageLine: String {

@@ -71,6 +71,14 @@ private func makeEvent(id: String, startMinutes: Int, lengthMinutes: Int) -> Cal
     #expect(CalendarService.carriesConferenceLink("Переговорка на третьем этаже") == false)
 }
 
+@Test func calendarAuthorizationMapsToTheRightAction() {
+    #expect(CalendarService.accessAction(for: .notDetermined) == .requestAccess)
+    #expect(CalendarService.accessAction(for: .denied) == .openSettings)
+    #expect(CalendarService.accessAction(for: .restricted) == .openSettings)
+    #expect(CalendarService.accessAction(for: .writeOnly) == .openSettings)
+    #expect(CalendarService.accessAction(for: .fullAccess) == .chooseCalendars)
+}
+
 @Test func linkingIsBrokenWithoutFullAccess() {
     let problem = CalendarService.linkingProblem(authorization: .writeOnly, selected: [], available: ["work"])
 
