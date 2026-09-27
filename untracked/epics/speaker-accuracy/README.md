@@ -21,6 +21,7 @@ measurement uses: a small eval set with reference labels and one scorer. Researc
 | `echo_gate_real.sh`, `echo_gate_real.py` | BESEDA-95: echo gate before/after on the 15 truth calls (echo level, own share, echo kept, own words lost, sentence bounds) → [results/echo-gate-real.md](results/echo-gate-real.md) |
 | `embedding_clustering.sh`, `embedding_clustering.py` | BESEDA-114: re-cluster the raw per-window embeddings (long-only, eigengap/spectral, FluidAudio knobs, AHC on speaker means) on calls and benchmark → [results/embedding-clustering.md](results/embedding-clustering.md) |
 | `other_diarizers.sh`, `embed_segments.py`, `other_diarizers.py` | BESEDA-115: Sortformer, LS-EEND, Nemotron-3 (FluidAudio 0.17.4) and stronger embeddings (CAM++, ERes2NetV2, ResNet293 via sherpa-onnx) on the 15 truth calls and the benchmark → [results/other-diarizers.md](results/other-diarizers.md) |
+| `double_talk.sh`, `double_talk.py` | BESEDA-121: system channel diarized with Mikhail's mic speech zeroed or kept out of embeddings (mic VAD relative to his speech level) → [results/double-talk.md](results/double-talk.md) |
 | `asr/` | local remote-speech ASR alternatives (Whisper turbo, GigaAM CTC, loudnorm, ru/en routing) vs the baseline engines, WER/CER by language — [asr/README.md](asr/README.md) |
 
 ## What is in the set (28 min, 13 recordings)

@@ -211,6 +211,45 @@ if CommandLine.arguments.count > 2, CommandLine.arguments[2] == "chunks" {
     exit(0)
 }
 
+// BESEDA-121: `RealCalls <call dir> doubletalk` prints one JSON line for ../double_talk.py: Mikhail's own-speech runs
+// on the mic, the t0.70 timeline of them.asr.wav as is and with those runs zeroed. No audio and no text leave the copy.
+struct DoubleTalkDump: Encodable {
+    let speechLevelDb: Float
+    let own: [[Double]]
+    let now: [VariantTimeline.Turn]
+    let zeroed: [VariantTimeline.Turn]
+}
+
+func ownSpeechRuns(mic: [Float]) -> (speechLevel: Float, runs: [[Double]]) {
+    // 20 ms mic frames within 20 dB of the call's own speech level (90th percentile of frame levels); gaps under
+    // 0.3 s filled, runs under 0.1 s dropped. Relative to speech, not to the floor: a −80 dB floor made breaths own (BESEDA-95)
+    let levels = stride(from: 0, to: mic.count - 319, by: 320).map { 10 * log10(vDSP.meanSquare(mic[$0..<$0 + 320]) + 1e-10) }
+    let speechLevel = levels.sorted()[levels.count * 9 / 10]
+    var runs: [(Int, Int)] = []
+    for (frame, level) in levels.enumerated() where level >= speechLevel - 20 {
+        if let last = runs.last, frame - last.1 < 15 { runs[runs.count - 1].1 = frame + 1 } else { runs.append((frame, frame + 1)) }
+    }
+    return (speechLevel, runs.filter { $0.1 - $0.0 >= 5 }.map { [Double($0.0) / 50, Double($0.1) / 50] })
+}
+
+if CommandLine.arguments.count > 2, CommandLine.arguments[2] == "doubletalk" {
+    let input = URL(fileURLWithPath: CommandLine.arguments[1])
+    let converter = AudioConverter()
+    var system = try converter.resampleAudioFile(input.appendingPathComponent("them.asr.wav"))
+    let (speechLevel, own) = ownSpeechRuns(mic: try converter.resampleAudioFile(input.appendingPathComponent("me.asr.wav")))
+    let manager = OfflineDiarizerManager(config: OfflineDiarizerConfig(clusteringThreshold: 0.7))
+    try await manager.prepareModels()
+    let now = turns(try manager.cluster(try await manager.prepare(audio: system)))
+    for run in own {
+        let start = min(Int(run[0] * 16_000), system.count), end = min(Int(run[1] * 16_000), system.count)
+        system.replaceSubrange(start..<end, with: repeatElement(0, count: end - start))
+    }
+    let zeroed = turns(try manager.cluster(try await manager.prepare(audio: system)))
+    let dump = DoubleTalkDump(speechLevelDb: speechLevel, own: own, now: now, zeroed: zeroed)
+    print(String(decoding: try JSONEncoder().encode(dump), as: UTF8.self))
+    exit(0)
+}
+
 let started = Date()
 let argument = URL(fileURLWithPath: CommandLine.arguments[1])
 if argument.pathExtension == "wav" {
