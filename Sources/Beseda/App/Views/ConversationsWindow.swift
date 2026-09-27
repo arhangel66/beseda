@@ -12,11 +12,11 @@ struct ConversationsWindow: View {
         } detail: {
             CallDetailView(controller: controller, player: player)
         }
-        .navigationTitle("Разговоры")
+        .navigationTitle(ArchiveText.get("Разговоры"))
         .searchable(
             text: Bindable(controller).searchQuery,
             placement: .sidebar,
-            prompt: "Искать в разговорах"
+            prompt: Text(ArchiveText.get("Искать в разговорах"))
         )
         .accessibilityIdentifier(UIJourneyContract.Identifier.search)
         .toolbar {
@@ -29,12 +29,12 @@ struct ConversationsWindow: View {
                         SendToWebhookButton(controller: controller, detail: detail)
                     }
                     CopyTranscriptButton(controller: controller)
-                    Button("Удалить", systemImage: "trash") {
+                    Button(ArchiveText.get("Удалить"), systemImage: "trash") {
                         controller.callPendingDeletion = detail.summary
                     }
                     .disabled(!controller.canDelete(detail.summary))
-                    .help("Удалить разговор со всеми файлами")
-                    .accessibilityLabel("Удалить разговор")
+                    .help(ArchiveText.get("Удалить разговор со всеми файлами"))
+                    .accessibilityLabel(ArchiveText.get("Удалить разговор"))
                     .accessibilityIdentifier(UIJourneyContract.Identifier.deleteCall)
                 }
                 RecordingToolbarButton(controller: controller)
@@ -42,23 +42,23 @@ struct ConversationsWindow: View {
         }
         .frame(minWidth: 880, minHeight: 560)
         .confirmationDialog(
-            "Удалить «\(controller.callPendingDeletion?.displayTitle ?? "")»?",
+            String(format: ArchiveText.get("Удалить «%@»?"), controller.callPendingDeletion?.displayTitle ?? ""),
             isPresented: Binding(
                 get: { controller.callPendingDeletion != nil },
                 set: { if !$0 { controller.callPendingDeletion = nil } }
             ),
             presenting: controller.callPendingDeletion
         ) { call in
-            Button("Удалить", role: .destructive) {
+            Button(ArchiveText.get("Удалить"), role: .destructive) {
                 controller.deleteCall(call)
             }
             // the app has no Russian localization, so the system's own button would read «Cancel»
-            Button("Отмена", role: .cancel) {}
+            Button(ArchiveText.get("Отмена"), role: .cancel) {}
         } message: { _ in
-            Text("Запись, расшифровка, итоги и копия в папке экспорта удалятся с этого Mac. Вернуть их не получится.")
+            Text(ArchiveText.get("Запись, расшифровка, итоги и копия в папке экспорта удалятся с этого Mac. Вернуть их не получится."))
         }
         .alert(
-            "Не удалось удалить разговор",
+            ArchiveText.get("Не удалось удалить разговор"),
             isPresented: Binding(
                 get: { controller.deleteError != nil },
                 set: { if !$0 { controller.deleteError = nil } }
@@ -69,7 +69,7 @@ struct ConversationsWindow: View {
             Text(controller.deleteError ?? "")
         }
         .alert(
-            "Не удалось прочитать разговоры",
+            ArchiveText.get("Не удалось прочитать разговоры"),
             isPresented: Binding(
                 get: { controller.callBrowserError != nil },
                 set: { if !$0 { controller.callBrowserError = nil } }
@@ -119,18 +119,18 @@ private struct RecordingToolbarButton: View {
                     .monospacedDigit()
                     .foregroundStyle(.red)
             }
-            .help(controller.isPaused ? "Пауза. Остановить запись (⌘R)" : "Идёт запись. Остановить (⌘R)")
-            .accessibilityLabel("Остановить запись")
-            .accessibilityValue((controller.isPaused ? "Пауза, " : "Идёт запись, ") + CallFormatting.mmss(controller.elapsedRecordingSeconds))
+            .help(ArchiveText.get(controller.isPaused ? "Пауза. Остановить запись (⌘R)" : "Идёт запись. Остановить (⌘R)"))
+            .accessibilityLabel(ArchiveText.get("Остановить запись"))
+            .accessibilityValue(ArchiveText.get(controller.isPaused ? "Пауза, " : "Идёт запись, ") + CallFormatting.mmss(controller.elapsedRecordingSeconds))
         } else {
             Button {
                 controller.startCallRecording()
             } label: {
-                Label("Записать", systemImage: "record.circle")
+                Label(ArchiveText.get("Записать"), systemImage: "record.circle")
             }
             .disabled(controller.isBusy)
-            .help(controller.isBusy ? "Дождитесь конца расшифровки" : "Начать запись (⌘R)")
-            .accessibilityLabel("Начать запись")
+            .help(ArchiveText.get(controller.isBusy ? "Дождитесь конца расшифровки" : "Начать запись (⌘R)"))
+            .accessibilityLabel(ArchiveText.get("Начать запись"))
         }
     }
 }

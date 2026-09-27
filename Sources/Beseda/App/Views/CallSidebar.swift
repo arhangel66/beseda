@@ -40,7 +40,7 @@ struct CallSidebar: View {
                         )
                         .tag(call.id)
                         .contextMenu {
-                            Button("Удалить…", role: .destructive) {
+                            Button(ArchiveText.get("Удалить…"), role: .destructive) {
                                 controller.callPendingDeletion = call
                             }
                             .disabled(!controller.canDelete(call))
@@ -50,7 +50,7 @@ struct CallSidebar: View {
             }
 
             if controller.hasMoreCalls && controller.searchQuery.isEmpty {
-                Button("Показать ещё") {
+                Button(ArchiveText.get("Показать ещё")) {
                     controller.loadMoreCalls()
                 }
                 .buttonStyle(.link)
@@ -75,11 +75,11 @@ struct CallSidebar: View {
         Group {
             if controller.searchQuery.isEmpty {
                 ContentUnavailableView {
-                    Label("Разговоров пока нет", systemImage: "waveform")
+                    Label(ArchiveText.get("Разговоров пока нет"), systemImage: "waveform")
                 } description: {
                     Text(controller.settings.autoDetectEnabled
-                         ? "Запись начнётся сама, когда пойдёт звонок."
-                         : "Автозапись выключена. Нажмите «Записать» или включите её в настройках.")
+                         ? ArchiveText.get("Запись начнётся сама, когда пойдёт звонок.")
+                         : ArchiveText.get("Автозапись выключена. Нажмите «Записать» или включите её в настройках."))
                 }
             } else {
                 ContentUnavailableView.search(text: controller.searchQuery)
@@ -94,7 +94,7 @@ private struct UpcomingEvents: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Label("Дальше по календарю", systemImage: "calendar")
+            Label(ArchiveText.get("Дальше по календарю"), systemImage: "calendar")
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(.secondary)
 
@@ -110,7 +110,7 @@ private struct UpcomingEvents: View {
                         .lineLimit(1)
                         .frame(maxWidth: .infinity, alignment: .leading)
 
-                    Text(controller.willRecord(event) ? "запишется" : "пропустится")
+                    Text(ArchiveText.get(controller.willRecord(event) ? "запишется" : "пропустится"))
                         .font(.caption)
                         .foregroundStyle(controller.willRecord(event) ? Color.green : Color.secondary)
                 }
@@ -120,7 +120,7 @@ private struct UpcomingEvents: View {
                 }
             }
 
-            Text("«Запишется» — догадка по ссылке на звонок в событии. Саму запись включает звук звонка.")
+            Text(ArchiveText.get("«Запишется» — догадка по ссылке на звонок в событии. Саму запись включает звук звонка."))
                 .font(.caption)
                 .foregroundStyle(.tertiary)
         }
@@ -128,7 +128,7 @@ private struct UpcomingEvents: View {
     }
 
     private func timeLabel(_ event: CalendarEvent) -> String {
-        Calendar.current.isDateInToday(event.startsAt) ? event.timeDescription : "завтра"
+        Calendar.current.isDateInToday(event.startsAt) ? event.timeDescription : ArchiveText.get("завтра")
     }
 }
 
@@ -140,7 +140,7 @@ private struct LiveRecordingRow: View {
             PulsingDot(size: 9)
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 2) {
-                Text(controller.isPaused ? "Пауза" : "Идёт запись")
+                Text(ArchiveText.get(controller.isPaused ? "Пауза" : "Идёт запись"))
                     .font(.body.weight(.semibold))
                 Text(CallFormatting.mmss(controller.elapsedRecordingSeconds))
                     .font(.caption.monospacedDigit())
