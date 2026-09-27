@@ -19,10 +19,20 @@ if [ "$BRANCH" != "main" ]; then
     echo "on $BRANCH; releases are cut from main" >&2
     exit 1
 fi
-# a release must be reproducible from its tag
+DIST="$ROOT/dist/$TAG"
+# a release must be reproducible from its tag. The one exception is a step 6 that
+# failed after copying the feed: its appcast.xml equals the signed one, so finish it
 if [ -n "$(git -C "$ROOT" status --porcelain)" ]; then
-    echo "uncommitted changes; commit first" >&2
-    exit 1
+    if [ -n "$(git -C "$ROOT" status --porcelain -- ':!appcast.xml')" ] \
+        || ! cmp -s "$ROOT/appcast.xml" "$DIST/appcast.xml"; then
+        echo "uncommitted changes; commit first" >&2
+        exit 1
+    fi
+    git -C "$ROOT" add appcast.xml
+    git -C "$ROOT" commit -q -m "Beseda $VERSION"
+    git -C "$ROOT" push -q origin main
+    echo "published $TAG: https://github.com/$REPO/releases/tag/$TAG"
+    exit 0
 fi
 if [ ! -f "$NOTES" ]; then
     echo "no $NOTES; an update has to say what changed" >&2
@@ -53,7 +63,6 @@ else
 fi
 git -C "$ROOT" push -q origin "$TAG"
 
-DIST="$ROOT/dist/$TAG"
 IS_DRAFT="$(gh release view "$TAG" --repo "$REPO" --json isDraft --jq .isDraft 2> /dev/null || echo missing)"
 HAS_ASSET="$(gh release view "$TAG" --repo "$REPO" --json assets \
     --jq "any(.assets[]; .name == \"Beseda-$VERSION.zip\")" 2> /dev/null || echo false)"
