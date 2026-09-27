@@ -33,13 +33,25 @@ private func detail(title: String) -> StoredCallDetail {
 }
 
 @Test func exportPutsTitleDateTypeResultThenTranscript() {
-    let text = CallExport.markdown(detail(title: "Релиз 0.6"), result: "**Итог**\nВыкатываем.\n", type: "Дейли")
+    let text = CallExport.markdown(detail(title: "Релиз 0.6"), result: "**Итог**\nВыкатываем.\n", type: "Дейли", locale: Locale(identifier: "ru_RU"))
 
     let lines = text.components(separatedBy: "\n")
     #expect(lines[0] == "# Релиз 0.6")
     #expect(lines[2].contains("2026"))
     #expect(lines[3] == "Тип: Дейли")
-    #expect(text.hasSuffix("\n\n**Итог**\nВыкатываем.\n\n## Transcript\n\nВы: Начнём с релиза.\nСобеседник: Давай.\n"))
+    #expect(text.hasSuffix("\n\n**Итог**\nВыкатываем.\n\n## Расшифровка\n\nВы: Начнём с релиза.\nСобеседник: Давай.\n"))
+}
+
+@Test func exportEnglishCopyKeepsAuthoredTextAndStableFileName() {
+    let call = detail(title: "Релиз 0.6")
+    let english = Locale(identifier: "en_US")
+    let russian = Locale(identifier: "ru_RU")
+    let exported = CallExport.markdown(call, result: "Итог", type: "Дейли", locale: english)
+    #expect(exported.contains("Type: Дейли"))
+    #expect(exported.contains("## Transcript\n\nYou: Начнём с релиза.\nOther speaker: Давай."))
+    #expect(TranscriptCopy.render(call, format: .markdown, locale: english).contains("**You**"))
+    #expect(TranscriptCopy.render(call, format: .clean, locale: russian).contains("Собеседник: Давай."))
+    #expect(CallExport.fileName(call.summary).hasPrefix("2026-08-29"))
 }
 
 @Test func exportFileNameDropsCharactersTheFileSystemRejects() {

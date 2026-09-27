@@ -48,7 +48,7 @@ struct CallGroup: Identifiable {
 }
 
 enum CallFormatting {
-    static let locale = Locale(identifier: "ru_RU")
+    static var locale: Locale { .current }
     private static let logger = Logger(subsystem: "app.beseda.Beseda", category: "dates")
 
     static func mmss(_ seconds: TimeInterval) -> String {
@@ -79,20 +79,21 @@ enum CallFormatting {
 
     /// "14:08" — the start time on its own, the sidebar's leading column
     static func clock(_ date: Date) -> String {
-        timeFormatter.string(from: date)
+        timeFormatter(locale: .current).string(from: date)
     }
 
     /// "сегодня, 16:20" / "вчера, 19:04" / "27 авг, 14:47"
-    static func when(_ date: Date, now: Date = Date(), calendar: Calendar = .current) -> String {
-        let time = timeFormatter.string(from: date)
+    static func when(_ date: Date, now: Date = Date(), calendar: Calendar = .current, locale: Locale = .current) -> String {
+        let time = timeFormatter(locale: locale).string(from: date)
         switch CallDayGroup.of(date, now: now, calendar: calendar) {
         case .today:
-            return "сегодня, \(time)"
+            return "\(locale.language.languageCode?.identifier == "ru" ? "сегодня" : "today"), \(time)"
         case .yesterday:
-            return "вчера, \(time)"
+            return "\(locale.language.languageCode?.identifier == "ru" ? "вчера" : "yesterday"), \(time)"
         case .thisWeek, .earlier:
             // ru "d MMM" ends in a period ("19 авг."), which reads badly before the comma
-            let day = dayFormatter.string(from: date).replacingOccurrences(of: ".", with: "")
+            let formatted = dayFormatter(locale: locale).string(from: date)
+            let day = locale.language.languageCode?.identifier == "ru" ? formatted.replacingOccurrences(of: ".", with: "") : formatted
             return "\(day), \(time)"
         }
     }
@@ -129,17 +130,18 @@ enum CallFormatting {
         return nil
     }
 
-    private static let timeFormatter: DateFormatter = {
+    private static func timeFormatter(locale: Locale) -> DateFormatter {
         let formatter = DateFormatter()
         formatter.locale = locale
-        formatter.dateFormat = "HH:mm"
+        formatter.dateStyle = .none
+        formatter.timeStyle = .short
         return formatter
-    }()
+    }
 
-    private static let dayFormatter: DateFormatter = {
+    private static func dayFormatter(locale: Locale) -> DateFormatter {
         let formatter = DateFormatter()
         formatter.locale = locale
-        formatter.dateFormat = "d MMM"
+        formatter.setLocalizedDateFormatFromTemplate("dMMM")
         return formatter
-    }()
+    }
 }
