@@ -43,7 +43,7 @@ private func permissions(_ url: URL) throws -> Int {
     #expect(try store.fetchCall(id: "20260926-101500") == nil)
     #expect(try store.fetchSegments(callID: "20260926-101500").isEmpty)
     #expect(!FileManager.default.fileExists(atPath: callFolder.path))
-    #expect(!FileManager.default.fileExists(atPath: exportCopy.path))
+    #expect(FileManager.default.fileExists(atPath: exportCopy.path)) // legacy row has no authoritative export path
     for name in ["calls.sqlite", "calls.sqlite-wal"] {
         let bytes = (try? Data(contentsOf: root.appendingPathComponent(name))) ?? Data()
         #expect(bytes.range(of: Data("секретныйпланрелиза".utf8)) == nil)

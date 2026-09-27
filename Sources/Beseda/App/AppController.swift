@@ -315,9 +315,19 @@ final class AppController {
             appendLog("Call index unavailable: \(error.localizedDescription)")
         }
         do {
+            try callStore.retryPendingCleanup { url in
+                if url.path.hasPrefix(paths.dataDirectory.path + "/") {
+                    try FileManager.default.removeItem(at: url)
+                } else {
+                    try settings.withExportFolder(at: url.deletingLastPathComponent().path) { _ in
+                        try FileManager.default.removeItem(at: url)
+                    }
+                }
+            }
             try callStore.emptyTrash()
         } catch {
-            appendLog("Could not empty the deleted calls' trash: \(error.localizedDescription)")
+            deleteError = error.localizedDescription
+            appendLog("Could not finish deleted call cleanup: \(error.localizedDescription)")
         }
         if settings.calendarEnabled,
            let problem = calendarService.linkingProblem(selected: settings.calendarIdentifiers) {

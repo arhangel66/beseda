@@ -99,14 +99,16 @@ folder is moved here once by `LegacyDataMigration`.
   protection where the volume supports it. Right after it `BackupExclusion.apply` sets or clears
   `isExcludedFromBackup` on the data folder from the «резервные копии» setting ([Privacy](../product/privacy.md)).
 - **Export access** — Settings saves a security-scoped folder bookmark in sandboxed builds; export and deletion resolve it and balance access around file operations. An invalid or revoked bookmark requires reselection rather than falling back to an untrusted path. A stale bookmark is renewed while access is active. Direct builds continue using the stored path. Bookmarks are retained by folder path when the selection changes or is cleared. Deletion resolves the folder of the stored export path, not just the current selection. If its bookmark is missing, stale and unrenewable, or revoked, deletion leaves the row and files intact: select that previous folder in Settings and retry, then restore the preferred export folder. No panel opens during automatic recovery.
-- **Deletion** — `CallStore.deleteCallAndFiles` moves the call folder to `trash/<uuid>/<call id>` next to
-  the index (a rename), deletes the row, then removes the export copies — the one at the stored
-  `calls.export_path` (the last written, whatever the title was then) and the one named by
-  `CallExport.fileName` (copies written before the path was stored) — and empties the trash. Loose files are moved into local trash before the row is removed; a failed move or row deletion restores moved files, so external cleanup failure does not silently orphan an export. A failed row
-  delete moves the folder back; a trash that cannot be emptied is retried at every launch
-  (`emptyTrash`), which keeps a folder whose row is still there. So no listed call points at missing files; segments, jobs, speakers and webhook deliveries go by `ON DELETE CASCADE`. `deleteCall` turns on
-  `secure_delete` and truncates the WAL, so deleted text is not left in free pages. A call still waiting
-  in the processing queue is dropped from it first.
+- **Deletion** — `CallStore.deleteCallAndFiles` stages copies in local `trash/` before removing the row.
+  It writes `pending-deletions.json` atomically before the row delete; a failed row delete leaves
+  originals intact and the pending entry cannot remove them while the row exists. After a successful
+  row delete, removal failures retain the entry and surface an error. Launch retries pending paths
+  with security-scoped access to each external folder and shows unresolved failures in the existing
+  delete error UI; it then empties trash. Only the recorded `export_path` is authoritative: legacy
+  rows without one do not infer an old export from the currently selected folder. Changing folders
+  does not change the recorded path. Segments, jobs, speakers and webhook deliveries go by
+  `ON DELETE CASCADE`; `secure_delete` and WAL truncation scrub deleted text. Sandbox/TCC checks
+  with real revoked or stale bookmarks remain parked pending owner-granted runtime access.
 
 ## Main files
 
