@@ -235,7 +235,7 @@ private struct RecordingPane: View {
                     .disabled(monitor.isRunning)
                 }
                 if let failure = monitor.failure {
-                    Text(failure).foregroundStyle(.red)
+                    Text(SettingsText.get(failure)).foregroundStyle(.red)
                 } else if monitor.heardMicrophone || monitor.heardSystemAudio {
                     Text(soundCheckResult).foregroundStyle(.secondary)
                 }
@@ -354,7 +354,7 @@ private struct ProcessingPane: View {
             Section {
                 Picker(SettingsText.get("Кто пишет итоги"), selection: Bindable(settings).summaryProvider) {
                     ForEach(SummaryProvider.allCases) { provider in
-                        Text(provider.title).tag(provider)
+                        Text(SettingsText.get(provider.title)).tag(provider)
                     }
                 }
                 .pickerStyle(.segmented)
@@ -365,7 +365,7 @@ private struct ProcessingPane: View {
                     .foregroundStyle(.secondary)
                 if settings.effectiveSummaryProvider != settings.summaryProvider {
                     Label(
-                        String(format: SettingsText.get("While Local only is on, the built-in model writes summaries instead of %@."), settings.summaryProvider.title),
+                        String(format: SettingsText.get("While Local only is on, the built-in model writes summaries instead of %@."), SettingsText.get(settings.summaryProvider.title)),
                         systemImage: "info.circle"
                     )
                     .foregroundStyle(.secondary)
@@ -424,7 +424,7 @@ private struct ProcessingPane: View {
                         }
                         .controlSize(.small)
                     } label: {
-                        Text(type.name.isEmpty ? SettingsText.get("Без названия") : type.name)
+                        Text(type.name.isEmpty ? SettingsText.get("Без названия") : type.isOther ? SettingsText.get(type.name) : type.name)
                     }
                 }
                 Button(SettingsText.get("Добавить тип")) {
@@ -443,7 +443,7 @@ private struct ProcessingPane: View {
             } header: {
                 Text(SettingsText.get("Типы звонков"))
             } footer: {
-                Text(String(format: SettingsText.get("The %@ type always exists: its instructions write summaries when no other type fits. With multiple types, Jev via OpenRouter chooses from the call time, duration, and start of the transcript. Without an OpenRouter key or if Jev fails, the summary model chooses. Do not use # headings in instructions: summaries show only bold text and line breaks."), CallType.otherName))
+                Text(String(format: SettingsText.get("The %@ type always exists: its instructions write summaries when no other type fits. With multiple types, Jev via OpenRouter chooses from the call time, duration, and start of the transcript. Without an OpenRouter key or if Jev fails, the summary model chooses. Do not use # headings in instructions: summaries show only bold text and line breaks."), SettingsText.get(CallType.otherName)))
             }
         }
         .formStyle(.grouped)
@@ -460,7 +460,7 @@ private struct ProcessingPane: View {
 
     @ViewBuilder
     private var lmStudioRows: some View {
-        LabeledContent(SettingsText.get("Сервер"), value: controller.summaryServerStatus ?? "проверка…")
+        LabeledContent(SettingsText.get("Сервер"), value: controller.summaryServerStatus.map { SettingsText.get($0) } ?? SettingsText.get("проверка…"))
         Picker(SettingsText.get("Модель"), selection: Bindable(settings).summaryModel) {
             Text(SettingsText.get("Автоматически")).tag("")
             ForEach(modelOptions, id: \.self) { model in
@@ -491,7 +491,7 @@ private struct ProcessingPane: View {
         case .lmStudio:
             LocalModelSupport.isInstalled
                 ? SettingsText.get("Итоги пишет модель, загруженная в LM Studio. Приложение должно быть запущено с включённым Local Server.")
-                : LocalModelSupport.manualInstructions
+                : SettingsText.get(LocalModelSupport.manualInstructions)
         }
     }
 
@@ -514,7 +514,7 @@ private struct BundledSummaryRow: View {
         } label: {
             VStack(alignment: .leading, spacing: 2) {
                 Text("\(BundledSummary.current.title) · \(BundledSummary.current.modelBytes.byteSizeDescription)")
-                Text(BundledSummary.current.subtitle)
+                Text(SettingsText.get(BundledSummary.current.subtitle))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -526,14 +526,14 @@ private struct BundledSummaryRow: View {
         if let stage = installer.stage {
             HStack(spacing: 8) {
                 if let fraction = installer.fraction {
-                    Text("\(stage.title) \(Int(fraction * 100))%")
+                    Text("\(SettingsText.get(stage.title)) \(Int(fraction * 100))%")
                         .foregroundStyle(.secondary)
                         .monospacedDigit()
                     ProgressView(value: fraction)
                         .frame(width: 90)
-                        .accessibilityLabel(stage.title)
+                        .accessibilityLabel(SettingsText.get(stage.title))
                 } else {
-                    Text(stage.title)
+                    Text(SettingsText.get(stage.title))
                         .foregroundStyle(.secondary)
                     ProgressView()
                         .controlSize(.small)
@@ -541,10 +541,10 @@ private struct BundledSummaryRow: View {
             }
         } else if let failure = installer.failure {
             HStack(spacing: 8) {
-                Text(failure)
+                Text(SettingsText.get(failure))
                     .foregroundStyle(Color.red)
                     .lineLimit(1)
-                    .help(failure)
+                    .help(SettingsText.get(failure))
                 Button(SettingsText.get("Повторить")) {
                     installer.install()
                 }
@@ -730,7 +730,7 @@ private struct StoragePane: View {
             }
         )) {
             ForEach(RetentionRule.allCases) { rule in
-                Text(rule.title).tag(rule)
+                Text(SettingsText.get(rule.title)).tag(rule)
             }
         }
     }
@@ -797,7 +797,7 @@ private struct IntegrationsPane: View {
                 Toggle(SettingsText.get("Отправлять расшифровку на свой сервис"), isOn: Bindable(settings).webhookEnabled)
                 TextField(SettingsText.get("Адрес"), text: Bindable(settings).webhookURL, prompt: Text("https://example.com/webhook"))
                 if settings.webhookEnabled, case .failure(.plainHTTP) = WebhookSender.checkedEndpoint(from: settings.webhookURL) {
-                    Text(String(format: SettingsText.get("Not sent. %@"), EndpointRefusal.plainHTTP.rawValue))
+                    Text(String(format: SettingsText.get("Not sent. %@"), SettingsText.get(EndpointRefusal.plainHTTP.rawValue)))
                         .foregroundStyle(.red)
                 }
                 SecretField(title: SettingsText.get("Секрет"), text: Bindable(settings).webhookSecret, isLoading: !settings.secretsLoaded)
@@ -809,7 +809,7 @@ private struct IntegrationsPane: View {
                         .foregroundStyle(.secondary)
                 }
                 HStack {
-                    Text(webhooks.testResult ?? SettingsText.get("Сервис должен принять пробный запрос."))
+                    Text(webhooks.testResult.map { SettingsText.webhookMessage($0) } ?? SettingsText.get("Сервис должен принять пробный запрос."))
                         .foregroundStyle(.secondary)
                     Spacer()
                     Button(webhooks.isTesting ? SettingsText.get("Отправка…") : SettingsText.get("Отправить тест")) {
@@ -843,7 +843,7 @@ private struct IntegrationsPane: View {
             SettingsText.get("Включите Беседу в разделе «Календари» в настройках конфиденциальности")
         case .chooseCalendars:
             settings.calendarEnabled
-                ? (controller.calendarService.linkingProblem(selected: settings.calendarIdentifiers) ?? SettingsText.get("Календари этого Mac"))
+                ? (controller.calendarService.linkingProblem(selected: settings.calendarIdentifiers).map { SettingsText.get($0) } ?? SettingsText.get("Календари этого Mac"))
                 : SettingsText.get("Доступ к календарю разрешён")
         }
     }
@@ -907,7 +907,7 @@ struct WebhookDeliveryRow: View {
 
             Spacer(minLength: 0)
 
-            Text([delivery.stateLabel, delivery.detailLine].filter { !$0.isEmpty }.joined(separator: " · "))
+            Text([SettingsText.get(delivery.stateLabel), SettingsText.webhookMessage(delivery.detailLine)].filter { !$0.isEmpty }.joined(separator: " · "))
                 .lineLimit(1)
                 .foregroundStyle(stateColor)
 

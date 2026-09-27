@@ -95,11 +95,11 @@ private struct SpeechModelCard: View {
             .foregroundStyle(Color.secondary)
         case .failed(let message):
             HStack(spacing: 10) {
-                Text(message)
+                Text(SettingsText.get(message))
                     .font(.caption)
                     .lineLimit(1)
                     .foregroundStyle(Color.red)
-                    .help(message)
+                    .help(SettingsText.get(message))
                 Button(SettingsText.get("Повторить")) {
                     controller.selectSpeechModel(model)
                 }
