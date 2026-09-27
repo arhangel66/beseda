@@ -1,4 +1,6 @@
+import AppKit
 import Foundation
+import SwiftUI
 import Testing
 
 @testable import Beseda
@@ -65,4 +67,44 @@ import Testing
     ]
     #expect(Set(identifiers).count == identifiers.count)
     #expect(identifiers.allSatisfy { !$0.isEmpty })
+}
+
+@MainActor
+@Test func journeyAccessibilityCanBeReadAndActedWithoutAFrontWindow() {
+    var presses = 0
+    let harness = AccessibilityHarness {
+        JourneyHarnessButton(identifier: UIJourneyContract.Identifier.onboardingAdvance) { presses += 1 }
+    }
+
+    #expect(harness.window.alphaValue == 0)
+    #expect(!harness.window.isKeyWindow)
+    #expect(!harness.window.isMainWindow)
+    #expect(NSApp.keyWindow !== harness.window)
+    #expect(NSApp.mainWindow !== harness.window)
+    #expect(harness.element(identifier: UIJourneyContract.Identifier.onboardingAdvance) != nil)
+    #expect(harness.element(label: "Продолжить") != nil)
+    #expect(harness.performPress(identifier: UIJourneyContract.Identifier.onboardingAdvance))
+    #expect(presses == 1)
+    #expect(!harness.window.isKeyWindow)
+    #expect(!harness.window.isMainWindow)
+}
+
+private struct JourneyHarnessButton: NSViewRepresentable {
+    let identifier: String
+    let action: () -> Void
+
+    func makeNSView(context: Context) -> NSButton {
+        let button = NSButton(title: "Продолжить", target: context.coordinator, action: #selector(Coordinator.press))
+        button.setAccessibilityIdentifier(identifier)
+        return button
+    }
+
+    func updateNSView(_ nsView: NSButton, context: Context) {}
+    func makeCoordinator() -> Coordinator { Coordinator(action: action) }
+
+    final class Coordinator: NSObject {
+        let action: () -> Void
+        init(action: @escaping () -> Void) { self.action = action }
+        @objc func press() { action() }
+    }
 }
