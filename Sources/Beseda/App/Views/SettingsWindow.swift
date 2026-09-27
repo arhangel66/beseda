@@ -309,6 +309,11 @@ private struct ProcessingPane: View {
                     )
                 }
                 .font(.caption)
+                if let progress = controller.speakerResplitProgress {
+                    Text("Обновлено разбиение голосов: \(progress.done) из \(progress.total)")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             } header: {
                 Text("Распознавание речи")
             } footer: {

@@ -43,6 +43,16 @@ the vendored Swift wrapper in `Vendor/TranscribeCpp`). No audio leaves the machi
   There is no merge rule: the 6 s short-reply rule of the old diarizer glued real people under Nemotron-3
   ([speaker accuracy](../decisions/speaker-accuracy.md)). A wrong split is fixed by hand with «Объединить с»,
   which survives a rerun with the same diarizer ([storage](storage.md)).
+- **Re-split of old calls** — `SpeakerResplitter` (BESEDA-161) redoes the speaker step on every ready dual
+  call whose `calls.diarizer` is not `Diarizer.id` and that still has `them.asr.wav` and `them.asr.json`:
+  the stored `them.asr.json` sentences go through `diarizer.timeline` and `SpeakerAssignment.remoteTurns`,
+  the stored `me` lines are kept as they are, and nothing else runs (no ASR, summary, webhook or Jev). It
+  starts at launch when the diarizer model is on disk, or when its prefetch finishes; one call at a time, at
+  background priority, waiting between calls while the app is busy (a recording or a retry). A call with
+  manual merges is skipped and logged; a failed one is logged and retried on the next launch; a call
+  without that audio keeps its speakers. transcript.md's dialogue, then the segments and `calls.diarizer`
+  in one transaction, then the export copy (if the export path has one) are rewritten; progress is one log
+  line per call and «Обновлено разбиение голосов: N из M» under Обработка → Распознавание речи.
 - **Echo gate** — remote speech leaking from the speakers into the mic would be transcribed again as
   `me`. `EchoGate` finds the delay (FFT cross-correlation, 0–500 ms) and gain of the system channel
   inside the mic; a 20 ms mic frame is own speech only when its energy beats the predicted echo by 6 dB
