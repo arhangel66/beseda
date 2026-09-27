@@ -1,0 +1,38 @@
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: #f8f6f0; color: #202b2b; font: 1rem/1.65 system-ui, sans-serif; }
+a { color: #145c58; text-underline-offset: .2em; }
+a:hover { color: #083b39; }
+a:focus-visible { outline: 3px solid #af6123; outline-offset: 4px; }
+.skip { position: absolute; left: 1rem; top: -5rem; background: white; padding: .5rem 1rem; z-index: 2; }
+.skip:focus { top: 1rem; }
+.site-header, footer { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.25rem max(1.5rem, calc((100vw - 72rem)/2)); }
+.site-header { border-bottom: 1px solid #d6ddd8; }
+.brand { font-size: 1.5rem; font-weight: 750; text-decoration: none; }
+nav { display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; }
+nav a[aria-current] { font-weight: 700; text-decoration-thickness: 2px; }
+main { max-width: 72rem; margin: auto; padding: 0 1.5rem; }
+section { padding: clamp(3rem, 7vw, 6rem) 0; border-bottom: 1px solid #d6ddd8; }
+.hero { max-width: 54rem; }
+h1, h2, h3 { line-height: 1.16; letter-spacing: -.025em; }
+h1 { font-size: clamp(2.6rem, 6vw, 5rem); margin: .3em 0; }
+h2 { font-size: clamp(1.9rem, 3vw, 2.8rem); margin: 0 0 1.5rem; }
+h3 { font-size: 1.35rem; margin: .3rem 0 .75rem; }
+p { max-width: 70ch; }
+.hero > p:not(.eyebrow) { font-size: 1.2rem; }
+.eyebrow { color: #386661; font-size: .85rem; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+.button { display: inline-block; margin-top: 1rem; padding: .8rem 1.2rem; border-radius: .4rem; background: #145c58; color: white; font-weight: 700; text-decoration: none; }
+.button:hover { background: #083b39; color: white; }
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.5rem; }
+.grid article, .example-grid > div { padding: 1.5rem; border: 1px solid #d6ddd8; border-radius: .7rem; background: white; }
+.example { background: #e8f0eb; margin: 0 -1.5rem; padding-left: 1.5rem; padding-right: 1.5rem; }
+.example-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.faq { max-width: 48rem; }
+.faq h3 { margin-top: 2rem; }
+footer { max-width: 75rem; margin: auto; font-size: .9rem; }
+@media (max-width: 700px) {
+  .site-header, footer { align-items: flex-start; flex-direction: column; }
+  .grid, .example-grid { grid-template-columns: 1fr; }
+  section { padding: 3rem 0; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
