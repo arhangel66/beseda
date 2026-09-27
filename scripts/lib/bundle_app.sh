@@ -44,14 +44,35 @@ xcrun actool "$ROOT/Sources/Beseda/Resources/AppIcon.icon" --compile "$APP_DIR/C
     --platform macosx --minimum-deployment-target 14.2 --app-icon AppIcon \
     --output-partial-info-plist "$ROOT/.build/appicon-partial.plist" > /dev/null
 
-IDENTITY="$(security find-identity -v -p codesigning | sed -n 's/.*"\(Apple Development: .*\)"/\1/p' | head -n 1)"
+# Developer ID when the keychain has one (Gatekeeper and notarization accept only that),
+# Apple Development otherwise
+IDENTITIES="$(security find-identity -v -p codesigning)"
+IDENTITY="$(sed -n 's/.*"\(Developer ID Application: .*\)"/\1/p' <<< "$IDENTITIES" | head -n 1)"
+TIMESTAMP=(--timestamp)
 if [ -z "$IDENTITY" ]; then
-    echo "no Apple Development signing identity in the keychain; run 'security find-identity -v -p codesigning'" >&2
+    IDENTITY="$(sed -n 's/.*"\(Apple Development: .*\)"/\1/p' <<< "$IDENTITIES" | head -n 1)"
+    # a secure timestamp is needed only for notarization and costs a network call per signature
+    TIMESTAMP=(--timestamp=none)
+fi
+if [ -z "$IDENTITY" ]; then
+    echo "no Developer ID Application or Apple Development signing identity in the keychain; run 'security find-identity -v -p codesigning'" >&2
     exit 1
 fi
 
-# no --options runtime and no entitlements: the hardened runtime would demand
-# com.apple.security.device.audio-input and silently kill microphone capture.
-# --deep also signs Sparkle's nested Autoupdate, Updater.app and XPC services.
-codesign --force --deep --sign "$IDENTITY" "$APP_DIR"
+# hardened runtime everywhere, signed inside-out as Sparkle documents (--deep would not
+# keep the Downloader's own entitlements). The app's entitlements are only the ones the
+# runtime would otherwise deny: the microphone and the calendar. llama-server is a separate
+# process with its own signature and the speech engine is a framework signed below by the
+# same team, so neither needs library-validation or JIT exceptions.
+sign() {
+    codesign --force --options runtime "${TIMESTAMP[@]}" --sign "$IDENTITY" "$@"
+}
+SPARKLE="$APP_DIR/Contents/Frameworks/Sparkle.framework/Versions/Current"
+sign "$SPARKLE/XPCServices/Installer.xpc"
+sign --preserve-metadata=entitlements "$SPARKLE/XPCServices/Downloader.xpc"
+sign "$SPARKLE/Autoupdate"
+sign "$SPARKLE/Updater.app"
+sign "$APP_DIR/Contents/Frameworks/Sparkle.framework"
+sign "$APP_DIR/Contents/Frameworks/CTranscribe.framework"
+sign --entitlements "$ROOT/scripts/Beseda.entitlements" "$APP_DIR"
 codesign --verify --strict --deep "$APP_DIR"

@@ -5,13 +5,36 @@ import Security
 /// A class so a test can subclass it into one whose writes fail.
 class Keychain {
     let service: String
+    /// where builds up to 0.4.x kept the keys. A login-keychain item trusts only the signature
+    /// that created it, so a build signed otherwise (Developer ID) gets a prompt reading it; the
+    /// value is copied into `service` once, where this build owns it and later reads are silent
+    let legacyService: String?
 
-    init(service: String = Bundle.main.bundleIdentifier ?? "app.beseda.Beseda") {
+    /// the app's own keys; derived from the bundle id so an isolated copy never touches the installed app's
+    static var app: Keychain {
+        let bundleID = Bundle.main.bundleIdentifier ?? "app.beseda.Beseda"
+        return Keychain(service: "\(bundleID).keys", legacyService: bundleID)
+    }
+
+    init(service: String, legacyService: String? = nil) {
         self.service = service
+        self.legacyService = legacyService
     }
 
     func read(account: String) -> String? {
-        var query = baseQuery(account: account)
+        if let value = read(account: account, service: service) {
+            return value
+        }
+        guard let legacyService, let value = read(account: account, service: legacyService) else {
+            return nil
+        }
+        // the legacy item stays: it is the copy an older build still reads after a rollback
+        _ = save(value, account: account)
+        return value
+    }
+
+    private func read(account: String, service: String) -> String? {
+        var query = baseQuery(account: account, service: service)
         query[kSecReturnData as String] = true
         query[kSecMatchLimit as String] = kSecMatchLimitOne
         var found: CFTypeRef?
@@ -32,7 +55,7 @@ class Keychain {
             item[kSecValueData as String] = data
             status = SecItemAdd(item as CFDictionary, nil)
         }
-        return status == errSecSuccess && read(account: account) == value
+        return status == errSecSuccess && read(account: account, service: service) == value
     }
 
     /// every item of this service; tests clean up with it
@@ -42,7 +65,8 @@ class Keychain {
         while SecItemDelete(query) == errSecSuccess {}
     }
 
-    private func baseQuery(account: String) -> [String: Any] {
-        [kSecClass as String: kSecClassGenericPassword, kSecAttrService as String: service, kSecAttrAccount as String: account]
+    private func baseQuery(account: String, service: String? = nil) -> [String: Any] {
+        let service = service ?? self.service
+        return [kSecClass as String: kSecClassGenericPassword, kSecAttrService as String: service, kSecAttrAccount as String: account]
     }
 }

@@ -301,3 +301,24 @@ private final class FailingKeychain: Keychain {
 
     #expect(settings.callTypes.map(\.prompt) == [ChatCompletionsProvider.defaultPrompt, edited.prompt])
 }
+
+@MainActor
+@Test func aKeyOnlyInTheLegacyServiceIsCopiedIntoTheNewOneAndKept() {
+    let suiteName = "beseda-test-\(UUID().uuidString)"
+    let defaults = UserDefaults(suiteName: suiteName)!
+    let legacy = Keychain(service: "\(suiteName).legacy")
+    let keychain = Keychain(service: suiteName, legacyService: legacy.service)
+    defer {
+        defaults.removePersistentDomain(forName: suiteName)
+        keychain.deleteAll()
+        legacy.deleteAll()
+    }
+    _ = legacy.save("sk-or-v1-old", account: "beseda.openRouterAPIKey")
+
+    let settings = AppSettings(defaults: defaults, keychain: keychain)
+
+    #expect(settings.openRouterAPIKey == "sk-or-v1-old")
+    #expect(Keychain(service: suiteName).read(account: "beseda.openRouterAPIKey") == "sk-or-v1-old")
+    #expect(legacy.read(account: "beseda.openRouterAPIKey") == "sk-or-v1-old")
+    #expect(settings.webhookSecret == "")
+}
