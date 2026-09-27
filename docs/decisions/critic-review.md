@@ -177,7 +177,7 @@ Effort is S (hours), M (days), or L (weeks). Priority is P0 (blocks safe sale or
     Move both secrets to Keychain, accept HTTPS only except an explicit localhost development case, and send
     one standard authorization header.
     Fixed in BESEDA-91: both secrets live in the Keychain with a silent one-time move out of UserDefaults;
-    the webhook refuses http except localhost/127.0.0.1/::1 and sends only `Authorization: Bearer`.
+    the webhook refuses http except localhost/127.0.0.1/::1 and sends the secret as-is in one `Authorization` header (no `Bearer` prefix: kushetka compares the whole value).
 
 19. **“Local” storage has no stated threat model for the target's sensitive data — P1, L.** Owner-only modes
     and `completeUntilFirstUserAuthentication` (`Storage/StorageJanitor.swift:153-171`) do not protect an

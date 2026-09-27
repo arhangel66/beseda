@@ -45,6 +45,11 @@ Agents in this repo do not use Serena/LSP tools (sourcekit-lsp indexing eats ten
 It builds the app and runs every test. `theInstalledModelTranscribesRealSpeech` is skipped unless the
 speech model is installed in Application Support and `samples/jfk.wav` (gitignored) is in the checkout.
 
+The app target's path is the repo root, so SwiftPM walks every directory there that `exclude` does not
+name. Never copy the sources into the checkout (e.g. `.build/b106-src`); build a copy in `/tmp`. A new
+large directory at the root goes into `exclude`. If the check stalls before compiling and `.build/build.db`
+is gigabytes, delete `.build` and rerun: a clean run takes ~1.5 min and ~3 GB of `.build`.
+
 ## No-focus, no-sound
 
 Someone works on this Mac. Never bring a window to the front and never play into the Mac's output device:
