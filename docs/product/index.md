@@ -5,3 +5,4 @@
 - [Install](install.md) — putting Beseda on a Mac, first launch, updates, uninstall.
 - [Privacy](privacy.md) — what is stored where, what protects it, what leaves the Mac.
 - [Landing message](landing-brief.md) — proposed copy and synthetic demo storyboard; not a published page.
+- [Mac App Store listing](app-store-listing.md) — proposed English metadata, consent copy and synthetic screenshot plan; not submitted.
