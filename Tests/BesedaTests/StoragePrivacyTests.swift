@@ -130,6 +130,54 @@ private func permissions(_ url: URL) throws -> Int {
     #expect(starts == stops)
 }
 
+@Test func failedRowDeletionRestoresMovedCallFolder() throws {
+    let root = try temporaryDirectory()
+    defer { try? FileManager.default.removeItem(at: root) }
+    let folder = root.appendingPathComponent("calls/id", isDirectory: true)
+    try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+    let transcript = folder.appendingPathComponent("transcript.md")
+    try Data("private call".utf8).write(to: transcript)
+    let store = CallStore(dbURL: root.appendingPathComponent("calls.sqlite"))
+    try store.prepare()
+    try store.upsertCall(id: "id", kind: "dual", startedAt: Date(), endedAt: nil, durationSec: nil,
+                         status: "ready", transcriptURL: transcript, audioDirectoryURL: folder,
+                         error: nil, appName: nil)
+    struct WriteFailed: Error {}
+    #expect(throws: WriteFailed.self) {
+        try store.deleteCallAndFiles(id: "id", exportFolder: nil, deleteRow: { _ in
+            #expect(!FileManager.default.fileExists(atPath: folder.path))
+            throw WriteFailed()
+        })
+    }
+    let call = try #require(try store.fetchCall(id: "id"))
+    #expect(call.audioDirectoryURL == folder)
+    #expect(try String(contentsOf: call.transcriptURL!, encoding: .utf8) == "private call")
+    try store.retryPendingCleanup()
+    try store.emptyTrash()
+    #expect(FileManager.default.fileExists(atPath: transcript.path))
+}
+
+@Test func directLegacyDeletionRemovesAuthorizedOldCopy() throws {
+    let root = try temporaryDirectory()
+    defer { try? FileManager.default.removeItem(at: root) }
+    let folder = root.appendingPathComponent("calls/id", isDirectory: true)
+    let export = root.appendingPathComponent("export", isDirectory: true)
+    try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+    try FileManager.default.createDirectory(at: export, withIntermediateDirectories: true)
+    let store = CallStore(dbURL: root.appendingPathComponent("calls.sqlite"))
+    try store.prepare()
+    try store.upsertCall(id: "id", kind: "dual", startedAt: Date(), endedAt: nil, durationSec: nil,
+                         status: "ready", transcriptURL: nil, audioDirectoryURL: folder, error: nil, appName: nil)
+    #expect(try store.exportPath(callID: "id") == nil)
+    let call = try #require(try store.fetchCall(id: "id"))
+    let copy = export.appendingPathComponent(CallExport.fileName(call))
+    try Data("old markdown".utf8).write(to: copy)
+    try store.deleteCallAndFiles(id: "id", exportFolder: export, requireExportScope: true)
+    #expect(try store.fetchCall(id: "id") == nil)
+    #expect(!FileManager.default.fileExists(atPath: copy.path))
+    #expect(!FileManager.default.fileExists(atPath: folder.path))
+}
+
 @Test func legacyDeletionWithoutFolderScopeRetainsCallAndCopy() throws {
     let root = try temporaryDirectory()
     let folder = root.appendingPathComponent("calls/id", isDirectory: true)
