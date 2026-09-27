@@ -77,6 +77,10 @@ final class AppSettings {
     private let webhookURLKey = "beseda.webhookURL"
     private let webhookSecretKey = "beseda.webhookSecret"
     private let speechModelKey = "beseda.speechModel"
+    private let excludesFromBackupKey = "beseda.excludesFromBackup"
+    private let strictModeKey = "beseda.strictMode"
+    private let strictModeConfirmedKey = "beseda.strictModeConfirmed"
+    private let valuesBeforeStrictModeKey = "beseda.valuesBeforeStrictMode"
 
     var autoDetectEnabled: Bool {
         didSet {
@@ -274,6 +278,51 @@ final class AppSettings {
         }
     }
 
+    /// opt-in (Mikhail keeps his backups, 2026-09-27); the app applies it to the data folder
+    var excludesFromBackup: Bool {
+        didSet {
+            defaults.set(excludesFromBackup, forKey: excludesFromBackupKey)
+        }
+    }
+
+    /// «Строгий режим»: audio goes right after transcription, no export, local only, no backups
+    private(set) var strictMode: Bool
+
+    /// the audio-deletion confirmation is shown only the first time strict mode goes on
+    var strictModeConfirmed: Bool {
+        didSet {
+            defaults.set(strictModeConfirmed, forKey: strictModeConfirmedKey)
+        }
+    }
+
+    /// saves what strict mode overrides so turning it off puts every value back
+    func setStrictMode(_ on: Bool) {
+        guard on != strictMode else { return }
+        if on {
+            defaults.set([
+                rawRetentionKey: rawAudioRetention.rawValue,
+                normalizedRetentionKey: normalizedAudioRetention.rawValue,
+                exportFolderKey: exportFolder,
+                localOnlyKey: localOnly,
+                excludesFromBackupKey: excludesFromBackup
+            ] as [String: Any], forKey: valuesBeforeStrictModeKey)
+            rawAudioRetention = .immediately
+            normalizedAudioRetention = .immediately
+            exportFolder = ""
+            localOnly = true
+            excludesFromBackup = true
+        } else if let saved = defaults.dictionary(forKey: valuesBeforeStrictModeKey) {
+            rawAudioRetention = (saved[rawRetentionKey] as? String).flatMap(RetentionRule.init(rawValue:)) ?? .days90
+            normalizedAudioRetention = (saved[normalizedRetentionKey] as? String).flatMap(RetentionRule.init(rawValue:)) ?? .days30
+            exportFolder = saved[exportFolderKey] as? String ?? ""
+            localOnly = saved[localOnlyKey] as? Bool ?? false
+            excludesFromBackup = saved[excludesFromBackupKey] as? Bool ?? false
+            defaults.removeObject(forKey: valuesBeforeStrictModeKey)
+        }
+        strictMode = on
+        defaults.set(on, forKey: strictModeKey)
+    }
+
     var speechModel: SpeechModel {
         SpeechModel.named(speechModelID) ?? .default
     }
@@ -318,6 +367,9 @@ final class AppSettings {
         self.webhookURL = defaults.string(forKey: webhookURLKey) ?? ""
         self.webhookSecret = defaults.string(forKey: webhookSecretKey) ?? ""
         self.speechModelID = defaults.string(forKey: speechModelKey) ?? SpeechModel.default.id
+        self.excludesFromBackup = defaults.bool(forKey: excludesFromBackupKey)
+        self.strictMode = defaults.bool(forKey: strictModeKey)
+        self.strictModeConfirmed = defaults.bool(forKey: strictModeConfirmedKey)
         secretsLoad = Task { await loadSecrets() }
     }
 

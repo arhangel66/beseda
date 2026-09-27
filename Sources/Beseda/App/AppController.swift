@@ -273,6 +273,7 @@ final class AppController {
         }
 
         StorageProtection.apply(to: paths.dataDirectory)
+        applyBackupExclusion()
 
         let freed = PythonRuntimeCleanup.run(paths)
         if freed > 0 {
@@ -806,6 +807,10 @@ final class AppController {
     func quit() {
         transcriber.stop()
         NSApplication.shared.terminate(nil)
+    }
+
+    func applyBackupExclusion() {
+        BackupExclusion.apply(excluded: settings.excludesFromBackup, to: paths.dataDirectory)
     }
 
     func openCallsFolder() {

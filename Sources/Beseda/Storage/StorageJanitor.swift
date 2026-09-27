@@ -171,3 +171,58 @@ enum StorageProtection {
         }
     }
 }
+
+/// Keeps the data folder out of Time Machine and the backup tools that honour the same flag.
+enum BackupExclusion {
+    /// the flag on the folder covers what is created in it later; clearing it never touches existing backups
+    static func apply(excluded: Bool, to directory: URL) {
+        var directory = directory
+        var values = URLResourceValues()
+        values.isExcludedFromBackup = excluded
+        try? directory.setResourceValues(values)
+    }
+
+    static func isExcluded(_ directory: URL) -> Bool {
+        (try? directory.resourceValues(forKeys: [.isExcludedFromBackupKey]))?.isExcludedFromBackup ?? false
+    }
+}
+
+enum ICloudDrive {
+    /// true for a folder iCloud Drive syncs, which would copy every export off the Mac
+    static func contains(_ path: String, home: URL = FileManager.default.homeDirectoryForCurrentUser) -> Bool {
+        guard !path.isEmpty else { return false }
+        let root = home.appendingPathComponent("Library/Mobile Documents", isDirectory: true).standardizedFileURL.path
+        let folder = URL(fileURLWithPath: path).standardizedFileURL.path
+        return folder == root || folder.hasPrefix(root + "/")
+    }
+}
+
+enum FileVault {
+    /// `fdesetup isactive` needs no admin rights and shows no dialog; nil when the answer is unclear
+    static func isOn(run: () -> (status: Int32, output: String)? = runIsActive) -> Bool? {
+        guard let answer = run() else { return nil }
+        switch (answer.status, answer.output.trimmingCharacters(in: .whitespacesAndNewlines)) {
+        case (0, "true"):
+            return true
+        case (1, "false"):
+            return false
+        default:
+            return nil
+        }
+    }
+
+    static let settingsURL = URL(string: "x-apple.systempreferences:com.apple.preference.security?FileVault")!
+
+    private static func runIsActive() -> (status: Int32, output: String)? {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/fdesetup")
+        process.arguments = ["isactive"]
+        let pipe = Pipe()
+        process.standardOutput = pipe
+        process.standardError = FileHandle.nullDevice
+        guard (try? process.run()) != nil else { return nil }
+        let output = pipe.fileHandleForReading.readDataToEndOfFile()
+        process.waitUntilExit()
+        return (process.terminationStatus, String(decoding: output, as: UTF8.self))
+    }
+}

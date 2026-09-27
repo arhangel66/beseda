@@ -86,7 +86,8 @@ folder is moved here once by `LegacyDataMigration`.
 - **Protection** — `StorageProtection.apply` runs at launch: it sets the process umask to 077, so every
   later file and folder is owner-only, and walks the data folder once, dropping group/other bits (owner
   bits kept, so built binaries stay executable) and setting `completeUntilFirstUserAuthentication` file
-  protection where the volume supports it.
+  protection where the volume supports it. Right after it `BackupExclusion.apply` sets or clears
+  `isExcludedFromBackup` on the data folder from the «резервные копии» setting ([Privacy](../product/privacy.md)).
 - **Deletion** — `CallStore.deleteCallAndFiles` moves the call folder to `trash/<uuid>/<call id>` next to
   the index (a rename), deletes the row, then removes the export copies — the one at the stored
   `calls.export_path` (the last written, whatever the title was then) and the one named by

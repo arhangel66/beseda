@@ -1,8 +1,8 @@
 ---
 type: Decision Record
 title: At-rest encryption
-description: Options for protecting calls on disk beyond FileVault, with threat model, migration and key-loss cost for each; recommends the smallest set for a psychologist's Mac — proposed.
-status: proposed
+description: Options for protecting calls on disk beyond FileVault, with threat model, migration and key-loss cost for each; accepted: (a) FileVault warning, (b) opt-in backup exclusion, (e) «Строгий режим».
+status: accepted
 tags: [privacy, security, storage, research]
 generated:
   by: agent
@@ -10,6 +10,16 @@ generated:
 ---
 
 # At-rest encryption
+
+**Decision (Mikhail, 2026-09-27):** «Да все три. Да» — (a), (b) and (e) are accepted and built in
+BESEDA-142; (c) and (d) are not done. He excludes his own Beseda folder from backups. As built:
+(a) reads `/usr/bin/fdesetup isactive` (no admin rights, no dialog; exit 0 + `true` is on, exit 1 +
+`false` is off, anything else shows nothing) and shows one line with a button to the FileVault pane;
+(b) is a toggle in Настройки → Хранение, **off by default for everyone** (not on for new installs),
+applied again at every launch, with a one-line warning when the export folder is under
+`~/Library/Mobile Documents`; (e) asks to confirm audio deletion the first time only, locks the
+settings it overrides and restores their previous values when turned off. The FileVault line is a
+warning, not a blocker of strict mode.
 
 Critic finding 19: `calls.sqlite`, transcripts, WAVs and exports lie on disk in plain form
 ([Privacy](../product/privacy.md)). One target audience is psychologists. This record picks the
