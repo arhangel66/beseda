@@ -2,19 +2,19 @@ import Foundation
 
 /// A processed call as one Markdown file in the export folder the user picked.
 enum CallExport {
-    static func markdown(_ detail: StoredCallDetail, result: String, type: String) -> String {
+    static func markdown(_ detail: StoredCallDetail, result: String, type: String, locale: Locale = .current) -> String {
         let summary = detail.summary
         return """
             # \(summary.displayTitle)
 
-            \(summary.startedDate.map(dateLine) ?? "—")
-            Тип: \(type)
+            \(summary.startedDate.map { dateLine($0, locale: locale) } ?? "—")
+            \(ExportText.get("Тип:", locale: locale)) \(type)
 
             \(result.trimmingCharacters(in: .whitespacesAndNewlines))
 
-            ## Transcript
+            \(ExportText.get("## Transcript", locale: locale))
 
-            \(TranscriptCopy.render(detail, format: .clean))
+            \(TranscriptCopy.render(detail, format: .clean, locale: locale))
 
             """
     }
@@ -39,8 +39,8 @@ enum CallExport {
         return url
     }
 
-    private static func dateLine(_ date: Date) -> String {
-        date.formatted(Date.FormatStyle(date: .long, time: .shortened).locale(CallFormatting.locale))
+    private static func dateLine(_ date: Date, locale: Locale) -> String {
+        date.formatted(Date.FormatStyle(date: .long, time: .shortened).locale(locale))
     }
 
     private static func fileDate(_ date: Date) -> String {

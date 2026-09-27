@@ -14,20 +14,21 @@ enum SpeakerNaming {
         return Int(speaker.dropFirst(prefix.count))
     }
 
-    static func defaultName(for speaker: String) -> String {
+    static func defaultName(for speaker: String, locale: Locale = .current) -> String {
         if speaker == TranscriptChannel.microphone.speakerID {
-            return "Вы"
+            return ExportText.get("Вы", locale: locale)
         }
         // an unknown key is never shown as is: it reads like a program's label, not a person
         guard let index = remoteIndex(of: speaker) else {
-            return "Участник"
+            return ExportText.get("Участник", locale: locale)
         }
         // an undiarized call keeps the plain name it always had
-        return speaker == TranscriptChannel.systemAudio.speakerID ? "Собеседник" : "Собеседник \(index)"
+        let remote = ExportText.get("Собеседник", locale: locale)
+        return speaker == TranscriptChannel.systemAudio.speakerID ? remote : "\(remote) \(index)"
     }
 
-    static func name(for speaker: String, overrides: [String: String]) -> String {
-        overrides[speaker] ?? defaultName(for: speaker)
+    static func name(for speaker: String, overrides: [String: String], locale: Locale = .current) -> String {
+        overrides[speaker] ?? defaultName(for: speaker, locale: locale)
     }
 
     /// avatar text: a renamed speaker shows their letter, a numbered one shows the number,

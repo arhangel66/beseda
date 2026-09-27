@@ -10,38 +10,42 @@ enum TranscriptCopyFormat: String, CaseIterable, Identifiable, Sendable {
         rawValue
     }
 
-    var title: String {
+    var title: String { title(locale: .current) }
+
+    func title(locale: Locale) -> String {
         switch self {
         case .timestamped:
-            "Диалог с таймкодами"
+            ExportText.get("Диалог с таймкодами", locale: locale)
         case .clean:
-            "Чистый диалог"
+            ExportText.get("Чистый диалог", locale: locale)
         case .markdown:
-            "Markdown для заметок"
+            ExportText.get("Markdown для заметок", locale: locale)
         }
     }
 
     /// the right-hand hint in the menu: what the first line will look like
-    var sample: String {
+    var sample: String { sample(locale: .current) }
+
+    func sample(locale: Locale) -> String {
         switch self {
         case .timestamped:
-            "00:41 Вы: …"
+            "00:41 \(ExportText.get("Вы", locale: locale)): …"
         case .clean:
-            "Вы: …"
+            "\(ExportText.get("Вы", locale: locale)): …"
         case .markdown:
-            "## Разговор"
+            ExportText.get("## Разговор", locale: locale)
         }
     }
 }
 
 enum TranscriptCopy {
-    static func render(_ detail: StoredCallDetail, format: TranscriptCopyFormat) -> String {
+    static func render(_ detail: StoredCallDetail, format: TranscriptCopyFormat, locale: Locale = .current) -> String {
         guard !detail.segments.isEmpty else {
             return detail.markdownText ?? ""
         }
         let names = detail.speakerNames
         func speaker(_ segment: StoredTranscriptSegment) -> String {
-            SpeakerNaming.name(for: segment.speaker, overrides: names)
+            SpeakerNaming.name(for: segment.speaker, overrides: names, locale: locale)
         }
 
         switch format {

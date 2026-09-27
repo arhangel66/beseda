@@ -52,7 +52,7 @@ What the code does today. Settings tabs are named as in the app: Основны�
   is no related call with a summary.
 - **Export.** With a folder picked under Хранение → Экспорт результатов → «Папка экспорта», every stored result (auto, manual
   or rerun) is written there as Markdown: title, date, type, result, then the clean transcript. The file
-  is named by date and title, so a rerun overwrites it (`Storage/CallExport.swift`).
+  is named by date and title, so a rerun overwrites it (`Storage/CallExport.swift`). Generated copy/export speaker names and export labels use English or Russian locale resources; authored titles, type names, transcript text and speaker overrides remain unchanged. Display dates use the system locale; export filenames retain their stable POSIX date.
 - **Privacy.** The data folder is owner-only (0700/0600, platform file protection where the volume
   supports it), tightened on every launch (`StorageProtection` in `Storage/StorageJanitor.swift`).
   «Удалить» in the conversations toolbar or a sidebar row's context menu, after a confirmation, removes the
