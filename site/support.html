@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Help with installing Beseda, recording calls, downloading speech models, and choosing local or cloud summaries.">
+  <title>Support — Beseda</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a href="#main">Skip to content</a>
+  <header>
+    <nav aria-label="Main navigation">
+      <a href="index.html">Beseda</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="support.html" aria-current="page">Support</a>
+    </nav>
+  </header>
+  <main id="main">
+    <h1>Beseda support</h1>
+    <p>Beseda is a menu bar app for Apple Silicon Macs running macOS 14.2 or newer. An internet connection is needed to download models and updates; transcription with an installed speech model runs locally.</p>
+
+    <h2>First launch and speech model</h2>
+    <p>Look for Beseda’s icon in the menu bar. In the first-run window, allow microphone and system-audio access, choose a speech model, and select Download. Parakeet v3 supports 25 languages; GigaAM v3 is for Russian. You can change the model later in Settings → Processing. Recording cannot start until the selected speech model is ready.</p>
+    <p>Allow at least 1 GB of free disk space for transcription only, or 6 GB if you also want the built-in summary model. If a download reports insufficient space, free space and try again. Model downloads need an internet connection; the app shows download progress in the menu bar.</p>
+
+    <h2>Permissions and recording</h2>
+    <p>If a source is missing, check macOS System Settings → Privacy &amp; Security for Beseda’s microphone and system-audio permissions. In Beseda, use Settings → Recording → Check Sound to test both channels without saving a call. Start or stop a recording from the menu bar. Automatic recording only applies to apps selected under Settings → Recording → Apps.</p>
+    <p>You are responsible for recording lawfully and obtaining participants’ consent. Beseda does not notify other participants for you.</p>
+
+    <h2>Local and cloud summaries</h2>
+    <p>Recording and transcription do not require a summary provider. In Settings → Processing, choose the built-in Gemma model for summaries on this Mac (a separate download), OpenRouter with your own key, or LM Studio. A remote LM Studio server or OpenRouter can receive call text. Optional classification, live key points and webhooks can also send text outside the Mac. Check the provider note in Settings → Processing and the <a href="privacy.html">privacy page</a> before enabling them. “Local only” uses the built-in model for summaries and live key points and turns off Jev classification and webhooks.</p>
+
+    <h2>Contact</h2>
+    <p><strong>Contact address TODO — awaiting the owner’s approved support address.</strong> There is no contact form or working email link yet. Please do not send call recordings or transcripts until a contact channel and its handling are confirmed.</p>
+  </main>
+  <footer>
+    <nav aria-label="Footer navigation">
+      <a href="index.html">Home</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="support.html" aria-current="page">Support</a>
+    </nav>
+  </footer>
+</body>
+</html>
