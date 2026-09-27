@@ -40,11 +40,34 @@ enum RetentionRule: String, CaseIterable, Identifiable, Sendable {
     }
 }
 
+struct ExportBookmarks {
+    let sandboxed: Bool
+    let create: (URL) throws -> Data
+    let resolve: (Data) throws -> (url: URL, stale: Bool)
+    let start: (URL) -> Bool
+    let stop: (URL) -> Void
+
+    static var live: Self {
+        Self(sandboxed: Bundle.main.object(forInfoDictionaryKey: "BesedaStoreSummary") as? Bool == true ||
+             ProcessInfo.processInfo.environment["APP_SANDBOX_CONTAINER_ID"] != nil,
+             create: { try $0.bookmarkData(options: .withSecurityScope, includingResourceValuesForKeys: nil, relativeTo: nil) },
+             resolve: { data in
+                 var stale = false
+                 let url = try URL(resolvingBookmarkData: data, options: .withSecurityScope,
+                                   relativeTo: nil, bookmarkDataIsStale: &stale)
+                 return (url, stale)
+             },
+             start: { $0.startAccessingSecurityScopedResource() },
+             stop: { $0.stopAccessingSecurityScopedResource() })
+    }
+}
+
 @MainActor
 @Observable
 final class AppSettings {
     private let defaults: UserDefaults
     private let keychain: Keychain
+    @ObservationIgnored private let exportBookmarks: ExportBookmarks
     /// the background Keychain read started by `init`; tests await it
     @ObservationIgnored private(set) var secretsLoad: Task<Void, Never>?
     @ObservationIgnored private var isLoadingSecrets = false
@@ -263,14 +286,11 @@ final class AppSettings {
 
     var exportNeedsReselection = false
 
-    var sandboxed: Bool {
-        Bundle.main.object(forInfoDictionaryKey: "BesedaStoreSummary") as? Bool == true ||
-            ProcessInfo.processInfo.environment["APP_SANDBOX_CONTAINER_ID"] != nil
-    }
+    var sandboxed: Bool { exportBookmarks.sandboxed }
 
     func selectExportFolder(_ url: URL) throws {
         if sandboxed {
-            let bookmark = try url.bookmarkData(options: .withSecurityScope, includingResourceValuesForKeys: nil, relativeTo: nil)
+            let bookmark = try exportBookmarks.create(url)
             defaults.set(bookmark, forKey: exportBookmarkKey)
             var bookmarks = defaults.dictionary(forKey: exportBookmarksKey) as? [String: Data] ?? [:]
             bookmarks[url.standardizedFileURL.path] = bookmark
@@ -292,37 +312,38 @@ final class AppSettings {
             exportNeedsReselection = true
             throw ExportAccessError.reselect
         }
-        var stale = false
-        let url: URL
+        let resolved: (url: URL, stale: Bool)
         do {
-            url = try URL(resolvingBookmarkData: bookmark, options: .withSecurityScope,
-                          relativeTo: nil, bookmarkDataIsStale: &stale)
+            resolved = try exportBookmarks.resolve(bookmark)
         } catch {
             exportNeedsReselection = true
             throw ExportAccessError.reselect
         }
+        let url = resolved.url
         guard url.standardizedFileURL.path == URL(fileURLWithPath: path).standardizedFileURL.path,
-              url.startAccessingSecurityScopedResource() else {
+              exportBookmarks.start(url) else {
             exportNeedsReselection = true
             throw ExportAccessError.reselect
         }
-        defer { url.stopAccessingSecurityScopedResource() }
-        if stale {
-            if let renewed = try? url.bookmarkData(options: .withSecurityScope, includingResourceValuesForKeys: nil, relativeTo: nil) {
+        defer { exportBookmarks.stop(url) }
+        if resolved.stale {
+            if let renewed = try? exportBookmarks.create(url) {
                 var bookmarks = defaults.dictionary(forKey: exportBookmarksKey) as? [String: Data] ?? [:]
                 bookmarks[url.standardizedFileURL.path] = renewed
                 defaults.set(bookmarks, forKey: exportBookmarksKey)
                 if path == exportFolder { defaults.set(renewed, forKey: exportBookmarkKey) }
             } else {
                 exportNeedsReselection = true
+                throw ExportAccessError.reselect
             }
         }
+        exportNeedsReselection = false
         return try body(url)
     }
 
     enum ExportAccessError: LocalizedError {
         case reselect
-        var errorDescription: String? { "Select the export folder again in Settings / Выберите папку экспорта снова в настройках" }
+        var errorDescription: String? { SettingsText.get("Выберите папку экспорта снова в настройках") }
     }
 
     var webhookURL: String {
@@ -397,7 +418,7 @@ final class AppSettings {
         SpeechModel.named(speechModelID) ?? .default
     }
 
-    init(defaults: UserDefaults = .standard, keychain: Keychain = .app) {
+    init(defaults: UserDefaults = .standard, keychain: Keychain = .app, exportBookmarks: ExportBookmarks = .live) {
         if defaults === UserDefaults.standard,
            ProcessInfo.processInfo.environment["IOS_KIT_CLEAN_DEFAULTS"] == nil,
            let legacy = UserDefaults(suiteName: "app.podushka.Podushka") {
@@ -405,6 +426,7 @@ final class AppSettings {
         }
         self.defaults = defaults
         self.keychain = keychain
+        self.exportBookmarks = exportBookmarks
         self.autoDetectEnabled = AppSettings.bool(defaults, autoDetectKey, otherwise: false)
         self.enabledCallApps = (defaults.array(forKey: enabledCallAppsKey) as? [String])
             .map(Set.init) ?? AppSettings.defaultEnabledCallApps
