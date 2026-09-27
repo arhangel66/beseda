@@ -1,1 +1,1 @@
-../../../../../../Transcription/Diarizer.swift
+../../../../../../Sources/Beseda/Transcription/Diarizer.swift

@@ -35,17 +35,20 @@ final class BundledSummaryInstaller {
     @ObservationIgnored private let paths: AppPaths
     @ObservationIgnored private let artifacts: BundledSummary
     @ObservationIgnored private let downloader: RuntimeDownloader
+    @ObservationIgnored private let freeSpace: FreeSpaceReader
     @ObservationIgnored private let warmUp: () async throws -> Void
 
     init(
         paths: AppPaths,
         artifacts: BundledSummary = .current,
         downloader: @escaping RuntimeDownloader = FileDownloader.download,
+        freeSpace: @escaping FreeSpaceReader = FreeSpace.read,
         warmUp: @escaping () async throws -> Void
     ) {
         self.paths = paths
         self.artifacts = artifacts
         self.downloader = downloader
+        self.freeSpace = freeSpace
         self.warmUp = warmUp
         self.isReady = artifacts.isInstalled(paths)
     }
@@ -68,6 +71,11 @@ final class BundledSummaryInstaller {
                 isReady = artifacts.isInstalled(paths)
             }
             do {
+                if !artifacts.isModelDownloaded(paths) {
+                    // checked before the engine too, so a short disk downloads nothing
+                    try FileManager.default.createDirectory(at: paths.modelsDirectory, withIntermediateDirectories: true)
+                    try FreeSpace.ensure(artifacts.modelBytes, in: paths.modelsDirectory, reader: freeSpace)
+                }
                 if !artifacts.isRuntimeInstalled(paths) {
                     try await run(.runtime, installRuntime)
                 }

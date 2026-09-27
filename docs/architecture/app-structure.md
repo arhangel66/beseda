@@ -7,6 +7,9 @@ description: The menu bar app, AppController and its transcription pipeline, the
 
 ## How it works
 
+The app target's sources are in `Sources/Beseda` (paths below are relative to it; `Resources/` holds
+`Info.plist` and the icon that `scripts/lib/bundle_app.sh` reads), the tests in `Tests/BesedaTests`.
+
 Beseda is a SwiftUI menu bar app (`App/BesedaApp.swift`). `AppDelegate` owns the single `AppController`
 and keeps the app alive when the last window closes; `applicationWillTerminate` calls
 `controller.shutdown()`, which stops the child `llama-server` and unloads the speech model.

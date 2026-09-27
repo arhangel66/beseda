@@ -151,6 +151,9 @@ Effort is S (hours), M (days), or L (weeks). Priority is P0 (blocks safe sale or
     diarization and force one remote speaker when the calendar has two attendees or the user chooses “1:1”.
     Keep unconstrained diarization only for group calls. This directly fixes the 2–3-label symptom without a
     new model.
+    *2026-09-27: replaced by Mikhail's decision (BESEDA-120).* The 6 s merge is back as the interim default and
+    the 1:1 variant is gone: nothing reliable says a call is 1:1 (no calendar event on ad-hoc calls, the local
+    LLM said «один» on 3 of 5 dailies); «Объединить с» is the escape hatch.
 
 15. **The claimed real-call truth is not adequate ground truth — P1, M.**
     `untracked/epics/speaker-accuracy/results/real-calls-truth.md` derives participant counts from anonymised
@@ -233,7 +236,10 @@ Effort is S (hours), M (days), or L (weeks). Priority is P0 (blocks safe sale or
     about 3 GB free, while the same page says the built-in model alone is 4.6 GB at lines 32-34, before ASR,
     runtime, temporary downloads and calls. State separate minimums for transcription-only and local-summary
     installs, including temporary download headroom, and enforce them before downloads.
-    Addressed in BESEDA-90: separate minimums in [install.md](../product/install.md); no free-space check before downloads.
+    Addressed in BESEDA-90: separate minimums in [install.md](../product/install.md).
+    Fixed in BESEDA-122: the speech model and the built-in summary installers check
+    `volumeAvailableCapacityForImportantUsage` against the model size plus 500 MB before downloading
+    and show how much is needed instead of starting.
 
 ## Anything else
 

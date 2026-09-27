@@ -45,10 +45,10 @@ Agents in this repo do not use Serena/LSP tools (sourcekit-lsp indexing eats ten
 It builds the app and runs every test. `theInstalledModelTranscribesRealSpeech` is skipped unless the
 speech model is installed in Application Support and `samples/jfk.wav` (gitignored) is in the checkout.
 
-The app target's path is the repo root, so SwiftPM walks every directory there that `exclude` does not
-name. Never copy the sources into the checkout (e.g. `.build/b106-src`); build a copy in `/tmp`. A new
-large directory at the root goes into `exclude`. If the check stalls before compiling and `.build/build.db`
-is gigabytes, delete `.build` and rerun: a clean run takes ~1.5 min and ~3 GB of `.build`.
+The app sources live in `Sources/Beseda` and the tests in `Tests/BesedaTests`, so SwiftPM never walks the
+rest of the checkout: `.factory/`, `untracked/` or a large scratch folder at the root do not slow the build.
+If the check still stalls before compiling and `.build/build.db` is gigabytes, delete `.build` and rerun: a
+clean run takes ~1.5 min and ~1.2 GB of `.build`.
 
 ## No-focus, no-sound
 

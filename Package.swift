@@ -42,37 +42,6 @@ let package = Package(
                 .product(name: "Sparkle", package: "Sparkle"),
                 "TranscribeCpp"
             ],
-            path: ".",
-            exclude: [
-                ".agents",
-                ".factory",
-                ".gitignore",
-                ".idea",
-                ".venv",
-                "AGENT.md",
-                "dist",
-                "README.md",
-                "Tests",
-                "VERSION",
-                "Vendor",
-                "docs",
-                "implementation_journal.md",
-                "samples",
-                "scripts",
-                "skills-lock.json",
-                "spikes",
-                "untracked"
-            ],
-            sources: [
-                "App",
-                "Audio",
-                "Calendar",
-                "Storage",
-                "Summarization",
-                "Transcription",
-                "Webhooks",
-                "Runtime"
-            ],
             resources: [
                 .copy("Resources")
             ],
@@ -87,8 +56,7 @@ let package = Package(
         ),
         .testTarget(
             name: "BesedaTests",
-            dependencies: ["Beseda"],
-            path: "Tests/BesedaTests"
+            dependencies: ["Beseda"]
         )
     ]
 )

@@ -33,9 +33,10 @@ warns about the missing excluded paths; the warnings are harmless.
   `dist/Beseda-<VERSION>.zip`.
 - `scripts/lib/bundle_app.sh <bin-dir> <app-dir> [release]` — assembles `Beseda.app`: `Info.plist` with
   `VERSION` and a timestamp `CFBundleVersion`, `CTranscribe` and `Sparkle` frameworks, licenses, the icon
-  compiled by `actool`, then `codesign --deep` with the first "Apple Development" identity. No hardened
-  runtime: it would require an audio-input entitlement and silently kill microphone capture. Only the
-  `release` flavour adds the Sparkle feed, public EdDSA key and hourly automatic checks.
+  compiled by `actool`, then signs inside-out with hardened runtime (see «Developer ID и нотаризация»)
+  with the first "Developer ID Application" identity, or the first "Apple Development" one when there is
+  none. Only the `release` flavour adds the Sparkle feed, public EdDSA key and hourly automatic checks.
+- `scripts/Beseda.entitlements` — the app's hardened-runtime entitlements.
 - `scripts/release.sh` — publishes a release (below).
 
 ## Releasing
@@ -67,6 +68,94 @@ refused. The clean-tree check lets through exactly one leftover: an `appcast.xml
 
 Installed release copies check the feed hourly; `AppUpdater` holds the install until no call is being
 recorded. Dev builds carry no feed and never update themselves.
+
+## Developer ID и нотаризация
+
+Gatekeeper opens a downloaded app only when it is signed with Developer ID, has the hardened runtime and
+is notarized. Up to 0.4.0 releases were signed with Apple Development (team `PRH5UQNC57`), no hardened
+runtime, not notarized. The scripts are ready; what is left is the account's side.
+
+### Signing (in place, works with either identity)
+
+`bundle_app.sh` signs with `--options runtime`, inside-out as Sparkle documents: `Installer.xpc`,
+`Downloader.xpc` (`--preserve-metadata=entitlements`), `Autoupdate`, `Updater.app`, `Sparkle.framework`,
+`CTranscribe.framework`, then the app with `scripts/Beseda.entitlements`. A Developer ID identity also
+gets `--timestamp` (notarization requires a secure timestamp); Apple Development gets `--timestamp=none`.
+
+Entitlements, only what the runtime would otherwise deny:
+
+- `com.apple.security.device.audio-input` — without it the hardened runtime silently records silence.
+- `com.apple.security.personal-information.calendars` — calendar names for conversations.
+- No `network.client`: it is an App Sandbox entitlement; the app is not sandboxed.
+- No `cs.disable-library-validation` / `allow-unsigned-executable-memory` / `allow-jit`: the speech
+  engine is `CTranscribe.framework`, signed by the same team in the same pass, so library validation
+  passes; the downloaded `llama-server` (ad-hoc signed, with its own dylibs) is a child process with its
+  own signature, and the parent's runtime does not apply to it.
+
+Checked on 2026-09-27 with the Apple Development identity: a release bundle with hardened runtime, bundle
+id `app.beseda.Beseda.hrcheck`, launched isolated, loaded `CTranscribe` and `Sparkle` (library validation
+passed), checked the feed (`SULastCheckTime` set, Sparkle's installer launcher started for the offered
+0.4.0). A probe signed the same way ran the installed `llama-server --version` with its dylibs, exit 0.
+Microphone/BlackHole capture and a full transcription were not run: a new bundle id triggers a TCC dialog.
+
+### One-time setup once the account is active
+
+1. Certificate. developer.apple.com → Certificates → «+» → **Developer ID Application** (G2 Sub-CA).
+   Create the CSR in Keychain Access (Certificate Assistant → Request a Certificate From a Certificate
+   Authority, saved to disk), upload it, download the `.cer`, double-click: it lands in the **login**
+   keychain next to its private key. Check: `security find-identity -v -p codesigning` lists
+   `Developer ID Application: … (PRH5UQNC57)`. Export the certificate with its key as `.p12` into
+   1Password: it cannot be downloaded again with the key.
+2. notarytool credentials, stored in the login keychain under the profile `beseda-notary`
+   (`NOTARY_PROFILE` in `release.sh`). Recommended: an **App Store Connect API key** (Users and Access →
+   Integrations → Team Keys, role Developer): it is not tied to Mikhail's Apple ID password or 2FA,
+   survives a password change, can be revoked alone. An app-specific password works too but breaks
+   when the Apple ID password is reset.
+
+   ```
+   xcrun notarytool store-credentials beseda-notary \
+       --key ~/secrets/AuthKey_<KEY_ID>.p8 --key-id <KEY_ID> --issuer <ISSUER_ID>
+   ```
+
+   Secrets for the bb secrets form: `ASC_API_KEY_P8` (the `.p8` file contents), `ASC_API_KEY_ID`
+   (10 characters), `ASC_API_ISSUER_ID` (UUID). The alternative instead: `APPLE_ID`,
+   `APPLE_APP_SPECIFIC_PASSWORD`, team id `PRH5UQNC57`
+   (`store-credentials beseda-notary --apple-id … --team-id PRH5UQNC57 --password …`).
+   The certificate itself is not a secret for the form: it is created in the account on this Mac.
+
+### Release with notarization
+
+```
+REQUIRE_NOTARIZATION=1 ./scripts/release.sh
+```
+
+Step 3 of «Releasing» becomes: bundle (signed as above) → if the app's authority is Developer ID: zip →
+`xcrun notarytool submit --keychain-profile beseda-notary --wait` → `xcrun stapler staple` the `.app` →
+`spctl --assess` → zip again (the shipped zip holds the stapled app) → upload; the EdDSA feed steps are
+unchanged. Without Developer ID the build ships as before, unless `REQUIRE_NOTARIZATION=1`: then the
+script refuses before tagging (no identity) or before uploading (bundle not Developer ID).
+
+### Installed copies accept the first Developer ID update
+
+Yes. Sparkle 2's `SUUpdateValidator` accepts a bundle update when **either** the EdDSA signature checks
+against the old app's public key **or** the new code signature matches the old one; a valid EdDSA
+signature explicitly allows a changed code-signing identity, as long as the new signature is itself valid
+and the update still carries an EdDSA key. 0.3.5 and 0.4.0 have `SUPublicEDKey`, the key is unchanged,
+so the Developer ID build installs. Never rotate the EdDSA key in the same release as the identity:
+then neither check would pass.
+
+### Keychain keys survive the identity change
+
+0.4.0 keeps the OpenRouter key and the webhook secret as generic passwords in the login keychain
+(service = bundle id). Such an item's ACL trusts the designated requirement of the app that created it,
+and that requirement names the certificate: Apple Development pins the leaf's CN, Developer ID pins the
+Developer ID CA and team OU. The same team id does not help (only the data-protection keychain uses team
+access groups, and that needs a provisioning profile). So the first Developer ID build gets a macOS
+prompt per item («Beseda wants to use … in your keychain»); seen on this Mac with a differently signed
+copy. To make that the only prompt: since this change the keys live under the service
+`<bundle id>.keys`; a key missing there is read once from the old service (the prompt, «Allow» is
+enough) and saved into the new one, owned by the new signature, so later launches are silent. The old
+item stays for a rollback. «Deny» leaves the key empty until it is entered again in Settings.
 
 ## Constraints
 

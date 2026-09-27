@@ -273,7 +273,7 @@ final class AppSettings {
         SpeechModel.named(speechModelID) ?? .default
     }
 
-    init(defaults: UserDefaults = .standard, keychain: Keychain = Keychain()) {
+    init(defaults: UserDefaults = .standard, keychain: Keychain = .app) {
         if defaults === UserDefaults.standard, let legacy = UserDefaults(suiteName: "app.podushka.Podushka") {
             AppSettings.importLegacyValues(from: legacy, into: defaults)
         }

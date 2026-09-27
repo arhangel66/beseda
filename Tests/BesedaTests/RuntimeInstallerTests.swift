@@ -59,6 +59,7 @@ private struct Harness {
     func installer(
         downloads: Downloads,
         progress: [Double] = [],
+        freeSpace: Int64 = .max,
         warmUp: @escaping () async throws -> Void = {}
     ) -> RuntimeInstaller {
         RuntimeInstaller(
@@ -69,6 +70,7 @@ private struct Harness {
                 progress.forEach(onProgress)
                 try data.write(to: destination)
             },
+            freeSpace: { _ in freeSpace },
             warmUp: warmUp
         )
     }
@@ -219,4 +221,22 @@ private struct Harness {
     defer { try? FileManager.default.removeItem(at: url) }
 
     #expect(try RuntimeInstaller.sha256(of: url) == "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad")
+}
+
+@MainActor
+@Test func aShortDiskFailsTheStageWithoutDownloading() async throws {
+    let harness = try Harness()
+    defer { harness.tearDown() }
+    let downloads = Downloads(payload: harness.payload)
+
+    let installer = harness.installer(downloads: downloads, freeSpace: 1_000)
+    installer.install()
+    try await harness.settled(installer)
+
+    #expect(await downloads.sources.isEmpty)
+    guard case .failed(let message) = installer.state(of: .speechModel) else {
+        Issue.record("the stage did not fail")
+        return
+    }
+    #expect(message.hasPrefix("Не хватает места на диске: для загрузки нужно"))
 }

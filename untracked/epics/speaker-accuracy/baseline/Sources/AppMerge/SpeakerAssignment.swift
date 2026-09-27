@@ -1,1 +1,1 @@
-../../../../../../Transcription/SpeakerAssignment.swift
+../../../../../../Sources/Beseda/Transcription/SpeakerAssignment.swift

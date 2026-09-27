@@ -1,1 +1,1 @@
-../../../../../../Transcription/EchoGate.swift
+../../../../../../Sources/Beseda/Transcription/EchoGate.swift
