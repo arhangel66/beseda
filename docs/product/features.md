@@ -7,13 +7,15 @@ What the code does today. Settings tabs are named as in the app: Основны�
 Интеграции.
 
 - **Menu bar app.** The popover starts and stops a recording, shows progress and the latest calls, and
-  copies a transcript (`App/Views/MenuBarPopover.swift`). A separate window lists conversations
+  copies a transcript. During recording, status and stop stay at the top, recent calls are hidden, and the
+  capped live transcript and key points are collapsed by default (`App/Views/MenuBarPopover.swift`). A separate window lists conversations
   (`App/Views/ConversationsWindow.swift`).
 - **Capture.** Microphone and system audio are recorded as two channels (`Audio/DualCapture.swift`,
   `Audio/SystemAudioTap.swift`); system audio needs macOS 14.2. Recording can be paused. After the call
   the audio is normalized to 16 kHz mono (`Audio/AudioNormalizer.swift`).
-- **Live transcription.** Optional, under Запись → «Расшифровывать во время звонка» (off by default):
-  while recording, the popover shows the last me/them lines, transcribed in 20 s chunks from the files on
+- **Live transcription.** Optional, under Запись → «Расшифровывать во время звонка» (off by default), above
+  the per-app recording list. Запись also has «Проверить звук», the same unsaved ten-second two-channel check
+  used in onboarding. While recording, the popover shows the last me/them lines, transcribed in 20 s chunks from the files on
   disk, and 3–5 «Ключевые моменты» from the summary provider every 3 minutes. A preview only; it backs
   off when it falls behind (`Transcription/LiveTranscriptionLoop.swift`).
 - **Automatic recording.** `Audio/CallDetector.swift` starts recording when an app from the list under
@@ -23,7 +25,8 @@ What the code does today. Settings tabs are named as in the app: Основны�
   Обработка: Parakeet v3 (25 languages) or GigaAM v3 (Russian) — `Transcription/SpeechModel.swift`,
   `Transcription/LocalTranscriber.swift`. Speakers inside the system channel are separated with NVIDIA's
   Nemotron-3 Diarization via FluidAudio (`Transcription/Diarizer.swift`; 199 MB, OpenMDW-1.1, downloaded in the
-  background once a speech model is picked, and listed with its licence under Обработка) and can be renamed. One set of state words
+  background once a speech model is picked; Обработка calls it «Разделение собеседников» and keeps the model
+  name and licence under «Подробнее») and can be renamed. One set of state words
   (`SpeechModel.stateLabel`) is shown on the cards in onboarding and Обработка and in the popover: «Выбрана · не
   скачана», «Выбрана · скачана» (on disk, not yet usable), «Скачана» (another model on disk), and «Готова» only
   for the selected, usable model; without a ready model the popover disables «Начать запись» and shows
@@ -61,13 +64,17 @@ What the code does today. Settings tabs are named as in the app: Основны�
   «Скачайте её в Настройках → Обработка».
 - **Calendar.** With calendar access, a call is named after the matching calendar event from the calendars
   picked under Интеграции (`Calendar/CalendarService.swift`). A broken link shows as one red row whose button
-  fixes it: «Открыть доступ…» without access, «Выбрать календари…» when a picked calendar is gone.
-- **Webhook.** A finished transcript is POSTed as JSON to a URL set under Интеграции → «Свой сервис», with an optional secret
-  as the bare `Authorization` header value (https only, http just for localhost), retried on failure, with a delivery log (`Webhooks/`).
+  fixes it: «Открыть доступ…» without access, «Выбрать календари…» when a picked calendar is gone. When a
+  selected calendar is missing, the footer says that new conversations will not receive names until an
+  available calendar is selected instead of showing historical coverage.
+- **Webhook.** A finished transcript is sent as JSON to the URL under Интеграции → «Свой сервис», retried on
+  failure, with a delivery log (`Webhooks/`). The main text names the sent fields and destination; «Подробнее
+  для разработчиков» contains POST, `Authorization`, Bearer and protocol restrictions.
 - **Onboarding.** A first-run window: welcome (headline «Аудио остаётся на этом Mac», with the exception —
   text goes to the cloud only for features the user turns on — in the same block), «Два источника звука»
   (microphone and system sound, each with its own action; the footer points to Настройки → Запись), speech model
   download, a test recording that shows both channels (`App/Views/OnboardingWindow.swift`).
+- **Settings.** Основные uses a compact window height; content-heavy panes retain the full height.
 - **Updates.** Sparkle checks hourly and installs when no call is being recorded; Основные → Обновления
   checks by hand (`Runtime/AppUpdater.swift`).
 

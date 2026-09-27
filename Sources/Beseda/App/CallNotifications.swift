@@ -50,7 +50,7 @@ final class CallNotifier: NSObject, @preconcurrency UNUserNotificationCenterDele
     func autoRecordingStarted(appName: String) {
         let content = UNMutableNotificationContent()
         content.title = "Идёт запись звонка в \(appName)"
-        content.body = "Beseda включила запись сама."
+        content.body = "Беседа включила запись сама."
         content.categoryIdentifier = Self.autoRecordingCategory
         post(content)
     }

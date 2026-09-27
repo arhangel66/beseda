@@ -37,6 +37,8 @@ system appearance was Light. Screenshots are in `.factory/shots/BESEDA-ux2/`.
 
 ### P1 — The calendar error and success statistic contradict each other
 
+**Fixed in BESEDA-175.** A missing selected calendar now replaces historical coverage with the effect on new calls.
+
 - **Screen and shot:** Settings → Интеграции — [calendar problem](../../.factory/shots/BESEDA-ux2/settings-integrations-calendar-problem-интеграции.png).
 - **What is wrong:** the red row says «Выбранный календарь не найден», but the line directly below says an event
   was found for 63 of 64 conversations. A user cannot tell whether linking is broken now, partly working, or only
@@ -63,6 +65,8 @@ system appearance was Light. Screenshots are in `.factory/shots/BESEDA-ux2/`.
 
 ### P2 — Live transcription overwhelms the menu-bar surface
 
+**Fixed in BESEDA-175.** Recording hides recent calls and commands, keeps stop beside the status, and puts a capped live preview in a collapsed disclosure.
+
 - **Screen and shot:** popover, live transcription — [live](../../.factory/shots/BESEDA-ux2/popover-live-popover-preview.png).
 - **What is wrong:** key points, seven transcript lines, meters, controls, three recent calls, and commands make a
   681-point-tall window. On an 800-point display it nearly fills the usable height. The most urgent controls are
@@ -85,6 +89,8 @@ system appearance was Light. Screenshots are in `.factory/shots/BESEDA-ux2/`.
 
 ### P2 — The Recording pane hides an option below the fold
 
+**Fixed in BESEDA-175.** Global recording options and the reusable sound check now precede the conditional app list.
+
 - **Screen and shot:** Settings → Запись — [recording](../../.factory/shots/BESEDA-ux2/settings-recording-запись.png).
 - **What is wrong:** at the fixed 680×560 window size, «Расшифровывать во время звонка» is clipped at the bottom and
   no scrollbar is visible. A first-time user sees a complete-looking list and can miss the feature entirely.
@@ -94,6 +100,8 @@ system appearance was Light. Screenshots are in `.factory/shots/BESEDA-ux2/`.
 - **Priority:** P2.
 
 ### P2 — Technical English leaks into ordinary settings
+
+**Fixed in BESEDA-175.** The main rows describe speaker separation and webhook contents; model licence and protocol terms are under «Подробнее».
 
 - **Screen and shot:** Settings → Обработка — [processing](../../.factory/shots/BESEDA-ux2/settings-processing-missing-model-обработка.png); Settings → Интеграции — [integrations](../../.factory/shots/BESEDA-ux2/settings-integrations-интеграции.png).
 - **What is wrong:** «Nemotron-3 Diarization», «OpenMDW-1.1», «POST», «Authorization», «Bearer», «https», and
@@ -105,6 +113,8 @@ system appearance was Light. Screenshots are in `.factory/shots/BESEDA-ux2/`.
 - **Priority:** P2.
 
 ### P2 — The product name switches alphabets throughout the first run
+
+**Fixed in BESEDA-175.** User-facing Russian prose uses «Беседа»; technical identifiers retain `Beseda`.
 
 - **Screen and shot:** [onboarding-1](../../.factory/shots/BESEDA-ux2/onboarding-1-добро-пожаловать-в-beseda.png), [general settings](../../.factory/shots/BESEDA-ux2/settings-general-основные.png), [idle popover](../../.factory/shots/BESEDA-ux2/popover-idle-popover-preview.png).
 - **What is wrong:** Russian sentences use Latin «Beseda» («Добро пожаловать в Beseda», «Завершить Beseda»). It is
@@ -129,6 +139,8 @@ system appearance was Light. Screenshots are in `.factory/shots/BESEDA-ux2/`.
 
 ### P3 — The General pane looks unfinished
 
+**Fixed in BESEDA-175.** Settings uses a shorter window for the compact General pane.
+
 - **Screen and shot:** Settings → Основные — [general](../../.factory/shots/BESEDA-ux2/settings-general-основные.png).
 - **What is wrong:** two compact groups occupy the top third of a large fixed window and leave most of it blank.
   Next to the dense Recording and Processing panes, this looks like an unfinished placeholder rather than calm
@@ -148,6 +160,8 @@ system appearance was Light. Screenshots are in `.factory/shots/BESEDA-ux2/`.
   [warning](../../.factory/shots/BESEDA-ux2/popover-warning-popover-preview.png).
 
 ## Coverage limits
+
+No screenshots were taken for BESEDA-175 because signing, installation, and app launch were paused. Exact shots left for the follow-up: recording popover with the live disclosure collapsed and expanded; Settings → Основные; Settings → Запись with automatic recording on; Settings → Запись during and after «Проверить звук»; Settings → Обработка with model details collapsed and expanded; Settings → Интеграции with a missing selected calendar; Settings → Интеграции with webhook developer details collapsed and expanded.
 
 The host process did not have Accessibility permission. AX tree queries returned no descendants, AX actions could
 not find controls, and targeted `CGEvent` mouse/keyboard events did not change the hidden app. Therefore the

@@ -86,7 +86,7 @@ struct BesedaApp: App {
         }
         .commands {
             CommandGroup(replacing: .appInfo) {
-                Button("О Beseda") {
+                Button("О Беседе") {
                     NSApplication.shared.orderFrontStandardAboutPanel(nil)
                 }
                 if controller.updater.isAvailable {
@@ -117,7 +117,7 @@ struct BesedaApp: App {
             }
         }
 
-        Window("Добро пожаловать в Beseda", id: "onboarding") {
+        Window("Добро пожаловать в Беседу", id: "onboarding") {
             OnboardingWindow(controller: controller) {
                 dismissWindow(id: "onboarding")
                 showConversations()

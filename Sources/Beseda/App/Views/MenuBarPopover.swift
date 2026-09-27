@@ -7,13 +7,17 @@ struct MenuBarPopover: View {
     let controller: AppController
     let openConversations: () -> Void
 
+    @State private var isLivePreviewOpen = false
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             modelInstallLine
             statusRow
             controls
-            Divider()
-            latestCalls
+            if !controller.isRecording {
+                Divider()
+                latestCalls
+            }
             Divider()
             commands
         }
@@ -182,13 +186,6 @@ struct MenuBarPopover: View {
     @ViewBuilder
     private var controls: some View {
         if controller.isRecording {
-            VStack(spacing: 8) {
-                meterRow(icon: "mic", level: controller.microphoneLevel, color: .green, label: "микрофон")
-                meterRow(icon: "speaker.wave.2", level: controller.systemAudioLevel, color: .accentColor, label: "собеседник")
-            }
-            if let live = controller.liveTranscription {
-                liveTranscript(live)
-            }
             HStack(spacing: 8) {
                 Button(controller.isPaused ? "Продолжить" : "Пауза") {
                     controller.togglePause()
@@ -199,6 +196,17 @@ struct MenuBarPopover: View {
                 .buttonStyle(.borderedProminent)
                 .tint(.red)
                 .keyboardShortcut("r", modifiers: .command)
+            }
+            VStack(spacing: 8) {
+                meterRow(icon: "mic", level: controller.microphoneLevel, color: .green, label: "микрофон")
+                meterRow(icon: "speaker.wave.2", level: controller.systemAudioLevel, color: .accentColor, label: "собеседник")
+            }
+            if let live = controller.liveTranscription {
+                DisclosureGroup("Ключевые моменты и черновик", isExpanded: $isLivePreviewOpen) {
+                    liveTranscript(live)
+                        .padding(.top, 6)
+                }
+                .font(.caption.weight(.semibold))
             }
         } else {
             HStack(spacing: 10) {
@@ -256,7 +264,7 @@ struct MenuBarPopover: View {
                 ScrollViewReader { proxy in
                     ScrollView {
                         LazyVStack(alignment: .leading, spacing: 4) {
-                            ForEach(live.lines.suffix(40)) { line in
+                            ForEach(live.lines.suffix(8)) { line in
                                 (Text(line.channel == .microphone ? "Я: " : "Собеседник: ").bold() + Text(line.text))
                                     .font(.caption)
                                     .foregroundStyle(line.channel == .microphone ? .primary : .secondary)
@@ -265,7 +273,7 @@ struct MenuBarPopover: View {
                             }
                         }
                     }
-                    .frame(height: 140)
+                    .frame(height: 88)
                     // the popover reopens with lines already there, and onChange does not fire for them
                     .onAppear {
                         proxy.scrollTo(live.lines.last?.id, anchor: .bottom)
@@ -366,7 +374,7 @@ struct MenuBarPopover: View {
                 MenuRowLabel(title: "Настройки…", shortcut: "⌘,")
             }
             .buttonStyle(.plain)
-            MenuRow(title: "Завершить Beseda", shortcut: "⌘Q") { controller.quit() }
+            MenuRow(title: "Завершить Беседу", shortcut: "⌘Q") { controller.quit() }
                 .keyboardShortcut("q", modifiers: .command)
         }
     }
