@@ -1,28 +1,45 @@
 #!/usr/bin/env bash
-# Embed the pinned llama.cpp release in an unsigned store app, then sign inside-out.
-# Usage: package_store_summary.sh <app> <verified-release.tar.gz> <signing-identity>
+# Usage: package_store_summary.sh <unsigned-store-app> <pinned-release.tar.gz> <signing-identity>
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+[[ $# == 3 ]] || { echo 'usage: package_store_summary.sh <app> <archive> <identity>' >&2; exit 2; }
 APP="$1"
 ARCHIVE="$2"
 IDENTITY="$3"
 EXPECTED=8933e736495eadfef0731ae32054acfaa75699bf4a6ccba77cd8475db085ec66
-ACTUAL="$(shasum -a 256 "$ARCHIVE" | awk '{print $1}')"
-[[ "$ACTUAL" == "$EXPECTED" ]] || { echo 'llama.cpp archive hash mismatch' >&2; exit 1; }
-[[ -f "$APP/Contents/Info.plist" ]] || { echo 'app bundle missing' >&2; exit 1; }
+[[ -f "$APP/Contents/Info.plist" && -f "$APP/Contents/MacOS/Beseda" && ! -e "$APP/Contents/Helpers" ]] || {
+    echo 'expected an unsigned assembled store app without Helpers' >&2; exit 1;
+}
+[[ "$(shasum -a 256 "$ARCHIVE" | awk '{print $1}')" == "$EXPECTED" ]] || {
+    echo 'llama.cpp archive hash mismatch' >&2; exit 1;
+}
+# The pinned digest is the trust boundary. Still reject paths outside the single release root
+# before extracting: no archive entry may write outside the temporary directory.
+while IFS= read -r entry; do
+    case "$entry" in
+        llama-b10819|llama-b10819/|llama-b10819/*) ;;
+        *) echo "unexpected archive entry: $entry" >&2; exit 1 ;;
+    esac
+    case "/$entry/" in */../*|*/./*) echo "unsafe archive entry: $entry" >&2; exit 1 ;; esac
+done < <(tar tzf "$ARCHIVE")
 STAGING="$(mktemp -d)"
 trap 'rm -rf "$STAGING"' EXIT
 tar xzf "$ARCHIVE" -C "$STAGING"
 SOURCE="$STAGING/llama-b10819"
-[[ -f "$SOURCE/llama-server" ]] || { echo 'llama-server missing' >&2; exit 1; }
+[[ -f "$SOURCE/llama-server" && ! -L "$SOURCE/llama-server" ]] || {
+    echo 'llama-server missing' >&2; exit 1;
+}
 HELPERS="$APP/Contents/Helpers"
-mkdir -p "$HELPERS"
+mkdir "$HELPERS"
 cp "$SOURCE/llama-server" "$HELPERS/"
-find "$SOURCE" -maxdepth 1 -type f -name '*.dylib' -exec cp {} "$HELPERS/" \;
+for file in "$SOURCE"/*.dylib; do
+    [[ -f "$file" && ! -L "$file" ]] || { echo "invalid dylib: $file" >&2; exit 1; }
+    cp "$file" "$HELPERS/"
+done
 /usr/libexec/PlistBuddy -c 'Add :BesedaStoreSummary bool true' "$APP/Contents/Info.plist"
-for file in "$HELPERS"/*.dylib "$HELPERS/llama-server"; do
+for file in "$HELPERS"/*.dylib; do
     codesign --force --sign "$IDENTITY" "$file"
 done
-codesign --force --sign "$IDENTITY" --entitlements "$ROOT/scripts/store_summary.entitlements" "$APP/Contents/Helpers/llama-server"
+codesign --force --sign "$IDENTITY" --entitlements "$ROOT/scripts/store_summary.entitlements" "$HELPERS/llama-server"
 codesign --force --sign "$IDENTITY" --entitlements "$ROOT/scripts/store_summary_app.entitlements" "$APP"
 codesign --verify --strict --deep "$APP"
