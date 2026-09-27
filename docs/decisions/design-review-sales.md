@@ -41,6 +41,14 @@ description: Evidence-limited critique of Beseda screens before a paid launch.
 | **P2 trust** | Strict-mode deletion/backups and export are below the first Storage viewport; high-consequence choices deserve separate verification. | Small: keep the existing confirmation and risk words; test the full scroll, avoid a new settings framework. |
 | **P2 polish** | Old recording and General screenshots show crowded/tall and empty states respectively, but both were changed in source. | No new code on old evidence. Obtain current, appearance-matched captures before reopening either finding. |
 
-**Worst concepts to mock, pending independent PNG handoff:** (1) the four-step first-run *two-channel test / model-ready handoff*; (2) *Processing settings with effective provider and outbound-data status*; (3) *archive plus current call result versus previous-call digest*. These are concepts, not claimed product screenshots. Compare any eventual PNG against the linked baselines and label synthetic data and appearance; no proposed PNG path is asserted here.
+## Static proposals against the photographed baselines
+
+These [three light-appearance static concepts](../../.factory/shots/BESEDA-design-proposals/README.md) use invented names and dates. Each says “Concept — not product screenshot”; none is a fresh capture of current Beseda.
+
+| Proposal | Baseline | What a human notices |
+| --- | --- | --- |
+| [01 — first-run channels](../../.factory/shots/BESEDA-design-proposals/01-first-run-channels.png) | [Historical dark onboarding test](../../.factory/shots/BESEDA-75/after/onboarding-4-добро-пожаловать-в-beseda.png) and [model step](../../.factory/shots/BESEDA-75/after/onboarding-3-добро-пожаловать-в-beseda.png) | Separate microphone success and system-sound failure replace the ambiguous combined green meter; the one-sided-call risk and model readiness are visible before continuing. |
+| [02 — effective processing](../../.factory/shots/BESEDA-design-proposals/02-processing-effective-provider.png) | [Later light local-only preview](../../.factory/shots/BESEDA-99/processing-local-only-openrouter-обработка.png) and [historical dark processing pane](../../.factory/shots/BESEDA-75/after/settings-processing-обработка.png) | Effective local processing and no outbound text lead; selected OpenRouter is visibly overridden, rather than looking like the active destination. |
+| [03 — archive and current result](../../.factory/shots/BESEDA-design-proposals/03-archive-current-result.png) | [Expanded previous-result fixture](../../.factory/shots/BESEDA-99/previous-default-digest-разговоры.png) and [300-call archive fixture](../../.factory/shots/BESEDA-112/sidebar-300-calls-разговоры.png) | Итоги is selected, today's outcome leads, and a collapsed, dated previous-call digest stays secondary; date and source distinguish repeated archive titles. The expanded baseline is not the current default. |
 
 No feature code, launch, live user data, public claims or publication is authorized by this document. Current-light and current-dark captures, screen-reader/keyboard behavior, full scroll states and any competitor UI evaluation remain unverified.

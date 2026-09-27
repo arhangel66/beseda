@@ -1,5 +1,7 @@
 # Decisions
 
+- [Sales UX screen audit and design proposals](design-review-sales.md) — source-bounded screen review and three static concepts; proposed.
+
 - [First-sale price](first-sale-price.md) — approved $39.99 one-time Mac App Store launch price, evidence and gross-order threshold.
 - [Distribution readiness](distribution-readiness.md) — source-only private notarization, Mac App Store and public release verdicts; proposed.
 - [Trial and access](trial-access.md) — proposed provider-neutral evaluation and archive-safe entitlement boundary.
