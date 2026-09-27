@@ -114,7 +114,7 @@ struct WebhookPayload: Encodable {
         let stamp = now.iso8601WithFractions
         return WebhookPayload(
             event: testEvent,
-            meeting: Meeting(id: "test", name: "Тестовая отправка из Beseda", startedAt: stamp),
+            meeting: Meeting(id: "test", name: "Тестовая отправка из Беседы", startedAt: stamp),
             transcript: Transcript(text: "Вы: тест"),
             call: Call(id: "test", startedAt: stamp, endedAt: stamp, durationSec: 0, app: nil, kind: "test"),
             participants: [],

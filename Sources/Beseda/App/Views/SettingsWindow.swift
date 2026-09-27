@@ -57,7 +57,7 @@ struct SettingsWindow: View {
                     .tag(item)
             }
         }
-        .frame(width: 680, height: 560)
+        .frame(width: 680, height: section == .general ? 390 : 560)
         .onAppear {
             consumeRequestedSection()
             controller.refreshStorageUsage()
@@ -123,7 +123,7 @@ private struct GeneralPane: View {
                 Toggle("Запускать при входе в систему", isOn: Binding(get: { isLoginItemOn }, set: { setLoginItem($0) }))
                 Toggle("Уведомлять, когда расшифровка готова", isOn: Bindable(controller.settings).notifyWhenReady)
             } footer: {
-                Text(loginItemNote ?? "Beseda ждёт звонка в строке меню и не показывается в Dock.")
+                Text(loginItemNote ?? "Беседа ждёт звонка в строке меню и не показывается в Dock.")
             }
 
             Section("Обновления") {
@@ -166,7 +166,7 @@ private struct GeneralPane: View {
             return loginItemError
         }
         if loginItemStatus == .requiresApproval {
-            return "Подтвердите Beseda в Системных настройках → Основные → Объекты входа."
+            return "Подтвердите Беседу в Системных настройках → Основные → Объекты входа."
         }
         return nil
     }
@@ -194,6 +194,8 @@ private struct GeneralPane: View {
 private struct RecordingPane: View {
     let controller: AppController
 
+    @State private var monitor = LevelMonitor()
+
     private var settings: AppSettings {
         controller.settings
     }
@@ -209,18 +211,7 @@ private struct RecordingPane: View {
             Section {
                 Toggle("Включать запись при начале звонка", isOn: Bindable(settings).autoDetectEnabled)
             } footer: {
-                Text("Beseda узнаёт звонок по звуку из приложения и записывает микрофон и системный звук.")
-            }
-
-            if settings.autoDetectEnabled {
-                Section("Приложения") {
-                    ForEach(appNames, id: \.self) { name in
-                        Toggle(name, isOn: Binding(
-                            get: { isEnabled(name) },
-                            set: { setEnabled(name, $0) }
-                        ))
-                    }
-                }
+                Text("Беседа узнаёт звонок по звуку из приложения и записывает микрофон и системный звук.")
             }
 
             Section {
@@ -234,8 +225,47 @@ private struct RecordingPane: View {
             } footer: {
                 Text("Черновик разговора и ключевые моменты в меню, пока идёт запись. Итоговая расшифровка всё равно делается после звонка.")
             }
+
+            Section {
+                HStack(spacing: 12) {
+                    LevelMeter(level: max(monitor.microphoneLevel, monitor.systemAudioLevel), color: .green)
+                    Button(monitor.isRunning ? "Проверка…" : "Проверить звук") {
+                        monitor.start()
+                    }
+                    .disabled(monitor.isRunning)
+                }
+                if let failure = monitor.failure {
+                    Text(failure).foregroundStyle(.red)
+                } else if monitor.heardMicrophone || monitor.heardSystemAudio {
+                    Text(soundCheckResult).foregroundStyle(.secondary)
+                }
+            } footer: {
+                Text("Проверяет микрофон и системный звук 10 секунд. Запись не сохраняется.")
+            }
+
+            if settings.autoDetectEnabled {
+                Section("Приложения") {
+                    ForEach(appNames, id: \.self) { name in
+                        Toggle(name, isOn: Binding(
+                            get: { isEnabled(name) },
+                            set: { setEnabled(name, $0) }
+                        ))
+                    }
+                }
+            }
         }
         .formStyle(.grouped)
+        .onDisappear { monitor.stop() }
+    }
+
+    private var soundCheckResult: String {
+        if monitor.heardMicrophone && monitor.heardSystemAudio {
+            return "Микрофон и системный звук слышны"
+        }
+        if monitor.heardMicrophone {
+            return "Микрофон слышен, системный звук пока молчит"
+        }
+        return "Системный звук слышен, микрофон пока молчит"
     }
 
     private func bundleIDs(named name: String) -> [String] {
@@ -302,13 +332,14 @@ private struct ProcessingPane: View {
         Form {
             Section {
                 SpeechModelList(controller: controller)
-                LabeledContent("Разбор голосов") {
+                LabeledContent("Разделение собеседников", value: Diarizer.bytes.byteSizeDescription)
+                DisclosureGroup("Подробнее о модели разделения") {
                     Link(
-                        "\(Diarizer.title) · \(Diarizer.licence) · \(Diarizer.bytes.byteSizeDescription)",
+                        "\(Diarizer.title) · лицензия \(Diarizer.licence)",
                         destination: Diarizer.licenceURL
                     )
+                    .font(.caption)
                 }
-                .font(.caption)
                 if let progress = controller.speakerResplitProgress {
                     Text("Обновлено разбиение голосов: \(progress.done) из \(progress.total)")
                         .font(.caption)
@@ -717,6 +748,7 @@ private struct IntegrationsPane: View {
     let controller: AppController
 
     @State private var isCalendarPickerOpen = false
+    @State private var isWebhookDetailsOpen = false
 
     private var settings: AppSettings {
         controller.settings
@@ -758,7 +790,7 @@ private struct IntegrationsPane: View {
             } header: {
                 Text("Календарь")
             } footer: {
-                Text("\(coverageLine). Берётся событие, которое идёт в момент начала записи, ±5 минут. Запись всё так же включается по звуку звонка.")
+                Text("\(calendarStateLine). Берётся событие, которое идёт в момент начала записи, ±5 минут. Запись всё так же включается по звуку звонка.")
             }
 
             Section {
@@ -769,6 +801,13 @@ private struct IntegrationsPane: View {
                         .foregroundStyle(.red)
                 }
                 SecretField(title: "Секрет", text: Bindable(settings).webhookSecret, isLoading: !settings.secretsLoaded)
+                Text("После готовой расшифровки Беседа отправит на указанный адрес текст, участников, итоги и время звонка.")
+                    .foregroundStyle(.secondary)
+                DisclosureGroup("Подробнее для разработчиков", isExpanded: $isWebhookDetailsOpen) {
+                    Text("Отправляется POST-запрос. Секрет передаётся как заголовок Authorization без Bearer. Разрешён https; http — только для localhost.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
                 HStack {
                     Text(webhooks.testResult ?? "Сервис должен принять пробный запрос.")
                         .foregroundStyle(.secondary)
@@ -780,8 +819,6 @@ private struct IntegrationsPane: View {
                 }
             } header: {
                 Text("Свой сервис")
-            } footer: {
-                Text("После каждой готовой расшифровки Beseda отправляет на этот адрес POST-запрос: текст, участники, итоги и время звонка. Секрет передаётся как есть, одним заголовком Authorization (без Bearer); адрес — только https (http — лишь для localhost).")
             }
 
             Section("Журнал доставок") {
@@ -801,9 +838,9 @@ private struct IntegrationsPane: View {
     private func accessLine(for action: CalendarAccessAction) -> String {
         switch action {
         case .requestAccess:
-            "Beseda запросит доступ только после нажатия кнопки"
+            "Беседа запросит доступ только после нажатия кнопки"
         case .openSettings:
-            "Включите Beseda в разделе «Календари» в настройках конфиденциальности"
+            "Включите Беседу в разделе «Календари» в настройках конфиденциальности"
         case .chooseCalendars:
             settings.calendarEnabled
                 ? (controller.calendarService.linkingProblem(selected: settings.calendarIdentifiers) ?? "Календари этого Mac")
@@ -811,12 +848,16 @@ private struct IntegrationsPane: View {
         }
     }
 
-    private var coverageLine: String {
+    private var calendarStateLine: String {
+        if settings.calendarEnabled,
+           controller.calendarService.linkingProblem(selected: settings.calendarIdentifiers) != nil {
+            return "Новые разговоры не получат названия, пока не выбран доступный календарь"
+        }
         let coverage = controller.eventCoverage
         guard coverage.total > 0 else {
             return "Разговоров пока нет"
         }
-        return "Событие нашлось у \(coverage.matched) из \(coverage.total) разговоров"
+        return "Ранее событие нашлось у \(coverage.matched) из \(coverage.total) разговоров"
     }
 }
 

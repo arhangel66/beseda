@@ -41,7 +41,7 @@ final class MicrophoneCapture: @unchecked Sendable {
 
     func start(writingTo url: URL? = nil) async throws {
         if IsolatedCopy.skips("AVAudioEngine.start (microphone)") {
-            throw AudioCaptureError.permissionDenied("Beseda не разрешён доступ к микрофону")
+            throw AudioCaptureError.permissionDenied("Беседе не разрешён доступ к микрофону")
         }
         try await requestMicrophonePermission()
 
@@ -90,7 +90,7 @@ final class MicrophoneCapture: @unchecked Sendable {
             return
         }
         if permission == .denied {
-            throw AudioCaptureError.permissionDenied("Beseda не разрешён доступ к микрофону")
+            throw AudioCaptureError.permissionDenied("Беседе не разрешён доступ к микрофону")
         }
 
         let granted = await withCheckedContinuation { continuation in
