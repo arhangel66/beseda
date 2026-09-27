@@ -534,8 +534,7 @@ final class CallStore: @unchecked Sendable {
            previousExport.deletingLastPathComponent().standardizedFileURL != exportFolder?.standardizedFileURL {
             throw ExportDeletionError.oldFolder
         }
-        // the folder moves to the trash first: a failed row delete puts it back, and a trash that
-        // cannot be emptied now is emptied on the next launch, so no row ever points at missing files
+        // Copy before deleting the row: a failed database write must never require a fallible restore.
         let fileManager = FileManager.default
         let trashedFolder = trashURL.appendingPathComponent(UUID().uuidString, isDirectory: true)
             .appendingPathComponent(id, isDirectory: true)
@@ -543,7 +542,7 @@ final class CallStore: @unchecked Sendable {
         let folderExists = folder.map { fileManager.fileExists(atPath: $0.path) } ?? false
         if let folder, folderExists {
             try fileManager.createDirectory(at: trashedFolder.deletingLastPathComponent(), withIntermediateDirectories: true)
-            try fileManager.moveItem(at: folder, to: trashedFolder)
+            try fileManager.copyItem(at: folder, to: trashedFolder)
         }
         // the stored path finds a copy written under an older title; the current name covers
         // copies written before the path was stored
@@ -558,21 +557,34 @@ final class CallStore: @unchecked Sendable {
                 let destination = trashURL.appendingPathComponent(UUID().uuidString, isDirectory: true)
                     .appendingPathComponent(id, isDirectory: true).appendingPathComponent(url.lastPathComponent)
                 try fileManager.createDirectory(at: destination.deletingLastPathComponent(), withIntermediateDirectories: true)
-                try fileManager.moveItem(at: url, to: destination)
+                try fileManager.copyItem(at: url, to: destination)
                 movedFiles.append((url, destination))
             }
             try deleteCall(id: id)
         } catch {
-            for moved in movedFiles.reversed() { try? fileManager.moveItem(at: moved.to, to: moved.from) }
-            if let folder, folderExists { try? fileManager.moveItem(at: trashedFolder, to: folder) }
             throw error
+        }
+        // Keep the staged copies until every original is gone. A failed removal leaves a
+        // recoverable copy in trash and reports the residual path to the caller.
+        for moved in movedFiles {
+            do { try fileManager.removeItem(at: moved.from) }
+            catch { throw ExportDeletionError.residual(moved.from.path) }
+        }
+        if let folder, folderExists {
+            do { try fileManager.removeItem(at: folder) }
+            catch { throw ExportDeletionError.residual(folder.path) }
         }
         try emptyTrash()
     }
 
     enum ExportDeletionError: LocalizedError {
-        case oldFolder
-        var errorDescription: String? { "Previous export folder needs access / Требуется доступ к прежней папке экспорта" }
+        case oldFolder, residual(String)
+        var errorDescription: String? {
+            switch self {
+            case .oldFolder: "Previous export folder needs access / Требуется доступ к прежней папке экспорта"
+            case .residual(let path): "Deletion incomplete; copy remains at \(path). Retry after granting access / Удаление не завершено; копия осталась в \(path). Повторите после предоставления доступа"
+            }
+        }
     }
 
     /// call folders a deletion moved aside and could not remove
