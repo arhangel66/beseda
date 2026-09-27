@@ -135,19 +135,43 @@ private func makeResplitter(_ store: CallStore, _ calls: Calls, fails: Bool = fa
     #expect(calls.diarized.count == 1)
 }
 
+private actor ReleaseGate {
+    private var continuation: CheckedContinuation<Void, Never>?
+    private var released = false
+
+    func wait() async {
+        if released { return }
+        await withCheckedContinuation { continuation = $0 }
+    }
+
+    func release() {
+        released = true
+        continuation?.resume()
+    }
+}
+
 @Test func aUserDiarizationJumpsAheadOfWaitingBackgroundWork() async throws {
     let queue = DiarizationQueue()
+    let gate = ReleaseGate()
     let events = Calls()
     let first = Task {
         try await queue.perform(priority: .background) {
             events.logs.append("background-1-start")
-            try await Task.sleep(for: .milliseconds(100))
+            await gate.wait()
             events.logs.append("background-1-end")
         }
     }
-    try await Task.sleep(for: .milliseconds(20))
+    while !(await queue.state.running) {
+        await Task.yield()
+    }
     let second = Task { try await queue.perform(priority: .background) { events.logs.append("background-2") } }
     let user = Task { try await queue.perform(priority: .user) { events.logs.append("user") } }
+    while true {
+        let state = await queue.state
+        if state.users == 1 && state.background == 1 { break }
+        await Task.yield()
+    }
+    await gate.release()
     _ = try await (first.value, second.value, user.value)
 
     #expect(events.logs == ["background-1-start", "background-1-end", "user", "background-2"])

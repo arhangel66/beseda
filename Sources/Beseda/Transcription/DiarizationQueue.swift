@@ -9,6 +9,10 @@ actor DiarizationQueue {
     private var users: [CheckedContinuation<Void, Never>] = []
     private var background: [CheckedContinuation<Void, Never>] = []
 
+    var state: (running: Bool, users: Int, background: Int) {
+        (isRunning, users.count, background.count)
+    }
+
     func perform<T: Sendable>(
         priority: Priority,
         _ operation: @Sendable () async throws -> T
