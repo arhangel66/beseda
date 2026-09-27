@@ -16,15 +16,15 @@ private enum SettingsSection: String, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .general:
-            "Основные"
+            SettingsText.get("Основные")
         case .recording:
-            "Запись"
+            SettingsText.get("Запись")
         case .processing:
-            "Обработка"
+            SettingsText.get("Обработка")
         case .storage:
-            "Хранение"
+            SettingsText.get("Хранение")
         case .integrations:
-            "Интеграции"
+            SettingsText.get("Интеграции")
         }
     }
 
@@ -120,29 +120,29 @@ private struct GeneralPane: View {
     var body: some View {
         Form {
             Section {
-                Toggle("Запускать при входе в систему", isOn: Binding(get: { isLoginItemOn }, set: { setLoginItem($0) }))
-                Toggle("Уведомлять, когда расшифровка готова", isOn: Bindable(controller.settings).notifyWhenReady)
+                Toggle(SettingsText.get("Запускать при входе в систему"), isOn: Binding(get: { isLoginItemOn }, set: { setLoginItem($0) }))
+                Toggle(SettingsText.get("Уведомлять, когда расшифровка готова"), isOn: Bindable(controller.settings).notifyWhenReady)
             } footer: {
-                Text(loginItemNote ?? "Беседа ждёт звонка в строке меню и не показывается в Dock.")
+                Text(loginItemNote ?? SettingsText.get("Беседа ждёт звонка в строке меню и не показывается в Dock."))
             }
 
-            Section("Обновления") {
+            Section(SettingsText.get("Обновления")) {
                 if updater.isAvailable {
-                    Toggle("Устанавливать обновления автоматически", isOn: Binding(
+                    Toggle(SettingsText.get("Устанавливать обновления автоматически"), isOn: Binding(
                         get: { updater.installsAutomatically },
                         set: { updater.installsAutomatically = $0 }
                     ))
-                    LabeledContent("Версия", value: updater.version)
-                    LabeledContent("Последняя проверка", value: lastCheckNote)
+                    LabeledContent(SettingsText.get("Версия"), value: updater.version)
+                    LabeledContent(SettingsText.get("Последняя проверка"), value: lastCheckNote)
                     HStack {
                         Spacer()
-                        Button("Проверить сейчас…") {
+                        Button(SettingsText.get("Проверить сейчас…")) {
                             updater.checkForUpdates()
                         }
                     }
                 } else {
-                    LabeledContent("Версия", value: "\(updater.version), сборка для разработки")
-                    Text("Обновления в этой сборке не проверяются.")
+                    LabeledContent(SettingsText.get("Версия"), value: String(format: SettingsText.get("%@, development build"), updater.version))
+                    Text(SettingsText.get("Обновления в этой сборке не проверяются."))
                         .foregroundStyle(.secondary)
                 }
             }
@@ -152,7 +152,7 @@ private struct GeneralPane: View {
 
     private var lastCheckNote: String {
         guard let date = updater.lastCheckDate else {
-            return "ещё не было"
+            return SettingsText.get("ещё не было")
         }
         return date.formatted(date: .abbreviated, time: .shortened)
     }
@@ -166,7 +166,7 @@ private struct GeneralPane: View {
             return loginItemError
         }
         if loginItemStatus == .requiresApproval {
-            return "Подтвердите Беседу в Системных настройках → Основные → Объекты входа."
+            return SettingsText.get("Подтвердите Беседу в Системных настройках → Основные → Объекты входа.")
         }
         return nil
     }
@@ -209,27 +209,27 @@ private struct RecordingPane: View {
     var body: some View {
         Form {
             Section {
-                Toggle("Включать запись при начале звонка", isOn: Bindable(settings).autoDetectEnabled)
+                Toggle(SettingsText.get("Включать запись при начале звонка"), isOn: Bindable(settings).autoDetectEnabled)
             } footer: {
-                Text("Беседа узнаёт звонок по звуку из приложения и записывает микрофон и системный звук.")
+                Text(SettingsText.get("Беседа узнаёт звонок по звуку из приложения и записывает микрофон и системный звук."))
             }
 
             Section {
-                Toggle("Останавливать после минуты тишины", isOn: Bindable(settings).stopOnSilence)
+                Toggle(SettingsText.get("Останавливать после минуты тишины"), isOn: Bindable(settings).stopOnSilence)
             } footer: {
-                Text("Чтобы не записывать пустоту после конца встречи.")
+                Text(SettingsText.get("Чтобы не записывать пустоту после конца встречи."))
             }
 
             Section {
-                Toggle("Расшифровывать во время звонка", isOn: Bindable(settings).transcribesDuringCall)
+                Toggle(SettingsText.get("Расшифровывать во время звонка"), isOn: Bindable(settings).transcribesDuringCall)
             } footer: {
-                Text("Черновик разговора и ключевые моменты в меню, пока идёт запись. Итоговая расшифровка всё равно делается после звонка.")
+                Text(SettingsText.get("Черновик разговора и ключевые моменты в меню, пока идёт запись. Итоговая расшифровка всё равно делается после звонка."))
             }
 
             Section {
                 HStack(spacing: 12) {
                     LevelMeter(level: max(monitor.microphoneLevel, monitor.systemAudioLevel), color: .green)
-                    Button(monitor.isRunning ? "Проверка…" : "Проверить звук") {
+                    Button(monitor.isRunning ? SettingsText.get("Проверка…") : SettingsText.get("Проверить звук")) {
                         monitor.start()
                     }
                     .disabled(monitor.isRunning)
@@ -240,11 +240,11 @@ private struct RecordingPane: View {
                     Text(soundCheckResult).foregroundStyle(.secondary)
                 }
             } footer: {
-                Text("Проверяет микрофон и системный звук 10 секунд. Запись не сохраняется.")
+                Text(SettingsText.get("Проверяет микрофон и системный звук 10 секунд. Запись не сохраняется."))
             }
 
             if settings.autoDetectEnabled {
-                Section("Приложения") {
+                Section(SettingsText.get("Приложения")) {
                     ForEach(appNames, id: \.self) { name in
                         Toggle(name, isOn: Binding(
                             get: { isEnabled(name) },
@@ -260,12 +260,12 @@ private struct RecordingPane: View {
 
     private var soundCheckResult: String {
         if monitor.heardMicrophone && monitor.heardSystemAudio {
-            return "Микрофон и системный звук слышны"
+            return SettingsText.get("Микрофон и системный звук слышны")
         }
         if monitor.heardMicrophone {
-            return "Микрофон слышен, системный звук пока молчит"
+            return SettingsText.get("Микрофон слышен, системный звук пока молчит")
         }
-        return "Системный звук слышен, микрофон пока молчит"
+        return SettingsText.get("Системный звук слышен, микрофон пока молчит")
     }
 
     private func bundleIDs(named name: String) -> [String] {
@@ -304,15 +304,15 @@ private struct ProcessingPane: View {
     private var privacySinks: [String] {
         var sinks: [String] = []
         if settings.effectiveSummaryProvider == .openRouter {
-            sinks.append("в OpenRouter (openrouter.ai) уходит текст расшифровки — для итогов и ключевых моментов во время звонка")
+            sinks.append(SettingsText.get("в OpenRouter (openrouter.ai) уходит текст расшифровки — для итогов и ключевых моментов во время звонка"))
         } else if settings.effectiveSummaryProvider == .lmStudio, let host = settings.remoteSummaryHost {
-            sinks.append("текст расшифровки уходит на сервер итогов \(host)")
+            sinks.append(String(format: SettingsText.get("transcript text goes to summary server %@"), host))
         }
         if settings.classifiesWithJev, settings.callTypes.count > 1 {
-            sinks.append("в OpenRouter уходят время, длительность и начало расшифровки — чтобы Jev выбрал тип звонка")
+            sinks.append(SettingsText.get("в OpenRouter уходят время, длительность и начало расшифровки — чтобы Jev выбрал тип звонка"))
         }
         if settings.sendsWebhooks {
-            sinks.append("расшифровка уходит на ваш сервис из раздела «Интеграции»")
+            sinks.append(SettingsText.get("расшифровка уходит на ваш сервис из раздела «Интеграции»"))
         }
         return sinks
     }
@@ -322,50 +322,50 @@ private struct ProcessingPane: View {
         let sinks = privacySinks
         if sinks.isEmpty {
             return settings.effectiveSummaryProvider == settings.summaryProvider
-                ? "Всё обрабатывается на этом Mac: ни звук, ни текст не уходят в сеть."
-                : "Всё обрабатывается на этом Mac: итоги пишет встроенная модель, ни звук, ни текст не уходят в сеть."
+                ? SettingsText.get("Всё обрабатывается на этом Mac: ни звук, ни текст не уходят в сеть.")
+                : SettingsText.get("Всё обрабатывается на этом Mac: итоги пишет встроенная модель, ни звук, ни текст не уходят в сеть.")
         }
-        return "Звук остаётся на этом Mac, но " + sinks.joined(separator: "; ") + "."
+        return SettingsText.get("Звук остаётся на этом Mac, но ") + sinks.joined(separator: "; ") + "."
     }
 
     var body: some View {
         Form {
             Section {
                 SpeechModelList(controller: controller)
-                LabeledContent("Разделение собеседников", value: Diarizer.bytes.byteSizeDescription)
-                DisclosureGroup("Подробнее о модели разделения") {
+                LabeledContent(SettingsText.get("Разделение собеседников"), value: Diarizer.bytes.byteSizeDescription)
+                DisclosureGroup(SettingsText.get("Подробнее о модели разделения")) {
                     Link(
-                        "\(Diarizer.title) · лицензия \(Diarizer.licence)",
+                        String(format: SettingsText.get("%@ · license %@"), Diarizer.title, Diarizer.licence),
                         destination: Diarizer.licenceURL
                     )
                     .font(.caption)
                 }
                 if let progress = controller.speakerResplitProgress {
-                    Text("Обновлено разбиение голосов: \(progress.done) из \(progress.total)")
+                    Text(String(format: SettingsText.get("Speaker separation updated: %d of %d"), progress.done, progress.total))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
             } header: {
-                Text("Распознавание речи")
+                Text(SettingsText.get("Распознавание речи"))
             } footer: {
-                Text("Модели на диске: \((controller.runtime.diskUsage() + (controller.diarizer.isDownloaded ? Diarizer.bytes : 0)).byteSizeDescription). Модели работают на этом Mac; модель разбора голосов скачивается в фоне, как только выбрана модель речи. Смена модели не трогает уже сделанные расшифровки.")
+                Text(String(format: SettingsText.get("Models on disk: %@. Models run on this Mac; speaker separation downloads in the background after you choose a speech model. Changing models does not change existing transcripts."), (controller.runtime.diskUsage() + (controller.diarizer.isDownloaded ? Diarizer.bytes : 0)).byteSizeDescription))
             }
 
             Section {
-                Picker("Кто пишет итоги", selection: Bindable(settings).summaryProvider) {
+                Picker(SettingsText.get("Кто пишет итоги"), selection: Bindable(settings).summaryProvider) {
                     ForEach(SummaryProvider.allCases) { provider in
                         Text(provider.title).tag(provider)
                     }
                 }
                 .pickerStyle(.segmented)
 
-                Toggle("Только локально", isOn: Bindable(settings).localOnly)
+                Toggle(SettingsText.get("Только локально"), isOn: Bindable(settings).localOnly)
                     .disabled(settings.strictMode)
                 Label(privacyNote, systemImage: privacySinks.isEmpty ? "lock" : "icloud.and.arrow.up")
                     .foregroundStyle(.secondary)
                 if settings.effectiveSummaryProvider != settings.summaryProvider {
                     Label(
-                        "Пока включено «Только локально», итоги пишет встроенная модель, а не \(settings.summaryProvider.title).",
+                        String(format: SettingsText.get("While Local only is on, the built-in model writes summaries instead of %@."), settings.summaryProvider.title),
                         systemImage: "info.circle"
                     )
                     .foregroundStyle(.secondary)
@@ -387,63 +387,63 @@ private struct ProcessingPane: View {
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
-                    Button(controller.isCheckingSummary ? "Проверка…" : "Проверить") {
+                    Button(controller.isCheckingSummary ? SettingsText.get("Проверка…") : SettingsText.get("Проверить")) {
                         controller.checkSummaryConnection()
                     }
                     .disabled(controller.isCheckingSummary)
                 }
                 if settings.effectiveSummaryProvider == .lmStudio {
-                    DisclosureGroup("Дополнительно", isExpanded: $isAdvancedOpen) {
-                        TextField("Адрес сервера", text: Bindable(settings).summaryServerURL, prompt: Text("определяется сам"))
+                    DisclosureGroup(SettingsText.get("Дополнительно"), isExpanded: $isAdvancedOpen) {
+                        TextField(SettingsText.get("Адрес сервера"), text: Bindable(settings).summaryServerURL, prompt: Text(SettingsText.get("определяется сам")))
                     }
                 }
             } header: {
-                Text("Итоги")
+                Text(SettingsText.get("Итоги"))
             } footer: {
                 Text(providerNote)
             }
 
             Section {
-                Toggle("Обрабатывать звонки автоматически", isOn: Bindable(settings).autoProcessCalls)
+                Toggle(SettingsText.get("Обрабатывать звонки автоматически"), isOn: Bindable(settings).autoProcessCalls)
                 ForEach(Bindable(settings).callTypes) { $type in
                     DisclosureGroup {
-                        TextField("Название", text: $type.name)
-                        TextField("Когда выбирать", text: $type.description, prompt: Text("одной фразой, для выбора типа"))
+                        TextField(SettingsText.get("Название"), text: $type.name)
+                        TextField(SettingsText.get("Когда выбирать"), text: $type.description, prompt: Text(SettingsText.get("одной фразой, для выбора типа")))
                         TextEditor(text: $type.prompt)
                             .font(.body)
                             .frame(minHeight: 120)
                         HStack {
-                            Button("Сбросить инструкцию") {
+                            Button(SettingsText.get("Сбросить инструкцию")) {
                                 type.prompt = ChatCompletionsProvider.defaultPrompt
                             }
                             Spacer()
-                            Button("Удалить тип", role: .destructive) {
+                            Button(SettingsText.get("Удалить тип"), role: .destructive) {
                                 settings.deleteCallType(id: type.id)
                             }
                             .disabled(type.isOther)
                         }
                         .controlSize(.small)
                     } label: {
-                        Text(type.name.isEmpty ? "Без названия" : type.name)
+                        Text(type.name.isEmpty ? SettingsText.get("Без названия") : type.name)
                     }
                 }
-                Button("Добавить тип") {
+                Button(SettingsText.get("Добавить тип")) {
                     settings.callTypes.append(
-                        CallType(name: "Новый тип", description: "", prompt: ChatCompletionsProvider.defaultPrompt)
+                        CallType(name: SettingsText.get("Новый тип"), description: "", prompt: ChatCompletionsProvider.defaultPrompt)
                     )
                 }
-                Picker("Определение типа", selection: Bindable(settings).classifyLocally) {
-                    Text("Jev через OpenRouter (по умолчанию, если есть ключ)").tag(false)
-                    Text("Локально").tag(true)
+                Picker(SettingsText.get("Определение типа"), selection: Bindable(settings).classifyLocally) {
+                    Text(SettingsText.get("Jev через OpenRouter (по умолчанию, если есть ключ)")).tag(false)
+                    Text(SettingsText.get("Локально")).tag(true)
                 }
                 // Jev needs the key even when another provider writes summaries.
                 if !settings.classifyLocally && settings.summaryProvider != .openRouter {
-                    SecretField(title: "Ключ OpenRouter", text: Bindable(settings).openRouterAPIKey, isLoading: !settings.secretsLoaded)
+                    SecretField(title: SettingsText.get("Ключ OpenRouter"), text: Bindable(settings).openRouterAPIKey, isLoading: !settings.secretsLoaded)
                 }
             } header: {
-                Text("Типы звонков")
+                Text(SettingsText.get("Типы звонков"))
             } footer: {
-                Text("«\(CallType.otherName)» есть всегда: его инструкция пишет итоги, когда другие типы не подошли или других нет. Если типов больше одного, сначала выбирается тип — по времени, длительности и началу разговора. Выбирает Jev через OpenRouter, а без ключа OpenRouter или при сбое — модель итогов. Не пишите в инструкциях заголовки с «#»: в итогах видны только жирный текст и переносы строк.")
+                Text(String(format: SettingsText.get("The %@ type always exists: its instructions write summaries when no other type fits. With multiple types, Jev via OpenRouter chooses from the call time, duration, and start of the transcript. Without an OpenRouter key or if Jev fails, the summary model chooses. Do not use # headings in instructions: summaries show only bold text and line breaks."), CallType.otherName))
             }
         }
         .formStyle(.grouped)
@@ -454,15 +454,15 @@ private struct ProcessingPane: View {
 
     @ViewBuilder
     private var openRouterRows: some View {
-        SecretField(title: "Ключ", text: Bindable(settings).openRouterAPIKey, isLoading: !settings.secretsLoaded)
-        TextField("Модель", text: Bindable(settings).openRouterModel, prompt: Text(OpenRouter.defaultModel))
+        SecretField(title: SettingsText.get("Ключ"), text: Bindable(settings).openRouterAPIKey, isLoading: !settings.secretsLoaded)
+        TextField(SettingsText.get("Модель"), text: Bindable(settings).openRouterModel, prompt: Text(OpenRouter.defaultModel))
     }
 
     @ViewBuilder
     private var lmStudioRows: some View {
-        LabeledContent("Сервер", value: controller.summaryServerStatus ?? "проверка…")
-        Picker("Модель", selection: Bindable(settings).summaryModel) {
-            Text("Автоматически").tag("")
+        LabeledContent(SettingsText.get("Сервер"), value: controller.summaryServerStatus ?? "проверка…")
+        Picker(SettingsText.get("Модель"), selection: Bindable(settings).summaryModel) {
+            Text(SettingsText.get("Автоматически")).tag("")
             ForEach(modelOptions, id: \.self) { model in
                 Text(model).tag(model)
             }
@@ -470,12 +470,12 @@ private struct ProcessingPane: View {
         HStack {
             Spacer()
             if LocalModelSupport.isInstalled, controller.isServerDown {
-                Button(controller.isStartingLocalModelServer ? "Запуск…" : "Запустить LM Studio") {
+                Button(controller.isStartingLocalModelServer ? SettingsText.get("Запуск…") : SettingsText.get("Запустить LM Studio")) {
                     controller.startLocalModelServer()
                 }
                 .disabled(controller.isStartingLocalModelServer)
             }
-            Button("Обновить список") {
+            Button(SettingsText.get("Обновить список")) {
                 controller.refreshSummaryModels()
             }
         }
@@ -485,12 +485,12 @@ private struct ProcessingPane: View {
     private var providerNote: String {
         switch settings.effectiveSummaryProvider {
         case .openRouter:
-            "Ключ создаётся на openrouter.ai, оплата по факту: час разговора на gemini-flash стоит несколько центов."
+            SettingsText.get("Ключ создаётся на openrouter.ai, оплата по факту: час разговора на gemini-flash стоит несколько центов.")
         case .builtIn:
-            "Модель работает на этом Mac, без интернета и без ключей. Запускается на время итогов и занимает около 5 ГБ памяти, потом выгружается."
+            SettingsText.get("Модель работает на этом Mac, без интернета и без ключей. Запускается на время итогов и занимает около 5 ГБ памяти, потом выгружается.")
         case .lmStudio:
             LocalModelSupport.isInstalled
-                ? "Итоги пишет модель, загруженная в LM Studio. Приложение должно быть запущено с включённым Local Server."
+                ? SettingsText.get("Итоги пишет модель, загруженная в LM Studio. Приложение должно быть запущено с включённым Local Server.")
                 : LocalModelSupport.manualInstructions
         }
     }
@@ -545,20 +545,20 @@ private struct BundledSummaryRow: View {
                     .foregroundStyle(Color.red)
                     .lineLimit(1)
                     .help(failure)
-                Button("Повторить") {
+                Button(SettingsText.get("Повторить")) {
                     installer.install()
                 }
             }
         } else if installer.isReady {
             HStack(spacing: 8) {
-                Text("Скачана")
+                Text(SettingsText.get("Скачана"))
                     .foregroundStyle(.secondary)
-                Button("Удалить") {
+                Button(SettingsText.get("Удалить")) {
                     try? installer.remove()
                 }
             }
         } else {
-            Button("Скачать") {
+            Button(SettingsText.get("Скачать")) {
                 installer.install()
             }
         }
@@ -580,7 +580,7 @@ private struct StoragePane: View {
     var body: some View {
         Form {
             Section {
-                Toggle("Строгий режим", isOn: Binding(
+                Toggle(SettingsText.get("Строгий режим"), isOn: Binding(
                     get: { settings.strictMode },
                     set: { on in
                         if on, !settings.strictModeConfirmed {
@@ -590,7 +590,7 @@ private struct StoragePane: View {
                         }
                     }
                 ))
-                Toggle("Не включать записи в резервные копии (Time Machine и др.)", isOn: Binding(
+                Toggle(SettingsText.get("Не включать записи в резервные копии (Time Machine и др.)"), isOn: Binding(
                     get: { settings.excludesFromBackup },
                     set: { excluded in
                         settings.excludesFromBackup = excluded
@@ -598,68 +598,68 @@ private struct StoragePane: View {
                     }
                 ))
                 .disabled(settings.strictMode)
-                Text("Уже сделанные копии и снимки Time Machine не удаляются. Выключите, чтобы записи снова попадали в копии: без копии сломанный диск унесёт все записи.")
+                Text(SettingsText.get("Уже сделанные копии и снимки Time Machine не удаляются. Выключите, чтобы записи снова попадали в копии: без копии сломанный диск унесёт все записи."))
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 if fileVaultIsOn == false {
                     HStack {
-                        Label("FileVault выключен: при краже Mac записи можно прочитать.", systemImage: "exclamationmark.triangle")
+                        Label(SettingsText.get("FileVault выключен: при краже Mac записи можно прочитать."), systemImage: "exclamationmark.triangle")
                             .foregroundStyle(.orange)
                         Spacer()
-                        Button("Открыть настройки FileVault") {
+                        Button(SettingsText.get("Открыть настройки FileVault")) {
                             NSWorkspace.shared.open(FileVault.settingsURL)
                         }
                     }
                 }
             } header: {
-                Text("Приватность")
+                Text(SettingsText.get("Приватность"))
             } footer: {
-                Text("Строгий режим удаляет аудио сразу после расшифровки, выключает экспорт, включает «Только локально» и не пускает записи в резервные копии. Пока он включён, эти настройки заблокированы; выключение вернёт прежние значения.")
+                Text(SettingsText.get("Строгий режим удаляет аудио сразу после расшифровки, выключает экспорт, включает «Только локально» и не пускает записи в резервные копии. Пока он включён, эти настройки заблокированы; выключение вернёт прежние значения."))
             }
 
             Section {
                 retentionPicker(
-                    "Исходное аудио",
+                    SettingsText.get("Исходное аудио"),
                     size: controller.storageUsage.rawAudioBytes,
                     selection: Bindable(settings).rawAudioRetention
                 )
                 .disabled(settings.strictMode)
                 retentionPicker(
-                    "Подготовленное аудио",
+                    SettingsText.get("Подготовленное аудио"),
                     size: controller.storageUsage.normalizedAudioBytes,
                     selection: Bindable(settings).normalizedAudioRetention
                 )
                 .disabled(settings.strictMode)
-                LabeledContent("Расшифровки, \(controller.storageUsage.textBytes.byteSizeDescription)", value: "всегда")
+                LabeledContent(String(format: SettingsText.get("Transcripts, %@"), controller.storageUsage.textBytes.byteSizeDescription), value: SettingsText.get("всегда"))
                 HStack {
                     Text(cleanupHint)
                         .foregroundStyle(.secondary)
                     Spacer()
-                    Button("Очистить сейчас") {
+                    Button(SettingsText.get("Очистить сейчас")) {
                         controller.runCleanupNow()
                     }
                     .disabled(controller.expiredAudioBytes == 0)
                 }
             } header: {
-                Text("Сколько хранить")
+                Text(SettingsText.get("Сколько хранить"))
             } footer: {
-                Text("«Сразу» удаляет аудио, как только расшифровка сохранена, остальные сроки проверяются раз в сутки. Исходное аудио — WAV с микрофона и системного звука, подготовленное — промежуточный файл для расшифровки.")
+                Text(SettingsText.get("«Сразу» удаляет аудио, как только расшифровка сохранена, остальные сроки проверяются раз в сутки. Исходное аудио — WAV с микрофона и системного звука, подготовленное — промежуточный файл для расшифровки."))
             }
 
             Section {
-                LabeledContent("Папка экспорта") {
-                    Text(settings.exportFolder.isEmpty ? "не выбрана" : settings.exportFolder)
+                LabeledContent(SettingsText.get("Папка экспорта")) {
+                    Text(settings.exportFolder.isEmpty ? SettingsText.get("не выбрана") : settings.exportFolder)
                         .lineLimit(1)
                         .truncationMode(.middle)
                         .textSelection(.enabled)
                 }
                 HStack {
                     Spacer()
-                    Button("Очистить") {
+                    Button(SettingsText.get("Очистить")) {
                         settings.exportFolder = ""
                     }
                     .disabled(settings.exportFolder.isEmpty)
-                    Button("Выбрать…") {
+                    Button(SettingsText.get("Выбрать…")) {
                         let panel = NSOpenPanel()
                         panel.canChooseDirectories = true
                         panel.canChooseFiles = false
@@ -671,17 +671,17 @@ private struct StoragePane: View {
                 }
                 .disabled(settings.strictMode)
                 if ICloudDrive.contains(settings.exportFolder) {
-                    Label("Папка в iCloud Drive: экспорт уходит в облако Apple.", systemImage: "icloud")
+                    Label(SettingsText.get("Папка в iCloud Drive: экспорт уходит в облако Apple."), systemImage: "icloud")
                         .foregroundStyle(.orange)
                 }
             } header: {
-                Text("Экспорт результатов")
+                Text(SettingsText.get("Экспорт результатов"))
             } footer: {
-                Text("Каждый готовый результат обработки сохраняется сюда файлом Markdown: заголовок, дата, тип, результат и расшифровка.")
+                Text(SettingsText.get("Каждый готовый результат обработки сохраняется сюда файлом Markdown: заголовок, дата, тип, результат и расшифровка."))
             }
 
-            Section("Папка") {
-                LabeledContent("Записи") {
+            Section(SettingsText.get("Папка")) {
+                LabeledContent(SettingsText.get("Записи")) {
                     Text(controller.callsDirectory.path)
                         .lineLimit(1)
                         .truncationMode(.middle)
@@ -689,7 +689,7 @@ private struct StoragePane: View {
                 }
                 HStack {
                     Spacer()
-                    Button("Показать в Finder") {
+                    Button(SettingsText.get("Показать в Finder")) {
                         controller.openCallsFolder()
                     }
                 }
@@ -705,13 +705,13 @@ private struct StoragePane: View {
             #endif
             fileVaultIsOn = await Task.detached { FileVault.isOn() }.value
         }
-        .confirmationDialog("Включить строгий режим?", isPresented: $isConfirmingStrictMode) {
-            Button("Включить и удалять аудио", role: .destructive) {
+        .confirmationDialog(SettingsText.get("Включить строгий режим?"), isPresented: $isConfirmingStrictMode) {
+            Button(SettingsText.get("Включить и удалять аудио"), role: .destructive) {
                 settings.strictModeConfirmed = true
                 setStrictMode(true)
             }
         } message: {
-            Text("Аудио уже расшифрованных записей удалится при следующей очистке, а новое — сразу после расшифровки. Удалённое аудио не вернуть, даже если выключить режим.")
+            Text(SettingsText.get("Аудио уже расшифрованных записей удалится при следующей очистке, а новое — сразу после расшифровки. Удалённое аудио не вернуть, даже если выключить режим."))
         }
     }
 
@@ -737,8 +737,8 @@ private struct StoragePane: View {
 
     private var cleanupHint: String {
         controller.expiredAudioBytes > 0
-            ? "Под правила попадает \(controller.expiredAudioBytes.byteSizeDescription)."
-            : "Под текущие правила ничего не попадает."
+            ? String(format: SettingsText.get("%@ matches the current rules."), controller.expiredAudioBytes.byteSizeDescription)
+            : SettingsText.get("Под текущие правила ничего не попадает.")
     }
 }
 
@@ -761,7 +761,7 @@ private struct IntegrationsPane: View {
     var body: some View {
         Form {
             Section {
-                Toggle("Брать название из календаря", isOn: Binding(
+                Toggle(SettingsText.get("Брать название из календаря"), isOn: Binding(
                     get: { settings.calendarEnabled },
                     set: { controller.setCalendarEnabled($0) }
                 ))
@@ -769,15 +769,15 @@ private struct IntegrationsPane: View {
                 LabeledContent(accessLine(for: accessAction)) {
                     switch accessAction {
                     case .requestAccess:
-                        Button("Разрешить доступ к календарю") {
+                        Button(SettingsText.get("Разрешить доступ к календарю")) {
                             controller.requestCalendarAccess()
                         }
                     case .openSettings:
-                        Button("Открыть настройки…") {
+                        Button(SettingsText.get("Открыть настройки…")) {
                             PermissionsModel.openPrivacySettings(pane: "Privacy_Calendars")
                         }
                     case .chooseCalendars:
-                        Button("Выбрать календари…") {
+                        Button(SettingsText.get("Выбрать календари…")) {
                             isCalendarPickerOpen = true
                         }
                         .popover(isPresented: $isCalendarPickerOpen, arrowEdge: .bottom) {
@@ -788,42 +788,42 @@ private struct IntegrationsPane: View {
                 }
                 .foregroundStyle(accessAction == .openSettings ? Color.red : Color.primary)
             } header: {
-                Text("Календарь")
+                Text(SettingsText.get("Календарь"))
             } footer: {
-                Text("\(calendarStateLine). Берётся событие, которое идёт в момент начала записи, ±5 минут. Запись всё так же включается по звуку звонка.")
+                Text(String(format: SettingsText.get("%@. Uses the event at recording start (±5 minutes). Recording still starts when call audio is detected."), calendarStateLine))
             }
 
             Section {
-                Toggle("Отправлять расшифровку на свой сервис", isOn: Bindable(settings).webhookEnabled)
-                TextField("Адрес", text: Bindable(settings).webhookURL, prompt: Text("https://example.com/webhook"))
+                Toggle(SettingsText.get("Отправлять расшифровку на свой сервис"), isOn: Bindable(settings).webhookEnabled)
+                TextField(SettingsText.get("Адрес"), text: Bindable(settings).webhookURL, prompt: Text("https://example.com/webhook"))
                 if settings.webhookEnabled, case .failure(.plainHTTP) = WebhookSender.checkedEndpoint(from: settings.webhookURL) {
-                    Text("Не отправляется. \(EndpointRefusal.plainHTTP.rawValue)")
+                    Text(String(format: SettingsText.get("Not sent. %@"), EndpointRefusal.plainHTTP.rawValue))
                         .foregroundStyle(.red)
                 }
-                SecretField(title: "Секрет", text: Bindable(settings).webhookSecret, isLoading: !settings.secretsLoaded)
-                Text("После готовой расшифровки Беседа отправит на указанный адрес текст, участников, итоги и время звонка.")
+                SecretField(title: SettingsText.get("Секрет"), text: Bindable(settings).webhookSecret, isLoading: !settings.secretsLoaded)
+                Text(SettingsText.get("После готовой расшифровки Беседа отправит на указанный адрес текст, участников, итоги и время звонка."))
                     .foregroundStyle(.secondary)
-                DisclosureGroup("Подробнее для разработчиков", isExpanded: $isWebhookDetailsOpen) {
-                    Text("Отправляется POST-запрос. Секрет передаётся как заголовок Authorization без Bearer. Разрешён https; http — только для localhost.")
+                DisclosureGroup(SettingsText.get("Подробнее для разработчиков"), isExpanded: $isWebhookDetailsOpen) {
+                    Text(SettingsText.get("Отправляется POST-запрос. Секрет передаётся как заголовок Authorization без Bearer. Разрешён https; http — только для localhost."))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
                 HStack {
-                    Text(webhooks.testResult ?? "Сервис должен принять пробный запрос.")
+                    Text(webhooks.testResult ?? SettingsText.get("Сервис должен принять пробный запрос."))
                         .foregroundStyle(.secondary)
                     Spacer()
-                    Button(webhooks.isTesting ? "Отправка…" : "Отправить тест") {
+                    Button(webhooks.isTesting ? SettingsText.get("Отправка…") : SettingsText.get("Отправить тест")) {
                         webhooks.sendTest()
                     }
                     .disabled(webhooks.isTesting)
                 }
             } header: {
-                Text("Свой сервис")
+                Text(SettingsText.get("Свой сервис"))
             }
 
-            Section("Журнал доставок") {
+            Section(SettingsText.get("Журнал доставок")) {
                 if webhooks.recent.isEmpty {
-                    Text("Пока ничего не отправлялось")
+                    Text(SettingsText.get("Пока ничего не отправлялось"))
                         .foregroundStyle(.secondary)
                 } else {
                     ForEach(webhooks.recent) { delivery in
@@ -838,26 +838,26 @@ private struct IntegrationsPane: View {
     private func accessLine(for action: CalendarAccessAction) -> String {
         switch action {
         case .requestAccess:
-            "Беседа запросит доступ только после нажатия кнопки"
+            SettingsText.get("Беседа запросит доступ только после нажатия кнопки")
         case .openSettings:
-            "Включите Беседу в разделе «Календари» в настройках конфиденциальности"
+            SettingsText.get("Включите Беседу в разделе «Календари» в настройках конфиденциальности")
         case .chooseCalendars:
             settings.calendarEnabled
-                ? (controller.calendarService.linkingProblem(selected: settings.calendarIdentifiers) ?? "Календари этого Mac")
-                : "Доступ к календарю разрешён"
+                ? (controller.calendarService.linkingProblem(selected: settings.calendarIdentifiers) ?? SettingsText.get("Календари этого Mac"))
+                : SettingsText.get("Доступ к календарю разрешён")
         }
     }
 
     private var calendarStateLine: String {
         if settings.calendarEnabled,
            controller.calendarService.linkingProblem(selected: settings.calendarIdentifiers) != nil {
-            return "Новые разговоры не получат названия, пока не выбран доступный календарь"
+            return SettingsText.get("Новые разговоры не получат названия, пока не выбран доступный календарь")
         }
         let coverage = controller.eventCoverage
         guard coverage.total > 0 else {
-            return "Разговоров пока нет"
+            return SettingsText.get("Разговоров пока нет")
         }
-        return "Ранее событие нашлось у \(coverage.matched) из \(coverage.total) разговоров"
+        return String(format: SettingsText.get("Calendar events matched %d of %d previous calls"), coverage.matched, coverage.total)
     }
 }
 
@@ -872,14 +872,14 @@ private struct SecretField: View {
     var body: some View {
         HStack {
             if isShown {
-                TextField(title, text: text, prompt: isLoading ? Text("Загрузка…") : nil)
+                TextField(title, text: text, prompt: isLoading ? Text(SettingsText.get("Загрузка…")) : nil)
             } else {
-                SecureField(title, text: text, prompt: isLoading ? Text("Загрузка…") : nil)
+                SecureField(title, text: text, prompt: isLoading ? Text(SettingsText.get("Загрузка…")) : nil)
             }
-            Button(isShown ? "Скрыть" : "Показать") {
+            Button(isShown ? SettingsText.get("Скрыть") : SettingsText.get("Показать")) {
                 isShown.toggle()
             }
-            .accessibilityLabel(isShown ? "Скрыть \(title.lowercased())" : "Показать \(title.lowercased())")
+            .accessibilityLabel(isShown ? String(format: SettingsText.get("Hide %@"), title) : String(format: SettingsText.get("Show %@"), title))
             .controlSize(.small)
         }
     }
@@ -902,7 +902,7 @@ struct WebhookDeliveryRow: View {
                 Text(delivery.callTitle)
                     .lineLimit(1)
             } else {
-                Text("попытка \(delivery.attempt)")
+                Text(String(format: SettingsText.get("attempt %d"), delivery.attempt))
             }
 
             Spacer(minLength: 0)
@@ -912,7 +912,7 @@ struct WebhookDeliveryRow: View {
                 .foregroundStyle(stateColor)
 
             if inJournal, delivery.state == "failed", !controller.webhooks.sending.contains(delivery.callID) {
-                Button("Повторить") {
+                Button(SettingsText.get("Повторить")) {
                     controller.webhooks.sendNow(callID: delivery.callID)
                 }
                 .controlSize(.small)
@@ -938,7 +938,7 @@ private struct CalendarPicker: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("Пустой список — берутся все календари")
+            Text(SettingsText.get("Пустой список — берутся все календари"))
                 .font(.caption)
                 .foregroundStyle(.secondary)
 

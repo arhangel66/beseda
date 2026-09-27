@@ -15,13 +15,13 @@ enum RetentionRule: String, CaseIterable, Identifiable, Sendable {
     var title: String {
         switch self {
         case .immediately:
-            "Сразу"
+            SettingsText.get("Сразу")
         case .days30:
-            "30 дней"
+            SettingsText.get("30 дней")
         case .days90:
-            "90 дней"
+            SettingsText.get("90 дней")
         case .forever:
-            "Всегда"
+            SettingsText.get("Всегда")
         }
     }
 
