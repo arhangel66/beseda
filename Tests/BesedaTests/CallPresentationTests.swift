@@ -40,8 +40,12 @@ private let noon = Calendar.current.date(from: DateComponents(year: 2026, month:
 @Test func microphoneNoteWithoutATranscriptGetsItsOwnTitle() {
     let call = makeCall(kind: "mic", appName: nil, previewText: nil)
 
-    #expect(call.displayTitle == "Заметка с микрофона")
-    #expect(call.appLabel == "Микрофон")
+    #expect(call.displayTitle == ArchiveText.get("Заметка с микрофона"))
+    #expect(call.appLabel == ArchiveText.get("Микрофон"))
+    #expect(ArchiveText.get("Заметка с микрофона", locale: Locale(identifier: "ru_RU")) == "Заметка с микрофона")
+    #expect(ArchiveText.get("Заметка с микрофона", locale: Locale(identifier: "en_US")) == "Microphone note")
+    #expect(ArchiveText.get("Микрофон", locale: Locale(identifier: "ru_RU")) == "Микрофон")
+    #expect(ArchiveText.get("Микрофон", locale: Locale(identifier: "en_US")) == "Microphone")
 }
 
 @Test func dayGroupSplitsTodayYesterdayThisWeekAndEarlier() {
@@ -54,10 +58,14 @@ private let noon = Calendar.current.date(from: DateComponents(year: 2026, month:
 }
 
 @Test func humanDurationReadsAsTheProtoypeWritesIt() {
-    #expect(CallFormatting.humanDuration(42) == "42 сек")
-    #expect(CallFormatting.humanDuration(214) == "4 мин")
-    #expect(CallFormatting.humanDuration(3155) == "53 мин")
-    #expect(CallFormatting.humanDuration(3900) == "1 ч 5 мин")
+    let russian = Locale(identifier: "ru_RU")
+    let english = Locale(identifier: "en_US")
+    #expect(CallFormatting.humanDuration(42, locale: russian) == "42 сек")
+    #expect(CallFormatting.humanDuration(214, locale: russian) == "4 мин")
+    #expect(CallFormatting.humanDuration(3155, locale: russian) == "53 мин")
+    #expect(CallFormatting.humanDuration(3900, locale: russian) == "1 ч 5 мин")
+    #expect(CallFormatting.humanDuration(42, locale: english) == "42s")
+    #expect(CallFormatting.humanDuration(214, locale: english) == "4m")
 }
 
 private func makeCall(
