@@ -263,7 +263,8 @@ final class AppSettings {
     var exportNeedsReselection = false
 
     var sandboxed: Bool {
-        ProcessInfo.processInfo.environment["APP_SANDBOX_CONTAINER_ID"] != nil
+        Bundle.main.object(forInfoDictionaryKey: "BesedaStoreSummary") as? Bool == true ||
+            ProcessInfo.processInfo.environment["APP_SANDBOX_CONTAINER_ID"] != nil
     }
 
     func selectExportFolder(_ url: URL) throws {
