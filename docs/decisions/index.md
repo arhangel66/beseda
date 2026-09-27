@@ -1,5 +1,6 @@
 # Decisions
 
+- [First-sale price](first-sale-price.md) — approved $39.99 one-time Mac App Store launch price, evidence and gross-order threshold.
 - [Distribution readiness](distribution-readiness.md) — source-only private notarization, Mac App Store and public release verdicts; proposed.
 - [Trial and access](trial-access.md) — proposed provider-neutral evaluation and archive-safe entitlement boundary.
 - [First payment path](payment-path.md) — conditional comparison of seller eligibility and first $500 gross receipts; proposed.
