@@ -166,7 +166,7 @@ private func line(_ speaker: String) -> SpeakerTranscriptSegment {
     #expect(call.status == "failed")
     #expect(call.kind == "dual")
     #expect(call.durationSec == 1800)
-    #expect(call.error?.contains("Found on disk but missing from call index") == true)
+    #expect(call.error?.contains(MenuText.get("Найдена на диске без записи в индексе")) == true)
     // the janitor compares standardized paths, so a failed call's audio survives the sweep
     #expect(try harness.store.protectedAudioDirectories().map { URL(fileURLWithPath: $0).standardizedFileURL.path }
         .contains(folder.standardizedFileURL.path))
@@ -218,7 +218,7 @@ private func line(_ speaker: String) -> SpeakerTranscriptSegment {
         Issue.record("status is \(controller.status)")
         return
     }
-    #expect(message.contains("Call index unavailable"))
+    #expect(message.contains(MenuText.get("Индекс звонков недоступен: %@").components(separatedBy: "%@")[0]))
 }
 
 @MainActor
@@ -239,7 +239,7 @@ private func line(_ speaker: String) -> SpeakerTranscriptSegment {
         Issue.record("status is \(controller.status)")
         return
     }
-    #expect(message.contains("Could not resume call processing"))
+    #expect(message.contains(MenuText.get("Не удалось возобновить обработку звонков: %@").components(separatedBy: "%@")[0]))
 }
 
 // MARK: - 13: the auto-processing queue survives quit
@@ -435,8 +435,8 @@ func childHitsAFileSizeLimitWhileRecording() throws {
     controller.stopRecording(after: writeError, capture: DualCapture())
     let metadata = try recorder.finish()
 
-    #expect(controller.recordingWarning?.hasPrefix("Recording stopped: Could not write audio to disk") == true)
-    #expect(controller.recordingWarning?.contains("Audio recorded so far will be transcribed") == true)
+    #expect(controller.recordingWarning?.hasPrefix(MenuText.get("Запись остановлена: %@").components(separatedBy: "%@")[0]) == true)
+    #expect(controller.recordingWarning?.contains(MenuText.get("не удалось записать звук на диск (%@). Всё записанное до этого будет расшифровано.").components(separatedBy: "%@").last!) == true)
     #expect(metadata.frameCount > 0)
     let file = try AVAudioFile(forReading: url)
     #expect(file.length > 0 && file.length == Int64(metadata.frameCount))
@@ -490,7 +490,7 @@ private final class DownloadLog: @unchecked Sendable {
     let controller = harness.controller(
         diarizer: Diarizer(paths: harness.paths, downloader: downloads.downloader(), freeSpace: { _ in nil })
     )
-    #expect(controller.diarizerPrefetchStatus == "Downloading speaker model…")
+    #expect(controller.diarizerPrefetchStatus == MenuText.get("Скачивается модель разбора голосов…"))
     await controller.diarizerPrefetch?.value
 
     #expect(downloads.count == 1)

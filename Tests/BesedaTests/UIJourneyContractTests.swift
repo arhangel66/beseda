@@ -28,7 +28,7 @@ import Testing
         markdownText: try String(contentsOf: #require(call.transcriptURL), encoding: .utf8),
         jobStats: nil
     )
-    #expect(TranscriptCopy.render(detail, format: .clean).contains("Other speaker 1: Обсудили маяк путешествия"))
+    #expect(TranscriptCopy.render(detail, format: .clean).contains("\(SpeakerNaming.defaultName(for: "them-1")): Обсудили маяк путешествия"))
 
     try store.mergeSpeaker(callID: call.id, speakerKey: "them-2", into: "them-1")
     #expect(Set(try store.fetchSegments(callID: call.id).map(\.speaker)) == ["them-1"])

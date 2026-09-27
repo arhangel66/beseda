@@ -33,20 +33,20 @@ private let detail = StoredCallDetail(
 @Test func timestampedFormatPutsTheClockBeforeTheSpeaker() {
     let text = TranscriptCopy.render(detail, format: .timestamped)
 
-    #expect(text == "00:41 You: Начнём с релиза.\n00:52 Other speaker: Давай.")
+    #expect(text == "00:41 \(SpeakerNaming.defaultName(for: "me")): Начнём с релиза.\n00:52 \(SpeakerNaming.defaultName(for: "them")): Давай.")
 }
 
 @Test func cleanFormatDropsTheClock() {
     let text = TranscriptCopy.render(detail, format: .clean)
 
-    #expect(text == "You: Начнём с релиза.\nOther speaker: Давай.")
+    #expect(text == "\(SpeakerNaming.defaultName(for: "me")): Начнём с релиза.\n\(SpeakerNaming.defaultName(for: "them")): Давай.")
 }
 
 @Test func markdownFormatOpensWithTheConversationName() {
     let text = TranscriptCopy.render(detail, format: .markdown)
 
     #expect(text.hasPrefix("## Релиз 0.6 — синк"))
-    #expect(text.contains("**You** 00:41"))
+    #expect(text.contains("**\(SpeakerNaming.defaultName(for: "me"))** 00:41"))
 }
 
 @Test func withoutSegmentsTheStoredMarkdownIsCopiedAsItIs() {
@@ -76,5 +76,5 @@ private let detail = StoredCallDetail(
 
     let text = TranscriptCopy.render(renamed, format: .clean)
 
-    #expect(text == "You: Начнём.\nИра: Давай.\nOther speaker 2: Секунду.")
+    #expect(text == "\(SpeakerNaming.defaultName(for: "me")): Начнём.\nИра: Давай.\n\(SpeakerNaming.defaultName(for: "them-2")): Секунду.")
 }
