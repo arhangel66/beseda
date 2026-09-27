@@ -248,14 +248,14 @@ private func line(_ speaker: String) -> SpeakerTranscriptSegment {
     #expect(try harness.store.fetchCall(id: "second")?.summaryText == "summary of second")
 }
 
-// MARK: - BESEDA-104: the classifier's «one other person» folds the remote speakers
+// MARK: - BESEDA-107: the classifier's «one other person» is stored, never relabels
 
 /// a finished call with three remote speakers auto-processed through a stub answering `oneOtherPerson`;
-/// returns the speakers in the index and the transcript file afterwards
+/// returns the speakers in the index, the transcript file and the stored answer afterwards
 @MainActor
 private func remoteSpeakersAfterProcessing(
     oneOtherPerson: Bool?, failure: Error? = nil
-) async throws -> (indexed: [String], transcript: String) {
+) async throws -> (indexed: [String], transcript: String, stored: Bool?) {
     let harness = try Harness()
     defer { harness.cleanUp() }
     harness.settings.autoProcessCalls = true
@@ -276,23 +276,34 @@ private func remoteSpeakersAfterProcessing(
 
     return (
         try harness.store.fetchSegments(callID: "call").map(\.speaker),
-        try String(contentsOf: folder.appendingPathComponent("transcript.md"), encoding: .utf8)
+        try String(contentsOf: folder.appendingPathComponent("transcript.md"), encoding: .utf8),
+        storedOneOtherPerson(harness.paths.callIndexURL, callID: "call")
     )
 }
 
-@MainActor
-@Test func theClassifierSayingOneOtherPersonLeavesOneRemoteSpeakerInTheIndexAndTheTranscriptFile() async throws {
-    let (indexed, transcript) = try await remoteSpeakersAfterProcessing(oneOtherPerson: true)
+/// `calls.one_other_person` read straight from the index; nil when the column is NULL
+private func storedOneOtherPerson(_ dbURL: URL, callID: String) -> Bool? {
+    var db: OpaquePointer?
+    var statement: OpaquePointer?
+    defer { sqlite3_finalize(statement); sqlite3_close(db) }
+    sqlite3_open(dbURL.path, &db)
+    sqlite3_prepare_v2(db, "SELECT one_other_person FROM calls WHERE id = '\(callID)'", -1, &statement, nil)
+    guard sqlite3_step(statement) == SQLITE_ROW, sqlite3_column_type(statement, 0) != SQLITE_NULL else { return nil }
+    return sqlite3_column_int(statement, 0) == 1
+}
 
-    #expect(indexed == ["me", "them-1", "them-1", "them-1"])
-    #expect(transcript.contains("**Собеседник 1**"))
-    #expect(!transcript.contains("Собеседник 2"))
-    #expect(!transcript.contains("Собеседник 3"))
+@MainActor
+@Test func theClassifierSayingOneOtherPersonIsStoredAndKeepsTheDiarizerSpeakers() async throws {
+    let (indexed, transcript, stored) = try await remoteSpeakersAfterProcessing(oneOtherPerson: true)
+
+    #expect(indexed == ["me", "them-1", "them-2", "them-3"])
+    #expect(transcript.contains("Собеседник 3"))
+    #expect(stored == true)
 }
 
 @MainActor
 @Test func theClassifierSayingSeveralPeopleKeepsTheDiarizerSpeakers() async throws {
-    let (indexed, transcript) = try await remoteSpeakersAfterProcessing(oneOtherPerson: false)
+    let (indexed, transcript, _) = try await remoteSpeakersAfterProcessing(oneOtherPerson: false)
 
     #expect(indexed == ["me", "them-1", "them-2", "them-3"])
     #expect(transcript.contains("Собеседник 3"))
@@ -300,7 +311,7 @@ private func remoteSpeakersAfterProcessing(
 
 @MainActor
 @Test func noClassifierAnswerKeepsTheDiarizerSpeakers() async throws {
-    let (indexed, transcript) = try await remoteSpeakersAfterProcessing(oneOtherPerson: nil)
+    let (indexed, transcript, _) = try await remoteSpeakersAfterProcessing(oneOtherPerson: nil)
 
     #expect(indexed == ["me", "them-1", "them-2", "them-3"])
     #expect(transcript.contains("Собеседник 3"))
@@ -308,7 +319,7 @@ private func remoteSpeakersAfterProcessing(
 
 @MainActor
 @Test func aFailedClassificationKeepsTheDiarizerSpeakers() async throws {
-    let (indexed, transcript) = try await remoteSpeakersAfterProcessing(
+    let (indexed, transcript, _) = try await remoteSpeakersAfterProcessing(
         oneOtherPerson: true, failure: SummarizationError.unavailable("down")
     )
 

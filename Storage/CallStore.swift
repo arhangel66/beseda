@@ -638,13 +638,13 @@ final class CallStore {
     }
 
     private func mergeRemoteSpeakersOfOneToOneCall(_ db: OpaquePointer, callID: String) throws {
-        // a calendar event with exactly one other attendee, or the classifier inferring one other person from the text:
-        // the diarizer's extra `them-N` are that person's short replies (docs/decisions/speaker-accuracy.md).
-        // Plain `them` (no diarization) and group calls stay as they are
+        // a calendar event with exactly one other attendee: the diarizer's extra `them-N` are that person's short
+        // replies (docs/decisions/speaker-accuracy.md). Not `one_other_person`: the local model said «один» on 3 of 5
+        // dailies, and this relabel is one-way. Plain `them` (no diarization) and group calls stay as they are
         try run(db, """
             UPDATE transcript_segments SET speaker = 'them-1'
             WHERE call_id = ? AND speaker LIKE 'them-%' AND speaker != 'them-1'
-              AND (SELECT instr(participants, char(10)) = 0 OR one_other_person = 1 FROM calls WHERE id = ?)
+              AND (SELECT instr(participants, char(10)) = 0 FROM calls WHERE id = ?)
             """, callID, callID)
         guard sqlite3_changes(db) > 0,
               let path = try query(db, "SELECT transcript_path FROM calls WHERE id = ?", callID, row: { columnString($0, 0) })
@@ -658,12 +658,11 @@ final class CallStore {
         )
     }
 
-    /// the classifier's «exactly one other person» answer; true folds the remote speakers into one
+    /// the classifier's «exactly one other person» answer, stored as a measurement only: it does not relabel speakers
     func setOneOtherPerson(callID: String, _ oneOtherPerson: Bool) throws {
         try database { db in
             try run(db, "UPDATE calls SET one_other_person = ?, updated_at = ? WHERE id = ?",
                     oneOtherPerson, Date().iso8601WithFractions, callID)
-            try mergeRemoteSpeakersOfOneToOneCall(db, callID: callID)
         }
     }
 

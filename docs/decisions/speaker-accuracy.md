@@ -188,9 +188,12 @@ linked, so an event matched after diarization relabels too. Signals the app has:
 - calendar event with exactly one attendee besides Mikhail (`calls.participants`) — **used**;
 - a 1:1 call type — **not there**: the defaults hold only «Другое», Mikhail's own list only adds «Дейли»;
   types are user-defined names with no "1:1" meaning, so a later type change relabels nothing;
-- inferred participant count — **used since BESEDA-104**: the call-type classification also answers «exactly
-  one other person?» on a transcript with every remote speaker labelled «Удалённо» (`calls.one_other_person`);
-  «yes» (Jev: `one` at ≥ 0.5) relabels like the calendar signal, and transcript.md's dialogue is rewritten.
+- inferred participant count — **stored, not used** (BESEDA-104, BESEDA-107): the call-type classification also
+  answers «exactly one other person?» on a transcript with every remote speaker labelled «Удалённо», and the
+  answer is kept in `calls.one_other_person` as a measurement. It does not relabel: the bundled local model said
+  «один» on 3 of 5 dailies (20260925-125945, 20260924-130017, 20260922-125838;
+  untracked/epics/speaker-accuracy/results/one-to-one-forced.md), the relabel is one-way, and the Jev answer is
+  unmeasured. Only the calendar signal is known, not guessed (critic review, finding 14).
 
 Unlinking the event or switching to a group event does not split the speakers back (re-transcribe to undo).
 

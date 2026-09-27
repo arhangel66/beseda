@@ -43,9 +43,10 @@ to their first type, which was «Другое» by position then.
     containment, longest name first, on the answer's first line. An unknown answer falls back to «Другое»
     and is logged. The prompt's second line asks «один» or «несколько» people besides Mikhail
     (`parseOneOtherPerson`; anything else is no answer).
-  - **One other person** (BESEDA-104): the answer is stored as `calls.one_other_person`; true folds the
-    remote speakers into one exactly as a one-attendee calendar event does ([ASR](asr.md)). No answer
-    (a given type, only «Другое», an unreadable line, a failed summary) leaves the call as it was.
+  - **One other person** (BESEDA-104): the answer is stored as `calls.one_other_person` and changes
+    nothing else (BESEDA-107): the local model said «один» on 3 of 5 dailies and Jev is unmeasured, so
+    only a one-attendee calendar event folds the remote speakers ([ASR](asr.md),
+    [speaker accuracy](../decisions/speaker-accuracy.md)). No answer leaves the column null.
   - Privacy is per app, not per type: the type is unknown before classification, so a private type
     cannot keep its call away from Jev. Settings say what leaves the Mac next to the picker.
   - «Только локально» (`AppSettings.localOnly`, off by default) turns Jev off, replaces OpenRouter or a

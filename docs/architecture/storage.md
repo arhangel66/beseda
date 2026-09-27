@@ -41,7 +41,7 @@ folder is moved here once by `LegacyDataMigration`.
   the user, lowercased emails, newline-joined) are nullable TEXT written by `setEvent` whenever an event
   is matched or picked; calls linked before them stay null.
   `calls.one_other_person` (nullable INTEGER) is the classifier's «exactly one other person» answer
-  (`setOneOtherPerson`, BESEDA-104); null means never answered.
+  (`setOneOtherPerson`, BESEDA-104), a measurement that relabels nothing (BESEDA-107); null means never answered.
 - **Writes throw** — every index write in the recording and retry pipeline (`saveCall`,
   `upsertTranscriptJob`) throws into the job's error path, which shows the failure in the status line. A
   finished transcript goes in through `markReady`: segments and `status = 'ready'` in one transaction; only
