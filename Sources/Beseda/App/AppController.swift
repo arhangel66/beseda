@@ -1606,9 +1606,11 @@ final class AppController {
             return
         }
         do {
-            let url = try CallExport.write(detail, result: result, type: type, to: URL(fileURLWithPath: settings.exportFolder))
-            try callStore.replaceExportCopy(callID: detail.id, with: url)
-            appendLog("Exported \(detail.id) to \(url.path)")
+            try settings.withExportFolder { folder in
+                let url = try CallExport.write(detail, result: result, type: type, to: folder)
+                try callStore.replaceExportCopy(callID: detail.id, with: url)
+                appendLog("Exported \(detail.id) to \(url.path)")
+            }
         } catch {
             appendLog("Export failed: \(error.localizedDescription)")
         }
@@ -1760,8 +1762,13 @@ final class AppController {
         // a call waiting its turn would reach runSummary with its row gone
         processingQueue.removeWaiting { $0.0.id == call.id }
         do {
-            let exportFolder = settings.exportFolder.isEmpty ? nil : URL(fileURLWithPath: settings.exportFolder)
-            try callStore.deleteCallAndFiles(id: call.id, exportFolder: exportFolder)
+            if settings.exportFolder.isEmpty {
+                try callStore.deleteCallAndFiles(id: call.id, exportFolder: nil, requireExportScope: settings.sandboxed)
+            } else {
+                try settings.withExportFolder { folder in
+                    try callStore.deleteCallAndFiles(id: call.id, exportFolder: folder, requireExportScope: settings.sandboxed)
+                }
+            }
             if selectedCallDetail?.id == call.id {
                 selectCall(id: nil)
             }

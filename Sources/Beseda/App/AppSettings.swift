@@ -73,6 +73,7 @@ final class AppSettings {
     private let localOnlyKey = "beseda.localOnly"
     private let autoProcessCallsKey = "beseda.autoProcessCalls"
     private let exportFolderKey = "beseda.exportFolder"
+    private let exportBookmarkKey = "beseda.exportBookmark"
     private let webhookEnabledKey = "beseda.webhookEnabled"
     private let webhookURLKey = "beseda.webhookURL"
     private let webhookSecretKey = "beseda.webhookSecret"
@@ -252,11 +253,61 @@ final class AppSettings {
         }
     }
 
-    /// a plain path, empty = no export; no security-scoped bookmark while the app is not sandboxed
     var exportFolder: String {
         didSet {
             defaults.set(exportFolder, forKey: exportFolderKey)
+            if exportFolder.isEmpty { defaults.removeObject(forKey: exportBookmarkKey) }
         }
+    }
+
+    var exportNeedsReselection = false
+
+    var sandboxed: Bool {
+        ProcessInfo.processInfo.environment["APP_SANDBOX_CONTAINER_ID"] != nil
+    }
+
+    func selectExportFolder(_ url: URL) throws {
+        if sandboxed {
+            let bookmark = try url.bookmarkData(options: .withSecurityScope, includingResourceValuesForKeys: nil, relativeTo: nil)
+            defaults.set(bookmark, forKey: exportBookmarkKey)
+        }
+        exportFolder = url.path
+        exportNeedsReselection = false
+    }
+
+    func withExportFolder<T>(_ body: (URL) throws -> T) throws -> T {
+        if !sandboxed { return try body(URL(fileURLWithPath: exportFolder)) }
+        guard let bookmark = defaults.data(forKey: exportBookmarkKey) else {
+            exportNeedsReselection = true
+            throw ExportAccessError.reselect
+        }
+        var stale = false
+        let url: URL
+        do {
+            url = try URL(resolvingBookmarkData: bookmark, options: .withSecurityScope,
+                          relativeTo: nil, bookmarkDataIsStale: &stale)
+        } catch {
+            exportNeedsReselection = true
+            throw ExportAccessError.reselect
+        }
+        guard url.startAccessingSecurityScopedResource() else {
+            exportNeedsReselection = true
+            throw ExportAccessError.reselect
+        }
+        defer { url.stopAccessingSecurityScopedResource() }
+        if stale {
+            if let renewed = try? url.bookmarkData(options: .withSecurityScope, includingResourceValuesForKeys: nil, relativeTo: nil) {
+                defaults.set(renewed, forKey: exportBookmarkKey)
+            } else {
+                exportNeedsReselection = true
+            }
+        }
+        return try body(url)
+    }
+
+    enum ExportAccessError: LocalizedError {
+        case reselect
+        var errorDescription: String? { "Select the export folder again in Settings / Выберите папку экспорта снова в настройках" }
     }
 
     var webhookURL: String {
@@ -303,6 +354,7 @@ final class AppSettings {
                 rawRetentionKey: rawAudioRetention.rawValue,
                 normalizedRetentionKey: normalizedAudioRetention.rawValue,
                 exportFolderKey: exportFolder,
+                exportBookmarkKey: defaults.data(forKey: exportBookmarkKey) ?? Data(),
                 localOnlyKey: localOnly,
                 excludesFromBackupKey: excludesFromBackup
             ] as [String: Any], forKey: valuesBeforeStrictModeKey)
@@ -315,6 +367,9 @@ final class AppSettings {
             rawAudioRetention = (saved[rawRetentionKey] as? String).flatMap(RetentionRule.init(rawValue:)) ?? .days90
             normalizedAudioRetention = (saved[normalizedRetentionKey] as? String).flatMap(RetentionRule.init(rawValue:)) ?? .days30
             exportFolder = saved[exportFolderKey] as? String ?? ""
+            if let bookmark = saved[exportBookmarkKey] as? Data, !bookmark.isEmpty {
+                defaults.set(bookmark, forKey: exportBookmarkKey)
+            }
             localOnly = saved[localOnlyKey] as? Bool ?? false
             excludesFromBackup = saved[excludesFromBackupKey] as? Bool ?? false
             defaults.removeObject(forKey: valuesBeforeStrictModeKey)

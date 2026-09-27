@@ -665,11 +665,19 @@ private struct StoragePane: View {
                         panel.canChooseFiles = false
                         panel.canCreateDirectories = true
                         if panel.runModal() == .OK, let url = panel.url {
-                            settings.exportFolder = url.path
+                            do {
+                                try settings.selectExportFolder(url)
+                            } catch {
+                                settings.exportNeedsReselection = true
+                            }
                         }
                     }
                 }
                 .disabled(settings.strictMode)
+                if settings.exportNeedsReselection {
+                    Label(SettingsText.get("Выберите папку экспорта снова в настройках"), systemImage: "exclamationmark.triangle")
+                        .foregroundStyle(.orange)
+                }
                 if ICloudDrive.contains(settings.exportFolder) {
                     Label(SettingsText.get("Папка в iCloud Drive: экспорт уходит в облако Apple."), systemImage: "icloud")
                         .foregroundStyle(.orange)

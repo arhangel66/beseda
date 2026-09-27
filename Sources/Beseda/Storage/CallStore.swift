@@ -525,9 +525,14 @@ final class CallStore: @unchecked Sendable {
     }
 
     /// the row with its transcript, the call folder and the Markdown copy in the export folder
-    func deleteCallAndFiles(id: String, exportFolder: URL?) throws {
+    func deleteCallAndFiles(id: String, exportFolder: URL?, requireExportScope: Bool = false) throws {
         guard let call = try fetchCall(id: id) else {
             return
+        }
+        let previousExport = try exportPath(callID: id).map { URL(fileURLWithPath: $0) }
+        if requireExportScope, let previousExport,
+           previousExport.deletingLastPathComponent().standardizedFileURL != exportFolder?.standardizedFileURL {
+            throw ExportDeletionError.oldFolder
         }
         // the folder moves to the trash first: a failed row delete puts it back, and a trash that
         // cannot be emptied now is emptied on the next launch, so no row ever points at missing files
@@ -544,7 +549,7 @@ final class CallStore: @unchecked Sendable {
         // copies written before the path was stored
         let looseFiles = [
             call.transcriptURL, exportFolder?.appendingPathComponent(CallExport.fileName(call)),
-            try exportPath(callID: id).map { URL(fileURLWithPath: $0) }
+            previousExport
         ]
         do {
             try deleteCall(id: id)
@@ -558,6 +563,11 @@ final class CallStore: @unchecked Sendable {
             try fileManager.removeItem(at: url)
         }
         try emptyTrash()
+    }
+
+    enum ExportDeletionError: LocalizedError {
+        case oldFolder
+        var errorDescription: String? { "Previous export folder needs access / Требуется доступ к прежней папке экспорта" }
     }
 
     /// call folders a deletion moved aside and could not remove
