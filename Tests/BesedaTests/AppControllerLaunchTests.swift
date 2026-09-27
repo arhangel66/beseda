@@ -206,6 +206,27 @@ private func line(_ speaker: String) -> SpeakerTranscriptSegment {
     #expect(message.contains("Индекс звонков недоступен"))
 }
 
+@MainActor
+@Test func aFailedResumeAtLaunchIsNotReportedAsAnUnavailableIndex() throws {
+    let harness = try Harness()
+    defer { harness.cleanUp() }
+    try harness.store.prepare()
+    try harness.addCall("call", status: "ready")
+    let transcript = try harness.folder("call").appendingPathComponent("transcript.md")
+    // not UTF-8: reading the transcript to resume the call throws
+    try Data([0xFF, 0xFE, 0xFD]).write(to: transcript)
+    try harness.store.markReady(callID: "call", transcriptURL: transcript, segments: [])
+    try harness.store.setProcessingPending(callID: "call", true)
+
+    let controller = harness.controller()
+
+    guard case .failed(let message) = controller.status else {
+        Issue.record("status is \(controller.status)")
+        return
+    }
+    #expect(message.contains("возобновить обработку"))
+}
+
 // MARK: - 13: the auto-processing queue survives quit
 
 @MainActor
