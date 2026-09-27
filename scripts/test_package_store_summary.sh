@@ -6,6 +6,8 @@ TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 mkdir -p "$TMP/bin" "$TMP/src/llama-b10819" "$TMP/Store.app/Contents/MacOS"
 printf 'stub app\n' > "$TMP/Store.app/Contents/MacOS/Beseda"
+mkdir -p "$TMP/Store.app/Contents/Resources/Beseda_Beseda.bundle/Resources/en.lproj"
+printf 'stub strings\n' > "$TMP/Store.app/Contents/Resources/Beseda_Beseda.bundle/Resources/en.lproj/Menu.strings"
 printf '#!/bin/sh\nexit 0\n' > "$TMP/src/llama-b10819/llama-server"
 printf 'stub dylib\n' > "$TMP/src/llama-b10819/libllama.dylib"
 printf 'second dylib\n' > "$TMP/src/llama-b10819/libggml.0.23.dylib"
@@ -23,6 +25,18 @@ fi
 grep -q 'archive hash mismatch' "$TMP/error"
 test ! -e "$TMP/Store.app/Contents/Helpers/llama-server"
 # Only the digest command is stubbed for the happy path; the real rejection above guards the boundary.
+touch "$TMP/Store.app/stray"
+if bash "$ROOT/scripts/package_store_summary.sh" "$TMP/Store.app" "$TMP/archive.tar.gz" stub >"$TMP/error" 2>&1; then
+    echo 'stray root content accepted' >&2; exit 1
+fi
+grep -q 'unsealed content' "$TMP/error"
+rm "$TMP/Store.app/stray"
+mv "$TMP/Store.app/Contents/Resources/Beseda_Beseda.bundle" "$TMP/Store.app/Contents/Resources/moved"
+if bash "$ROOT/scripts/package_store_summary.sh" "$TMP/Store.app" "$TMP/archive.tar.gz" stub >"$TMP/error" 2>&1; then
+    echo 'missing resource bundle accepted' >&2; exit 1
+fi
+grep -q 'resource bundle missing' "$TMP/error"
+mv "$TMP/Store.app/Contents/Resources/moved" "$TMP/Store.app/Contents/Resources/Beseda_Beseda.bundle"
 printf '#!/bin/sh\necho "8933e736495eadfef0731ae32054acfaa75699bf4a6ccba77cd8475db085ec66  $3"\n' > "$TMP/bin/shasum"
 chmod +x "$TMP/bin/shasum"
 bash "$ROOT/scripts/package_store_summary.sh" "$TMP/Store.app" "$TMP/archive.tar.gz" stub

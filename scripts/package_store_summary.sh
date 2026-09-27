@@ -10,6 +10,15 @@ EXPECTED=8933e736495eadfef0731ae32054acfaa75699bf4a6ccba77cd8475db085ec66
 [[ -f "$APP/Contents/Info.plist" && -f "$APP/Contents/MacOS/Beseda" && ! -e "$APP/Contents/Helpers" ]] || {
     echo 'expected an unsigned assembled store app without Helpers' >&2; exit 1;
 }
+[[ -d "$APP/Contents/Resources/Beseda_Beseda.bundle/Resources/en.lproj" ]] || {
+    echo 'store resource bundle missing from Contents/Resources' >&2; exit 1;
+}
+[[ -f "$APP/Contents/Resources/Beseda_Beseda.bundle/Resources/en.lproj/Menu.strings" ]] || {
+    echo 'store localization missing' >&2; exit 1;
+}
+[[ -z "$(find "$APP" -mindepth 1 -maxdepth 1 ! -name Contents -print -quit)" ]] || {
+    echo 'unsealed content in app root' >&2; exit 1;
+}
 [[ "$(shasum -a 256 "$ARCHIVE" | awk '{print $1}')" == "$EXPECTED" ]] || {
     echo 'llama.cpp archive hash mismatch' >&2; exit 1;
 }
