@@ -706,9 +706,10 @@ final class CallStore {
         }
     }
 
-    func fetchCalls(limit: Int = 200) throws -> [StoredCallSummary] {
+    func fetchCalls(limit: Int = 200, offset: Int = 0) throws -> [StoredCallSummary] {
         try database { db in
-            try query(db, "\(Self.callSelect) ORDER BY c.started_at DESC LIMIT ?", limit, row: makeSummary)
+            try query(db, "\(Self.callSelect) ORDER BY c.started_at DESC LIMIT ? OFFSET ?", limit, offset,
+                      row: makeSummary)
         }
     }
 
@@ -938,17 +939,23 @@ final class CallStore {
         }
     }
 
-    /// call ids whose transcript contains the query; the sidebar search reaches inside
-    /// transcripts without loading every segment of every call
-    func searchCallIDs(matching query: String) throws -> Set<String> {
+    /// every call, loaded or not, whose metadata or transcript contains `query`
+    // ponytail: LIKE scans every segment and folds case for ASCII only; FTS5 if it grows
+    func searchCalls(matching query: String) throws -> [StoredCallSummary] {
         let escaped = query
             .replacingOccurrences(of: "\\", with: "\\\\")
             .replacingOccurrences(of: "%", with: "\\%")
             .replacingOccurrences(of: "_", with: "\\_")
+        let pattern = "%\(escaped)%"
         return try database { db in
-            let ids = try self.query(db, "SELECT DISTINCT call_id FROM transcript_segments WHERE text LIKE ? ESCAPE '\\'",
-                                     "%\(escaped)%") { columnString($0, 0) }
-            return Set(ids.compactMap { $0 })
+            try self.query(db, """
+                \(Self.callSelect)
+                WHERE c.event_title LIKE ?1 ESCAPE '\\' OR c.app_name LIKE ?1 ESCAPE '\\'
+                   OR c.summary_text LIKE ?1 ESCAPE '\\' OR c.participants LIKE ?1 ESCAPE '\\'
+                   OR c.error LIKE ?1 ESCAPE '\\'
+                   OR c.id IN (SELECT call_id FROM transcript_segments WHERE text LIKE ?1 ESCAPE '\\')
+                ORDER BY c.started_at DESC
+                """, pattern, row: makeSummary)
         }
     }
 

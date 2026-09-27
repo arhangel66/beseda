@@ -90,6 +90,6 @@ import Testing
 
     #expect(try store.fetchCall(id: "call-1")?.status == "ready")
     #expect(try store.fetchSegments(callID: "call-1").map(\.text) == [transcription.text])
-    #expect(try store.searchCallIDs(matching: "редкий поисковый") == ["call-1"])
+    #expect(try store.searchCalls(matching: "редкий поисковый").map(\.id) == ["call-1"])
     #expect(FileManager.default.fileExists(atPath: transcriptURL.path))
 }

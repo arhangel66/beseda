@@ -48,6 +48,15 @@ struct CallSidebar: View {
                     }
                 }
             }
+
+            if controller.hasMoreCalls && controller.searchQuery.isEmpty {
+                Button("Показать ещё") {
+                    controller.loadMoreCalls()
+                }
+                .buttonStyle(.link)
+                .listRowSeparator(.hidden)
+                .selectionDisabled()
+            }
         }
         .listStyle(.sidebar)
         .safeAreaInset(edge: .bottom, spacing: 0) {

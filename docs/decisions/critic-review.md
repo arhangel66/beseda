@@ -59,6 +59,8 @@ Effort is S (hours), M (days), or L (weeks). Priority is P0 (blocks safe sale or
    and search filters that loaded array even though SQLite searches all segment IDs. At two calls per workday,
    older memory disappears from navigation in about five months. Add cursor pagination and SQLite FTS; make
    search return and open records outside the loaded page.
+   Addressed in BESEDA-92: «Показать ещё» pages the sidebar, `searchCalls` searches every call in SQLite
+   ([storage.md](../architecture/storage.md)); offset paging and LIKE, no FTS — ~0.1 s on 2000 calls.
 
 6. **“В прошлый раз” is incompatible with the advertised custom prompts — P1, M.**
    `Storage/RelatedCalls.swift:21-22,50-72` extracts three exact headings from the default Russian prompt
