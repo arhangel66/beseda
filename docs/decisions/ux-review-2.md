@@ -14,6 +14,8 @@ system appearance was Light. Screenshots are in `.factory/shots/BESEDA-ux2/`.
 
 ### P1 — The first privacy promise is broader than the explanation
 
+**Fixed in BESEDA-155.** The onboarding headline now says «Аудио остаётся на этом Mac»; its adjacent explanation names the optional cloud text paths (OpenRouter, Jev and live key points).
+
 - **Screen and shot:** onboarding, step 1 — [onboarding-1](../../.factory/shots/BESEDA-ux2/onboarding-1-добро-пожаловать-в-beseda.png).
 - **What is wrong:** «Ваши разговоры остаются на этом Mac» reads as a complete privacy guarantee. The next
   sentence qualifies it: text can leave the Mac when cloud summaries are enabled. A psychologist choosing a
@@ -25,6 +27,8 @@ system appearance was Light. Screenshots are in `.factory/shots/BESEDA-ux2/`.
 - **Priority:** P1.
 
 ### P1 — A selected speech model looks ready when it is absent
+
+**Fixed in BESEDA-155.** `SpeechModel.stateLabel` distinguishes «Выбрана · не скачана», «Выбрана · скачана» and «Готова» (only when usable); onboarding and Settings share `SpeechModelList`, and the missing-model popover uses the same label.
 
 - **Screen and shot:** onboarding, step 3 — [onboarding-3](../../.factory/shots/BESEDA-ux2/onboarding-3-добро-пожаловать-в-beseda.png); Settings → Обработка — [missing model](../../.factory/shots/BESEDA-ux2/settings-processing-missing-model-обработка.png).
 - **What is wrong:** Parakeet carries the orange «Выбрана» badge next to «Скачать», while the Settings footer says
@@ -77,6 +81,8 @@ system appearance was Light. Screenshots are in `.factory/shots/BESEDA-ux2/`.
 - **Priority:** P2.
 
 ### P2 — Onboarding calls a check a permission
+
+**Fixed in BESEDA-155.** The step is «Два источника звука», explains microphone versus system sound, uses «Разрешить доступ» versus «Проверить звук», and names «Настройки → Запись» as the later check path.
 
 - **Screen and shot:** onboarding, step 2 — [access](../../.factory/shots/BESEDA-ux2/onboarding-2-добро-пожаловать-в-beseda.png).
 - **What is wrong:** «Два доступа» groups «Разрешить» for the microphone with «Проверить» for system sound. Those are
@@ -160,6 +166,8 @@ system appearance was Light. Screenshots are in `.factory/shots/BESEDA-ux2/`.
   [warning](../../.factory/shots/BESEDA-ux2/popover-warning-popover-preview.png).
 
 ## Coverage limits
+
+BESEDA-155 changed the onboarding and model-state copy described above. The referenced after shots under `.factory/shots/BESEDA-153/` are not present in this checkout, so no visual verification or working after-shot links can be cited here; the fixed markers reflect the source changes, not a new screenshot review.
 
 No screenshots were taken for BESEDA-175 because signing, installation, and app launch were paused. Exact shots left for the follow-up: recording popover with the live disclosure collapsed and expanded; Settings → Основные; Settings → Запись with automatic recording on; Settings → Запись during and after «Проверить звук»; Settings → Обработка with model details collapsed and expanded; Settings → Интеграции with a missing selected calendar; Settings → Интеграции with webhook developer details collapsed and expanded.
 
