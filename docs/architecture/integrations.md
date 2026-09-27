@@ -35,8 +35,8 @@ There are two: an outgoing webhook and the macOS calendar. There is no MCP code 
 
 ### Main files
 
-`Webhooks/WebhookService.swift` (queue, retries, journal), `Webhooks/WebhookSender.swift` (one POST,
-outcome classification), `Webhooks/WebhookPayload.swift`. Settings: `webhookEnabled`, `webhookURL`,
+`Sources/Beseda/Webhooks/WebhookService.swift` (queue, retries, journal), `Sources/Beseda/Webhooks/WebhookSender.swift` (one POST,
+outcome classification), `Sources/Beseda/Webhooks/WebhookPayload.swift`. Settings: `webhookEnabled`, `webhookURL`,
 `webhookSecret` in `AppSettings`; the journal is shown in Settings → «Интеграции» and on the call.
 
 ### Constraints

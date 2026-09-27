@@ -84,7 +84,7 @@ let theirs = try segments(callDirectory.appendingPathComponent("them.asr.json"))
 
 // the gate's own echo model, recomputed to report it
 let frames = mic.count / EchoGate.frameSamples
-let lag = EchoGate.echoLag(mic: mic, system: system)
+let lag = try EchoGate.echoLag(mic: SampleSource(mic), system: SampleSource(system))
 let shifted = [Float](repeating: 0, count: min(lag, mic.count)) + system.prefix(max(mic.count - lag, 0))
 let echoSignal = shifted + [Float](repeating: 0, count: mic.count - shifted.count)
 let micDot = vDSP.dot(mic, echoSignal)
@@ -99,7 +99,7 @@ let echoEnergy = vDSP.multiply(gain * gain, frameEnergies(echoSignal))
 let micFloor = micEnergy.sorted()[Int(Double(frames - 1) * 0.1)]
 let systemEnergy = frameEnergies(system + [Float](repeating: 0, count: max(mic.count - system.count, 0)))
 let systemFloor = systemEnergy.sorted()[Int(Double(frames - 1) * 0.1)]
-let own = EchoGate.ownSpeechFrames(mic: mic, system: system)
+let own = try EchoGate.ownSpeechFrames(mic: SampleSource(mic), system: SampleSource(system))
 let systemActive = systemEnergy.map { $0 > 10 * systemFloor }
 
 func normalized(_ text: String) -> String {
@@ -156,6 +156,6 @@ let report = CallReport(
     micWords: allWords.count,
     echoWords: allWords.filter(isSystemRepeat).count,
     before: counts(gateBefore(mine, own: own)),
-    after: counts(EchoGate.ownSpeechSegments(mine, mic: mic, system: system))
+    after: counts(try EchoGate.ownSpeechSegments(mine, mic: SampleSource(mic), system: SampleSource(system)))
 )
 print(String(decoding: try JSONEncoder().encode(report), as: UTF8.self))

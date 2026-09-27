@@ -54,16 +54,17 @@ the vendored Swift wrapper in `Vendor/TranscribeCpp`). No audio leaves the machi
   (`BESEDA_LONG_CALL_MEMORY=echo|asr`, synthetic 4-hour two-channel call in a temp dir, model not run),
   peak RSS of the test process: echo gate 3576 MB before, 62 MB after; reading and cutting for ASR
   1772 MB before, 77 MB after. `noReadGrowsWithTheLengthOfTheCall` checks the largest read is the same
-  for a 5 and a 20 minute call (120 s + 1 sample).- **Merge** — `DualTranscriptResult.speakerSegments` interleaves `me` segments with the remote turns by
+  for a 5 and a 20 minute call (120 s + 1 sample).
+- **Merge** — `DualTranscriptResult.speakerSegments` interleaves `me` segments with the remote turns by
   start time. `TranscriptMerger.writeDualTranscript` writes `transcript.md` with a `## Dialogue` block
   and a `## Channels` block (per-channel text and segments). `SpeakerNaming` turns keys into display
   names; renames rewrite only the dialogue block (`rewriteDialogue`).
 
 ## Main files
 
-`Transcription/LocalTranscriber.swift`, `SampleSource.swift`, `SpeechModel.swift`, `UtteranceSplitter.swift`,
+`Sources/Beseda/Transcription/LocalTranscriber.swift`, `SampleSource.swift`, `SpeechModel.swift`, `UtteranceSplitter.swift`,
 `WordAssembler.swift`, `SentenceBuilder.swift`, `EchoGate.swift`, `Diarizer.swift`, `SpeakerAssignment.swift`,
-`SpeakerNaming.swift`, `TranscriptMerger.swift`, `TranscriptModels.swift`; `Runtime/RuntimeInstaller.swift`;
+`SpeakerNaming.swift`, `TranscriptMerger.swift`, `TranscriptModels.swift`; `Sources/Beseda/Runtime/RuntimeInstaller.swift`;
 the pipeline order is in `AppController.transcribeDualCall`.
 
 ## Data flow

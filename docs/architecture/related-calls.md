@@ -5,7 +5,7 @@ description: How the previous related call is found for a call or a calendar eve
 ---
 # Related calls
 
-Logic for the «В прошлый раз» block (epic BESEDA-52); code in `Storage/RelatedCalls.swift`, the rule from
+Logic for the «В прошлый раз» block (epic BESEDA-52); code in `Sources/Beseda/Storage/RelatedCalls.swift`, the rule from
 [development directions](../decisions/development-directions.md#related-calls).
 
 ## Entry points
