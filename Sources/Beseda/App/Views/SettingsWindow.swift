@@ -309,7 +309,7 @@ private struct ProcessingPane: View {
             } header: {
                 Text("Распознавание речи")
             } footer: {
-                Text("Модели на диске: \((controller.runtime.diskUsage() + (controller.diarizer.isDownloaded ? Diarizer.bytes : 0)).byteSizeDescription). Модели работают на этом Mac; модель разбора голосов скачивается с первым звонком. Смена модели не трогает уже сделанные расшифровки.")
+                Text("Модели на диске: \((controller.runtime.diskUsage() + (controller.diarizer.isDownloaded ? Diarizer.bytes : 0)).byteSizeDescription). Модели работают на этом Mac; модель разбора голосов скачивается в фоне, как только выбрана модель речи. Смена модели не трогает уже сделанные расшифровки.")
             }
 
             Section {
@@ -653,7 +653,10 @@ private struct IntegrationsPane: View {
                     get: { settings.calendarEnabled },
                     set: { controller.setCalendarEnabled($0) }
                 ))
-                LabeledContent(accessLine) {
+                // one row: a broken link replaces the access line, and its button fixes that very problem
+                let problem = settings.calendarEnabled
+                    ? controller.calendarService.linkingProblem(selected: settings.calendarIdentifiers) : nil
+                LabeledContent(problem ?? accessLine) {
                     if controller.calendarService.isAuthorized {
                         Button("Выбрать календари…") {
                             isCalendarPickerOpen = true
@@ -667,16 +670,8 @@ private struct IntegrationsPane: View {
                         }
                     }
                 }
+                .foregroundStyle(problem == nil ? Color.primary : Color.red)
                 .disabled(!settings.calendarEnabled)
-                if settings.calendarEnabled,
-                   let problem = controller.calendarService.linkingProblem(selected: settings.calendarIdentifiers) {
-                    LabeledContent(problem) {
-                        Button("Открыть настройки…") {
-                            PermissionsModel.openPrivacySettings(pane: "Privacy_Calendars")
-                        }
-                    }
-                    .foregroundStyle(.red)
-                }
             } header: {
                 Text("Календарь")
             } footer: {
