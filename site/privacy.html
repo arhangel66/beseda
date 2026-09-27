@@ -33,7 +33,7 @@
         <li><strong>Live key points:</strong> If enabled, accumulated live transcript lines go to the selected summary provider every few minutes. Live transcription itself is local.</li>
         <li><strong>LM Studio:</strong> If selected for summaries or live key points, text goes to the configured LM Studio server. That server may be on another machine; it is not necessarily local to your Mac.</li>
         <li><strong>Webhooks:</strong> If configured, Beseda sends the transcript, title, time and summary to your chosen endpoint. Endpoints must use HTTPS except for localhost. Beseda stores the endpoint's response body in its local index.</li>
-        <li><strong>Downloads:</strong> Beseda fetches models, the llama.cpp engine and updates from Hugging Face and GitHub. These downloads do not send call data.</li>
+        <li><strong>Downloads:</strong> Beseda downloads speech and summary model data from Hugging Face. The Store build ships a pinned signed llama.cpp helper with the app; it does not download that executable. The direct build may download the llama.cpp engine from GitHub and uses Sparkle for app updates. Apple handles Store app updates; Store update behavior has not been tested in a provisioned app. The app requests model files for downloads; this is not a guarantee about every field in a network request.</li>
       </ul>
       <p>The “Local only” processing setting disables Jev and webhooks and uses the built-in model for summaries and live key points. Check your processing settings before recording sensitive calls.</p>
     </section>
