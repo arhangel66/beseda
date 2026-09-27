@@ -40,9 +40,12 @@ outcome classification), `Sources/Beseda/Webhooks/WebhookPayload.swift`. Setting
 `webhookSecret` in `AppSettings`; the journal is shown in Settings → «Интеграции» and on the call.
 
 When the switch is on but linking cannot work — access is not `.fullAccess`, or a chosen calendar
-identifier is gone from EventKit — `CalendarService.linkingProblem` returns a reason: it is logged once at
-launch (`Calendar linking off: …`) and shown in red in Settings → Интеграции → Календарь with a button to the
-Calendars privacy pane. Without it a lost calendar silently stopped every match (BESEDA-130).
+identifier is gone from EventKit — `CalendarService.linkingProblem` returns a reason and it is logged once at
+launch (`Calendar linking off: …`). Settings → Интеграции → Календарь maps EventKit's authorization state to
+one explicit action: `.notDetermined` requests access only after a click, denied access opens the Calendars
+privacy pane with instructions, and full access shows the calendar picker. Enabling the integration never
+causes a permission prompt by itself. Without the warning a lost calendar silently stopped every match
+(BESEDA-130).
 
 ### Constraints
 

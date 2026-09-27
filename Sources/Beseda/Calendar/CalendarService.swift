@@ -20,6 +20,12 @@ struct CalendarEvent: Identifiable, Hashable, Sendable {
     }
 }
 
+enum CalendarAccessAction: Equatable {
+    case requestAccess
+    case openSettings
+    case chooseCalendars
+}
+
 /// Reads the Mac's calendars to name conversations and to show what is coming up.
 /// It never starts a recording — that still comes from the sound of a call app.
 @MainActor
@@ -43,9 +49,25 @@ final class CalendarService {
         if IsolatedCopy.skips("EKEventStore.requestFullAccessToEvents") {
             return
         }
-        // macOS 14 split calendar access in two, and reading events needs the full kind
-        _ = try? await store.requestFullAccessToEvents()
+        if #available(macOS 14.0, *) {
+            _ = try? await store.requestFullAccessToEvents()
+        } else {
+            _ = try? await store.requestAccess(to: .event)
+        }
         authorization = EKEventStore.authorizationStatus(for: .event)
+    }
+
+    nonisolated static func accessAction(for authorization: EKAuthorizationStatus) -> CalendarAccessAction {
+        switch authorization {
+        case .notDetermined:
+            .requestAccess
+        case .fullAccess:
+            .chooseCalendars
+        case .restricted, .denied, .writeOnly:
+            .openSettings
+        @unknown default:
+            .openSettings
+        }
     }
 
     /// why calls cannot be linked to events right now, or nil when nothing is broken

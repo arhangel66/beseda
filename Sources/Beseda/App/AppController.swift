@@ -525,21 +525,22 @@ final class AppController {
 
     // MARK: - Calendar
 
-    /// turning the switch on is also when access is asked for: nothing happens before that
     func setCalendarEnabled(_ enabled: Bool) {
         settings.calendarEnabled = enabled
         eventMatchAttempted = []
-        guard enabled else {
+        if enabled {
+            refreshCalendar()
+        } else {
             upcomingEvents = []
-            return
         }
+    }
+
+    func requestCalendarAccess() {
         Task { [weak self] in
             guard let self else {
                 return
             }
-            if !calendarService.isAuthorized {
-                await calendarService.requestAccess()
-            }
+            await calendarService.requestAccess()
             refreshCalendar()
         }
     }
