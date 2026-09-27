@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="How Beseda stores call recordings and transcripts, when text leaves your Mac, and how to delete or protect your data.">
+  <title>Privacy — Beseda</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <nav aria-label="Main navigation">
+      <a href="index.html">Beseda</a>
+      <a href="privacy.html" aria-current="page">Privacy</a>
+      <a href="support.html">Support</a>
+    </nav>
+  </header>
+  <main>
+    <h1>Privacy</h1>
+    <p>Beseda records and transcribes conversations on your Mac. Recording and transcription are local; optional features can send text to services you choose. This page describes the app's data flows and limits.</p>
+
+    <section aria-labelledby="stored">
+      <h2 id="stored">What stays on your Mac</h2>
+      <p>Beseda keeps call audio, transcription results and transcripts in <code>~/Library/Application Support/Beseda/calls/</code>. Its <code>calls.sqlite</code> index contains call titles, transcript segments, summaries, matched calendar event information and attendee email addresses, and a webhook delivery log including endpoint response bodies. It also writes an app log. The SQLite index is not encrypted by Beseda. OpenRouter keys and webhook secrets are stored in the macOS Keychain.</p>
+      <p>Beseda sets owner-only file permissions in its data folder and uses macOS file protection where supported, which prevents access until the first login after a restart. These measures do not protect calls from someone using your unlocked account, software running as your user, or an administrator. Turn on FileVault to protect a lost Mac's disk.</p>
+    </section>
+
+    <section aria-labelledby="sharing">
+      <h2 id="sharing">When data leaves your Mac</h2>
+      <ul>
+        <li><strong>OpenRouter summaries:</strong> If selected, Beseda sends the full transcript and call-type prompt to OpenRouter and the model it routes to. The built-in summary model does not send the transcript away.</li>
+        <li><strong>Call-type classification:</strong> With an OpenRouter key and non-local classification, Beseda sends the opening of the transcript and call-type names to OpenRouter's Decisions API (Jev).</li>
+        <li><strong>Live key points:</strong> If enabled, accumulated live transcript lines go to the selected summary provider every few minutes. Live transcription itself is local.</li>
+        <li><strong>LM Studio:</strong> If selected for summaries or live key points, text goes to the configured LM Studio server. That server may be on another machine; it is not necessarily local to your Mac.</li>
+        <li><strong>Webhooks:</strong> If configured, Beseda sends the transcript, title, time and summary to your chosen endpoint. Endpoints must use HTTPS except for localhost. Beseda stores the endpoint's response body in its local index.</li>
+        <li><strong>Downloads:</strong> Beseda fetches models, the llama.cpp engine and updates from Hugging Face and GitHub. These downloads do not send call data.</li>
+      </ul>
+      <p>The “Local only” processing setting disables Jev and webhooks and uses the built-in model for summaries and live key points. Check your processing settings before recording sensitive calls.</p>
+    </section>
+
+    <section aria-labelledby="retention">
+      <h2 id="retention">Retention, deletion and backups</h2>
+      <p>Audio retention can remove WAV files immediately after processing, after 30 or 90 days, or never. Failed and in-progress calls keep their audio for retry. Retention does not remove transcripts, summaries or exports. Deleting a call removes its managed folder, index entry and associated segments and webhook log, as well as its export copies when Beseda can access their folder. SQLite secure deletion removes deleted text from free pages. Copies already held by another service or a backup are not deleted by this action.</p>
+      <p>Beseda makes a <code>calls.sqlite.v&lt;version&gt;.backup</code> copy before migrating an existing database. Time Machine and other full-Mac backup tools may copy the data folder, including calls and migration backups. You can exclude the data folder from backups in Settings; this does not erase backups already made, and other backup tools may behave differently. Encrypt your backup disk if it holds sensitive calls.</p>
+      <p>If you enable Markdown export, files are written to the folder you choose outside Beseda's managed data folder. That folder's permissions and any iCloud Drive, Dropbox or other sync behavior apply. Audio retention does not remove exports. If access to an export folder has been revoked or it is no longer available, restore access before deleting the call so Beseda can remove its export copies; check other copies and backups yourself.</p>
+    </section>
+
+    <section aria-labelledby="consent">
+      <h2 id="consent">Recording responsibility</h2>
+      <p>You are responsible for recording lawfully, getting any required consent from participants, and deciding where to store or send conversation data. Beseda does not notify participants for you. For sensitive calls, consider Local only and strict mode, FileVault, short audio retention, an unsynced export folder and encrypted or excluded backups.</p>
+    </section>
+  </main>
+  <footer>
+    <nav aria-label="Footer navigation">
+      <a href="index.html">Home</a>
+      <a href="privacy.html" aria-current="page">Privacy</a>
+      <a href="support.html">Support</a>
+    </nav>
+  </footer>
+</body>
+</html>
