@@ -544,7 +544,7 @@ final class CallStore: @unchecked Sendable {
         let folderExists = folder.map { fileManager.fileExists(atPath: $0.path) } ?? false
         if let folder, folderExists {
             try fileManager.createDirectory(at: trashedFolder.deletingLastPathComponent(), withIntermediateDirectories: true)
-            try fileManager.copyItem(at: folder, to: trashedFolder)
+            try fileManager.moveItem(at: folder, to: trashedFolder)
         }
         let legacyExport = previousExport == nil ? exportFolder?.appendingPathComponent(CallExport.fileName(call)) : nil
         let looseFiles = [call.transcriptURL, previousExport, legacyExport]
@@ -558,10 +558,13 @@ final class CallStore: @unchecked Sendable {
                 try fileManager.copyItem(at: url, to: destination)
                 movedFiles.append((url, destination))
             }
-            let pending = movedFiles.map(\.from) + (folderExists ? [folder!] : [])
+            let pending = movedFiles.map(\.from) + (folderExists ? [trashedFolder] : [])
             try savePendingCleanup(pending, id: id)
             try (deleteRow ?? deleteCall)(id)
         } catch {
+            if let folder, folderExists, fileManager.fileExists(atPath: trashedFolder.path) {
+                try fileManager.moveItem(at: trashedFolder, to: folder)
+            }
             throw error
         }
         try retryPendingCleanup(remove: remove)
@@ -601,8 +604,7 @@ final class CallStore: @unchecked Sendable {
         var pending = try loadPendingCleanup()
         for (id, paths) in pending {
             if let retryID, id != retryID { continue }
-            let currentExport = try exportPath(callID: id)
-            if try fetchCall(id: id) != nil && (currentExport == nil || paths.contains(currentExport!) || paths.count != 1) { continue }
+            if try fetchCall(id: id) != nil { continue }
             for path in paths {
                 let url = URL(fileURLWithPath: path)
                 if FileManager.default.fileExists(atPath: path) {
@@ -921,20 +923,45 @@ final class CallStore: @unchecked Sendable {
         }
     }
 
+    private var pendingExportsURL: URL {
+        dbURL.deletingLastPathComponent().appendingPathComponent("pending-export-cleanup.json")
+    }
+
+    private func pendingExports() throws -> [String: [String]] {
+        guard FileManager.default.fileExists(atPath: pendingExportsURL.path) else { return [:] }
+        return try JSONDecoder().decode([String: [String]].self, from: Data(contentsOf: pendingExportsURL))
+    }
+
+    func retryPendingExports(withOldFolder: (String, () throws -> Void) throws -> Void = { _, body in try body() }) throws {
+        var pending = try pendingExports()
+        for (id, paths) in pending {
+            for path in paths {
+                // A path reused for a live export must never be removed.
+                if try exportPath(callID: id) != path, FileManager.default.fileExists(atPath: path) {
+                    try withOldFolder(URL(fileURLWithPath: path).deletingLastPathComponent().path) {
+                        try FileManager.default.removeItem(atPath: path)
+                    }
+                }
+                pending[id]?.removeAll { $0 == path }
+                if pending[id]?.isEmpty == true { pending.removeValue(forKey: id) }
+                try JSONEncoder().encode(pending).write(to: pendingExportsURL, options: .atomic)
+            }
+        }
+    }
+
     /// a renamed call is written under a new name: the copy under the old one goes, or it lingers
     func replaceExportCopy(callID: String, with url: URL,
                            withOldFolder: (String, () throws -> Void) throws -> Void = { _, body in try body() }) throws {
         let oldPath = try exportPath(callID: callID)
         if let oldPath, oldPath != url.path, FileManager.default.fileExists(atPath: oldPath) {
-            try savePendingCleanup([URL(fileURLWithPath: oldPath)], id: callID)
+            var pending = try pendingExports()
+            if !(pending[callID] ?? []).contains(oldPath) { pending[callID, default: []].append(oldPath) }
+            try JSONEncoder().encode(pending).write(to: pendingExportsURL, options: .atomic)
         }
         try database { db in
             try run(db, "UPDATE calls SET export_path = ? WHERE id = ?", url.path, callID)
         }
-        guard let oldPath, oldPath != url.path, FileManager.default.fileExists(atPath: oldPath) else { return }
-        try withOldFolder(URL(fileURLWithPath: oldPath).deletingLastPathComponent().path) {
-            try retryPendingCleanup(only: callID)
-        }
+        try retryPendingExports(withOldFolder: withOldFolder)
     }
 
     // MARK: - Webhook deliveries

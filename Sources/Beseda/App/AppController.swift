@@ -324,6 +324,9 @@ final class AppController {
                     }
                 }
             }
+            try callStore.retryPendingExports { folder, remove in
+                try settings.withExportFolder(at: folder) { _ in try remove() }
+            }
             try callStore.emptyTrash()
         } catch {
             deleteError = error.localizedDescription
