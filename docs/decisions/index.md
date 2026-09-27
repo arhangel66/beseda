@@ -1,5 +1,6 @@
 # Decisions
 
+- [Pre-handoff UX review, round 2](ux-review-2.md) — first-time-user and psychologist findings across the current native UI; proposed.
 - [Adversarial product and code review](critic-review.md) — product, architecture, speaker, privacy and release findings; proposed.
 - [Development directions](development-directions.md) — where Beseda goes next: Mikhail's answers and the phased plan; approved with changes.
 - [Speaker accuracy, local](speaker-accuracy.md) — echo gate, diarizer timeline, Nemotron-3 as the diarizer without the 6 s rule.
