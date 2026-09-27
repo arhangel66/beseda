@@ -29,8 +29,7 @@ enum OpenRouter {
     static let defaultModel = "google/gemini-3.8-flash"
 }
 
-/// The two pinned files the built-in provider needs. Both are downloaded at runtime rather
-/// than bundled: nothing third-party to re-sign, and the llama.cpp build moves on its own.
+/// Pinned model data and llama.cpp release; store bundles the executable, direct builds download it.
 /// A value rather than a bag of constants so tests can install a synthetic pair.
 struct BundledSummary: Sendable {
     let title: String
@@ -57,6 +56,13 @@ struct BundledSummary: Sendable {
         modelBytes: 4_590_807_392,
         modelID: "gemma-4-e4b"
     )
+
+    /// Store mode is declared by the signed app plist, never inferred from a writable path.
+    static var storeMode: Bool { Bundle.main.object(forInfoDictionaryKey: "BesedaStoreSummary") as? Bool == true }
+
+    static func bundledServer(in bundle: URL) -> URL {
+        bundle.appendingPathComponent("Contents/Helpers/llama-server")
+    }
 
     /// the directory the release tarball unpacks into
     var archiveRootName: String {

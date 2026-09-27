@@ -215,6 +215,40 @@ private struct Harness {
 }
 
 @MainActor
+@Test func storeInstallNeverFetchesAnExecutableEvenWhenDirectRuntimeExists() async throws {
+    let harness = try Harness()
+    defer { harness.tearDown() }
+    let downloads = Downloads(files: harness.files)
+    let installer = BundledSummaryInstaller(paths: harness.paths, artifacts: harness.artifacts,
+        downloader: { url, destination, _ in
+            let data = try await downloads.fetch(url)
+            try data.write(to: destination)
+        }, warmUp: {}, storeMode: true)
+    installer.install()
+    try await harness.settled(installer)
+    #expect(await downloads.sources.isEmpty)
+    #expect(installer.failure != nil)
+}
+
+@MainActor
+@Test func storeServerIgnoresApplicationSupportExecutable() async throws {
+    let harness = try Harness()
+    defer { harness.tearDown() }
+    let direct = harness.artifacts.serverExecutable(harness.paths)
+    try FileManager.default.createDirectory(at: direct.deletingLastPathComponent(), withIntermediateDirectories: true)
+    try Data("unsafe".utf8).write(to: direct)
+    try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: direct.path)
+    let server = LlamaServer(paths: harness.paths, artifacts: harness.artifacts,
+                             storeMode: true, bundleURL: harness.directory)
+    do {
+        _ = try await server.ensureRunning()
+        Issue.record("store executed an unbundled server")
+    } catch SummarizationError.modelMissing {
+        #expect(!server.isRunning)
+    }
+}
+
+@MainActor
 @Test func aServerThatIsNotInstalledIsReportedAsAMissingModel() async {
     let directory = FileManager.default.temporaryDirectory
         .appendingPathComponent("beseda-summary-\(UUID().uuidString)", isDirectory: true)
