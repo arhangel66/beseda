@@ -1,5 +1,6 @@
 # Decisions
 
+- [First payment path](payment-path.md) — conditional comparison of seller eligibility and first $500 gross receipts; proposed.
 - [App Store sandbox audit](app-store-sandbox.md) — source-only status, required changes and parked checks for a Mac App Store build; proposed.
 - [Pre-handoff UX review, round 2](ux-review-2.md) — first-time-user and psychologist findings across the current native UI; proposed.
 - [Adversarial product and code review](critic-review.md) — product, architecture, speaker, privacy and release findings; proposed.
