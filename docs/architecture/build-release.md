@@ -125,6 +125,15 @@ exactly the audio-input and calendars entitlements above. The bundle was not lau
 installed or submitted for notarization. Next, verify the `beseda-notary` profile and run a
 separate controlled notarization/stapling check before publishing a release.
 
+### Private notarization attempt (BESEDA-207)
+
+The read-only `xcrun notarytool history --keychain-profile beseda-notary` check found no Keychain
+password item for `beseda-notary`. Stopped before building or submitting, as required for a missing
+profile. Submission ID: none; notarization status: not submitted. No bundle was stapled or assessed.
+The existing `~/.config/apple/asc.env` was present but was not read or changed; the missing field is
+the Keychain profile `beseda-notary` (its individual credential fields cannot be checked until it exists).
+This does not establish public release readiness or bypass the Astra gate.
+
 ### One-time setup once the account is active
 
 1. Certificate. developer.apple.com → Certificates → «+» → **Developer ID Application** (G2 Sub-CA).
