@@ -220,6 +220,12 @@ Effort is S (hours), M (days), or L (weeks). Priority is P0 (blocks safe sale or
     migration matrix from released databases, and no packaged-app trust/update smoke test. Add those four
     black-box checks; make the release script consume their packaged artifact instead of rebuilding after
     tests.
+    Partly fixed in BESEDA-98 (`AppControllerLaunchTests`, `CallStoreSafetyTests`): a child test process
+    records both WAVs and is SIGKILLed, then the launch recovery shows the call failed with both files
+    readable; a child under a file size limit gets a real OS write refusal, the controller shows the warning
+    and the WAV keeps what reached disk; migrations are tested from the oldest schema, 0.3.x and version 1.
+    Not covered: the live capture callbacks and `DualCapture`'s ticker wiring (real devices), and the
+    packaged-app trust/update smoke test.
 
 23. **Installation requirements are internally impossible — P2, S.** `docs/product/install.md:6-7` asks for
     about 3 GB free, while the same page says the built-in model alone is 4.6 GB at lines 32-34, before ASR,

@@ -254,3 +254,68 @@ func aReleasedSchemaMigratesToCurrentKeepingItsData(schema: String) throws {
     #expect(try store.fetchCall(id: "call") != nil)
     #expect(FileManager.default.fileExists(atPath: store.backupURL(fromVersion: current).path))
 }
+
+/// the oldest file `prepare` still upgrades (before 0.2.2): no app, summary, event or model columns,
+/// the per-call keep_audio flag, and no speaker names or webhook tables yet
+private let schemaBefore022 = """
+    CREATE TABLE calls (
+        id TEXT PRIMARY KEY, kind TEXT NOT NULL, started_at TEXT NOT NULL, ended_at TEXT, duration_sec REAL,
+        status TEXT NOT NULL, transcript_path TEXT, audio_dir TEXT NOT NULL, error TEXT,
+        created_at TEXT NOT NULL, updated_at TEXT NOT NULL, keep_audio INTEGER
+    );
+    CREATE TABLE transcript_segments (
+        id TEXT PRIMARY KEY, call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE, speaker TEXT NOT NULL,
+        start_sec REAL NOT NULL, end_sec REAL, text TEXT NOT NULL, order_idx INTEGER NOT NULL
+    );
+    CREATE TABLE transcript_jobs (
+        id TEXT PRIMARY KEY, call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE, speaker TEXT NOT NULL,
+        status TEXT NOT NULL, audio_path TEXT NOT NULL, asr_json_path TEXT, audio_duration_sec REAL,
+        wall_time_sec REAL, real_time_factor REAL, error TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL
+    );
+    INSERT INTO calls (id, kind, started_at, duration_sec, status, audio_dir, created_at, updated_at, keep_audio)
+    VALUES ('oldest', 'dual', '2025-12-01T10:00:00.000Z', 600, 'ready', '/calls/oldest',
+            '2025-12-01T10:00:00.000Z', '2025-12-01T10:00:00.000Z', 1);
+    INSERT INTO transcript_segments VALUES ('oldest-0', 'oldest', 'me', 0, 2, 'самая старая строка', 0);
+    INSERT INTO transcript_jobs VALUES ('job', 'oldest', 'me', 'done', '/calls/oldest/me.asr.wav', NULL, 600,
+                                        30, 0.05, NULL, '2025-12-01T10:00:00.000Z', '2025-12-01T10:00:00.000Z');
+    """
+
+@Test func theOldestSchemaMigratesToCurrentKeepingItsData() throws {
+    let root = try temporaryDirectory()
+    let dbURL = root.appendingPathComponent("calls.sqlite")
+    try execute(dbURL, schemaBefore022)
+    let store = CallStore(dbURL: dbURL)
+
+    try store.prepare()
+
+    let call = try #require(try store.fetchCall(id: "oldest"))
+    #expect(call.status == "ready")
+    #expect(call.durationSec == 600)
+    #expect(call.appName == nil)
+    #expect(try store.fetchSegments(callID: "oldest").map(\.text) == ["самая старая строка"])
+    #expect(try store.fetchSpeakerNames(callID: "oldest").isEmpty)
+    #expect(userVersion(dbURL) == store.migrations.count)
+    #expect(!columnNames(dbURL, table: "calls").contains("keep_audio"))
+    #expect(columnNames(dbURL, table: "calls").isSuperset(of: ["summary_text", "event_pinned", "processing_pending"]))
+    #expect(columnNames(dbURL, table: "transcript_jobs").contains("model"))
+    #expect(!columnNames(dbURL, table: "webhook_deliveries").isEmpty)
+}
+
+@Test func thePreviousVersionMigratesToCurrentKeepingItsData() throws {
+    let root = try temporaryDirectory()
+    let dbURL = root.appendingPathComponent("calls.sqlite")
+    let store = CallStore(dbURL: dbURL)
+    // version 1 is exactly what the first migration leaves, so it is built by running only that one
+    try store.prepare(migrations: Array(store.migrations.prefix(1)))
+    try makeCall(store, id: "previous", folder: root, status: "ready")
+    try execute(dbURL, "INSERT INTO transcript_segments VALUES ('previous-0', 'previous', 'me', 0, 2, 'строка версии 1', 0)")
+    #expect(userVersion(dbURL) == 1)
+
+    try store.prepare()
+
+    #expect(try store.fetchCall(id: "previous")?.status == "ready")
+    #expect(try store.fetchSegments(callID: "previous").map(\.text) == ["строка версии 1"])
+    #expect(userVersion(dbURL) == store.migrations.count)
+    #expect(columnNames(dbURL, table: "calls").contains("processing_pending"))
+    #expect(FileManager.default.fileExists(atPath: store.backupURL(fromVersion: 1).path))
+}

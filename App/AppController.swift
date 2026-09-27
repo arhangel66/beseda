@@ -1755,7 +1755,7 @@ final class AppController {
     }
 
     /// a failed write (disk full, the 4 GB WAV limit) keeps what reached the disk and ends the call there
-    private func stopRecording(after writeError: any Error, capture: DualCapture) {
+    func stopRecording(after writeError: any Error, capture: DualCapture) {
         recordingWarning = Self.recordingWarning(forWriteError: writeError)
         appendLog("Recording write failed: \(writeError.localizedDescription)")
         // the notification's title already says «Запись остановлена»
