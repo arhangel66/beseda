@@ -122,8 +122,7 @@ prompt (the signing command had a 120-second noninteractive timeout); `.build` u
 `codesign --verify --strict --deep` passed. The app signature has Developer ID Application
 (team `PRH5UQNC57`), a secure timestamp, hardened runtime (`flags=0x10000(runtime)`), and
 exactly the audio-input and calendars entitlements above. The bundle was not launched,
-installed or submitted for notarization. Next, verify the `beseda-notary` profile and run a
-separate controlled notarization/stapling check before publishing a release.
+installed or submitted for notarization. The separate controlled notarization check is recorded below.
 
 ### Private notarization attempt (BESEDA-207)
 
@@ -133,6 +132,20 @@ profile. Submission ID: none; notarization status: not submitted. No bundle was 
 The existing `~/.config/apple/asc.env` was present but was not read or changed; the missing field is
 the Keychain profile `beseda-notary` (its individual credential fields cannot be checked until it exists).
 This does not establish public release readiness or bypass the Astra gate.
+
+### Private notarization validation (BESEDA-224)
+
+On 2026-09-27, checked the shared `asc.env` (mode `0600`), all four nonempty fields,
+`DEVELOPMENT_TEAM=PRH5UQNC57`, and the referenced `.p8` (mode `0600`) without printing credentials.
+Stored the existing account's `beseda-notary` profile and verified it with `notarytool history`.
+Under the factory heavy lock and `nice -n 19`, built a private release-flavour Developer ID bundle,
+verified its strict code signature, and zipped it. Submitted that zip **once** with
+`notarytool submit --wait --keychain-profile beseda-notary`.
+Submission ID: `3d3a22b0-7b11-499b-8696-196c70e50494`; status: **Accepted**.
+Stapling and ticket validation succeeded; `spctl --assess --type execute` returned
+`accepted` / `source=Notarized Developer ID`, and `codesign --verify --strict --deep` passed
+on the stapled app. The throwaway bundle was not installed, launched, uploaded, or released.
+This is private validation only, not Astra approval for App Store review or release.
 
 ### One-time setup once the account is active
 
