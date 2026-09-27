@@ -20,3 +20,25 @@ Build of product 'AppMerge' complete! (91.07s)
 {"call": "20260922-125838", "diarizer": 6, "them": 4}
 {"call": "20260921-125925", "diarizer": 6, "them": 4}
 ```
+
+## Rerun (BESEDA-120, 2026-09-27)
+
+`app_merge.sh` run twice with `mergingShortReplies` restored. Counts equal the table above on every call, and the per-segment keys (`turns`, `them-N` of every ASR segment) are identical between the two runs on all 15 calls, so a stored manual merge can be reapplied by key after «Расшифровать снова».
+
+```
+{"call": "20260925-114649", "diarizer": 2, "them": 1}
+{"call": "20260925-111702", "diarizer": 2, "them": 1}
+{"call": "20260924-173649", "diarizer": 2, "them": 1}
+{"call": "20260924-173310", "diarizer": 2, "them": 1}
+{"call": "20260924-133358", "diarizer": 3, "them": 1}
+{"call": "20260924-110157", "diarizer": 3, "them": 1}
+{"call": "20260923-125419", "diarizer": 2, "them": 2}
+{"call": "20260923-101613", "diarizer": 3, "them": 1}
+{"call": "20260922-115609", "diarizer": 2, "them": 1}
+{"call": "20260922-084404", "diarizer": 2, "them": 1}
+{"call": "20260925-125945", "diarizer": 4, "them": 3}
+{"call": "20260924-130017", "diarizer": 5, "them": 2}
+{"call": "20260923-130021", "diarizer": 7, "them": 5}
+{"call": "20260922-125838", "diarizer": 6, "them": 4}
+{"call": "20260921-125925", "diarizer": 6, "them": 4}
+```

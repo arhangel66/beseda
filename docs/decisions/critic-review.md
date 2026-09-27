@@ -151,6 +151,9 @@ Effort is S (hours), M (days), or L (weeks). Priority is P0 (blocks safe sale or
     diarization and force one remote speaker when the calendar has two attendees or the user chooses “1:1”.
     Keep unconstrained diarization only for group calls. This directly fixes the 2–3-label symptom without a
     new model.
+    *2026-09-27: replaced by Mikhail's decision (BESEDA-120).* The 6 s merge is back as the interim default and
+    the 1:1 variant is gone: nothing reliable says a call is 1:1 (no calendar event on ad-hoc calls, the local
+    LLM said «один» on 3 of 5 dailies); «Объединить с» is the escape hatch.
 
 15. **The claimed real-call truth is not adequate ground truth — P1, M.**
     `untracked/epics/speaker-accuracy/results/real-calls-truth.md` derives participant counts from anonymised
