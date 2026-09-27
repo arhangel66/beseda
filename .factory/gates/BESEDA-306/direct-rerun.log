@@ -1,0 +1,743 @@
+[0/1] Planning build
+Building for debugging...
+[0/5] Write swift-version--58304C5D6DBC2206.txt
+[1/4] Linking Beseda
+[2/4] Applying Beseda
+Build complete! (1.94s)
+Test Suite 'All tests' started at 2026-09-28 01:18:59.914.
+Test Suite 'All tests' passed at 2026-09-28 01:18:59.922.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.008) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test growingFileReadsTheOpenRecordingAt16kMono() started.
+◇ Test aStoppedDiscoveredServerUsesTheTypedRecoveryError() started.
+◇ Test writePastTheLimitSurfacesAsARecordingWarning() started.
+◇ Test anotherAppTakingTheMicrophoneStartsItsOwnRecording() started.
+◇ Test aQuarterHourEventIsAlreadyTooShort() started.
+➜ Test jevClassifiesATinySyntheticExcerptLive() skipped.
+◇ Test linkingWorksWithFullAccessAndExistingCalendars() started.
+◇ Test seededJourneyCannotModifyARealAppRun() started.
+➜ Test liveLoopLogsOnceAndStopsWhenTheSpeechModelIsMissing() skipped.
+◇ Test numberedSpeakersCarryTheirNumberIntoTheAvatar() started.
+◇ Suite SettingsDynamicLocalizationTests started.
+◇ Test mergingASpeakerRelabelsItsSegmentsAndPersists() started.
+◇ Test aDeliveryRoundTripsThroughItsThreeStates() started.
+◇ Test plainHttpIsRefusedExceptToThisMac() started.
+◇ Test eachDeniedExportFolderRetriesOnlyUnderItsOwnScope() started.
+◇ Test jevsConfidentPickIsUsedWithoutAskingTheSummaryModel() started.
+◇ Test installWaitsWhileRecordingAndRunsOnceWhenItStops() started.
+◇ Test resplitRedoesOnlyOldCallsWithAudioAndWithoutMerges() started.
+◇ Test aKeyOnlyInTheLegacyServiceIsCopiedIntoTheNewOneAndKept() started.
+◇ Test theDiarizerDownloadStopsBeforeADiskThatCannotHoldIt() started.
+◇ Test aFailingMigrationRollsBackAndLeavesTheBackup() started.
+◇ Test podushkaValuesAreImportedUnlessAlreadySetUnderTheNewName() started.
+◇ Test aLaunchBeforeAnySpeechModelIsDownloadedLeavesTheDiarizerModelAlone() started.
+◇ Test theEchoLagIsFound() started.
+◇ Suite SettingsServiceMessagesTests started.
+◇ Test catalogueEntriesAreDistinct() started.
+◇ Test anEmptyCalendarMatchesNothing() started.
+◇ Test queueProcessesTwoCallsFinishingBackToBackInOrder() started.
+◇ Test aDiarizerFileWithTheWrongHashIsNeverInstalled() started.
+◇ Test aRenameIsDroppedWhenAnotherDiarizerRelabelsTheCall() started.
+◇ Test anUnknownJevChoiceFallsBackToOther() started.
+◇ Test aFailedSegmentWriteLeavesTheCallNotReady() started.
+◇ Test aManualMergeIsReappliedWhenARerunWritesTheSameSpeakersAgain() started.
+◇ Test theRequestCarriesTheSecretAndDeliveryHeaders() started.
+◇ Test switchingModelsReopensTheStages() started.
+◇ Test theRecordedJevResponseParsesToTheChoiceItsProbabilityAndCost() started.
+◇ Test nextChunkWaitsForAFullChunkOnDisk() started.
+◇ Suite SettingsLocalizationTests started.
+◇ Test withoutSegmentsTheStoredMarkdownIsCopiedAsItIs() started.
+◇ Test startsOnlyAfterTheDebounceElapsed() started.
+◇ Test aCallWithoutSummaryHasNothingToShow() started.
+◇ Test everyRemoteSpeakerGetsItsOwnLane() started.
+◇ Test lessThanThirtySecondsFromRemoteIsNotAutomaticallyQueued() started.
+➜ Test noReadGrowsWithTheLengthOfTheCall() skipped.
+◇ Test aManualSendBypassesTheAutomaticFilter() started.
+◇ Test archiveDetailAndRecoveryLabelsAreLocalized() started.
+◇ Test trailingWordsWithoutPunctuationStillBecomeASegment() started.
+◇ Test protectedStorageIsOwnerOnlyForOldAndNewFiles() started.
+◇ Test markReadyFailsForACallWithNoRow() started.
+◇ Test keyPointsRunEveryIntervalOnlyWithNewText() started.
+◇ Test anOldDatabaseWithoutTheTypeColumnOpensAndTheTypeRoundTrips() started.
+◇ Test releaseBeforeTheDebounceRecordsNothing() started.
+◇ Test journeyAccessibilityNamesAreStableAndUnique() started.
+◇ Test titleFallsBackToTheFirstSentenceWhenEveryLineIsShort() started.
+◇ Test secretsInUserDefaultsMoveToTheKeychainAndLeaveDefaults() started.
+➜ Test callbackTimeUnderCPUAndDiskLoad() skipped.
+◇ Test titleCutsALongFirstSentenceOnAWordBoundary() started.
+◇ Test theTestPayloadStillHasAMeetingStartTime() started.
+◇ Test fileVaultIsReadFromTheIsActiveAnswerAndUnknownOtherwise() started.
+◇ Test anInterruptedCallWithABrokenChannelSaysSo() started.
+◇ Test aTranscriptWithoutADialogueBlockIsLeftUntouched() started.
+◇ Test interleavedInt16FromTheSystemTapIsConvertedAsBefore() started.
+◇ Test emptyInputYieldsNoSegments() started.
+◇ Test cleanFormatDropsTheClock() started.
+◇ Test anUnavailableCallIndexIsShownToTheUser() started.
+◇ Test withTwoEventsStartingNearbyTheNearerOneWins() started.
+◇ Test theEventStartingWithTheCallWins() started.
+◇ Test recordingTranscriptArchiveAndSearchRoundTrip() started.
+◇ Test aFailedResumeAtLaunchIsNotReportedAsAnUnavailableIndex() started.
+◇ Test transcriptionLanguageMatchesModelCapabilities() started.
+◇ Test aGarbageAnswerFallsBackToTheFirstTypeWhateverItIsNamed() started.
+◇ Test otherCannotBeDeletedButOtherTypesCan() started.
+◇ Test theRequestCarriesTheKeyAsABearerHeaderWhenThereIsOne() started.
+◇ Test anUnparseableStoredDateIsNotShownAsData() started.
+◇ Test isolatedCopyNeverReachesAPermissionDialog() started.
+◇ Test twoCallsFinishingBackToBackAreBothProcessed() started.
+◇ Test sendGoesThroughTheInjectedTransport() started.
+◇ Test aRenamedFirstTypeIsNotMigrated() started.
+◇ Test theSameTypeWithASharedParticipantIsRelated() started.
+◇ Test aRejectionQueuesNothing() started.
+◇ Test aCallFolderMissingFromTheIndexAppearsAsFailedAndRetryable() started.
+◇ Test titleSkipsTheFillerOpenerForTheFirstSentenceThatCarriesSomething() started.
+◇ Test slowChunksWidenTheRestAndCleanOnesNarrowIt() started.
+◇ Test theSummaryProviderDefaultsToTheBuiltInModelAndRoundTripsThroughUserDefaults() started.
+➜ Test childRecordsUntilKilled() skipped.
+◇ Test aCallWithNeitherLinesNorMarkdownNeverReachesTheProvider() started.
+◇ Test stopsWhenTheMicrophoneIsReleased() started.
+◇ Test theDigestKeepsAgreementsNextStepsAndOpenQuestions() started.
+◇ Test calendarAuthorizationMapsToTheRightAction() started.
+◇ Test downloadStateFollowsTheFileSize() started.
+◇ Test theRequestAsksForTheWholeSummaryAtOnce() started.
+◇ Test bookmarksPersistRecoverAndBalanceScopes() started.
+◇ Test aLongEventTheCallMerelyFallsInsideIsNotTheName() started.
+◇ Test nothingRelatedGivesNil() started.
+◇ Test theClassifierPicksTheTypeTheModelNamesAndRunsItsPrompt() started.
+◇ Test displayDatesFollowLocaleWhileFileDatesRemainStable() started.
+◇ Test thePodushkaFolderBecomesTheBesedaFolderOnce() started.
+◇ Test aTranscriptUnderBudgetReachesTheProviderUntouched() started.
+◇ Test aFailingJevFallsBackToTheLocalModelAndIsLogged() started.
+◇ Test installingLeavesTheServerTheModelAndTheWarmUpMarkerOnDisk() started.
+◇ Test downloadURLsPinARevision() started.
+◇ Test deniedOldExportKeepsNewPathAndRetries() started.
+◇ Test measureSplitsTheFolderByKind() started.
+◇ Test localOnlyIsOffByDefaultAndKeepsSummariesJevAndWebhooksOnTheMac() started.
+◇ Test lanesSplitTheCallBetweenTheTwoSides() started.
+◇ Test aSpeakerWithOnlyShortSegmentsStaysItsOwnSpeaker() started.
+◇ Test aModelAlreadyOnDiskIsNotDownloadedAgain() started.
+◇ Test segmentsNamesAndSearchRoundTripThroughTheDatabase() started.
+◇ Test exportEnglishCopyKeepsAuthoredTextAndStableFileName() started.
+◇ Test previousCallContentShowsDateAndDigestAsStored() started.
+◇ Test aBrokenURLStillQueuesNothing() started.
+◇ Test aLongWaitIsRoundedUpToMinutes() started.
+◇ Test pipelineSpeakerIdsMapToDistinctNamesAndColours() started.
+◇ Test aFreshDirectoryHasEveryStagePending() started.
+◇ Test justOverFortyMinutesWithExactlyThirtySecondsPerSideIsDelivered() started.
+◇ Test everyFileLivesUnderTheDataDirectory() started.
+◇ Test aServerThatIsNotInstalledIsReportedAsAMissingModel() started.
+◇ Test aChunkAfterASkipKeepsAllItsWords() started.
+◇ Test resplitSkipsRenamedSpeakers() started.
+◇ Test aPendingJobResumedAtLaunchWaitsForTheKeychainKey() started.
+◇ Test seriesAndParticipantsSurviveTheDatabase() started.
+◇ Test aShortDiskFailsTheStageWithoutDownloading() started.
+◇ Test theAttemptCountCountsEveryRowOfTheCall() started.
+◇ Test aReleasedSchemaMigratesToCurrentKeepingItsData(schema:) started.
+◇ Test resplitWaitsWhileTheAppIsBusy() started.
+◇ Test piecesCoverTheOriginalWithoutGapsOrOverlap() started.
+◇ Test remoteSpeechMustReachThirtySecondsForOneParticipant() started.
+◇ Test onlyQueuedRowsWhoseTimeHasComeAreDue() started.
+◇ Test theRequestGoesOutWithoutAnAuthorizationHeaderToALocalServer() started.
+◇ Test theRetryScheduleStopsAfterTheFourthAttempt() started.
+◇ Test storedTypesWithoutTheFlagMakeTheFirstOtherAndItKeepsTheFlagAnywhereInTheList() started.
+◇ Test firstRunCopyIsLocalizedWithoutRequestingPermissions() started.
+◇ Test aGivenTypeSkipsTheClassifier() started.
+◇ Test deletingACallLeavesNothingOfItOnDisk() started.
+◇ Test storeServerIgnoresApplicationSupportExecutable() started.
+◇ Test humanDurationReadsAsTheProtoypeWritesIt() started.
+◇ Test aRowLeftSendingIsFailedOnLaunchAndReturned() started.
+◇ Test aFiveOhThreeIsAFailureWorthRetrying() started.
+◇ Test recordingStopWithNothingPendingDoesNothing() started.
+◇ Test thePreviousVersionMigratesToCurrentKeepingItsData() started.
+◇ Test aFailedRowDeleteKeepsTheRowAndTheFiles() started.
+◇ Test aCustomResultWithOnlyOpenQuestionsIsShownWhole() started.
+◇ Test aPendingProcessingJobResumesOnceAfterRelaunch() started.
+◇ Test russianUILiteralsUseTheCyrillicProductName() started.
+◇ Test nothingIsQueuedWhileTheWebhookIsOff() started.
+◇ Test removingTakesBackTheModelAndKeepsTheEngine() started.
+◇ Test aFailedSegmentWriteInFinishCallKeepsTheAudioAndSendsNoWebhook() started.
+◇ Test resplitWithNoDiarizerSpeechIsNotRepeated() started.
+◇ Test aRecordingKilledMidCallIsReadableAndFailedAfterRelaunch() started.
+◇ Test longPauseClosesASegmentWithoutPunctuation() started.
+◇ Test generatedExportLabelsAndNamesFollowExplicitLocale() started.
+◇ Test parseThrowsTheServerMessageOnAnErrorBody() started.
+◇ Test datedRuleExpiresOnlyPastItsDeadline() started.
+◇ Test parseTreatsEmptyChoicesAsAnUnavailableModel() started.
+◇ Test recorderLeavesARepairableFileWithoutStop() started.
+◇ Test sweepLeavesTheAudioOfAProtectedCallAlone() started.
+◇ Test markdownFormatOpensWithTheConversationName() started.
+◇ Test withoutAnEventTheTitleStillComesFromTheTranscript() started.
+◇ Test deletionFailuresAndOldExportLocation() started.
+◇ Test onlyGigaamNeedsSplitting() started.
+◇ Test lessThanThirtySecondsFromMeIsNotAutomaticallyQueued() started.
+◇ Test onlyTheServerAndItsLibrariesSurviveTheUnpacking() started.
+◇ Test doesNotStartWhileAManualRecordingIsRunning() started.
+◇ Test textIsNeverSweptWhateverTheAudioRulesSay() started.
+◇ Test exportFileNameDropsCharactersTheFileSystemRejects() started.
+◇ Test aWrongHashFailsTheStageAndLeavesNoFile() started.
+◇ Test overlappingChunksKeepEachWordOnce() started.
+◇ Test onlyAFolderInsideMobileDocumentsCountsAsICloudDrive() started.
+◇ Test aTranscriptOverBudgetIsCutAtTheLastNewlineAndFlagged() started.
+◇ Test installDownloadsTheModelAndMarksTheWarmUp() started.
+◇ Test aBareMarkerStillOpensAWord() started.
+◇ Test aCallRecordedBeforeDiarizationKeepsTheUnnumberedName() started.
+◇ Test parseTellsARefusedKeyApartFromAnyOtherFailure() started.
+◇ Test journeyAccessibilityCanBeReadAndActedWithoutAFrontWindow() started.
+◇ Test thePayloadCarriesTheKrispKeysNextToBesedasOwn() started.
+◇ Test fileNamesMapToTheThreeStorageKinds() started.
+◇ Test piecesReadWindowByWindowFromAFileMatchTheWholeArraySplit() started.
+◇ Test aDeletedCallWaitingInTheQueueIsNotProcessed() started.
+◇ Test renamedCallKeepsOneExportCopyAndDeletionRemovesIt() started.
+◇ Test theEstimateComesFromHowLongTheFinishedPartTook() started.
+2026-09-28 01:19:00.002 swiftpm-testing-helper[94284:32833008] Audio files cannot be non-interleaved. Ignoring setting AVLinearPCMIsNonInterleaved YES.
+◇ Test theClassifierContextHasTheWeekdayLocalTimeAndDuration() started.
+◇ Test aCustomPromptResultIsShownWhole() started.
+◇ Test silenceStopDoesNotRestartUntilTheMicrophoneIsTakenAgain() started.
+◇ Test linkingIsBrokenWithoutFullAccess() started.
+◇ Test buffersThroughTheCallbackPathLandOnDiskAsTheOldPathWroteThem() started.
+◇ Test theBarCountsFinishedStepsAndThePartOfTheRunningOne() started.
+◇ Test laterAndUnreadyCallsAreIgnored() started.
+◇ Test audioShorterThanTheLimitIsNotSplit() started.
+◇ Test aFailedKeychainWriteKeepsTheSecretInDefaults() started.
+◇ Test directLegacyDeletionRemovesAuthorizedOldCopy() started.
+◇ Test aRenameReplacesBothTheNameAndTheAvatarLetter() started.
+◇ Test sharesStillAddUpOnACallWithHundredsOfShortLines() started.
+◇ Test aShortDiskDownloadsNeitherTheEngineNorTheModel() started.
+◇ Test segmentBoundsFollowTheFirstAndLastWord() started.
+◇ Test aBarelyStartedStepGivesNoEstimate() started.
+◇ Test anUnrenamedCallTypeFromBESEDA46BecomesOtherWithItsPrompt() started.
+◇ Test theBackupExclusionIsAppliedToTheDataFolderAtLaunchAndCleared() started.
+◇ Test anEditedSummaryPromptBecomesTheFirstCallTypesPrompt() started.
+◇ Test sentenceEndingWordClosesASegment() started.
+◇ Test aFourOhOneIsRejectedWithoutRetry() started.
+◇ Test titleIsNilForAnEmptyTranscript() started.
+◇ Test bookmarkRecoveryStringsExistInBothLanguages() started.
+◇ Test aFailedEngineDownloadStopsBeforeTheFourGigabyteModel() started.
+◇ Test failedRowDeletionRestoresMovedCallFolder() started.
+◇ Test callWithoutATranscriptFallsBackToTheAppAndDate() started.
+◇ Test deletingTheCallDropsItsDeliveries() started.
+◇ Test aBacklogOfMoreThanAChunkIsSkipped() started.
+◇ Test aTwoHundredWithAnActionIsDelivered() started.
+◇ Test theDigestKeepsTheCurrentDefaultSections() started.
+◇ Test renamedSpeakersReplaceTheDefaultNamesEverywhere() started.
+◇ Test aCalendarEventOutranksTheTitleGuessedFromTheTranscript() started.
+◇ Test theResponseBodyIsCutAtTwoKilobytes() started.
+◇ Test aLegacyDatabaseMissingSpeakerMergeTableIsRepairedWithoutLosingCalls() started.
+◇ Test echoOnlySentencesAreDroppedAndOwnSpeechIsKept() started.
+◇ Test theMissingBuiltInModelErrorSaysWhereToDownloadIt() started.
+◇ Test theOldestOfMoreThanAPageOfCallsIsFoundBySearchAndByPaging() started.
+◇ Test archiveDurationUsesExplicitLocale() started.
+➜ Test peakMemoryOnASyntheticLongCall() skipped.
+◇ Test aWriterThatCannotKeepUpStopsTheRecordingVisibly() started.
+◇ Test aShortEventIsNotTheName() started.
+◇ Test parseLoadedKeepsOnlyLlmEntriesAndReturnsTheirIdentifiers() started.
+◇ Test onlyCallsThatStillNeedTheirAudioProtectTheirFolder() started.
+◇ Test overlappingAndInvalidSegmentsDoNotInflateRecognizedSpeech() started.
+◇ Test aOneSpeakerCallIsUnchanged() started.
+◇ Test failedResplitLeavesTheCallUntouched() started.
+◇ Test aRetryableFailureQueuesTheNextAttempt() started.
+◇ Test theWebhookSettingsDefaultToOffAndRoundTripThroughUserDefaults() started.
+◇ Test aServerThatDoesNotAnswerIsReportedAsDownAndNamed() started.
+◇ Test stateLabelDependsOnlyOnTheSelectedModelFile() started.
+◇ Test removingAModelDropsItsFileAndTheWarmUp() started.
+◇ Test aTimedOutTransportBecomesARetryableFailure() started.
+◇ Test sentencePiecesBecomeWords() started.
+◇ Test theOldestSchemaMigratesToCurrentKeepingItsData() started.
+◇ Test legacyDeletionWithoutFolderScopeRetainsCallAndCopy() started.
+◇ Test aLongSingleSpeakerSegmentKeepsOneLinePerSentence() started.
+◇ Test theSummarySettingsDefaultToEmptyAndRoundTripThroughUserDefaults() started.
+◇ Test aLaunchWithTheSpeechModelOnDiskPrefetchesTheDiarizerModel() started.
+◇ Test everyPieceStaysWithinTheLimit() started.
+◇ Test doesNotStartTwiceWhileAlreadyRecording() started.
+◇ Test installRunsAtOnceWhenNothingIsRecording() started.
+◇ Test markReadyWritesSegmentsAndStatusTogether() started.
+◇ Test anEventStartingFourMinutesLaterStillCounts() started.
+◇ Test liveLoopTranscribesChunksOfTheGrowingFilesUntilCancelled() started.
+◇ Test backToBackLinesOfOneSpeakerMergeIntoOneBar() started.
+◇ Test archiveSearchDeletionAndAccessibilityCopyAreLocalized() started.
+◇ Test aRenamedSpeakerReachesTheProviderUnderTheNewName() started.
+◇ Test aStepThatCannotReportShowsOnlyTheStepsBeforeIt() started.
+◇ Test aTranscriptOpeningWithoutTheMarkerKeepsItsFirstWord() started.
+◇ Test aManualMergeIsDroppedWhenAnotherDiarizerRelabelsTheCall() started.
+◇ Test anEventStartingSixMinutesLaterDoesNot() started.
+◇ Test aValidSelectedModelIsUsableWithoutAWarmUpMarker() started.
+◇ Test linkingIsBrokenWhenTheSelectedCalendarIsGone() started.
+◇ Test menuRecordingAndRecoveryCopyFollowsLocale() started.
+◇ Test aCorruptWAVThatCannotBeRepairedIsRecordedOnTheCall() started.
+◇ Test anExistingBesedaFolderIsLeftAlone() started.
+◇ Test progressFractionsReachTheStage() started.
+◇ Test exactlyFortyMinutesIsNotAutomaticallyQueued() started.
+◇ Test aUserDiarizationJumpsAheadOfWaitingBackgroundWork() started.
+recorder write failed: fileFull("Запись достигла предела WAV в 4 ГБ")
+◇ Test exportPutsTitleDateTypeResultThenTranscript() started.
+◇ Test exportWritesTheFileAndARerunOverwritesIt() started.
+◇ Test oneTypeRunsItsPromptWithoutAskingTheClassifier() started.
+◇ Test immediateRetentionDeletesTheAudioRightAfterTheCallIsMarkedReady() started.
+◇ Test aWordStraddlingTheCutIsNotRepeated() started.
+◇ Test immediateRuleExpiresAFreshFile() started.
+◇ Test theCutLandsInTheSilenceNotOnTheHardBoundary() started.
+◇ Test aStoredSummaryIsReadBackFromTheDatabase() started.
+◇ Test namedFindsCatalogueEntries() started.
+◇ Test renamingRewritesTheDialogueAndLeavesTheChannelsAlone() started.
+◇ Test aSentenceOutsideDiarizerSpeechKeepsItsTimesAndTheNearestSpeaker() started.
+➜ Test theInstalledModelTranscribesRealSpeech() skipped.
+◇ Test launchDoesNotWaitOnTheKeychainAndTheKeyAppearsOnceTheReadReturns() started.
+◇ Test timestampedFormatPutsTheClockBeforeTheSpeaker() started.
+◇ Test aDiskThatRefusesWritesStopsTheRecordingVisiblyAndKeepsWhatWasWritten() started.
+◇ Test testsNeverReachTheLoginKeychain() started.
+◇ Test anEmptyTimelineProducesNoTurns() started.
+◇ Test turnsTakeTheDiarizerSpeakersAndKeepSentenceTimes() started.
+◇ Test minimumGapSuppressesAnImmediateRestart() started.
+◇ Test aCallWithOnlyMarkdownStillGoesToTheProvider() started.
+◇ Test aRenameSurvivesARerunOfTheSameDiarizerAndReachesTheFile() started.
+➜ Test childHitsAFileSizeLimitWhileRecording() skipped.
+◇ Test onlyCallTypesWithTheUneditedPreviousDefaultPromptGetTheNewOne() started.
+◇ Test aCallWithOnlyOneChannelDrawsOneLane() started.
+◇ Test sweepRemovesExpiredAudioAndKeepsTheTranscript() started.
+◇ Test aGarbageAnswerFromTheLocalModelFallsBackToOtherWhereverItIsListed() started.
+◇ Test aCurrentStoreIsNeitherMigratedNorBackedUpAgain() started.
+◇ Test aSentenceTakesTheSpeakerOfTheSegmentItOverlapsMost() started.
+◇ Test transcribingWithoutTheModelFileFailsWithTheTypedError() started.
+◇ Test previousCallContentIsHiddenWithoutCallOrDigest() started.
+◇ Test theSameTitleIgnoringCaseAndSpacesIsRelated() started.
+◇ Test seededHeadlessJourneyCoversArchiveSearchSummaryCopySpeakerMergeAndDelete() started.
+◇ Test microphoneNoteWithoutATranscriptGetsItsOwnTitle() started.
+◇ Test parseReturnsTrimmedContentFromANormalAnswer() started.
+◇ Test aLowConfidenceJevPickFallsBackToOther() started.
+➜ Test liveModeLoadOfATenMinuteCall() skipped.
+◇ Test noTokensMeanNoWords() started.
+◇ Test strictModeOverridesItsSettingsAndTurningItOffRestoresThem() started.
+◇ Test anInvalidSelectedModelIsNotUsable() started.
+◇ Test renamedSpeakersReachBothTheTextAndTheParticipants() started.
+◇ Test aModelThatArrivesCorruptedLeavesNoFileBehind() started.
+◇ Test aMissingSummaryLeavesTheKeyOut() started.
+◇ Test successiveDeniedExportsSurviveRelaunch() started.
+◇ Test droppedBuffersWidenTheRestOnlyWhenTheyGrow() started.
+◇ Test dayGroupSplitsTodayYesterdayThisWeekAndEarlier() started.
+◇ Test aFailedDownloadStopsTheChainAndKeepsItsMessage() started.
+◇ Test anUnknownSpeakerKeyNeverShowsUpAsItsName() started.
+◇ Test resplitIsNotRepeatedAfterARestart() started.
+◇ Test aSentenceGluingEchoAndOwnSpeechKeepsOnlyTheOwnWordsWithTheirBounds() started.
+✔ Test aStoppedDiscoveredServerUsesTheTypedRecoveryError() passed after 0.096 seconds.
+✔ Test anotherAppTakingTheMicrophoneStartsItsOwnRecording() passed after 0.096 seconds.
+◇ Test theJevRequestIsOneChoiceOverTheTypesWithTheCallInState() started.
+◇ Test theSameCalendarSeriesIsRelated() started.
+✔ Test linkingWorksWithFullAccessAndExistingCalendars() passed after 0.097 seconds.
+◇ Test endpointAcceptsOnlyHttpAddressesWithAHost() started.
+◇ Test theErrorCardOffersTheWayOutThatMatchesTheFailure() started.
+◇ Test keyPointsSkipARoundWhileThePreviousRuns() started.
+◇ Test storeInstallNeverFetchesAnExecutableEvenWhenDirectRuntimeExists() started.
+2026-09-28 01:19:00.066 swiftpm-testing-helper[94284:32833007] Audio files cannot be non-interleaved. Ignoring setting AVLinearPCMIsNonInterleaved YES.
+◇ Test wordLimitClosesASegment() started.
+◇ Test aFailedFileRemovalLeavesNoBrokenCallAndIsCleanedLater() started.
+◇ Test jevClassifiesByDefaultOnlyWhenAnOpenRouterKeyIsSet() started.
+◇ Test sha256MatchesTheKnownDigestOfAFile() started.
+◇ Test aZoomLinkInTheEventCountsAsACall() started.
+◇ Test dynamicFailuresAndPrivacy() started.
+◇ Test normalisingYieldsSixteenKilohertzMonoInt16() started.
+✔ Test plainHttpIsRefusedExceptToThisMac() passed after 0.109 seconds.
+✔ Test aQuarterHourEventIsAlreadyTooShort() passed after 0.110 seconds.
+✔ Test installWaitsWhileRecordingAndRunsOnceWhenItStops() passed after 0.117 seconds.
+✔ Test numberedSpeakersCarryTheirNumberIntoTheAvatar() passed after 0.117 seconds.
+◇ Test case passing 1 argument schema → "CREATE TABLE calls (
+    id TEXT PRIMARY KEY, kind TEXT NOT NULL, started_at TEXT NOT NULL, ended_at TEXT, duration_sec REAL,
+    status TEXT NOT NULL, transcript_path TEXT, audio_dir TEXT NOT NULL, error TEXT, app_name TEXT,
+    summary_text TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL,
+    event_title TEXT, event_id TEXT, event_pinned INTEGER NOT NULL DEFAULT 0
+);
+CREATE TABLE transcript_segments (
+    id TEXT PRIMARY KEY, call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE, speaker TEXT NOT NULL,
+    start_sec REAL NOT NULL, end_sec REAL, text TEXT NOT NULL, order_idx INTEGER NOT NULL
+);
+CREATE INDEX idx_transcript_segments_call_order ON transcript_segments(call_id, order_idx);
+CREATE TABLE transcript_jobs (
+    id TEXT PRIMARY KEY, call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE, speaker TEXT NOT NULL,
+    status TEXT NOT NULL, audio_path TEXT NOT NULL, asr_json_path TEXT, audio_duration_sec REAL,
+    wall_time_sec REAL, real_time_factor REAL, model TEXT, error TEXT, created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+);
+CREATE INDEX idx_transcript_jobs_call ON transcript_jobs(call_id, speaker);
+CREATE TABLE call_speakers (
+    call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE, speaker_key TEXT NOT NULL,
+    display_name TEXT NOT NULL, PRIMARY KEY (call_id, speaker_key)
+);
+CREATE TABLE webhook_deliveries (
+    id TEXT PRIMARY KEY, call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE,
+    call_title TEXT NOT NULL, attempt INTEGER NOT NULL, event TEXT NOT NULL, url TEXT NOT NULL,
+    state TEXT NOT NULL, http_status INTEGER, response_action TEXT, response_body TEXT, error TEXT,
+    created_at TEXT NOT NULL, sent_at TEXT, finished_at TEXT, next_retry_at TEXT
+);
+INSERT INTO calls (id, kind, started_at, status, audio_dir, app_name, summary_text, created_at, updated_at,
+                   event_title, event_pinned)
+VALUES ('old', 'dual', '2026-01-10T10:00:00.000Z', 'ready', '/calls/old', 'Zoom', 'итоги',
+        '2026-01-10T10:00:00.000Z', '2026-01-10T10:00:00.000Z', 'Планёрка', 1);
+INSERT INTO transcript_segments VALUES ('old-0', 'old', 'them-1', 0, 2, 'старая строка', 0);
+INSERT INTO call_speakers VALUES ('old', 'them-1', 'Анна');" to aReleasedSchemaMigratesToCurrentKeepingItsData(schema:) started.
+◇ Test case passing 1 argument schema → "CREATE TABLE calls (
+    id TEXT PRIMARY KEY, kind TEXT NOT NULL, started_at TEXT NOT NULL, ended_at TEXT, duration_sec REAL,
+    status TEXT NOT NULL, transcript_path TEXT, audio_dir TEXT NOT NULL, error TEXT, app_name TEXT,
+    summary_text TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL,
+    event_title TEXT, event_id TEXT, event_pinned INTEGER NOT NULL DEFAULT 0, keep_audio INTEGER
+);
+CREATE TABLE transcript_segments (
+    id TEXT PRIMARY KEY, call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE, speaker TEXT NOT NULL,
+    start_sec REAL NOT NULL, end_sec REAL, text TEXT NOT NULL, order_idx INTEGER NOT NULL
+);
+CREATE INDEX idx_transcript_segments_call_order ON transcript_segments(call_id, order_idx);
+CREATE TABLE transcript_jobs (
+    id TEXT PRIMARY KEY, call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE, speaker TEXT NOT NULL,
+    status TEXT NOT NULL, audio_path TEXT NOT NULL, asr_json_path TEXT, audio_duration_sec REAL,
+    wall_time_sec REAL, real_time_factor REAL, model TEXT, error TEXT, created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+);
+CREATE INDEX idx_transcript_jobs_call ON transcript_jobs(call_id, speaker);
+CREATE TABLE call_speakers (
+    call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE, speaker_key TEXT NOT NULL,
+    display_name TEXT NOT NULL, PRIMARY KEY (call_id, speaker_key)
+);
+CREATE TABLE webhook_deliveries (
+    id TEXT PRIMARY KEY, call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE,
+    call_title TEXT NOT NULL, attempt INTEGER NOT NULL, event TEXT NOT NULL, url TEXT NOT NULL,
+    state TEXT NOT NULL, http_status INTEGER, response_action TEXT, response_body TEXT, error TEXT,
+    created_at TEXT NOT NULL, sent_at TEXT, finished_at TEXT, next_retry_at TEXT
+);
+INSERT INTO calls (id, kind, started_at, status, audio_dir, app_name, summary_text, created_at, updated_at,
+                   event_title, event_pinned)
+VALUES ('old', 'dual', '2026-01-10T10:00:00.000Z', 'ready', '/calls/old', 'Zoom', 'итоги',
+        '2026-01-10T10:00:00.000Z', '2026-01-10T10:00:00.000Z', 'Планёрка', 1);
+INSERT INTO transcript_segments VALUES ('old-0', 'old', 'them-1', 0, 2, 'старая строка', 0);
+INSERT INTO call_speakers VALUES ('old', 'them-1', 'Анна');" to aReleasedSchemaMigratesToCurrentKeepingItsData(schema:) started.
+◇ Test formattedResponsesAndFailures() started.
+✔ Test anEmptyCalendarMatchesNothing() passed after 0.231 seconds.
+✔ Test catalogueEntriesAreDistinct() passed after 0.235 seconds.
+✔ Test jevsConfidentPickIsUsedWithoutAskingTheSummaryModel() passed after 0.236 seconds.
+2026-09-28 01:19:00.200 swiftpm-testing-helper[94284:32833007] Audio files cannot be non-interleaved. Ignoring setting AVLinearPCMIsNonInterleaved YES.
+✔ Test theDiarizerDownloadStopsBeforeADiskThatCannotHoldIt() passed after 0.322 seconds.
+2026-09-28 01:19:00.300 swiftpm-testing-helper[94284:32832999] Audio files cannot be non-interleaved. Ignoring setting AVLinearPCMIsNonInterleaved YES.
+2026-09-28 01:19:00.305 swiftpm-testing-helper[94284:32832999] Audio files cannot be non-interleaved. Ignoring setting AVLinearPCMIsNonInterleaved YES.
+✔ Test aDiarizerFileWithTheWrongHashIsNeverInstalled() passed after 0.387 seconds.
+✔ Test theRequestCarriesTheSecretAndDeliveryHeaders() passed after 0.387 seconds.
+✔ Test seededJourneyCannotModifyARealAppRun() passed after 0.453 seconds.
+✔ Test anUnknownJevChoiceFallsBackToOther() passed after 0.489 seconds.
+2026-09-28 01:19:00.452 swiftpm-testing-helper[94284:32833001] Audio files cannot be non-interleaved. Ignoring setting AVLinearPCMIsNonInterleaved YES.
+recorder write failed: writerBehind("Запись не успевала на диск: потеряно 8192 кадров звука")
+✔ Test theRecordedJevResponseParsesToTheChoiceItsProbabilityAndCost() passed after 0.542 seconds.
+✔ Test nextChunkWaitsForAFullChunkOnDisk() passed after 0.542 seconds.
+◇ Test privacyDestructionAndAccessibility() started.
+◇ Test modelStatesAndLanguageChoices() started.
+2026-09-28 01:19:00.579 swiftpm-testing-helper[94284:32833000] Audio files cannot be non-interleaved. Ignoring setting AVLinearPCMIsNonInterleaved YES.
+✔ Test withoutSegmentsTheStoredMarkdownIsCopiedAsItIs() passed after 0.634 seconds.
+✔ Test startsOnlyAfterTheDebounceElapsed() passed after 0.649 seconds.
+✔ Test aCallWithoutSummaryHasNothingToShow() passed after 0.649 seconds.
+✔ Test everyRemoteSpeakerGetsItsOwnLane() passed after 0.656 seconds.
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test childHitsAFileSizeLimitWhileRecording() started.
+✔ Test trailingWordsWithoutPunctuationStillBecomeASegment() passed after 0.757 seconds.
+✔ Test theEchoLagIsFound() passed after 0.757 seconds.
+✔ Test writePastTheLimitSurfacesAsARecordingWarning() passed after 0.758 seconds.
+✔ Test archiveDetailAndRecoveryLabelsAreLocalized() passed after 0.767 seconds.
+✔ Test keyPointsRunEveryIntervalOnlyWithNewText() passed after 0.767 seconds.
+✔ Test protectedStorageIsOwnerOnlyForOldAndNewFiles() passed after 0.767 seconds.
+✔ Test releaseBeforeTheDebounceRecordsNothing() passed after 0.767 seconds.
+✔ Test journeyAccessibilityNamesAreStableAndUnique() passed after 0.767 seconds.
+✔ Test titleFallsBackToTheFirstSentenceWhenEveryLineIsShort() passed after 0.768 seconds.
+✔ Test theTestPayloadStillHasAMeetingStartTime() passed after 0.815 seconds.
+✔ Test fileVaultIsReadFromTheIsActiveAnswerAndUnknownOtherwise() passed after 0.815 seconds.
+✔ Test titleCutsALongFirstSentenceOnAWordBoundary() passed after 0.817 seconds.
+✔ Test aTranscriptWithoutADialogueBlockIsLeftUntouched() passed after 0.817 seconds.
+✔ Test aFailingMigrationRollsBackAndLeavesTheBackup() passed after 0.818 seconds.
+✔ Test markReadyFailsForACallWithNoRow() passed after 0.817 seconds.
+✔ Test emptyInputYieldsNoSegments() passed after 0.817 seconds.
+2026-09-28 01:19:00.858 swiftpm-testing-helper[94288:32833044] Audio files cannot be non-interleaved. Ignoring setting AVLinearPCMIsNonInterleaved YES.
+2026-09-28 01:19:00.881 swiftpm-testing-helper[94284:32833004] Audio files cannot be non-interleaved. Ignoring setting AVLinearPCMIsNonInterleaved YES.
+✔ Test mergingASpeakerRelabelsItsSegmentsAndPersists() passed after 0.919 seconds.
+✔ Test cleanFormatDropsTheClock() passed after 0.918 seconds.
+✔ Test theEventStartingWithTheCallWins() passed after 0.918 seconds.
+✔ Test withTwoEventsStartingNearbyTheNearerOneWins() passed after 0.918 seconds.
+✔ Test transcriptionLanguageMatchesModelCapabilities() passed after 0.918 seconds.
+✔ Test theRequestCarriesTheKeyAsABearerHeaderWhenThereIsOne() passed after 0.918 seconds.
+✔ Test aGarbageAnswerFallsBackToTheFirstTypeWhateverItIsNamed() passed after 0.918 seconds.
+✔ Test sendGoesThroughTheInjectedTransport() passed after 0.918 seconds.
+✔ Test anUnparseableStoredDateIsNotShownAsData() passed after 0.918 seconds.
+✔ Test titleSkipsTheFillerOpenerForTheFirstSentenceThatCarriesSomething() passed after 0.918 seconds.
+✔ Test slowChunksWidenTheRestAndCleanOnesNarrowIt() passed after 0.918 seconds.
+✔ Test aCallWithNeitherLinesNorMarkdownNeverReachesTheProvider() passed after 0.918 seconds.
+✔ Test stopsWhenTheMicrophoneIsReleased() passed after 0.918 seconds.
+✔ Test theDigestKeepsAgreementsNextStepsAndOpenQuestions() passed after 0.918 seconds.
+✔ Test calendarAuthorizationMapsToTheRightAction() passed after 0.918 seconds.
+✔ Test theSameTypeWithASharedParticipantIsRelated() passed after 0.918 seconds.
+✔ Test theRequestAsksForTheWholeSummaryAtOnce() passed after 0.918 seconds.
+✔ Test aLongEventTheCallMerelyFallsInsideIsNotTheName() passed after 0.918 seconds.
+✔ Test nothingRelatedGivesNil() passed after 0.918 seconds.
+✔ Test theClassifierPicksTheTypeTheModelNamesAndRunsItsPrompt() passed after 0.918 seconds.
+✔ Test displayDatesFollowLocaleWhileFileDatesRemainStable() passed after 0.918 seconds.
+✔ Test downloadStateFollowsTheFileSize() passed after 0.918 seconds.
+✔ Test aRenameIsDroppedWhenAnotherDiarizerRelabelsTheCall() passed after 0.919 seconds.
+✔ Test aTranscriptUnderBudgetReachesTheProviderUntouched() passed after 0.918 seconds.
+✔ Test downloadURLsPinARevision() passed after 0.918 seconds.
+✔ Test aFailedSegmentWriteLeavesTheCallNotReady() passed after 0.920 seconds.
+✔ Test lanesSplitTheCallBetweenTheTwoSides() passed after 0.918 seconds.
+✔ Test aSpeakerWithOnlyShortSegmentsStaysItsOwnSpeaker() passed after 0.918 seconds.
+✔ Test interleavedInt16FromTheSystemTapIsConvertedAsBefore() passed after 0.919 seconds.
+✔ Test aFailingJevFallsBackToTheLocalModelAndIsLogged() passed after 0.918 seconds.
+✔ Test previousCallContentShowsDateAndDigestAsStored() passed after 0.917 seconds.
+✔ Test aLongWaitIsRoundedUpToMinutes() passed after 0.917 seconds.
+✔ Test thePodushkaFolderBecomesTheBesedaFolderOnce() passed after 0.918 seconds.
+✔ Test exportEnglishCopyKeepsAuthoredTextAndStableFileName() passed after 0.918 seconds.
+✔ Test pipelineSpeakerIdsMapToDistinctNamesAndColours() passed after 0.918 seconds.
+✔ Test aChunkAfterASkipKeepsAllItsWords() passed after 0.917 seconds.
+✔ Test everyFileLivesUnderTheDataDirectory() passed after 0.917 seconds.
+✔ Test measureSplitsTheFolderByKind() passed after 0.918 seconds.
+✔ Test aDeliveryRoundTripsThroughItsThreeStates() passed after 0.921 seconds.
+✔ Test aManualMergeIsReappliedWhenARerunWritesTheSameSpeakersAgain() passed after 0.920 seconds.
+✔ Test anOldDatabaseWithoutTheTypeColumnOpensAndTheTypeRoundTrips() passed after 0.920 seconds.
+✔ Test recordingTranscriptArchiveAndSearchRoundTrip() passed after 0.920 seconds.
+✔ Test resplitSkipsRenamedSpeakers() passed after 0.917 seconds.
+✔ Test theRequestGoesOutWithoutAnAuthorizationHeaderToALocalServer() passed after 0.917 seconds.
+✔ Test theRetryScheduleStopsAfterTheFourthAttempt() passed after 0.917 seconds.
+✔ Test eachDeniedExportFolderRetriesOnlyUnderItsOwnScope() passed after 0.921 seconds.
+✔ Test aGivenTypeSkipsTheClassifier() passed after 0.917 seconds.
+✔ Test firstRunCopyIsLocalizedWithoutRequestingPermissions() passed after 0.917 seconds.
+✔ Test humanDurationReadsAsTheProtoypeWritesIt() passed after 0.917 seconds.
+✔ Test growingFileReadsTheOpenRecordingAt16kMono() passed after 0.922 seconds.
+✔ Test aFiveOhThreeIsAFailureWorthRetrying() passed after 0.917 seconds.
+✔ Test recordingStopWithNothingPendingDoesNothing() passed after 0.917 seconds.
+✔ Test theAttemptCountCountsEveryRowOfTheCall() passed after 0.918 seconds.
+✔ Test seriesAndParticipantsSurviveTheDatabase() passed after 0.918 seconds.
+✔ Test aCustomResultWithOnlyOpenQuestionsIsShownWhole() passed after 0.917 seconds.
+✔ Test deniedOldExportKeepsNewPathAndRetries() passed after 0.919 seconds.
+✔ Test segmentsNamesAndSearchRoundTripThroughTheDatabase() passed after 0.919 seconds.
+✔ Test longPauseClosesASegmentWithoutPunctuation() passed after 0.917 seconds.
+✔ Test generatedExportLabelsAndNamesFollowExplicitLocale() passed after 0.917 seconds.
+✔ Test parseThrowsTheServerMessageOnAnErrorBody() passed after 0.917 seconds.
+✔ Test datedRuleExpiresOnlyPastItsDeadline() passed after 0.917 seconds.
+✔ Test parseTreatsEmptyChoicesAsAnUnavailableModel() passed after 0.917 seconds.
+✔ Test recorderLeavesARepairableFileWithoutStop() passed after 0.917 seconds.
+✔ Test resplitRedoesOnlyOldCallsWithAudioAndWithoutMerges() passed after 0.922 seconds.
+✔ Test markdownFormatOpensWithTheConversationName() passed after 0.917 seconds.
+✔ Test withoutAnEventTheTitleStillComesFromTheTranscript() passed after 0.917 seconds.
+✔ Test sweepLeavesTheAudioOfAProtectedCallAlone() passed after 0.917 seconds.
+✔ Test onlyGigaamNeedsSplitting() passed after 0.917 seconds.
+✔ Test doesNotStartWhileAManualRecordingIsRunning() passed after 0.917 seconds.
+✔ Test textIsNeverSweptWhateverTheAudioRulesSay() passed after 0.917 seconds.
+✔ Test exportFileNameDropsCharactersTheFileSystemRejects() passed after 0.917 seconds.
+✔ Test overlappingChunksKeepEachWordOnce() passed after 0.917 seconds.
+✔ Test onlyAFolderInsideMobileDocumentsCountsAsICloudDrive() passed after 0.917 seconds.
+✔ Test aTranscriptOverBudgetIsCutAtTheLastNewlineAndFlagged() passed after 0.917 seconds.
+✔ Test aBareMarkerStillOpensAWord() passed after 0.917 seconds.
+✔ Test aCallRecordedBeforeDiarizationKeepsTheUnnumberedName() passed after 0.917 seconds.
+✔ Test parseTellsARefusedKeyApartFromAnyOtherFailure() passed after 0.917 seconds.
+✔ Test thePayloadCarriesTheKrispKeysNextToBesedasOwn() passed after 0.917 seconds.
+✔ Test fileNamesMapToTheThreeStorageKinds() passed after 0.917 seconds.
+✔ Test aReleasedSchemaMigratesToCurrentKeepingItsData(schema:) with 2 test cases passed after 0.919 seconds.
+✔ Test theEstimateComesFromHowLongTheFinishedPartTook() passed after 0.917 seconds.
+✔ Test theClassifierContextHasTheWeekdayLocalTimeAndDuration() passed after 0.883 seconds.
+✔ Test aCustomPromptResultIsShownWhole() passed after 0.883 seconds.
+✔ Test silenceStopDoesNotRestartUntilTheMicrophoneIsTakenAgain() passed after 0.883 seconds.
+✔ Test linkingIsBrokenWithoutFullAccess() passed after 0.883 seconds.
+✔ Test russianUILiteralsUseTheCyrillicProductName() passed after 0.919 seconds.
+✔ Test theBarCountsFinishedStepsAndThePartOfTheRunningOne() passed after 0.883 seconds.
+✔ Test laterAndUnreadyCallsAreIgnored() passed after 0.883 seconds.
+✔ Test onlyQueuedRowsWhoseTimeHasComeAreDue() passed after 0.920 seconds.
+✔ Test aRowLeftSendingIsFailedOnLaunchAndReturned() passed after 0.919 seconds.
+✔ Test aRenameReplacesBothTheNameAndTheAvatarLetter() passed after 0.883 seconds.
+✔ Test sharesStillAddUpOnACallWithHundredsOfShortLines() passed after 0.883 seconds.
+✔ Test segmentBoundsFollowTheFirstAndLastWord() passed after 0.883 seconds.
+✔ Test sentenceEndingWordClosesASegment() passed after 0.882 seconds.
+✔ Test aBarelyStartedStepGivesNoEstimate() passed after 0.883 seconds.
+✔ Test aFourOhOneIsRejectedWithoutRetry() passed after 0.882 seconds.
+✔ Test titleIsNilForAnEmptyTranscript() passed after 0.882 seconds.
+✔ Test audioShorterThanTheLimitIsNotSplit() passed after 0.883 seconds.
+✔ Test bookmarkRecoveryStringsExistInBothLanguages() passed after 0.882 seconds.
+✔ Test callWithoutATranscriptFallsBackToTheAppAndDate() passed after 0.882 seconds.
+✔ Test aBacklogOfMoreThanAChunkIsSkipped() passed after 0.882 seconds.
+✔ Test aFailedRowDeleteKeepsTheRowAndTheFiles() passed after 0.920 seconds.
+✔ Test aTwoHundredWithAnActionIsDelivered() passed after 0.882 seconds.
+✔ Test theDigestKeepsTheCurrentDefaultSections() passed after 0.882 seconds.
+✔ Test renamedSpeakersReplaceTheDefaultNamesEverywhere() passed after 0.882 seconds.
+✔ Test aCalendarEventOutranksTheTitleGuessedFromTheTranscript() passed after 0.877 seconds.
+✔ Test theResponseBodyIsCutAtTwoKilobytes() passed after 0.877 seconds.
+✔ Test resplitWithNoDiarizerSpeechIsNotRepeated() passed after 0.919 seconds.
+✔ Test thePreviousVersionMigratesToCurrentKeepingItsData() passed after 0.920 seconds.
+✔ Test theMissingBuiltInModelErrorSaysWhereToDownloadIt() passed after 0.865 seconds.
+✔ Test podushkaValuesAreImportedUnlessAlreadySetUnderTheNewName() passed after 0.924 seconds.
+✔ Test archiveDurationUsesExplicitLocale() passed after 0.865 seconds.
+✔ Test deletingACallLeavesNothingOfItOnDisk() passed after 0.920 seconds.
+✔ Test deletingTheCallDropsItsDeliveries() passed after 0.883 seconds.
+✔ Test parseLoadedKeepsOnlyLlmEntriesAndReturnsTheirIdentifiers() passed after 0.864 seconds.
+✔ Test aShortEventIsNotTheName() passed after 0.864 seconds.
+✔ Test failedRowDeletionRestoresMovedCallFolder() passed after 0.883 seconds.
+✔ Test aOneSpeakerCallIsUnchanged() passed after 0.864 seconds.
+✔ Test aLegacyDatabaseMissingSpeakerMergeTableIsRepairedWithoutLosingCalls() passed after 0.877 seconds.
+✔ Test aServerThatDoesNotAnswerIsReportedAsDownAndNamed() passed after 0.864 seconds.
+✔ Test aTimedOutTransportBecomesARetryableFailure() passed after 0.864 seconds.
+✔ Test sentencePiecesBecomeWords() passed after 0.864 seconds.
+✔ Test stateLabelDependsOnlyOnTheSelectedModelFile() passed after 0.864 seconds.
+✔ Test deletionFailuresAndOldExportLocation() passed after 0.919 seconds.
+✔ Test directLegacyDeletionRemovesAuthorizedOldCopy() passed after 0.884 seconds.
+✔ Test aLongSingleSpeakerSegmentKeepsOneLinePerSentence() passed after 0.864 seconds.
+✔ Test doesNotStartTwiceWhileAlreadyRecording() passed after 0.863 seconds.
+✔ Test echoOnlySentencesAreDroppedAndOwnSpeechIsKept() passed after 0.865 seconds.
+✔ Test installRunsAtOnceWhenNothingIsRecording() passed after 0.864 seconds.
+✔ Test onlyCallsThatStillNeedTheirAudioProtectTheirFolder() passed after 0.864 seconds.
+✔ Test anEventStartingFourMinutesLaterStillCounts() passed after 0.864 seconds.
+✔ Test renamedCallKeepsOneExportCopyAndDeletionRemovesIt() passed after 0.919 seconds.
+✔ Test backToBackLinesOfOneSpeakerMergeIntoOneBar() passed after 0.864 seconds.
+✔ Test archiveSearchDeletionAndAccessibilityCopyAreLocalized() passed after 0.864 seconds.
+✔ Test aRenamedSpeakerReachesTheProviderUnderTheNewName() passed after 0.864 seconds.
+✔ Test aStepThatCannotReportShowsOnlyTheStepsBeforeIt() passed after 0.864 seconds.
+✔ Test aTranscriptOpeningWithoutTheMarkerKeepsItsFirstWord() passed after 0.864 seconds.
+✔ Test failedResplitLeavesTheCallUntouched() passed after 0.865 seconds.
+✔ Test anEventStartingSixMinutesLaterDoesNot() passed after 0.864 seconds.
+✔ Test linkingIsBrokenWhenTheSelectedCalendarIsGone() passed after 0.864 seconds.
+✔ Test menuRecordingAndRecoveryCopyFollowsLocale() passed after 0.864 seconds.
+✔ Test anExistingBesedaFolderIsLeftAlone() passed after 0.864 seconds.
+✔ Test exportPutsTitleDateTypeResultThenTranscript() passed after 0.863 seconds.
+✔ Test exportWritesTheFileAndARerunOverwritesIt() passed after 0.863 seconds.
+✔ Test oneTypeRunsItsPromptWithoutAskingTheClassifier() passed after 0.863 seconds.
+✔ Test aWordStraddlingTheCutIsNotRepeated() passed after 0.862 seconds.
+✔ Test immediateRuleExpiresAFreshFile() passed after 0.862 seconds.
+✔ Test markReadyWritesSegmentsAndStatusTogether() passed after 0.864 seconds.
+✔ Test aWriterThatCannotKeepUpStopsTheRecordingVisibly() passed after 0.866 seconds.
+✔ Test namedFindsCatalogueEntries() passed after 0.862 seconds.
+✔ Test renamingRewritesTheDialogueAndLeavesTheChannelsAlone() passed after 0.862 seconds.
+✔ Test theOldestSchemaMigratesToCurrentKeepingItsData() passed after 0.865 seconds.
+✔ Test aSentenceOutsideDiarizerSpeechKeepsItsTimesAndTheNearestSpeaker() passed after 0.862 seconds.
+✔ Test timestampedFormatPutsTheClockBeforeTheSpeaker() passed after 0.862 seconds.
+✔ Test testsNeverReachTheLoginKeychain() passed after 0.862 seconds.
+✔ Test anEmptyTimelineProducesNoTurns() passed after 0.861 seconds.
+✔ Test turnsTakeTheDiarizerSpeakersAndKeepSentenceTimes() passed after 0.861 seconds.
+✔ Test minimumGapSuppressesAnImmediateRestart() passed after 0.861 seconds.
+✔ Test buffersThroughTheCallbackPathLandOnDiskAsTheOldPathWroteThem() passed after 0.885 seconds.
+✔ Test aCallWithOnlyOneChannelDrawsOneLane() passed after 0.861 seconds.
+✔ Test aStoredSummaryIsReadBackFromTheDatabase() passed after 0.862 seconds.
+✔ Test aGarbageAnswerFromTheLocalModelFallsBackToOtherWhereverItIsListed() passed after 0.861 seconds.
+✔ Test aCallWithOnlyMarkdownStillGoesToTheProvider() passed after 0.862 seconds.
+✔ Test aSentenceTakesTheSpeakerOfTheSegmentItOverlapsMost() passed after 0.861 seconds.
+✔ Test legacyDeletionWithoutFolderScopeRetainsCallAndCopy() passed after 0.865 seconds.
+✔ Test theSameTitleIgnoringCaseAndSpacesIsRelated() passed after 0.861 seconds.
+✔ Test sweepRemovesExpiredAudioAndKeepsTheTranscript() passed after 0.862 seconds.
+✔ Test microphoneNoteWithoutATranscriptGetsItsOwnTitle() passed after 0.861 seconds.
+✔ Test parseReturnsTrimmedContentFromANormalAnswer() passed after 0.861 seconds.
+✔ Test aLowConfidenceJevPickFallsBackToOther() passed after 0.861 seconds.
+✔ Test noTokensMeanNoWords() passed after 0.861 seconds.
+✔ Test renamedSpeakersReachBothTheTextAndTheParticipants() passed after 0.861 seconds.
+✔ Test aMissingSummaryLeavesTheKeyOut() passed after 0.861 seconds.
+✔ Test aManualMergeIsDroppedWhenAnotherDiarizerRelabelsTheCall() passed after 0.865 seconds.
+✔ Test droppedBuffersWidenTheRestOnlyWhenTheyGrow() passed after 0.847 seconds.
+✔ Test dayGroupSplitsTodayYesterdayThisWeekAndEarlier() passed after 0.830 seconds.
+✔ Test anUnknownSpeakerKeyNeverShowsUpAsItsName() passed after 0.830 seconds.
+✔ Test aCurrentStoreIsNeitherMigratedNorBackedUpAgain() passed after 0.862 seconds.
+✔ Test aRenameSurvivesARerunOfTheSameDiarizerAndReachesTheFile() passed after 0.862 seconds.
+✔ Test theJevRequestIsOneChoiceOverTheTypesWithTheCallInState() passed after 0.830 seconds.
+✔ Test theSameCalendarSeriesIsRelated() passed after 0.829 seconds.
+✔ Test endpointAcceptsOnlyHttpAddressesWithAHost() passed after 0.829 seconds.
+✔ Test theErrorCardOffersTheWayOutThatMatchesTheFailure() passed after 0.829 seconds.
+✔ Test keyPointsSkipARoundWhileThePreviousRuns() passed after 0.829 seconds.
+✔ Test wordLimitClosesASegment() passed after 0.818 seconds.
+✔ Test seededHeadlessJourneyCoversArchiveSearchSummaryCopySpeakerMergeAndDelete() passed after 0.862 seconds.
+✔ Test sha256MatchesTheKnownDigestOfAFile() passed after 0.818 seconds.
+✔ Test aZoomLinkInTheEventCountsAsACall() passed after 0.818 seconds.
+✔ Test dynamicFailuresAndPrivacy() passed after 0.818 seconds.
+✔ Test successiveDeniedExportsSurviveRelaunch() passed after 0.848 seconds.
+✔ Test resplitIsNotRepeatedAfterARestart() passed after 0.830 seconds.
+✔ Test aLaunchBeforeAnySpeechModelIsDownloadedLeavesTheDiarizerModelAlone() passed after 0.926 seconds.
+✔ Test formattedResponsesAndFailures() passed after 0.708 seconds.
+✔ Test aFailedFileRemovalLeavesNoBrokenCallAndIsCleanedLater() passed after 0.818 seconds.
+✔ Test previousCallContentIsHiddenWithoutCallOrDigest() passed after 0.861 seconds.
+✔ Test privacyDestructionAndAccessibility() passed after 0.346 seconds.
+✔ Test anInterruptedCallWithABrokenChannelSaysSo() passed after 0.926 seconds.
+✔ Test modelStatesAndLanguageChoices() passed after 0.346 seconds.
+✔ Test anUnavailableCallIndexIsShownToTheUser() passed after 0.926 seconds.
+✔ Test aFailedResumeAtLaunchIsNotReportedAsAnUnavailableIndex() passed after 0.926 seconds.
+✔ Suite SettingsServiceMessagesTests passed after 0.927 seconds.
+✔ Suite SettingsLocalizationTests passed after 0.926 seconds.
+✔ Suite SettingsDynamicLocalizationTests passed after 0.927 seconds.
+✔ Test aUserDiarizationJumpsAheadOfWaitingBackgroundWork() passed after 0.865 seconds.
+✔ Test transcribingWithoutTheModelFileFailsWithTheTypedError() passed after 0.863 seconds.
+✔ Test otherCannotBeDeletedButOtherTypesCan() passed after 0.929 seconds.
+✔ Test resplitWaitsWhileTheAppIsBusy() passed after 0.938 seconds.
+✔ Test piecesCoverTheOriginalWithoutGapsOrOverlap() passed after 0.949 seconds.
+✔ Test normalisingYieldsSixteenKilohertzMonoInt16() passed after 0.867 seconds.
+✔ Test aSentenceGluingEchoAndOwnSpeechKeepsOnlyTheOwnWordsWithTheirBounds() passed after 0.890 seconds.
+recorder write failed: Error Domain=com.apple.coreaudio.avfaudio Code=-40 "(null)" UserInfo={failed call=ExtAudioFileWrite(_impl->_extAudioFile, buffer.frameLength, buffer.audioBufferList)}
+✔ Test childHitsAFileSizeLimitWhileRecording() passed after 0.275 seconds.
+✔ Test run with 1 test in 0 suites passed after 0.276 seconds.
+✔ Test aDiskThatRefusesWritesStopsTheRecordingVisiblyAndKeepsWhatWasWritten() passed after 0.964 seconds.
+✔ Test aRenamedFirstTypeIsNotMigrated() passed after 1.039 seconds.
+✔ Test aCallFolderMissingFromTheIndexAppearsAsFailedAndRetryable() passed after 1.113 seconds.
+✔ Test theCutLandsInTheSilenceNotOnTheHardBoundary() passed after 1.051 seconds.
+✔ Test bookmarksPersistRecoverAndBalanceScopes() passed after 1.126 seconds.
+✔ Test everyPieceStaysWithinTheLimit() passed after 1.146 seconds.
+✔ Test localOnlyIsOffByDefaultAndKeepsSummariesJevAndWebhooksOnTheMac() passed after 1.207 seconds.
+✔ Test aFreshDirectoryHasEveryStagePending() passed after 1.223 seconds.
+✔ Test piecesReadWindowByWindowFromAFileMatchTheWholeArraySplit() passed after 1.230 seconds.
+✔ Test storedTypesWithoutTheFlagMakeTheFirstOtherAndItKeepsTheFlagAnywhereInTheList() passed after 1.326 seconds.
+✔ Test theOldestOfMoreThanAPageOfCallsIsFoundBySearchAndByPaging() passed after 1.460 seconds.
+✔ Test aFailedSegmentWriteInFinishCallKeepsTheAudioAndSendsNoWebhook() passed after 1.598 seconds.
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test childRecordsUntilKilled() started.
+2026-09-28 01:19:01.612 swiftpm-testing-helper[94295:32833072] Audio files cannot be non-interleaved. Ignoring setting AVLinearPCMIsNonInterleaved YES.
+2026-09-28 01:19:01.614 swiftpm-testing-helper[94295:32833072] Audio files cannot be non-interleaved. Ignoring setting AVLinearPCMIsNonInterleaved YES.
+2026-09-28 01:19:01.712 swiftpm-testing-helper[94284:32833000] Audio files cannot be non-interleaved. Ignoring setting AVLinearPCMIsNonInterleaved YES.
+✔ Test journeyAccessibilityCanBeReadAndActedWithoutAFrontWindow() passed after 1.924 seconds.
+✔ Test anUnrenamedCallTypeFromBESEDA46BecomesOtherWithItsPrompt() passed after 1.967 seconds.
+✔ Test theBackupExclusionIsAppliedToTheDataFolderAtLaunchAndCleared() passed after 1.983 seconds.
+✔ Test anEditedSummaryPromptBecomesTheFirstCallTypesPrompt() passed after 1.984 seconds.
+✔ Test theSummarySettingsDefaultToEmptyAndRoundTripThroughUserDefaults() passed after 2.093 seconds.
+✔ Test aValidSelectedModelIsUsableWithoutAWarmUpMarker() passed after 2.105 seconds.
+✔ Test aCorruptWAVThatCannotBeRepairedIsRecordedOnTheCall() passed after 2.130 seconds.
+✔ Test immediateRetentionDeletesTheAudioRightAfterTheCallIsMarkedReady() passed after 2.173 seconds.
+✔ Test onlyCallTypesWithTheUneditedPreviousDefaultPromptGetTheNewOne() passed after 2.177 seconds.
+✔ Test strictModeOverridesItsSettingsAndTurningItOffRestoresThem() passed after 2.180 seconds.
+✔ Test anInvalidSelectedModelIsNotUsable() passed after 2.181 seconds.
+✔ Test jevClassifiesByDefaultOnlyWhenAnOpenRouterKeyIsSet() passed after 2.285 seconds.
+✔ Test lessThanThirtySecondsFromRemoteIsNotAutomaticallyQueued() passed after 2.393 seconds.
+✔ Test aBrokenURLStillQueuesNothing() passed after 2.415 seconds.
+✔ Test remoteSpeechMustReachThirtySecondsForOneParticipant() passed after 2.417 seconds.
+✔ Test nothingIsQueuedWhileTheWebhookIsOff() passed after 2.419 seconds.
+✔ Test lessThanThirtySecondsFromMeIsNotAutomaticallyQueued() passed after 2.420 seconds.
+✔ Test aRecordingKilledMidCallIsReadableAndFailedAfterRelaunch() passed after 2.507 seconds.
+✔ Test exactlyFortyMinutesIsNotAutomaticallyQueued() passed after 2.455 seconds.
+✔ Test queueProcessesTwoCallsFinishingBackToBackInOrder() passed after 2.517 seconds.
+✔ Test isolatedCopyNeverReachesAPermissionDialog() passed after 2.516 seconds.
+✔ Test switchingModelsReopensTheStages() passed after 2.518 seconds.
+✔ Test aModelAlreadyOnDiskIsNotDownloadedAgain() passed after 2.517 seconds.
+✔ Test aServerThatIsNotInstalledIsReportedAsAMissingModel() passed after 2.516 seconds.
+✔ Test aShortDiskFailsTheStageWithoutDownloading() passed after 2.516 seconds.
+✔ Test storeServerIgnoresApplicationSupportExecutable() passed after 2.516 seconds.
+✔ Test aDeletedCallWaitingInTheQueueIsNotProcessed() passed after 2.518 seconds.
+✔ Test aShortDiskDownloadsNeitherTheEngineNorTheModel() passed after 2.483 seconds.
+✔ Test aKeyOnlyInTheLegacyServiceIsCopiedIntoTheNewOneAndKept() passed after 2.525 seconds.
+✔ Test storeInstallNeverFetchesAnExecutableEvenWhenDirectRuntimeExists() passed after 2.423 seconds.
+✔ Test theSummaryProviderDefaultsToTheBuiltInModelAndRoundTripsThroughUserDefaults() passed after 2.524 seconds.
+✔ Test aWrongHashFailsTheStageAndLeavesNoFile() passed after 2.521 seconds.
+✔ Test aLaunchWithTheSpeechModelOnDiskPrefetchesTheDiarizerModel() passed after 2.475 seconds.
+✔ Test installDownloadsTheModelAndMarksTheWarmUp() passed after 2.597 seconds.
+✔ Test aFailedEngineDownloadStopsBeforeTheFourGigabyteModel() passed after 2.562 seconds.
+✔ Test removingAModelDropsItsFileAndTheWarmUp() passed after 2.545 seconds.
+✔ Test aFailedDownloadStopsTheChainAndKeepsItsMessage() passed after 2.510 seconds.
+✔ Test twoCallsFinishingBackToBackAreBothProcessed() passed after 2.763 seconds.
+✔ Test aPendingJobResumedAtLaunchWaitsForTheKeychainKey() passed after 3.109 seconds.
+✔ Test aFailedKeychainWriteKeepsTheSecretInDefaults() passed after 3.072 seconds.
+✔ Test theWebhookSettingsDefaultToOffAndRoundTripThroughUserDefaults() passed after 3.069 seconds.
+✔ Test launchDoesNotWaitOnTheKeychainAndTheKeyAppearsOnceTheReadReturns() passed after 3.074 seconds.
+✔ Test aModelThatArrivesCorruptedLeavesNoFileBehind() passed after 3.093 seconds.
+✔ Test installingLeavesTheServerTheModelAndTheWarmUpMarkerOnDisk() passed after 3.157 seconds.
+✔ Test aRejectionQueuesNothing() passed after 3.159 seconds.
+✔ Test aPendingProcessingJobResumesOnceAfterRelaunch() passed after 3.158 seconds.
+✔ Test removingTakesBackTheModelAndKeepsTheEngine() passed after 3.167 seconds.
+✔ Test progressFractionsReachTheStage() passed after 3.121 seconds.
+✔ Test onlyTheServerAndItsLibrariesSurviveTheUnpacking() passed after 3.179 seconds.
+✔ Test aManualSendBypassesTheAutomaticFilter() passed after 3.184 seconds.
+✔ Test justOverFortyMinutesWithExactlyThirtySecondsPerSideIsDelivered() passed after 3.182 seconds.
+✔ Test aRetryableFailureQueuesTheNextAttempt() passed after 3.126 seconds.
+✔ Test overlappingAndInvalidSegmentsDoNotInflateRecognizedSpeech() passed after 3.126 seconds.
+✔ Test secretsInUserDefaultsMoveToTheKeychainAndLeaveDefaults() passed after 3.186 seconds.
+✔ Test liveLoopTranscribesChunksOfTheGrowingFilesUntilCancelled() passed after 3.386 seconds.
+✔ Test run with 320 tests in 3 suites passed after 3.448 seconds.
