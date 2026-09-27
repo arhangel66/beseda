@@ -73,6 +73,7 @@ struct OnboardingWindow: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .keyboardShortcut(.defaultAction)
+                .accessibilityIdentifier(UIJourneyContract.Identifier.onboardingAdvance)
                 .disabled(!canAdvance)
             }
             .padding(.horizontal, 40)
@@ -80,6 +81,7 @@ struct OnboardingWindow: View {
             .padding(.bottom, 24)
         }
         .frame(width: 640, height: 520)
+        .accessibilityIdentifier(UIJourneyContract.Identifier.onboarding)
         .onAppear {
             permissions.refresh()
         }

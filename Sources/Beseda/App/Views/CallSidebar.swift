@@ -59,6 +59,7 @@ struct CallSidebar: View {
             }
         }
         .listStyle(.sidebar)
+        .accessibilityIdentifier(UIJourneyContract.Identifier.archive)
         .safeAreaInset(edge: .bottom, spacing: 0) {
             Text(controller.storageLine)
                 .font(.caption)

@@ -286,6 +286,12 @@ final class AppController {
 
         do {
             try callStore.prepare()
+            try UIJourneyContract.seedIfRequested(
+                environment: ProcessInfo.processInfo.environment,
+                isolated: IsolatedCopy.isActive,
+                paths: paths,
+                store: callStore
+            )
             let sweptDirectories = try callStore.failInterruptedCalls(reason: "Interrupted before the app restarted")
             if !sweptDirectories.isEmpty {
                 appendLog("Marked \(sweptDirectories.count) interrupted call(s) as failed")

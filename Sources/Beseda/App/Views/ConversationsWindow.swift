@@ -18,6 +18,7 @@ struct ConversationsWindow: View {
             placement: .sidebar,
             prompt: "Искать в разговорах"
         )
+        .accessibilityIdentifier(UIJourneyContract.Identifier.search)
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
                 if let detail = controller.selectedCallDetail {
@@ -34,6 +35,7 @@ struct ConversationsWindow: View {
                     .disabled(!controller.canDelete(detail.summary))
                     .help("Удалить разговор со всеми файлами")
                     .accessibilityLabel("Удалить разговор")
+                    .accessibilityIdentifier(UIJourneyContract.Identifier.deleteCall)
                 }
                 RecordingToolbarButton(controller: controller)
             }

@@ -137,6 +137,7 @@ struct CallDetailView: View {
                 }
             }
             .pickerStyle(.segmented)
+            .accessibilityIdentifier(UIJourneyContract.Identifier.summaryTab)
             .labelsHidden()
             .fixedSize()
         }
@@ -352,6 +353,7 @@ struct CopyTranscriptButton: View {
         .help("Скопировать в формате «\(controller.settings.copyFormat.title)» (⇧⌘C); в меню — другие форматы")
         .accessibilityLabel("Скопировать расшифровку")
         .accessibilityValue(controller.settings.copyFormat.title)
+        .accessibilityIdentifier(UIJourneyContract.Identifier.copyTranscript)
     }
 }
 
@@ -571,8 +573,15 @@ private struct TranscriptLine: View {
         .padding(.vertical, 2)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(isActive ? Color.accentColor.opacity(0.1) : .clear, in: .rect(cornerRadius: Metrics.rowCorner))
-        // the rename lives in the context menu, which VoiceOver does not reach on its own
+        .accessibilityIdentifier(UIJourneyContract.Identifier.speakerLinePrefix + segment.speaker)
+        // Context menus cannot be reached reliably while the app stays inactive, so every speaker
+        // operation is also an explicit accessibility action on the transcript line.
         .accessibilityAction(named: "Переименовать участника", onRename)
+        .accessibilityActions {
+            ForEach(mergeTargets, id: \.self) { target in
+                Button("Объединить с \(SpeakerNaming.name(for: target, overrides: names))") { onMerge(target) }
+            }
+        }
         .contextMenu {
             Button("Перейти к \(CallFormatting.mmss(segment.startSec))", action: onSeek)
             Button("Переименовать участника…", action: onRename)
