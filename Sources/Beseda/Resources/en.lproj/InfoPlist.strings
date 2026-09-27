@@ -1,0 +1,4 @@
+"NSAudioCaptureUsageDescription" = "Beseda captures system call audio for local transcription.";
+"NSMicrophoneUsageDescription" = "Beseda records local test clips and calls for transcription on this Mac.";
+"NSCalendarsFullAccessUsageDescription" = "Beseda uses calendar events to name conversations and show upcoming meetings.";
+"NSCalendarsUsageDescription" = "Beseda uses calendar events to name conversations and show upcoming meetings.";
