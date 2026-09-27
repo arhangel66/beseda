@@ -1762,12 +1762,19 @@ final class AppController {
         // a call waiting its turn would reach runSummary with its row gone
         processingQueue.removeWaiting { $0.0.id == call.id }
         do {
-            if settings.exportFolder.isEmpty {
-                try callStore.deleteCallAndFiles(id: call.id, exportFolder: nil, requireExportScope: settings.sandboxed)
-            } else {
+            let oldFolder = try callStore.exportPath(callID: call.id).map {
+                URL(fileURLWithPath: $0).deletingLastPathComponent().path
+            }
+            if let oldFolder {
+                try settings.withExportFolder(at: oldFolder) { folder in
+                    try callStore.deleteCallAndFiles(id: call.id, exportFolder: folder, requireExportScope: settings.sandboxed)
+                }
+            } else if !settings.exportFolder.isEmpty {
                 try settings.withExportFolder { folder in
                     try callStore.deleteCallAndFiles(id: call.id, exportFolder: folder, requireExportScope: settings.sandboxed)
                 }
+            } else {
+                try callStore.deleteCallAndFiles(id: call.id, exportFolder: nil, requireExportScope: settings.sandboxed)
             }
             if selectedCallDetail?.id == call.id {
                 selectCall(id: nil)
@@ -1777,7 +1784,10 @@ final class AppController {
             appendLog("Deleted call \(call.id)")
         } catch {
             appendLog("Delete failed: \(error.localizedDescription)")
-            deleteError = error.localizedDescription
+            if settings.sandboxed { settings.exportNeedsReselection = true }
+            deleteError = error.localizedDescription + (settings.sandboxed
+                ? " — Select the previous export folder in Settings and retry / Выберите прежнюю папку экспорта в настройках и повторите удаление"
+                : "")
         }
     }
 

@@ -681,7 +681,7 @@ private struct StoragePane: View {
                 }
                 .disabled(settings.strictMode)
                 if settings.exportNeedsReselection {
-                    Label(SettingsText.get("Выберите папку экспорта снова в настройках"), systemImage: "exclamationmark.triangle")
+                    Label(SettingsText.get("Для удаления старой копии выберите прежнюю папку и повторите удаление. Затем можно вернуть текущую папку."), systemImage: "exclamationmark.triangle")
                         .foregroundStyle(.orange)
                 }
                 if ICloudDrive.contains(settings.exportFolder) {

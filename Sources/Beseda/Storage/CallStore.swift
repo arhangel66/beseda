@@ -551,16 +551,21 @@ final class CallStore: @unchecked Sendable {
             call.transcriptURL, exportFolder?.appendingPathComponent(CallExport.fileName(call)),
             previousExport
         ]
+        var movedFiles: [(from: URL, to: URL)] = []
         do {
+            for url in looseFiles.compactMap({ $0 }) where fileManager.fileExists(atPath: url.path)
+                && !movedFiles.contains(where: { $0.from == url }) {
+                let destination = trashURL.appendingPathComponent(UUID().uuidString, isDirectory: true)
+                    .appendingPathComponent(id, isDirectory: true).appendingPathComponent(url.lastPathComponent)
+                try fileManager.createDirectory(at: destination.deletingLastPathComponent(), withIntermediateDirectories: true)
+                try fileManager.moveItem(at: url, to: destination)
+                movedFiles.append((url, destination))
+            }
             try deleteCall(id: id)
         } catch {
-            if let folder, folderExists {
-                try? fileManager.moveItem(at: trashedFolder, to: folder)
-            }
+            for moved in movedFiles.reversed() { try? fileManager.moveItem(at: moved.to, to: moved.from) }
+            if let folder, folderExists { try? fileManager.moveItem(at: trashedFolder, to: folder) }
             throw error
-        }
-        for url in looseFiles.compactMap({ $0 }) where fileManager.fileExists(atPath: url.path) {
-            try fileManager.removeItem(at: url)
         }
         try emptyTrash()
     }
