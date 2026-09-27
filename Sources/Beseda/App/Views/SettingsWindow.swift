@@ -235,7 +235,7 @@ private struct RecordingPane: View {
                     .disabled(monitor.isRunning)
                 }
                 if let failure = monitor.failure {
-                    Text(SettingsText.get(failure)).foregroundStyle(.red)
+                    Text(SettingsText.serviceFailure(failure)).foregroundStyle(.red)
                 } else if monitor.heardMicrophone || monitor.heardSystemAudio {
                     Text(soundCheckResult).foregroundStyle(.secondary)
                 }
@@ -383,7 +383,7 @@ private struct ProcessingPane: View {
 
                 HStack {
                     if let summaryCheckResult = controller.summaryCheckResult {
-                        Text(summaryCheckResult)
+                        Text(SettingsText.serviceFailure(summaryCheckResult))
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
@@ -541,10 +541,10 @@ private struct BundledSummaryRow: View {
             }
         } else if let failure = installer.failure {
             HStack(spacing: 8) {
-                Text(SettingsText.get(failure))
+                Text(SettingsText.serviceFailure(failure))
                     .foregroundStyle(Color.red)
                     .lineLimit(1)
-                    .help(SettingsText.get(failure))
+                    .help(SettingsText.serviceFailure(failure))
                 Button(SettingsText.get("Повторить")) {
                     installer.install()
                 }

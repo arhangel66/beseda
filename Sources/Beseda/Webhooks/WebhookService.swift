@@ -143,7 +143,7 @@ final class WebhookService {
             let elapsed = String(format: "%.1f", Date().timeIntervalSince(startedAt))
             switch outcome {
             case .delivered(let status, let action, _):
-                self.testResult = "Сервис ответил \(status)\(action.map { " · \($0)" } ?? "") за \(elapsed) с"
+                self.testResult = SettingsText.webhookResponse(status: status, action: action, seconds: elapsed)
             case .rejected(401, _):
                 self.testResult = "Секрет не подошёл (401)"
             case .rejected(let status, _):
