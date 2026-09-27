@@ -67,7 +67,7 @@ import Testing
 
     let writeError = try #require(recorder.writeError)
     #expect(recorder.droppedBufferCount == 1)
-    #expect(AppController.recordingWarning(forWriteError: writeError).contains("4 ГБ"))
-    #expect(AppController.recordingWarning(forWriteError: CocoaError(.fileWriteOutOfSpace)).contains("не удалось записать"))
+    #expect(AppController.recordingWarning(forWriteError: writeError).contains("4 GB"))
+    #expect(AppController.recordingWarning(forWriteError: CocoaError(.fileWriteOutOfSpace)).contains("Could not write audio"))
     #expect(try recorder.finish().frameCount == 1_000)
 }

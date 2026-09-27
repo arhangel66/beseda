@@ -33,20 +33,20 @@ private let detail = StoredCallDetail(
 @Test func timestampedFormatPutsTheClockBeforeTheSpeaker() {
     let text = TranscriptCopy.render(detail, format: .timestamped)
 
-    #expect(text == "00:41 Вы: Начнём с релиза.\n00:52 Собеседник: Давай.")
+    #expect(text == "00:41 You: Начнём с релиза.\n00:52 Other speaker: Давай.")
 }
 
 @Test func cleanFormatDropsTheClock() {
     let text = TranscriptCopy.render(detail, format: .clean)
 
-    #expect(text == "Вы: Начнём с релиза.\nСобеседник: Давай.")
+    #expect(text == "You: Начнём с релиза.\nOther speaker: Давай.")
 }
 
 @Test func markdownFormatOpensWithTheConversationName() {
     let text = TranscriptCopy.render(detail, format: .markdown)
 
     #expect(text.hasPrefix("## Релиз 0.6 — синк"))
-    #expect(text.contains("**Вы** 00:41"))
+    #expect(text.contains("**You** 00:41"))
 }
 
 @Test func withoutSegmentsTheStoredMarkdownIsCopiedAsItIs() {
@@ -76,5 +76,5 @@ private let detail = StoredCallDetail(
 
     let text = TranscriptCopy.render(renamed, format: .clean)
 
-    #expect(text == "Вы: Начнём.\nИра: Давай.\nСобеседник 2: Секунду.")
+    #expect(text == "You: Начнём.\nИра: Давай.\nOther speaker 2: Секунду.")
 }

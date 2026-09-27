@@ -48,7 +48,7 @@ private func makeSegment(_ speaker: String, _ start: Double, _ end: Double, _ in
     let lanes = SpeakerLane.build(from: segments, duration: 100, names: ["them-2": "Ира"])
 
     #expect(lanes.map(\.speaker) == ["me", "them-1", "them-2"])
-    #expect(lanes.map(\.label) == ["Вы", "Собеседник 1", "Ира"])
+    #expect(lanes.map(\.label) == ["You", "Other speaker 1", "Ира"])
 }
 
 @Test func backToBackLinesOfOneSpeakerMergeIntoOneBar() {
@@ -63,5 +63,5 @@ private func makeSegment(_ speaker: String, _ start: Double, _ end: Double, _ in
 
     #expect(lanes[0].bars.map(\.start) == [0, 0.75])
     #expect(lanes[0].bars.map(\.width) == [0.5, 0.25])
-    #expect(lanes[0].label == "Вы")
+    #expect(lanes[0].label == "You")
 }
