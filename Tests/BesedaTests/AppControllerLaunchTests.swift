@@ -166,7 +166,7 @@ private func line(_ speaker: String) -> SpeakerTranscriptSegment {
     #expect(call.status == "failed")
     #expect(call.kind == "dual")
     #expect(call.durationSec == 1800)
-    #expect(call.error?.contains("без записи в индексе") == true)
+    #expect(call.error?.contains("Found on disk but missing from call index") == true)
     // the janitor compares standardized paths, so a failed call's audio survives the sweep
     #expect(try harness.store.protectedAudioDirectories().map { URL(fileURLWithPath: $0).standardizedFileURL.path }
         .contains(folder.standardizedFileURL.path))
@@ -218,7 +218,7 @@ private func line(_ speaker: String) -> SpeakerTranscriptSegment {
         Issue.record("status is \(controller.status)")
         return
     }
-    #expect(message.contains("Индекс звонков недоступен"))
+    #expect(message.contains("Call index unavailable"))
 }
 
 @MainActor
@@ -239,7 +239,7 @@ private func line(_ speaker: String) -> SpeakerTranscriptSegment {
         Issue.record("status is \(controller.status)")
         return
     }
-    #expect(message.contains("возобновить обработку"))
+    #expect(message.contains("Could not resume call processing"))
 }
 
 // MARK: - 13: the auto-processing queue survives quit
@@ -435,8 +435,8 @@ func childHitsAFileSizeLimitWhileRecording() throws {
     controller.stopRecording(after: writeError, capture: DualCapture())
     let metadata = try recorder.finish()
 
-    #expect(controller.recordingWarning?.hasPrefix("Запись остановлена: не удалось записать звук на диск") == true)
-    #expect(controller.recordingWarning?.contains("Всё записанное до этого будет расшифровано") == true)
+    #expect(controller.recordingWarning?.hasPrefix("Recording stopped: Could not write audio to disk") == true)
+    #expect(controller.recordingWarning?.contains("Audio recorded so far will be transcribed") == true)
     #expect(metadata.frameCount > 0)
     let file = try AVAudioFile(forReading: url)
     #expect(file.length > 0 && file.length == Int64(metadata.frameCount))
@@ -490,7 +490,7 @@ private final class DownloadLog: @unchecked Sendable {
     let controller = harness.controller(
         diarizer: Diarizer(paths: harness.paths, downloader: downloads.downloader(), freeSpace: { _ in nil })
     )
-    #expect(controller.diarizerPrefetchStatus == "Скачивается модель разбора голосов…")
+    #expect(controller.diarizerPrefetchStatus == "Downloading speaker model…")
     await controller.diarizerPrefetch?.value
 
     #expect(downloads.count == 1)
