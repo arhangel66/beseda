@@ -5,7 +5,7 @@ import Testing
 
 @Test func previousCallContentShowsDateAndDigestAsStored() throws {
     let now = try #require(Calendar.current.date(bySettingHour: 12, minute: 0, second: 0, of: Date()))
-    let call = PreviousRelatedCall(callID: "call-1", startedAt: now.addingTimeInterval(-60), digest: "**Главное**\nДоговорились")
+    let call = PreviousRelatedCall(callID: "call-1", startedAt: now.addingTimeInterval(-60), digest: "**Главное**\nДоговорились", isWholeSummary: false)
 
     let content = try #require(PreviousCallContent(call, now: now))
 
@@ -16,7 +16,7 @@ import Testing
 }
 
 @Test func previousCallContentIsHiddenWithoutCallOrDigest() {
-    let blank = PreviousRelatedCall(callID: "call-1", startedAt: Date(), digest: " \n")
+    let blank = PreviousRelatedCall(callID: "call-1", startedAt: Date(), digest: " \n", isWholeSummary: true)
 
     #expect(PreviousCallContent(nil) == nil)
     #expect(PreviousCallContent(blank) == nil)

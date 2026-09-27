@@ -68,7 +68,9 @@ folder is moved here once by `LegacyDataMigration`.
   preview, error). From two characters on, `searchCalls` adds every call, loaded or not, whose event title,
   app, summary, participants, error or transcript text match an escaped `LIKE '%query%'`; such rows open
   through `fetchCall(id:)`. No full-text index: the scan takes ~0.1 s over 2000 calls × 200 segments.
-  SQLite `LIKE` folds case for ASCII only, so Cyrillic metadata beyond the loaded page matches case-exactly.
+  SQLite `LIKE` folds case for ASCII only, so both sides go through `unicode_lower`, a function every
+  connection registers with Swift's `lowercased()`: «иван» finds «Иван». `AppController` runs the search
+  0.3 s after the last keystroke, not on every one.
 - **StorageJanitor** — classifies files by suffix (`.raw.wav` raw, `.asr.wav`/`.16k-mono.wav`
   normalized, `.md`/`.json` text, kept forever), measures usage, and deletes audio older than the
   retention rule (`immediately`, 30, 90 days, `forever`) by modification date. Folders of calls in

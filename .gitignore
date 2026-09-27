@@ -9,6 +9,7 @@ untracked/*
 !untracked/epics/
 untracked/epics/*
 !untracked/epics/speaker-accuracy/
+!untracked/epics/summary-quality/
 
 # Local audio samples and generated normalization outputs.
 samples/

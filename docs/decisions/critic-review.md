@@ -47,6 +47,11 @@ Effort is S (hours), M (days), or L (weeks). Priority is P0 (blocks safe sale or
    less trustworthy than the transcript. Build a small, human-labelled agreement/action benchmark from
    real calls and do not present generated conclusions as the primary result until the chosen local model
    clears it; an extractive list with transcript links is a safer interim result.
+   Addressed in part by BESEDA-94: a new default prompt («Договорились», «Кто что делает» with names and
+   dates, temperature 0.1), checked on one synthetic Russian call with 6 agreements and 9 assignments,
+   three runs each, hand-scored ([summarization.md](../architecture/summarization.md)). Both prompts kept 5
+   of 6 agreements and all five assignees; the new one kept 23 of 27 assignments against 21. No
+   human-labelled benchmark from real calls was built, and the result is still the primary one.
 
 4. **Feature scope is larger than the proved job — P1, M.** Jev, user-defined classifier prompts, live key
    points, LM Studio discovery and the bespoke webhook add failure modes before demand is known
@@ -68,6 +73,9 @@ Effort is S (hours), M (days), or L (weeks). Priority is P0 (blocks safe sale or
    an introduction instead of agreements, and calls without calendar metadata often cannot relate at all
    (`docs/architecture/related-calls.md:24-29`). Store decisions, actions and open questions as structured
    fields independent of presentation, and add a manual relation when calendar matching has no answer.
+   Addressed in BESEDA-94 without structured fields: a result with the default headings shows the digest,
+   any other result is shown whole, collapsed with «Показать полностью»
+   ([related-calls.md](../architecture/related-calls.md)). No manual relation.
 
 ## Architecture and code
 

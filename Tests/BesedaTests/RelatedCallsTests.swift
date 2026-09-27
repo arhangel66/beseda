@@ -124,12 +124,36 @@ private func makeTarget(
     #expect(digest == "**Главное**\n— релиз в пятницу\n\n**Что делать**\n— Анна пишет заметки\n\n**Открытые вопросы**\n— кто дежурит")
 }
 
-@Test func theDigestFallsBackToTheFirstLines() {
-    let summary = "Первая\n\nВторая\nТретья\nЧетвёртая\nПятая\nШестая"
+@Test func theDigestKeepsTheCurrentDefaultSections() {
+    let summary = """
+        **О чём говорили**
+        Обсудили релиз.
 
-    let digest = RelatedCalls.digest(ofSummary: summary)
+        **Договорились**
+        — релиз 17 октября
 
-    #expect(digest == "Первая\nВторая\nТретья\nЧетвёртая\nПятая")
+        **Кто что делает**
+        — Ольга — макеты — к среде
+
+        **Открытые вопросы**
+        — что с данными
+        """
+    let calls = [makeCall(id: "default", daysAgo: 7, title: "Sync", summary: summary)]
+
+    let previous = RelatedCalls.previousRelatedCall(to: makeTarget(title: "Sync"), among: calls)
+
+    #expect(previous?.digest == "**Договорились**\n— релиз 17 октября\n\n**Кто что делает**\n— Ольга — макеты — к среде\n\n**Открытые вопросы**\n— что с данными")
+    #expect(previous?.isWholeSummary == false)
+}
+
+@Test func aCustomPromptResultIsShownWhole() {
+    let summary = "**Настроение**\nСпокойное.\n\n**Темы**\n— отпуск\n— нагрузка\n— обучение\n— ревью\n\n**Решили**\n— меньше встреч"
+    let calls = [makeCall(id: "custom", daysAgo: 7, title: "1:1", summary: summary)]
+
+    let previous = RelatedCalls.previousRelatedCall(to: makeTarget(title: "1:1"), among: calls)
+
+    #expect(previous?.digest == summary)
+    #expect(previous?.isWholeSummary == true)
 }
 
 @Test func aCallWithoutSummaryHasNothingToShow() {

@@ -31,6 +31,9 @@ The scan covers the latest 1000 calls in memory.
 ## The digest
 
 `RelatedCalls.digest(ofSummary:)` uses only `calls.summary_text`, never the transcript and never a model:
-the sections **Главное**, **Что делать**, **Открытые вопросы** of the default prompt
-(`ChatCompletionsProvider.defaultPrompt`) with their headings; if none are there, the first five non-empty
-lines. No summary — nil, and the call is not offered at all.
+the sections **Договорились**, **Кто что делает**, **Открытые вопросы** of the default prompt
+(`ChatCompletionsProvider.defaultPrompt`), or **Главное**, **Что делать** of the one before BESEDA-94,
+with their headings. A result with none of them came from a custom prompt: `PreviousRelatedCall` then
+carries the whole summary with `isWholeSummary`, and `PreviousCallBlock` shows four lines (fewer if the
+place asks) with «Показать полностью». No structured fields are stored. No summary — nil, and the call is
+not offered at all.

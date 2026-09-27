@@ -284,3 +284,20 @@ private final class FailingKeychain: Keychain {
     #expect(settings.effectiveSummaryProvider == .lmStudio)
     #expect(AppSettings(defaults: defaults, keychain: Keychain(service: suiteName)).localOnly)
 }
+
+@MainActor
+@Test func onlyCallTypesWithTheUneditedPreviousDefaultPromptGetTheNewOne() throws {
+    let suiteName = "beseda-test-\(UUID().uuidString)"
+    let defaults = UserDefaults(suiteName: suiteName)!
+    defer {
+        defaults.removePersistentDomain(forName: suiteName)
+        Keychain(service: suiteName).deleteAll()
+    }
+    let unedited = CallType(name: "Другое", description: "", prompt: ChatCompletionsProvider.previousDefaultPrompt, isOther: true)
+    let edited = CallType(name: "1:1", description: "", prompt: ChatCompletionsProvider.previousDefaultPrompt + "\nи про настроение")
+    defaults.set(try JSONEncoder().encode([unedited, edited]), forKey: "beseda.callTypes")
+
+    let settings = AppSettings(defaults: defaults, keychain: Keychain(service: suiteName))
+
+    #expect(settings.callTypes.map(\.prompt) == [ChatCompletionsProvider.defaultPrompt, edited.prompt])
+}

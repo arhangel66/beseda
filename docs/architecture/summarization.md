@@ -61,7 +61,7 @@ The chosen type's name is stored on the call (`callStore.setCallType`, column `c
    was summarized.
 2. `AppController.makeSummaryProvider` builds a `ChatCompletionsProvider` for
    `AppSettings.effectiveSummaryProvider` (the chosen `SummaryProvider`, or built-in under «Только локально»). All three speak the OpenAI-compatible `chat/completions` API; one request
-   shape (system prompt + transcript, temperature 0.3, `max_tokens` 4096):
+   shape (system prompt + transcript, temperature 0.1, `max_tokens` 4096):
    - **OpenRouter** — cloud, needs a key; model defaults to `OpenRouter.defaultModel`. Budget 300k chars.
    - **LM Studio** — `LocalModelSupport.resolve` takes the URL/model from settings or discovers them with
      the `lms` CLI (`lms server status --json`, `lms ps --json` to prefer an already loaded chat model).
@@ -73,7 +73,13 @@ The chosen type's name is stored on the call (`callStore.setCallType`, column `c
    error card offers a recovery (`SummaryRecovery`), e.g. starting LM Studio with `lms server start`.
 
 The default prompt (`ChatCompletionsProvider.defaultPrompt`, the starting prompt of every type) asks for four Russian
-sections with bold names only.
+sections with bold names only: «О чём говорили», «Договорились» (every decision on its own line, with dates),
+«Кто что делает» (`Имя — что — срок`, one task per line), «Открытые вопросы». BESEDA-94 replaced the
+earlier «Главное»/«Что делать» prompt, kept as `previousDefaultPrompt`: on load
+`AppSettings.migratingStoredCallTypes` gives a type whose prompt equals it word for word the new one;
+edited prompts stay. The check behind it — one synthetic call, three runs per variant, hand-scored — is in
+`untracked/epics/summary-quality/README.md`: both prompts kept 5 of 6 agreements and named all five
+assignees; the new one kept 23 of 27 assignments against 21, within run-to-run noise.
 
 ## Call screen and export
 
