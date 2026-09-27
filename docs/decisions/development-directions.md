@@ -59,24 +59,11 @@ serves three moments: after the call, before the next one, and during it.
 
 ## App Store sandbox
 
-What the Mac App Store demands against what the code does today:
-
-| Part | Today | In the sandbox |
-|---|---|---|
-| System audio (`Audio/SystemAudioTap.swift`, `AudioHardwareCreateProcessTap`, macOS 14.2+) | works | Process taps ask the user through `NSAudioCaptureUsageDescription`, not an entitlement; expected to work sandboxed, **to verify on a sandboxed build first** — it is the whole product. |
-| Microphone (`Audio/MicrophoneCapture.swift`) | works | Needs `com.apple.security.device.audio-input`. Fine. |
-| Calendar (`Calendar/CalendarService.swift`, EventKit) | works | Needs `com.apple.security.personal-information.calendars`. Fine. |
-| llama-server (`Summarization/LlamaServer.swift`) | downloaded into Application Support by `BundledSummaryInstaller`, then run with `Process` | **Breaks**: review guideline 2.5.2 forbids downloading executable code. It must ship inside the bundle (signed, sandbox-inherited helper) or be linked as a library. |
-| Speech and summary models | downloaded, hash-checked | Allowed — models are data. Needs `com.apple.security.network.client`. |
-| Updates (Sparkle, `Runtime/AppUpdater.swift`) | appcast | Removed in the store build; the store updates. |
-| Signing (`scripts/lib/bundle_app.sh`) | no hardened runtime, no entitlements | Hardened runtime and an entitlements file become required for both channels (notarization also needs them). |
-| OpenRouter / LM Studio, webhook | HTTP | Network client entitlement. Fine. |
-| Export folder (decision 6) | — | A user-picked folder kept through a security-scoped bookmark. |
-
-**Verdict.** The store is possible once llama-server ships inside the bundle and the process tap is
-confirmed sandboxed; everything else is an entitlement. **Alternative:** direct sale outside the store —
-Developer ID signed and notarized DMG, Sparkle as today, payment in crypto with a licence key. It keeps the
-downloaded runtime as is but still needs the hardened runtime.
+The current source-only assessment is [App Store sandbox audit](app-store-sandbox.md). The store route is
+blocked by the downloaded `llama-server`; export bookmarks, a Sparkle-free store build and provisioned
+entitlements also need changes. Process-tap, login-item and `fdesetup` behavior is parked until a signed
+sandbox build can be exercised. Direct distribution remains the alternative described in
+[Build and release](../architecture/build-release.md).
 
 ## Related calls
 
