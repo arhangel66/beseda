@@ -25,7 +25,7 @@ done < <(tar tzf "$ARCHIVE")
 STAGING="$(mktemp -d)"
 trap 'rm -rf "$STAGING"' EXIT
 tar xzf "$ARCHIVE" -C "$STAGING"
-SOURCE="$STAGING/llama-b10819"
+SOURCE="$(realpath "$STAGING/llama-b10819")"
 [[ -f "$SOURCE/llama-server" && ! -L "$SOURCE/llama-server" ]] || {
     echo 'llama-server missing' >&2; exit 1;
 }
@@ -33,12 +33,24 @@ HELPERS="$APP/Contents/Helpers"
 mkdir "$HELPERS"
 cp "$SOURCE/llama-server" "$HELPERS/"
 for file in "$SOURCE"/*.dylib; do
-    [[ -f "$file" && ! -L "$file" ]] || { echo "invalid dylib: $file" >&2; exit 1; }
-    cp "$file" "$HELPERS/"
+    [[ -f "$file" ]] || { echo "invalid dylib: $file" >&2; exit 1; }
+    if [[ -L "$file" ]]; then
+        target="$(readlink "$file")"
+        resolved="$(realpath "$file")" || { echo "invalid dylib: $file" >&2; exit 1; }
+        [[ "$target" != /* && "$resolved" == "$SOURCE/"*.dylib && -f "$resolved" ]] || {
+            echo "invalid dylib: $file" >&2; exit 1;
+        }
+        cp -P "$file" "$HELPERS/"
+    else
+        cp "$file" "$HELPERS/"
+    fi
+done
+for file in "$HELPERS"/*.dylib; do
+    [[ -f "$file" ]] || { echo "invalid dylib: $file" >&2; exit 1; }
 done
 /usr/libexec/PlistBuddy -c 'Add :BesedaStoreSummary bool true' "$APP/Contents/Info.plist"
 for file in "$HELPERS"/*.dylib; do
-    codesign --force --sign "$IDENTITY" "$file"
+    [[ -L "$file" ]] || codesign --force --sign "$IDENTITY" "$file"
 done
 codesign --force --sign "$IDENTITY" --entitlements "$ROOT/scripts/store_summary.entitlements" "$HELPERS/llama-server"
 codesign --force --sign "$IDENTITY" --entitlements "$ROOT/scripts/store_summary_app.entitlements" "$APP"

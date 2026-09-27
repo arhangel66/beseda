@@ -8,5 +8,5 @@ BESEDA_STORE=1 swift build --jobs 2 --scratch-path .build/store
 APP="$ROOT/.build/Beseda-store.app"
 scripts/lib/bundle_app.sh "$ROOT/.build/store/debug" "$APP" store
 codesign --force --sign "$2" "$APP/Contents/Frameworks/CTranscribe.framework"
-scripts/package_store_summary.sh "$APP" "$1" "$2"
+bash scripts/package_store_summary.sh "$APP" "$1" "$2"
 echo "$APP"

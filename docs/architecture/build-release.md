@@ -29,10 +29,13 @@ license, feed and SU keys. The app signature uses `scripts/store_summary_app.ent
 network client, microphone, calendars and user-selected read/write only. The helper keeps its own
 entitlements. The direct release assembly and feed are unchanged.
 
-Verified locally: both flavor builds with `--jobs 2`. Parked: assembled bundle signature and
-resource assertions until the exact pinned helper archive is available; no app launch, sandbox
-capture, Apple provisioning, TestFlight or review was attempted. A build alone is not proof of
-sandbox compatibility.
+Verified locally: both flavor builds with `--jobs 2`; pinned b10819 archive SHA-256 matches the
+recorded digest and its relative dylib links can be copied and signed inside-out. The assembled
+store app still fails strict signing: SwiftPM's `Beseda_Beseda.bundle` is copied into the app root
+because its generated accessor expects it there, but codesign rejects that location as unsealed
+contents. Moving it into `Contents/Resources` requires fixing resource lookup first. No app launch,
+sandbox capture, Apple provisioning, TestFlight or review was attempted. A build alone is not proof
+of sandbox compatibility.
 
 ## Check
 
