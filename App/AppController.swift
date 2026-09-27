@@ -279,7 +279,12 @@ final class AppController {
             webhooks.start()
             refreshRecentCalls()
             appendLog("Call index ready: \(paths.callIndexURL.path)")
-            try resumePendingProcessing()
+            do {
+                try resumePendingProcessing()
+            } catch {
+                status = .failed("Не удалось возобновить обработку звонков: \(error.localizedDescription)")
+                appendLog("Could not resume pending processing: \(error.localizedDescription)")
+            }
         } catch {
             status = .failed("Индекс звонков недоступен: \(error.localizedDescription)")
             appendLog("Call index unavailable: \(error.localizedDescription)")
