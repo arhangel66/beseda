@@ -185,6 +185,7 @@ Effort is S (hours), M (days), or L (weeks). Priority is P0 (blocks safe sale or
     psychologists this can contain regulated client material. Remove psychologists from marketing until the
     product documents FileVault/backup/export exposure, offers a strict-local profile, supports short
     retention defaults, and encrypts the index and exported sensitive fields with a Keychain-held key.
+    Docs part addressed in BESEDA-90: [privacy.md](../product/privacy.md); encryption of the index and exports is not done.
 
 ## Docs, tests and release
 
@@ -214,6 +215,7 @@ Effort is S (hours), M (days), or L (weeks). Priority is P0 (blocks safe sale or
     about 3 GB free, while the same page says the built-in model alone is 4.6 GB at lines 32-34, before ASR,
     runtime, temporary downloads and calls. State separate minimums for transcription-only and local-summary
     installs, including temporary download headroom, and enforce them before downloads.
+    Addressed in BESEDA-90: separate minimums in [install.md](../product/install.md); no free-space check before downloads.
 
 ## Anything else
 
