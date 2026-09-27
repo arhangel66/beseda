@@ -44,21 +44,32 @@ warns about the missing excluded paths; the warnings are harmless.
 2. Write `docs/release-notes/<version>.md`; it is the update dialog text and the GitHub release description.
 3. Run `./scripts/release.sh` on `main`.
 
-The script refuses to run unless it is on `main`, the tag `v<version>` is not published, the tree is clean
-and the notes exist. It runs `swift test --jobs 2`, makes a release build and bundle, zips it into
-`dist/v<version>/`, runs Sparkle's `generate_appcast` (signs the zip with the EdDSA key from the login
-keychain, embeds the notes) into `dist/v<version>/appcast.xml`, then publishes in this order: tags the last
-pushed commit and pushes the tag, creates the GitHub release in `arhangel66/beseda` with the zip, downloads the
-zip back and compares it byte for byte, and only then copies the feed to `appcast.xml`, commits it and pushes
-`main`. A failed upload or download stops before the feed changes, so no installed copy is offered a missing
-asset; to rerun, delete the tag (`git push origin :v<version> && git tag -d v<version>`).
+The script refuses to run unless it is on `main`, the tree is clean and the notes exist. Then, each step
+skipping what an earlier run already did:
+
+1. If `appcast.xml` at `HEAD` already has this version's zip URL, only `git push origin main` is left; it
+   pushes and stops.
+2. Tags `HEAD` as `v<version>` and pushes the tag. An existing tag (local or on `origin`) is reused only if
+   it points at `HEAD`; otherwise the script refuses.
+3. If the release has no `Beseda-<version>.zip` yet: `swift test --jobs 2`, release build and bundle, zip
+   into `dist/v<version>/`, a draft GitHub release in `arhangel66/beseda` if there is none, upload with
+   `--clobber`. An uploaded zip is never rebuilt: a new build would not match it.
+4. Downloads the zip back from the release and runs Sparkle's `generate_appcast` on those bytes (EdDSA key
+   from the login keychain, notes embedded) into `dist/v<version>/appcast.xml`.
+5. Publishes the draft (a draft's download URL is not public), downloads the public URL, compares it byte
+   for byte with step 4 and checks the feed's `edSignature` with `sign_update --verify`.
+6. Only then copies the feed to `appcast.xml`, commits `Beseda <version>` and pushes `main`.
+
+A failure at any step leaves the feed untouched (or, at step 6, committed but not pushed), so the fix is to
+rerun; a published release without the feed is finished by the rerun, not refused.
 
 Installed release copies check the feed hourly; `AppUpdater` holds the install until no call is being
 recorded. Dev builds carry no feed and never update themselves.
 
 ## Constraints
 
-- The tag points at the commit before the appcast commit: the feed is not part of the build.
+- The tag points at the commit before the appcast commit: the feed is not part of the build. A new
+  commit after a failed run makes the old tag refuse; delete it or bump `VERSION`.
 - Release only from `main`: the appcast commit lands on the current branch while the push targets `main`,
   so a release cut elsewhere would publish a tag and zip no installed copy is offered.
 - The private EdDSA key exists only in the login keychain of Mikhail's Mac; losing it means installed
