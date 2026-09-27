@@ -64,17 +64,22 @@ enum CallFormatting {
         return String(format: "%d:%02d", total / 60, total % 60)
     }
 
-    /// "42 сек" / "3 мин" / "1 ч 5 мин", as in the prototype's call rows
-    static func humanDuration(_ seconds: TimeInterval) -> String {
+    static func humanDuration(_ seconds: TimeInterval, locale: Locale = .current) -> String {
         let total = Int(max(0, seconds).rounded())
-        if total < 60 {
-            return "\(total) сек"
-        }
         let minutes = Int((Double(total) / 60).rounded())
-        if minutes < 60 {
-            return "\(minutes) мин"
+        if locale.language.languageCode?.identifier == "ru" {
+            if total < 60 { return "\(total) сек" }
+            if minutes < 60 { return "\(minutes) мин" }
+            return "\(minutes / 60) ч \(minutes % 60) мин"
         }
-        return "\(minutes / 60) ч \(minutes % 60) мин"
+        let formatter = DateComponentsFormatter()
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.locale = locale
+        formatter.calendar = calendar
+        formatter.unitsStyle = .abbreviated
+        formatter.allowedUnits = total < 60 ? [.second] : minutes < 60 ? [.minute] : [.hour, .minute]
+        formatter.zeroFormattingBehavior = [.pad]
+        return formatter.string(from: TimeInterval(total < 60 ? total : minutes * 60)) ?? ""
     }
 
     /// "14:08" — the start time on its own, the sidebar's leading column
