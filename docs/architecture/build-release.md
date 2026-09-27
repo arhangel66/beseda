@@ -38,7 +38,7 @@ build: fast 27.2 → 11.0 s, full 102.6 s.
 - `scripts/Beseda.entitlements` — the app's hardened-runtime entitlements.
 - `scripts/release.sh` — publishes a release (below); runs `full_check.sh` before the release build.
 - `scripts/screenshot_copy.sh` — builds a copy with a random bundle id `app.beseda.shot.<random>` per run from this checkout's own
-  `.build` into `.build/Beseda-shot.app` (ad-hoc signed) and opens it hidden with a fresh
+  `.build` into `.build/Beseda-shot.app` (including Sparkle, ad-hoc signed without a timestamp or keychain access) and opens it hidden with a fresh
   `CFFIXED_USER_HOME`; the defaults domain is deleted when the copy quits (cfprefsd ignores
   `CFFIXED_USER_HOME`, so a fixed id would share defaults across runs). Never touches `/Applications/Beseda.app` or its data.
 - `scripts/nightly_check.sh` — the nightly full check: native-ui in its own detached worktree

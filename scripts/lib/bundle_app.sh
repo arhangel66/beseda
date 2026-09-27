@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Assembles and signs Beseda.app from a SwiftPM bin dir.
-# Usage: bundle_app.sh <bin-dir> <app-dir> [release]
+# Usage: bundle_app.sh <bin-dir> <app-dir> [release|screenshot]
 # Only a release bundle gets the Sparkle keys: a dev build with a feed URL would
 # replace itself with the published version at the next scheduled check.
 set -euo pipefail
@@ -44,19 +44,24 @@ xcrun actool "$ROOT/Sources/Beseda/Resources/AppIcon.icon" --compile "$APP_DIR/C
     --platform macosx --minimum-deployment-target 14.2 --app-icon AppIcon \
     --output-partial-info-plist "$ROOT/.build/appicon-partial.plist" > /dev/null
 
-# Developer ID when the keychain has one (Gatekeeper and notarization accept only that),
-# Apple Development otherwise
-IDENTITIES="$(security find-identity -v -p codesigning)"
-IDENTITY="$(sed -n 's/.*"\(Developer ID Application: .*\)"/\1/p' <<< "$IDENTITIES" | head -n 1)"
-TIMESTAMP=(--timestamp)
-if [ -z "$IDENTITY" ]; then
-    IDENTITY="$(sed -n 's/.*"\(Apple Development: .*\)"/\1/p' <<< "$IDENTITIES" | head -n 1)"
-    # a secure timestamp is needed only for notarization and costs a network call per signature
+# Screenshot copies must never consult the keychain: a locked Developer ID private key makes
+# codesign wait for a password dialog. Other flavours retain their release-capable signing path.
+if [ "$FLAVOR" = "screenshot" ]; then
+    IDENTITY="-"
     TIMESTAMP=(--timestamp=none)
-fi
-if [ -z "$IDENTITY" ]; then
-    echo "no Developer ID Application or Apple Development signing identity in the keychain; run 'security find-identity -v -p codesigning'" >&2
-    exit 1
+else
+    IDENTITIES="$(security find-identity -v -p codesigning)"
+    IDENTITY="$(sed -n 's/.*"\(Developer ID Application: .*\)"/\1/p' <<< "$IDENTITIES" | head -n 1)"
+    TIMESTAMP=(--timestamp)
+    if [ -z "$IDENTITY" ]; then
+        IDENTITY="$(sed -n 's/.*"\(Apple Development: .*\)"/\1/p' <<< "$IDENTITIES" | head -n 1)"
+        # a secure timestamp is needed only for notarization and costs a network call per signature
+        TIMESTAMP=(--timestamp=none)
+    fi
+    if [ -z "$IDENTITY" ]; then
+        echo "no Developer ID Application or Apple Development signing identity in the keychain; run 'security find-identity -v -p codesigning'" >&2
+        exit 1
+    fi
 fi
 
 # hardened runtime everywhere, signed inside-out as Sparkle documents (--deep would not
