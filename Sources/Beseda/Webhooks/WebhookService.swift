@@ -127,6 +127,7 @@ final class WebhookService {
                 return
             }
             defer { self.isTesting = false }
+            await self.settings.secretsLoad?.value
             let startedAt = Date()
             let body: Data
             do {
@@ -218,6 +219,8 @@ final class WebhookService {
             sending.remove(row.callID)
             refresh()
         }
+        // a delivery resumed at launch must not go out before the secret is read from the Keychain
+        await settings.secretsLoad?.value
         // switched off or a broken address: the row waits instead of burning an attempt
         guard settings.sendsWebhooks, let url = WebhookSender.endpoint(from: settings.webhookURL) else {
             return

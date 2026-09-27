@@ -330,7 +330,7 @@ private final class FailingKeychain: Keychain {
 }
 
 /// a Keychain whose reads wait like one behind an unanswered prompt, until the test releases them
-private final class BlockingKeychain: Keychain, @unchecked Sendable {
+final class BlockingKeychain: Keychain, @unchecked Sendable {
     let prompt = DispatchSemaphore(value: 0)
 
     override func read(account: String) -> String? {
