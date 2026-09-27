@@ -49,8 +49,7 @@ serves three moments: after the call, before the next one, and during it.
    dropped entirely, by Mikhail's decision; the legal responsibility for recording stays with the user.
 8. **Before handing it to people** — several polish rounds (cleanup, proofreading of UI copy, UI quality)
    and the features above. Users today: Mikhail and Irochka. A demand check comes later, with no fixed bar.
-9. **Price** — one-time $49, everything included. Payment channel open: no Stripe (Russia), so crypto or
-   the Mac App Store (Apple Developer enrollment in progress). See [App Store sandbox](#app-store-sandbox).
+9. **Price** — Mikhail answered one-time $49, everything included, on 2026-09-26; that historical answer is superseded by the [approved $39.99 one-time launch price](first-sale-price.md) under his pricing delegation. Mac App Store first; Paddle is a questions-only fallback, with its draft inquiry unsent until morning. See [payment path](payment-path.md) and [App Store sandbox](#app-store-sandbox).
 10. **"Before the meeting" block** — yes, and not deferred behind a demand check: where we stopped and what
     was agreed on the previous related call. See [Related calls](#related-calls).
 11. **ASR benchmark and model choice** — skipped for now. Open question: Mikhail praises a local
@@ -101,7 +100,7 @@ Ordered phases; each line is its definition of done. What needs no new UI and pr
 4. **Live transcription mode.** Optional; the transcript and key points of the last minutes appear during
    the call.
 5. **Polish rounds.** UI copy proofread, a UI review applied, storage protection and deletion in place.
-6. **Distribution.** Sandbox check done; App Store or direct build shipped with a $49 payment path.
+6. **Distribution.** Sandbox check done; Mac App Store first with the approved $39.99 one-time price; Paddle remains a questions-only fallback pending eligibility confirmation.
 
 **In parallel without sharing files:** 0 (`Audio/` recorder, `Package.swift`) and 1 (`Transcription/`
 speaker code, mic gate at the capture boundary — coordinate if the gate lands in `Audio/`) and the sandbox
