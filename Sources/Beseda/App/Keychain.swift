@@ -2,8 +2,9 @@ import Foundation
 import Security
 
 /// Generic-password items of one service in the login keychain; the account is the setting's key.
-/// A class so a test can subclass it into one whose writes fail.
-class Keychain {
+/// A class so a test can subclass it into one whose writes fail; immutable, so it is shared with
+/// the background read.
+class Keychain: @unchecked Sendable {
     let service: String
     /// where builds up to 0.4.x kept the keys. A login-keychain item trusts only the signature
     /// that created it, so a build signed otherwise (Developer ID) gets a prompt reading it; the

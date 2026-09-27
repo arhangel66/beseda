@@ -31,7 +31,7 @@ import Testing
 }
 
 @MainActor
-@Test func theSummaryProviderDefaultsToTheBuiltInModelAndRoundTripsThroughUserDefaults() {
+@Test func theSummaryProviderDefaultsToTheBuiltInModelAndRoundTripsThroughUserDefaults() async {
     let suiteName = "beseda-test-\(UUID().uuidString)"
     let defaults = UserDefaults(suiteName: suiteName)!
     defer {
@@ -50,13 +50,14 @@ import Testing
     settings.openRouterModel = "google/gemini-3.8-flash"
 
     let reloaded = AppSettings(defaults: defaults, keychain: Keychain(service: suiteName))
+    await reloaded.secretsLoad?.value
     #expect(reloaded.summaryProvider == .openRouter)
     #expect(reloaded.openRouterAPIKey == "sk-or-v1-secret")
     #expect(reloaded.openRouterModel == "google/gemini-3.8-flash")
 }
 
 @MainActor
-@Test func theWebhookSettingsDefaultToOffAndRoundTripThroughUserDefaults() {
+@Test func theWebhookSettingsDefaultToOffAndRoundTripThroughUserDefaults() async {
     let suiteName = "beseda-test-\(UUID().uuidString)"
     let defaults = UserDefaults(suiteName: suiteName)!
     defer {
@@ -74,6 +75,7 @@ import Testing
     settings.webhookSecret = "s3cret"
 
     let reloaded = AppSettings(defaults: defaults, keychain: Keychain(service: suiteName))
+    await reloaded.secretsLoad?.value
     #expect(reloaded.webhookEnabled == true)
     #expect(reloaded.webhookURL == "https://kushetka.example/api/webhooks/krisp")
     #expect(reloaded.webhookSecret == "s3cret")
@@ -218,7 +220,7 @@ private final class FailingKeychain: Keychain {
 }
 
 @MainActor
-@Test func secretsInUserDefaultsMoveToTheKeychainAndLeaveDefaults() {
+@Test func secretsInUserDefaultsMoveToTheKeychainAndLeaveDefaults() async {
     let suiteName = "beseda-test-\(UUID().uuidString)"
     let defaults = UserDefaults(suiteName: suiteName)!
     let keychain = Keychain(service: suiteName)
@@ -230,7 +232,9 @@ private final class FailingKeychain: Keychain {
     defaults.set("s3cret", forKey: "beseda.webhookSecret")
 
     let settings = AppSettings(defaults: defaults, keychain: keychain)
+    await settings.secretsLoad?.value
     let relaunched = AppSettings(defaults: defaults, keychain: keychain)
+    await relaunched.secretsLoad?.value
 
     #expect(settings.openRouterAPIKey == "sk-or-v1-old")
     #expect(relaunched.webhookSecret == "s3cret")
@@ -241,13 +245,14 @@ private final class FailingKeychain: Keychain {
 }
 
 @MainActor
-@Test func aFailedKeychainWriteKeepsTheSecretInDefaults() {
+@Test func aFailedKeychainWriteKeepsTheSecretInDefaults() async {
     let suiteName = "beseda-test-\(UUID().uuidString)"
     let defaults = UserDefaults(suiteName: suiteName)!
     defer { defaults.removePersistentDomain(forName: suiteName) }
     defaults.set("sk-or-v1-old", forKey: "beseda.openRouterAPIKey")
 
     let settings = AppSettings(defaults: defaults, keychain: FailingKeychain(service: suiteName))
+    await settings.secretsLoad?.value
     settings.webhookSecret = "new"
 
     #expect(settings.openRouterAPIKey == "sk-or-v1-old")
@@ -303,7 +308,7 @@ private final class FailingKeychain: Keychain {
 }
 
 @MainActor
-@Test func aKeyOnlyInTheLegacyServiceIsCopiedIntoTheNewOneAndKept() {
+@Test func aKeyOnlyInTheLegacyServiceIsCopiedIntoTheNewOneAndKept() async {
     let suiteName = "beseda-test-\(UUID().uuidString)"
     let defaults = UserDefaults(suiteName: suiteName)!
     let legacy = Keychain(service: "\(suiteName).legacy")
@@ -316,9 +321,41 @@ private final class FailingKeychain: Keychain {
     _ = legacy.save("sk-or-v1-old", account: "beseda.openRouterAPIKey")
 
     let settings = AppSettings(defaults: defaults, keychain: keychain)
+    await settings.secretsLoad?.value
 
     #expect(settings.openRouterAPIKey == "sk-or-v1-old")
     #expect(Keychain(service: suiteName).read(account: "beseda.openRouterAPIKey") == "sk-or-v1-old")
     #expect(legacy.read(account: "beseda.openRouterAPIKey") == "sk-or-v1-old")
     #expect(settings.webhookSecret == "")
+}
+
+/// a Keychain whose reads wait like one behind an unanswered prompt, until the test releases them
+private final class BlockingKeychain: Keychain, @unchecked Sendable {
+    let prompt = DispatchSemaphore(value: 0)
+
+    override func read(account: String) -> String? {
+        prompt.wait()
+        prompt.signal()
+        return account == "beseda.openRouterAPIKey" ? "sk-or-v1-saved" : nil
+    }
+}
+
+@MainActor
+@Test func launchDoesNotWaitOnTheKeychainAndTheKeyAppearsOnceTheReadReturns() async {
+    let suiteName = "beseda-test-\(UUID().uuidString)"
+    let defaults = UserDefaults(suiteName: suiteName)!
+    let keychain = BlockingKeychain(service: suiteName)
+    defer {
+        defaults.removePersistentDomain(forName: suiteName)
+        keychain.deleteAll()
+    }
+
+    let settings = AppSettings(defaults: defaults, keychain: keychain)
+    let keyWhilePromptIsUp = settings.openRouterAPIKey
+    keychain.prompt.signal()
+    await settings.secretsLoad?.value
+
+    #expect(keyWhilePromptIsUp == "")
+    #expect(settings.openRouterAPIKey == "sk-or-v1-saved")
+    #expect(keychain.read(account: "beseda.webhookSecret") == nil)
 }

@@ -53,7 +53,9 @@ capture.
 
 `AppSettings` stores every setting in `UserDefaults` under `beseda.*` keys, each written in `didSet`.
 The two secrets, `openRouterAPIKey` and `webhookSecret`, go to the login Keychain instead (`App/Keychain.swift`,
-generic password, service = bundle id, account = the same `beseda.*` key). At launch a secret still in
+generic password, service = `<bundle id>.keys`, account = the same `beseda.*` key). They load in a
+background task started by `init` (`secretsLoad`), since a Keychain prompt must not block launch; until it
+returns they read "", and a value typed meanwhile wins. At launch a secret still in
 `UserDefaults` is copied to the Keychain, read back, and only then removed from defaults; if the Keychain
 refuses, the value stays in defaults and keeps working, and the move is retried at the next launch or edit.
 Items are readable by later builds without a prompt as long as they are signed with the same Apple

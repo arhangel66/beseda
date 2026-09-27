@@ -45,6 +45,9 @@ enum RetentionRule: String, CaseIterable, Identifiable, Sendable {
 final class AppSettings {
     private let defaults: UserDefaults
     private let keychain: Keychain
+    /// the background Keychain read started by `init`; tests await it
+    @ObservationIgnored private(set) var secretsLoad: Task<Void, Never>?
+    @ObservationIgnored private var isLoadingSecrets = false
     private let autoDetectKey = "beseda.autoDetectEnabled"
     private let enabledCallAppsKey = "beseda.enabledCallApps"
     private let rawRetentionKey = "beseda.rawAudioRetention"
@@ -297,7 +300,7 @@ final class AppSettings {
             .map(Set.init) ?? []
         self.summaryProvider = defaults.string(forKey: summaryProviderKey)
             .flatMap(SummaryProvider.init(rawValue:)) ?? .builtIn
-        self.openRouterAPIKey = AppSettings.secret(openRouterAPIKeyKey, defaults: defaults, keychain: keychain)
+        self.openRouterAPIKey = defaults.string(forKey: openRouterAPIKeyKey) ?? ""
         self.openRouterModel = defaults.string(forKey: openRouterModelKey) ?? ""
         self.summaryServerURL = defaults.string(forKey: summaryServerURLKey) ?? ""
         self.summaryModel = defaults.string(forKey: summaryModelKey) ?? ""
@@ -311,23 +314,45 @@ final class AppSettings {
         self.webhookEnabled = defaults.bool(forKey: webhookEnabledKey)
         self.exportFolder = defaults.string(forKey: exportFolderKey) ?? ""
         self.webhookURL = defaults.string(forKey: webhookURLKey) ?? ""
-        self.webhookSecret = AppSettings.secret(webhookSecretKey, defaults: defaults, keychain: keychain)
+        self.webhookSecret = defaults.string(forKey: webhookSecretKey) ?? ""
         self.speechModelID = defaults.string(forKey: speechModelKey) ?? SpeechModel.default.id
+        secretsLoad = Task { await loadSecrets() }
     }
 
-    /// a secret still in UserDefaults (a release before the Keychain, or a failed write) moves to the
+    /// the secrets load off the main thread: reading an item another signature wrote makes macOS ask,
+    /// and a prompt left open must not hold up the menu bar and windows. Until it returns the keys read "".
+    /// A secret still in UserDefaults (a release before the Keychain, or a failed write) moves to the
     /// Keychain here; if the Keychain refuses, it stays in defaults and keeps working from there
-    private static func secret(_ key: String, defaults: UserDefaults, keychain: Keychain) -> String {
-        guard let stored = defaults.string(forKey: key) else {
-            return keychain.read(account: key) ?? ""
+    private func loadSecrets() async {
+        let keychain = keychain
+        for key in [openRouterAPIKeyKey, webhookSecretKey] {
+            let stored = defaults.string(forKey: key)
+            let loaded = await Task.detached {
+                guard let stored else {
+                    return keychain.read(account: key)
+                }
+                return keychain.save(stored, account: key) ? stored : nil
+            }.value
+            if stored != nil {
+                if loaded != nil, defaults.string(forKey: key) == stored {
+                    defaults.removeObject(forKey: key)
+                }
+                continue
+            }
+            // a key typed while the read was waiting wins over the stored one
+            guard let loaded else { continue }
+            isLoadingSecrets = true
+            if key == openRouterAPIKeyKey, openRouterAPIKey.isEmpty {
+                openRouterAPIKey = loaded
+            } else if key == webhookSecretKey, webhookSecret.isEmpty {
+                webhookSecret = loaded
+            }
+            isLoadingSecrets = false
         }
-        if keychain.save(stored, account: key) {
-            defaults.removeObject(forKey: key)
-        }
-        return stored
     }
 
     private func storeSecret(_ value: String, key: String) {
+        guard !isLoadingSecrets else { return }
         if keychain.save(value, account: key) {
             defaults.removeObject(forKey: key)
         } else {

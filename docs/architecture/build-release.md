@@ -7,17 +7,13 @@ description: Package.swift, the build/sign/package/release scripts, Sparkle upda
 
 ## Package
 
-`Package.swift` (tools 6.0, macOS 14.2) has one executable target, `Beseda`, with `path: "."` and sources
-`App`, `Audio`, `Calendar`, `Storage`, `Summarization`, `Transcription`, `Webhooks`, `Runtime`, plus
-`Resources`. Dependencies: FluidAudio (diarization), Sparkle (updates), and transcribe.cpp as the
-`CTranscribe` binary xcframework (pinned v0.2.3 with checksum) wrapped by the vendored
-`Vendor/TranscribeCpp` target. Tests are `Tests/BesedaTests`.
-
-Because the target sits at the repo root, `exclude` lists `.agents`, `.gitignore`, `.idea`, `.venv`,
-`AGENT.md`, `dist`, `README.md`, `Tests`, `VERSION`, `Vendor`, `docs`, `implementation_journal.md`,
-`samples`, `scripts`, `skills-lock.json` and `untracked`. Other root files (`AGENTS.md`,
-`Package.resolved`, `appcast.xml`, `.mcp.json`) are not excluded. In a clean worktree some of these do not exist and SwiftPM
-warns about the missing excluded paths; the warnings are harmless.
+`Package.swift` (tools 6.0, macOS 14.2) has one executable target, `Beseda`, at the default
+`Sources/Beseda` with sources `App`, `Audio`, `Calendar`, `Storage`, `Summarization`, `Transcription`,
+`Webhooks`, `Runtime`, plus `Resources`. Dependencies: FluidAudio (diarization), Sparkle (updates), and
+transcribe.cpp as the `CTranscribe` binary xcframework (pinned v0.2.3 with checksum) wrapped by the vendored
+`Vendor/TranscribeCpp` target. Tests are `Tests/BesedaTests`. With the targets in their own folders SwiftPM
+never walks the rest of the checkout, so no `exclude` list is needed and `.factory/`, `untracked/` or a
+scratch folder at the root do not slow the build.
 
 ## Check
 
@@ -155,7 +151,9 @@ prompt per item («Beseda wants to use … in your keychain»); seen on this Mac
 copy. To make that the only prompt: since this change the keys live under the service
 `<bundle id>.keys`; a key missing there is read once from the old service (the prompt, «Allow» is
 enough) and saved into the new one, owned by the new signature, so later launches are silent. The old
-item stays for a rollback. «Deny» leaves the key empty until it is entered again in Settings.
+item stays for a rollback. «Deny» leaves the key empty until it is entered again in Settings. The read
+runs off the main thread (`AppSettings.loadSecrets`), so the menu bar and windows work while the prompt is
+up; the keys read "" until it returns, and recording never needs them.
 
 ## Constraints
 
