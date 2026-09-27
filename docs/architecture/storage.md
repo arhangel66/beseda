@@ -105,7 +105,7 @@ folder is moved here once by `LegacyDataMigration`.
   row delete, removal failures retain the entry and surface an error. Launch retries pending paths
   with security-scoped access to each external folder and shows unresolved failures in the existing
   delete error UI; it then empties trash. The recorded `export_path` is authoritative when present. Legacy rows without one use the
-  selected folder and the call's old export filename; failure to remove it remains in pending cleanup.
+  selected folder and the call's old export filename; sandboxed deletion without that folder's scope leaves the row and files intact, while a failure after row deletion remains in pending cleanup.
   Re-export records each replaced copy in `pending-export-cleanup.json` before changing the row;
   retries remove each path independently under its previous folder's scope. Call-folder deletion
   remains in `pending-deletions.json` and is retried only after the row is gone. A current export
