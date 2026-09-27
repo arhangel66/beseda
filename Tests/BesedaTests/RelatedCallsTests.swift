@@ -143,7 +143,6 @@ private func makeTarget(
     let previous = RelatedCalls.previousRelatedCall(to: makeTarget(title: "Sync"), among: calls)
 
     #expect(previous?.digest == "**Договорились**\n— релиз 17 октября\n\n**Кто что делает**\n— Ольга — макеты — к среде\n\n**Открытые вопросы**\n— что с данными")
-    #expect(previous?.isWholeSummary == false)
 }
 
 @Test func aCustomPromptResultIsShownWhole() {
@@ -153,7 +152,6 @@ private func makeTarget(
     let previous = RelatedCalls.previousRelatedCall(to: makeTarget(title: "1:1"), among: calls)
 
     #expect(previous?.digest == summary)
-    #expect(previous?.isWholeSummary == true)
 }
 
 @Test func aCallWithoutSummaryHasNothingToShow() {
@@ -195,5 +193,4 @@ private func makeTarget(
     let previous = RelatedCalls.previousRelatedCall(to: makeTarget(title: "1:1"), among: calls)
 
     #expect(previous?.digest == summary)
-    #expect(previous?.isWholeSummary == true)
 }

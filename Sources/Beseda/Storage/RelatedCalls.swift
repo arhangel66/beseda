@@ -15,8 +15,6 @@ struct PreviousRelatedCall: Hashable {
     let callID: String
     let startedAt: Date
     let digest: String
-    /// the summary has none of the default sections, so `digest` is all of it
-    let isWholeSummary: Bool
 }
 
 enum RelatedCalls {
@@ -89,9 +87,7 @@ enum RelatedCalls {
         }
         // a custom prompt's result has no known sections; the user sees all of it, collapsed
         let digest = digest(ofSummary: summary)
-        return PreviousRelatedCall(
-            callID: call.id, startedAt: startedAt, digest: digest ?? summary, isWholeSummary: digest == nil
-        )
+        return PreviousRelatedCall(callID: call.id, startedAt: startedAt, digest: digest ?? summary)
     }
 
     private static func normalizedTitle(_ title: String?) -> String? {

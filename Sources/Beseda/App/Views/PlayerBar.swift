@@ -160,27 +160,27 @@ struct PlayerBar: View {
     private var legend: some View {
         HStack(spacing: 10) {
             ForEach(lanes) { lane in
-                Menu {
-                    Button("Переименовать…") { startRenaming(lane.speaker) }
-                    let targets = mergeTargets(for: lane.speaker)
-                    if !targets.isEmpty {
-                        Menu("Объединить с") {
-                            ForEach(targets) { target in
-                                Button(target.label) { controller.mergeSpeaker(lane.speaker, into: target.speaker) }
+                HStack(spacing: 5) {
+                    Circle()
+                        .fill(lane.style.bar)
+                        .frame(width: 8, height: 8)
+                    Menu {
+                        Button("Переименовать…") { startRenaming(lane.speaker) }
+                        let targets = mergeTargets(for: lane.speaker)
+                        if !targets.isEmpty {
+                            Menu("Объединить с") {
+                                ForEach(targets) { target in
+                                    Button(target.label) { controller.mergeSpeaker(lane.speaker, into: target.speaker) }
+                                }
                             }
                         }
-                    }
-                } label: {
-                    HStack(spacing: 5) {
-                        Circle()
-                            .fill(lane.style.bar)
-                            .frame(width: 8, height: 8)
+                    } label: {
                         Text(lane.label)
                             .font(.caption)
                             .lineLimit(1)
                     }
+                    .menuStyle(.borderlessButton)
                 }
-                .menuStyle(.borderlessButton)
                 .fixedSize()
                 .help("\(lane.label) · \(Int((lane.share * 100).rounded()))% разговора")
                 .accessibilityLabel("\(lane.label), \(Int((lane.share * 100).rounded()))% разговора")
