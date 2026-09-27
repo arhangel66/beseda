@@ -112,6 +112,19 @@ passed), checked the feed (`SULastCheckTime` set, Sparkle's installer launcher s
 0.4.0). A probe signed the same way ran the installed `llama-server --version` with its dylibs, exit 0.
 Microphone/BlackHole capture and a full transcription were not run: a new bundle id triggers a TCC dialog.
 
+### Controlled Developer ID signing check
+
+On 2026-09-27, a throwaway release-flavour bundle in this worktree's ignored
+`.build/BESEDA-196-signing.app` built with `swift build -c release --jobs 2` and
+`scripts/lib/bundle_app.sh .build/release .build/BESEDA-196-signing.app release` under
+`lockf /tmp/beseda-factory-heavy.lock nice -n 19`. Both commands completed without a keychain
+prompt (the signing command had a 120-second noninteractive timeout); `.build` used 1.1 GB.
+`codesign --verify --strict --deep` passed. The app signature has Developer ID Application
+(team `PRH5UQNC57`), a secure timestamp, hardened runtime (`flags=0x10000(runtime)`), and
+exactly the audio-input and calendars entitlements above. The bundle was not launched,
+installed or submitted for notarization. Next, verify the `beseda-notary` profile and run a
+separate controlled notarization/stapling check before publishing a release.
+
 ### One-time setup once the account is active
 
 1. Certificate. developer.apple.com → Certificates → «+» → **Developer ID Application** (G2 Sub-CA).
