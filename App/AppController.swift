@@ -60,6 +60,8 @@ final class AppController {
     var status: Status = .idle
     var recentCalls: [StoredCallSummary] = []
     var callBrowserCalls: [StoredCallSummary] = []
+    /// every stored call, not only the loaded pages
+    private(set) var storedCallCount = 0
     var selectedCallDetail: StoredCallDetail?
     /// looked up once per selection and per calendar refresh: each lookup scans the stored calls
     var previousCallForSelected: PreviousRelatedCall?
@@ -454,6 +456,7 @@ final class AppController {
     private func reloadCallBrowserCalls() throws {
         let limit = max(Self.callPageSize, callBrowserCalls.count)
         callBrowserCalls = try callStore.fetchCalls(limit: limit)
+        storedCallCount = try callStore.eventCoverage().total
         hasMoreCalls = callBrowserCalls.count == limit
     }
 
@@ -470,7 +473,7 @@ final class AppController {
     }
 
     var storageLine: String {
-        let calls = CallFormatting.plural(callBrowserCalls.count, "разговор", "разговора", "разговоров")
+        let calls = CallFormatting.plural(storedCallCount, "разговор", "разговора", "разговоров")
         return "Локально · \(calls) · \(storageUsage.audioBytes.byteSizeDescription) аудио"
     }
 

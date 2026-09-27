@@ -288,6 +288,8 @@ final class PCMFloatRecorder: @unchecked Sendable {
             try file.write(from: writeBuffer)
             lock.withLock { frameCount += frames }
         } catch {
+            // a refused write can take the tail of the previous one with it; count what the file really holds
+            lock.withLock { frameCount = min(frameCount, Int(file.length)) }
             record(error)
         }
     }

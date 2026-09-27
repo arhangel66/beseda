@@ -477,8 +477,7 @@ func childHitsAFileSizeLimitWhileRecording() throws {
     #expect(controller.recordingWarning?.contains("Всё записанное до этого будет расшифровано") == true)
     #expect(metadata.frameCount > 0)
     let file = try AVAudioFile(forReading: url)
-    // the refused write can take the tail of the one before it, so the count may run a few hundred frames ahead
-    #expect(file.length > 0 && file.length <= Int64(metadata.frameCount))
+    #expect(file.length > 0 && file.length == Int64(metadata.frameCount))
     let readBack = AVAudioPCMBuffer(pcmFormat: file.processingFormat, frameCapacity: AVAudioFrameCount(file.length))!
     try file.read(into: readBack)
     #expect(readBack.floatChannelData![0][Int(file.length) - 1] == 0.5)

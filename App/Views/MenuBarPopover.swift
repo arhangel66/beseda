@@ -112,8 +112,13 @@ struct MenuBarPopover: View {
         case .failed:
             Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.red)
         case .idle, .completed:
-            Image(systemName: microphoneDenied ? "mic.slash" : "checkmark.circle")
-                .foregroundStyle(microphoneDenied ? .red : .green)
+            if microphoneDenied {
+                Image(systemName: "mic.slash").foregroundStyle(.red)
+            } else if isSpeechModelMissing {
+                Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
+            } else {
+                Image(systemName: "checkmark.circle").foregroundStyle(.green)
+            }
         }
     }
 
