@@ -21,11 +21,7 @@ class Keychain: @unchecked Sendable {
     /// only the real app outside the isolated-launch recipe opens the login keychain: a copy under
     /// another bundle id, a copy launched with a temp home, or a test run shares his login keychain,
     /// and reading the main app's items there puts a permission dialog on his screen
-    static let usesLoginKeychain: Bool = {
-        let environment = ProcessInfo.processInfo.environment
-        return Bundle.main.bundleIdentifier == "app.beseda.Beseda"
-            && environment["BESEDA_NO_KEYCHAIN"] == nil && environment["CFFIXED_USER_HOME"] == nil
-    }()
+    static let usesLoginKeychain = !IsolatedCopy.isActive
     /// where secrets live when the login keychain is off, keyed by service then account; gone at exit
     private static let memory = OSAllocatedUnfairLock(initialState: [String: [String: String]]())
 

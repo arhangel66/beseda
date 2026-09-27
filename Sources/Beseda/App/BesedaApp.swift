@@ -51,7 +51,7 @@ struct BesedaApp: App {
                 if !controller.settings.onboardingDone {
                     openWindow(id: "onboarding")
                     if !isShotRun {
-                        NSApplication.shared.activate(ignoringOtherApps: true)
+                        IsolatedCopy.activateApp()
                     }
                 }
                 #if DEBUG
@@ -147,7 +147,7 @@ struct BesedaApp: App {
         } else {
             openWindow(id: "conversations")
         }
-        NSApplication.shared.activate(ignoringOtherApps: true)
+        IsolatedCopy.activateApp()
     }
 }
 

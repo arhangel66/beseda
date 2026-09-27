@@ -45,6 +45,9 @@ final class SystemAudioTap: @unchecked Sendable {
     }
 
     func start(writingTo url: URL? = nil) throws {
+        if IsolatedCopy.skips("AudioHardwareCreateProcessTap") {
+            throw AudioCaptureError.permissionDenied("Beseda не разрешён доступ к системному звуку")
+        }
         let excludedProcesses = currentProcessAudioObject().map { [$0] } ?? []
         let description = CATapDescription(stereoGlobalTapButExcludeProcesses: excludedProcesses)
         description.name = "Beseda System Audio"

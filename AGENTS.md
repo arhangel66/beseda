@@ -69,6 +69,8 @@ worktree's `.build` (incremental after the check, never a scratch build path) an
 BlackHole only. See the kit's `docs/headless.md` and `docs/macos.md`.
 The login keychain is shared even so: `Keychain` keeps secrets in memory unless the bundle id is
 `app.beseda.Beseda` with no `CFFIXED_USER_HOME` or `BESEDA_NO_KEYCHAIN`, so copies and tests never prompt.
+Isolated copies must not request permissions (`IsolatedCopy.skips` guards every dialog-capable call); screenshots
+that need capture use BlackHole plus a pre-granted real app, never a new bundle id.
 
 ## Kit
 

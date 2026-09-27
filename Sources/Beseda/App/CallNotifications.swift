@@ -14,6 +14,9 @@ final class CallNotifier: NSObject, @preconcurrency UNUserNotificationCenterDele
     private lazy var center = UNUserNotificationCenter.current()
 
     func start() {
+        if IsolatedCopy.skips("UNUserNotificationCenter.requestAuthorization") {
+            return
+        }
         // outside an app bundle (swift test, swift run) the notification center raises on first use
         guard Bundle.main.bundleURL.pathExtension == "app" else {
             return
