@@ -3,8 +3,10 @@ type: Feature List
 ---
 # Features
 
-What the code does today. Settings tabs are named as in the app: Основные, Запись, Обработка, Хранение,
-Интеграции.
+What the code does today. Settings tabs are named here in Russian: Основные, Запись, Обработка, Хранение,
+Интеграции. First run, menu, settings, archive and export have en/ru string resources in the build bundle;
+`scripts/lib/bundle_app.sh` copies that bundle into the app. Packaged lookup is structurally verified,
+but the app has not been launched on an English system. This does not establish payment readiness.
 
 - **Menu bar app.** The popover starts and stops a recording, shows progress and the latest calls, and
   copies a transcript. During recording, status and stop stay at the top, recent calls are hidden, and the
@@ -52,7 +54,7 @@ What the code does today. Settings tabs are named as in the app: Основны�
   is no related call with a summary.
 - **Export.** With a folder picked under Хранение → Экспорт результатов → «Папка экспорта», every stored result (auto, manual
   or rerun) is written there as Markdown: title, date, type, result, then the clean transcript. The file
-  is named by date and title, so a rerun overwrites it (`Storage/CallExport.swift`). Generated copy/export speaker names and export labels use English or Russian locale resources; authored titles, type names, transcript text and speaker overrides remain unchanged. Display dates use the system locale; export filenames retain their stable POSIX date.
+  is named by date and title, so a rerun overwrites it (`Storage/CallExport.swift`). Generated copy/export speaker names and export labels use English or Russian locale resources; authored titles, type names, transcript text, speaker overrides and fixture text remain unchanged. Unknown external summary/provider errors can remain verbatim. Display dates use the system locale; export filenames retain their stable POSIX date.
 - **Privacy.** The data folder is owner-only (0700/0600, platform file protection where the volume
   supports it), tightened on every launch (`StorageProtection` in `Storage/StorageJanitor.swift`).
   «Удалить» in the conversations toolbar or a sidebar row's context menu, after a confirmation, removes the
@@ -77,5 +79,7 @@ What the code does today. Settings tabs are named as in the app: Основны�
 - **Settings.** Основные uses a compact window height; content-heavy panes retain the full height.
 - **Updates.** Sparkle checks hourly and installs when no call is being recorded; Основные → Обновления
   checks by hand (`Runtime/AppUpdater.swift`).
+
+English-system visual first-run and permission recovery are parked under the host-screen incident. After resolution and permission, use `scripts/screenshot_copy.sh` with the kit's `scripts/window-shot.swift` without activating the host session. Source and bundle checks alone are not a pay-ready verdict.
 
 Not in the code: MCP, cloud sync.
