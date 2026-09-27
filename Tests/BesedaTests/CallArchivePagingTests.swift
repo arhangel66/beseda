@@ -29,4 +29,6 @@ import Testing
     #expect(secondPage.map(\.id) == ["call-4", "call-3", "call-2", "call-1", "call-0"])
     #expect(try store.searchCalls(matching: "архив").map(\.id) == ["call-0"])
     #expect(try store.searchCalls(matching: "Телемост").map(\.id) == ["call-0"])
+    #expect(try store.searchCalls(matching: "АРХИВ").map(\.id) == ["call-0"])
+    #expect(try store.searchCalls(matching: "телемост").map(\.id) == ["call-0"])
 }

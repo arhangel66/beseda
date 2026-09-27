@@ -353,8 +353,12 @@ final class AppSettings {
 
     /// Types stored before `isOther` meant «Другое» by position: the first one gets the flag.
     /// BESEDA-46 seeded one type named «Созвон»; unrenamed, it becomes «Другое» with its prompt kept.
+    /// A prompt still equal to the previous default gets the current one; an edited prompt stays.
     static func migratingStoredCallTypes(_ types: [CallType]) -> [CallType] {
         var types = types
+        for index in types.indices where types[index].prompt == ChatCompletionsProvider.previousDefaultPrompt {
+            types[index].prompt = ChatCompletionsProvider.defaultPrompt
+        }
         if !types.contains(where: \.isOther) {
             types[0].isOther = true
         }

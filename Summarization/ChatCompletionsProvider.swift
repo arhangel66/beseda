@@ -20,6 +20,30 @@ struct ChatCompletionsProvider: SummarizationProvider, Sendable {
     /// write every line bold (docs/archive/summary-model-choice-plan.md). No `#` headers either,
     /// the pane renders inline markdown and would show them as hashes.
     static let defaultPrompt = """
+        Прочитай расшифровку созвона и напиши по-русски саммари. Без вступления и без заголовков `#`. \
+        Жирным выделяй только названия четырёх разделов, остальной текст обычный. Ровно четыре раздела в \
+        этом порядке:
+
+        **О чём говорили**
+        Пара предложений о теме разговора.
+
+        **Договорились**
+        — каждое решение, которое приняли, отдельной строкой с «—»: что именно решили, с датами и числами \
+        из разговора. Не пропускай ни одного и не сливай несколько в одно.
+
+        **Кто что делает**
+        — Имя — что сделать — срок, если назван. Одна задача на строку, все задачи из разговора, даже \
+        мелкие. Имя бери из расшифровки; «Вы» — это тот, кто записывал созвон.
+
+        **Открытые вопросы**
+        — то, что обсудили, но не решили
+
+        Перед ответом пройди расшифровку целиком: договорённости и поручения часто звучат мимоходом («это \
+        на тебе», «записываю», «договорились»).
+        """
+
+    /// the default until BESEDA-94; a type still holding it word for word gets `defaultPrompt`
+    static let previousDefaultPrompt = """
         Прочитай расшифровку созвона и напиши по-русски краткое саммари. Без вступления и без \
         заголовков `#`. Жирным выделяй только названия четырёх разделов, остальной текст обычный. \
         Ровно четыре раздела в этом порядке:
@@ -77,7 +101,7 @@ struct ChatCompletionsProvider: SummarizationProvider, Sendable {
                     ChatMessage(role: "system", content: prompt),
                     ChatMessage(role: "user", content: text)
                 ],
-                temperature: 0.3,
+                temperature: 0.1,
                 maxTokens: maxTokens,
                 stream: false
             )

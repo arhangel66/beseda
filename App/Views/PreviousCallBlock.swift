@@ -5,6 +5,7 @@ struct PreviousCallContent: Equatable {
     let callID: String
     let dateLine: String
     let digest: String
+    let isWholeSummary: Bool
 
     init?(_ call: PreviousRelatedCall?, now: Date = Date()) {
         guard let call, !call.digest.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
@@ -13,6 +14,7 @@ struct PreviousCallContent: Equatable {
         callID = call.callID
         dateLine = CallFormatting.when(call.startedAt, now: now)
         digest = call.digest
+        isWholeSummary = call.isWholeSummary
     }
 }
 
@@ -22,6 +24,12 @@ struct PreviousCallBlock: View {
     /// the sidebar has little room, so it shows a few lines only
     var digestLineLimit: Int?
     let open: (String) -> Void
+    @State private var showsWholeSummary = false
+
+    /// a whole custom-prompt result could fill the pane, so it starts at a few lines
+    private var lineLimit: Int? {
+        content.isWholeSummary && !showsWholeSummary ? min(digestLineLimit ?? 4, 4) : digestLineLimit
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -36,8 +44,13 @@ struct PreviousCallBlock: View {
             }
             Text(CallSummaryView.rendered(content.digest))
                 .font(.callout)
-                .lineLimit(digestLineLimit)
+                .lineLimit(lineLimit)
                 .textSelection(.enabled)
+            if content.isWholeSummary && !showsWholeSummary {
+                Button("Показать полностью") { showsWholeSummary = true }
+                    .buttonStyle(.link)
+                    .font(.caption)
+            }
         }
         .padding(10)
         .frame(maxWidth: .infinity, alignment: .leading)

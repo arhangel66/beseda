@@ -15,12 +15,14 @@ struct PreviousRelatedCall: Hashable {
     let callID: String
     let startedAt: Date
     let digest: String
+    /// the summary has none of the default sections, so `digest` is all of it
+    let isWholeSummary: Bool
 }
 
 enum RelatedCalls {
-    /// the summary sections that say what was agreed and what is left, as ChatCompletionsProvider.defaultPrompt names them
-    static let digestSections = ["Главное", "Что делать", "Открытые вопросы"]
-    static let fallbackLineCount = 5
+    /// the sections that say what was agreed and what is left, as ChatCompletionsProvider.defaultPrompt
+    /// names them now and as previousDefaultPrompt named them before BESEDA-94
+    static let digestSections = ["Договорились", "Главное", "Кто что делает", "Что делать", "Открытые вопросы"]
 
     /// Most recent `ready` call before the target: same series or title first, then same type
     /// plus a shared participant. Rule (a) over the whole history wins before rule (b) is tried.
@@ -48,7 +50,7 @@ enum RelatedCalls {
     }
 
     /// Only stored summary text, never the transcript: the decision/next steps/open questions
-    /// sections when the summary has them, otherwise its first non-empty lines.
+    /// sections of a summary written by a default prompt; nil when it has none of them.
     static func digest(ofSummary summary: String?) -> String? {
         guard let summary else {
             return nil
@@ -71,19 +73,21 @@ enum RelatedCalls {
         let sections = digestSections.compactMap { heading in
             bodies[heading].map { "**\(heading)**\n" + $0.joined(separator: "\n") }
         }
-        if !sections.isEmpty {
-            return sections.joined(separator: "\n\n")
-        }
-        return lines.prefix(fallbackLineCount).joined(separator: "\n")
+        return sections.isEmpty ? nil : sections.joined(separator: "\n\n")
     }
 
     static func previousRelatedCall(to target: RelatedCallTarget, among calls: [StoredCallSummary]) -> PreviousRelatedCall? {
         guard let call = previousCall(to: target, among: calls),
               let startedAt = call.startedDate,
-              let digest = digest(ofSummary: call.summaryText) else {
+              let summary = call.summaryText?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !summary.isEmpty else {
             return nil
         }
-        return PreviousRelatedCall(callID: call.id, startedAt: startedAt, digest: digest)
+        // a custom prompt's result has no known sections; the user sees all of it, collapsed
+        let digest = digest(ofSummary: summary)
+        return PreviousRelatedCall(
+            callID: call.id, startedAt: startedAt, digest: digest ?? summary, isWholeSummary: digest == nil
+        )
     }
 
     private static func normalizedTitle(_ title: String?) -> String? {

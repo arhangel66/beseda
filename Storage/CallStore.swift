@@ -946,14 +946,15 @@ final class CallStore {
             .replacingOccurrences(of: "\\", with: "\\\\")
             .replacingOccurrences(of: "%", with: "\\%")
             .replacingOccurrences(of: "_", with: "\\_")
-        let pattern = "%\(escaped)%"
+        // LIKE folds case for ASCII only, so both sides go through Swift's lowercased() for Cyrillic
+        let pattern = "%\(escaped.lowercased())%"
         return try database { db in
             try self.query(db, """
                 \(Self.callSelect)
-                WHERE c.event_title LIKE ?1 ESCAPE '\\' OR c.app_name LIKE ?1 ESCAPE '\\'
-                   OR c.summary_text LIKE ?1 ESCAPE '\\' OR c.participants LIKE ?1 ESCAPE '\\'
-                   OR c.error LIKE ?1 ESCAPE '\\'
-                   OR c.id IN (SELECT call_id FROM transcript_segments WHERE text LIKE ?1 ESCAPE '\\')
+                WHERE unicode_lower(c.event_title) LIKE ?1 ESCAPE '\\' OR unicode_lower(c.app_name) LIKE ?1 ESCAPE '\\'
+                   OR unicode_lower(c.summary_text) LIKE ?1 ESCAPE '\\' OR unicode_lower(c.participants) LIKE ?1 ESCAPE '\\'
+                   OR unicode_lower(c.error) LIKE ?1 ESCAPE '\\'
+                   OR c.id IN (SELECT call_id FROM transcript_segments WHERE unicode_lower(text) LIKE ?1 ESCAPE '\\')
                 ORDER BY c.started_at DESC
                 """, pattern, row: makeSummary)
         }
@@ -1036,8 +1037,19 @@ final class CallStore {
             defer {
                 sqlite3_close(db)
             }
+            Self.registerUnicodeLower(db)
             return try body(db)
         }
+    }
+
+    /// `unicode_lower(text)`: SQLite's own lower() folds ASCII only; NULL stays NULL
+    private static func registerUnicodeLower(_ db: OpaquePointer) {
+        sqlite3_create_function_v2(db, "unicode_lower", 1, SQLITE_UTF8 | SQLITE_DETERMINISTIC, nil, { context, _, arguments in
+            guard let argument = arguments?[0], let text = sqlite3_value_text(argument) else {
+                return sqlite3_result_null(context)
+            }
+            sqlite3_result_text(context, String(cString: text).lowercased(), -1, sqliteTransient)
+        }, nil, nil, nil)
     }
 
     private func transaction(_ db: OpaquePointer, _ body: () throws -> Void) throws {

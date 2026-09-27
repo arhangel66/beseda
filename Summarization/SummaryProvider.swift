@@ -47,7 +47,7 @@ struct BundledSummary: Sendable {
 
     static let current = BundledSummary(
         title: "Gemma 4 E4B",
-        subtitle: "Работает без интернета. Теряет часть договорённостей и редко называет исполнителей.",
+        subtitle: "Работает без интернета. Называет исполнителей, но может пропустить одну договорённость или мелкое поручение.",
         llamaBuild: "b10819",
         llamaArchiveURL: URL(string: "https://github.com/ggml-org/llama.cpp/releases/download/b10819/llama-b10819-bin-macos-arm64.tar.gz")!,
         llamaArchiveSHA256: "8933e736495eadfef0731ae32054acfaa75699bf4a6ccba77cd8475db085ec66",

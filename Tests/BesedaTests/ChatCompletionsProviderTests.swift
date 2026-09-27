@@ -33,7 +33,7 @@ private let openRouter = URL(string: "https://openrouter.ai/api/v1")!
 
     #expect(json["max_tokens"] as? Int == ChatCompletionsProvider.maxTokens)
     #expect(json["stream"] as? Bool == false)
-    #expect(json["temperature"] as? Double == 0.3)
+    #expect(json["temperature"] as? Double == 0.1)
     let messages = try #require(json["messages"] as? [[String: String]])
     #expect(messages.map { $0["role"] } == ["system", "user"])
     #expect(messages.first?["content"] == "инструкция")

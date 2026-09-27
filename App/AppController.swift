@@ -133,7 +133,9 @@ final class AppController {
     @ObservationIgnored private var liveTicker: Timer?
     @ObservationIgnored private var toastTask: Task<Void, Never>?
     @ObservationIgnored private let janitor: StorageJanitor
-    @ObservationIgnored private var searchMatches: [StoredCallSummary] = []
+    /// observed: it lands after the debounce, when `searchQuery` has already stopped changing
+    private var searchMatches: [StoredCallSummary] = []
+    @ObservationIgnored private var searchTask: Task<Void, Never>?
     private(set) var hasMoreCalls = false
     @ObservationIgnored private var dailySweep: Timer?
     /// set by the app scene: a notification callback has no `openWindow` environment value
@@ -1713,13 +1715,21 @@ final class AppController {
         refreshStorageUsage()
     }
 
+    /// the SQLite search runs on the main thread, so it waits for a pause in typing
     private func refreshSearchMatches() {
+        searchTask?.cancel()
         let query = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
         guard query.count >= 2 else {
             searchMatches = []
             return
         }
-        searchMatches = (try? callStore.searchCalls(matching: query)) ?? []
+        searchTask = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(0.3))
+            guard !Task.isCancelled, let self else {
+                return
+            }
+            searchMatches = (try? callStore.searchCalls(matching: query)) ?? []
+        }
     }
 
     /// drives the recording clock and the two level meters while a capture is open
