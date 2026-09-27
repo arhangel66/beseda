@@ -14,6 +14,21 @@ sources:
     title: Beseda build and release documentation
   - id: kit-macos
     title: ios-kit macOS SwiftPM guidance
+  - id: apple-taps
+    title: Apple Core Audio process tap sample and permission notes
+    url: https://developer.apple.com/documentation/coreaudio/capturing-system-audio-with-core-audio-taps
+  - id: apple-sandbox
+    title: Apple App Sandbox entitlement
+    url: https://developer.apple.com/documentation/bundleresources/entitlements/com.apple.security.app-sandbox
+  - id: apple-input
+    title: Apple Audio Input entitlement
+    url: https://developer.apple.com/documentation/bundleresources/entitlements/com.apple.security.device.audio-input
+  - id: apple-system-usage
+    title: Apple system audio capture usage description
+    url: https://developer.apple.com/documentation/bundleresources/information-property-list/nsaudiocaptureusagedescription
+  - id: apple-mic-usage
+    title: Apple microphone usage description
+    url: https://developer.apple.com/documentation/bundleresources/information-property-list/nsmicrophoneusagedescription
 ---
 
 # App Store sandbox audit
@@ -51,6 +66,14 @@ permission and Keychain behavior cannot be inferred from an isolated launch
 | FileVault check (`fdesetup`) | **needs change, evidence incomplete** | The app launches `/usr/bin/fdesetup isactive` with `Process` (`Sources/Beseda/Storage/StorageJanitor.swift:200-226`). No available local Apple or kit document establishes whether the sandbox profile permits that executable. Do not claim pass or denial without the runtime check; the feature already represents an unclear result as `nil`. | Small if `Process` is allowed; medium to replace or omit the status feature if denied. | In the sandbox build on FileVault-on and FileVault-off Macs, call the check and inspect unified sandbox-denial logs; verify exact true/false parsing and the `nil` UI path. |
 | Time Machine backup exclusion | **works** | Despite the feature wording, the code does not execute `tmutil`: it sets and reads `URLResourceValues.isExcludedFromBackup` on the app data directory (`Sources/Beseda/Storage/StorageJanitor.swift:175-186`). That directory is inside the app's own Application Support/container, so no extra external-file access is implied. | Small/no code change. | Toggle exclusion in the sandbox build, relaunch, verify the resource value both ways, create a new call and confirm the directory flag still covers it; optionally confirm `tmutil isexcluded` only as an external diagnostic. |
 | Keychain access group | **needs change** | Generic-password queries specify class, service and account but no `kSecAttrAccessGroup` (`Sources/Beseda/App/Keychain.swift:45-53`, `Sources/Beseda/App/Keychain.swift:89-93`). The current entitlements contain no keychain access group (`scripts/Beseda.entitlements:1-10`). The direct-build ACL migration documented today is signature-based and is not evidence for a provisioned App Store build ([Build and release](../architecture/build-release.md#keychain-keys-survive-the-identity-change)). | Medium: choose the store app identifier's provisioned group, add the entitlement, use it consistently, and define one-time migration from direct-build items or explicitly document that keys must be re-entered. | On a provisioned sandbox build, save/read/update/delete both secrets across relaunch; inspect `SecItem*` status codes; upgrade from a direct build with existing keys and verify the chosen migration or re-entry behavior without repeated prompts. |
+
+## Process-tap sandbox research
+
+**Works (API shape, not sandbox capture):** Apple's [Core Audio tap sample](https://developer.apple.com/documentation/coreaudio/capturing-system-audio-with-core-audio-taps) creates a tap and HAL aggregate device, matching `SystemAudioTap.start`. Apple specifies macOS 14.2 or later and says the system prompts for system audio recording permission when recording first starts from an aggregate containing a tap. The [system-audio usage key](https://developer.apple.com/documentation/bundleresources/information-property-list/nsaudiocaptureusagedescription) is `NSAudioCaptureUsageDescription`, already present in Beseda's plist. System audio permission is separate from microphone permission; creating an aggregate does not prove nonempty captured samples.
+
+**Unknown:** Apple's [App Sandbox entitlement](https://developer.apple.com/documentation/bundleresources/entitlements/com.apple.security.app-sandbox) enables sandboxing, and its [Audio Input entitlement](https://developer.apple.com/documentation/bundleresources/entitlements/com.apple.security.device.audio-input) permits microphone recording and Core Audio input. Neither explicitly promises sandboxed process-tap capture; the tap sample does not assert sandbox compatibility. `com.apple.security.device.audio-input` is in the direct-build entitlements, but `com.apple.security.app-sandbox` is not. [Microphone usage text](https://developer.apple.com/documentation/bundleresources/information-property-list/nsmicrophoneusagedescription) is required for APIs accessing the device microphone; it cannot substitute for system-audio usage text. A compile-only helper could verify API linkage and entitlement syntax, not permission or samples; no helper was built because it cannot resolve the release gate.
+
+**Blocker to proof (live test parked):** A fresh bundle identity has no Screen & System Audio Recording TCC grant, so starting its aggregate may prompt. The authorized real app has Mikhail's live Application Support, defaults, Keychain and potentially calls in progress. `CFFIXED_USER_HOME` does not isolate defaults or login Keychain, and changing identity loses TCC authorization (ios-kit `docs/macos.md`). There is no safe unattended no-focus capture on the real bundle without touching his data. Owner-assisted gate: on a separate macOS user account or disposable Mac with no real Beseda data, sign a sandboxed build with the intended store identifier, `app-sandbox` and `device.audio-input` entitlements and applicable usage descriptions; have the owner explicitly grant Screen & System Audio Recording if prompted. Route a known fixture exclusively to BlackHole (never Mac output), capture to a temporary file for a fixed short interval, verify nonzero sample energy and no sandbox denial, stop and repeat after relaunch. Verify microphone authorization separately if microphone capture is in scope. Never transfer the owner's live container, defaults or Keychain. Until then, sandboxed call capture is **unknown**, not a pass.
 
 ## Proposed decision
 
