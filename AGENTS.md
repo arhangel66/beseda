@@ -56,6 +56,8 @@ Someone works on this Mac. Never bring a window to the front and never play into
 launch Beseda only with `open -n -g -j --env CFFIXED_USER_HOME="$(mktemp -d)"` on a copy with its own bundle
 id, shoot windows with the kit's `scripts/window-shot.swift` (it never activates), and send audio to files or
 BlackHole only. See the kit's `docs/headless.md` and `docs/macos.md`.
+The login keychain is shared even so: `Keychain` keeps secrets in memory unless the bundle id is
+`app.beseda.Beseda` with no `CFFIXED_USER_HOME` or `BESEDA_NO_KEYCHAIN`, so copies and tests never prompt.
 
 ## Kit
 
