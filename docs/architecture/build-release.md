@@ -33,14 +33,18 @@ entitlements. The direct release assembly and feed are unchanged.
 
 Verified locally: both flavor builds with `--jobs 2`; pinned b10819 archive SHA-256
 `8933e736495eadfef0731ae32054acfaa75699bf4a6ccba77cd8475db085ec66`.
-BESEDA-288 verified the full ad-hoc artifact at `/Users/mikhail/w/learning/beseda/.factory/work/BESEDA-288/.build/Beseda-store.app`; that worker worktree has since been removed, so the ignored artifact is no longer available for inspection. Its resource bundle lived
+BESEDA-290 rebuilt and retained an inspectable full ad-hoc artifact at
+`/Users/mikhail/w/learning/beseda/.factory/private/BESEDA-255/Beseda-store.app` (outside worker
+worktrees, in the ignored factory private directory). Both the worktree source and retained copy passed
+`codesign --verify --strict --deep`. This is ad-hoc signing, not provisioned App Store signing or runtime
+sandbox proof. Its resource bundle lives
 at `Contents/Resources/Beseda_Beseda.bundle`, with `Resources/en.lproj/Menu.strings` inside.
 SwiftPM generates an accessor that looks beside the app root; store calls instead use
 `Bundle.besedaResources` to resolve `Bundle.main.resourceURL` while direct calls continue to use
 SwiftPM's generated accessor. When running the store executable target under SwiftPM tests,
 `Bundle.besedaResources` falls back to `.module` because the test runner has no app resource URL.
 Shell stubs reject missing resources and stray root content.
-The BESEDA-288 assembled app passed `codesign --verify --strict --deep`; its helper had sandbox inheritance,
+The retained BESEDA-290 app passed `codesign --verify --strict --deep`; its helper has sandbox inheritance,
 and app entitlements include sandbox, network client, microphone, calendars and user-selected
 read/write. No Sparkle framework, feed or SU keys are present. Runtime resource lookup remains
 parked: no app launch, sandbox capture, Apple provisioning, TestFlight or review was attempted.
