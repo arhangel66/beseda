@@ -63,7 +63,8 @@ docs/architecture/build-release.md).
 ## No-focus, no-sound
 
 Someone works on this Mac. Never bring a window to the front and never play into the Mac's output device:
-launch Beseda only through `scripts/screenshot_copy.sh`: it bundles a copy with its own bundle id from this
+launch Beseda only through `scripts/screenshot_copy.sh`: it bundles a copy with a random bundle id per run (`app.beseda.shot.<random>`, its own defaults domain,
+deleted when the copy quits) from this
 worktree's `.build` (incremental after the check, never a scratch build path) and opens it with
 `open -n -g -j --env CFFIXED_USER_HOME="$(mktemp -d)"`; shoot windows with the kit's `scripts/window-shot.swift` (it never activates), and send audio to files or
 BlackHole only. See the kit's `docs/headless.md` and `docs/macos.md`.

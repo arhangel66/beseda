@@ -127,6 +127,27 @@ private func line(_ speaker: String) -> SpeakerTranscriptSegment {
     #expect(try harness.store.fetchWebhookDeliveries(callID: "call").isEmpty)
 }
 
+@MainActor
+@Test func immediateRetentionDeletesTheAudioRightAfterTheCallIsMarkedReady() throws {
+    let harness = try Harness()
+    defer { harness.cleanUp() }
+    harness.settings.rawAudioRetention = .immediately
+    harness.settings.normalizedAudioRetention = .immediately
+    let controller = harness.controller()
+    try harness.addCall("call", status: "transcribing")
+    let folder = try harness.folder("call")
+    let audio = try ["me.raw.wav", "them.raw.wav", "me.asr.wav", "them.asr.wav"].map { name in
+        let url = folder.appendingPathComponent(name)
+        try writeWAV(url)
+        return url
+    }
+
+    try controller.finishCall("call", in: folder, segments: [line("me"), line("them-1")], audio: audio)
+
+    #expect(try harness.store.fetchCall(id: "call")?.status == "ready")
+    #expect(audio.allSatisfy { !FileManager.default.fileExists(atPath: $0.path) })
+}
+
 // MARK: - 8: launch finds call folders the index lost
 
 @MainActor
