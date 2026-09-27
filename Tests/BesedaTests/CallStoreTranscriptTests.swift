@@ -24,8 +24,8 @@ import Testing
 
     #expect(try store.fetchSegments(callID: "call-1") == segments)
     #expect(try store.fetchSpeakerNames(callID: "call-1") == ["them-1": "Аня"])
-    #expect(try store.searchCallIDs(matching: "50%") == ["call-1"])
-    #expect(try store.searchCallIDs(matching: "5_%").isEmpty)
+    #expect(try store.searchCalls(matching: "50%").map(\.id) == ["call-1"])
+    #expect(try store.searchCalls(matching: "5_%").map(\.id).isEmpty)
     #expect(try store.fetchCalls().map(\.previewText) == ["Скидка 50% до пятницы. Договорились"])
     #expect(try store.fetchCall(id: "call-1")?.appName == "Zoom")
 }

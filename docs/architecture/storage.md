@@ -62,9 +62,13 @@ folder is moved here once by `LegacyDataMigration`.
   `transcript.md` is rewritten. `me` is never offered. The speaker count is not stored anywhere; lanes and
   names are derived from the segments, so they follow. A retry re-diarizes and undoes the merge.
   Before/after: [evidence/beseda-80-before-merge.png](evidence/beseda-80-before-merge.png), [evidence/beseda-80-after-merge.png](evidence/beseda-80-after-merge.png).
+- **Paging** — the sidebar loads 200 calls, newest first; «Показать ещё» fetches the next 200 by offset,
+  and refreshes keep however many are loaded.
 - **Search** — the sidebar filters loaded calls by `StoredCallSummary.searchableText` (title, app, date,
-  preview, error). From two characters on, `searchCallIDs` also matches transcript text with an escaped
-  `LIKE '%query%'` over `transcript_segments`. No full-text index.
+  preview, error). From two characters on, `searchCalls` adds every call, loaded or not, whose event title,
+  app, summary, participants, error or transcript text match an escaped `LIKE '%query%'`; such rows open
+  through `fetchCall(id:)`. No full-text index: the scan takes ~0.1 s over 2000 calls × 200 segments.
+  SQLite `LIKE` folds case for ASCII only, so Cyrillic metadata beyond the loaded page matches case-exactly.
 - **StorageJanitor** — classifies files by suffix (`.raw.wav` raw, `.asr.wav`/`.16k-mono.wav`
   normalized, `.md`/`.json` text, kept forever), measures usage, and deletes audio older than the
   retention rule (`immediately`, 30, 90 days, `forever`) by modification date. Folders of calls in

@@ -95,7 +95,7 @@ final class AppController {
     var isCheckingSummary = false
     var searchQuery = "" {
         didSet {
-            refreshTranscriptMatches()
+            refreshSearchMatches()
         }
     }
     var upcomingEvents: [CalendarEvent] = []
@@ -133,7 +133,8 @@ final class AppController {
     @ObservationIgnored private var liveTicker: Timer?
     @ObservationIgnored private var toastTask: Task<Void, Never>?
     @ObservationIgnored private let janitor: StorageJanitor
-    @ObservationIgnored private var transcriptMatchIDs: Set<String>?
+    @ObservationIgnored private var searchMatches: [StoredCallSummary] = []
+    private(set) var hasMoreCalls = false
     @ObservationIgnored private var dailySweep: Timer?
     /// set by the app scene: a notification callback has no `openWindow` environment value
     @ObservationIgnored var showMainWindow: (() -> Void)?
@@ -430,10 +431,31 @@ final class AppController {
         guard !query.isEmpty else {
             return callBrowserCalls
         }
-        return callBrowserCalls.filter { call in
-            call.searchableText.contains(query) || transcriptMatchIDs?.contains(call.id) == true
+        // the loaded page also matches on the formatted date; SQLite adds calls beyond it
+        let loadedMatches = callBrowserCalls.filter { $0.searchableText.contains(query) }
+        let loadedIDs = Set(loadedMatches.map(\.id))
+        return (loadedMatches + searchMatches.filter { !loadedIDs.contains($0.id) })
+            .sorted { $0.startedAt > $1.startedAt }
+    }
+
+    func loadMoreCalls() {
+        do {
+            let page = try callStore.fetchCalls(limit: Self.callPageSize, offset: callBrowserCalls.count)
+            callBrowserCalls += page
+            hasMoreCalls = page.count == Self.callPageSize
+        } catch {
+            callBrowserError = error.localizedDescription
         }
     }
+
+    /// reloads the sidebar keeping as many calls as «Показать ещё» has loaded
+    private func reloadCallBrowserCalls() throws {
+        let limit = max(Self.callPageSize, callBrowserCalls.count)
+        callBrowserCalls = try callStore.fetchCalls(limit: limit)
+        hasMoreCalls = callBrowserCalls.count == limit
+    }
+
+    private static let callPageSize = 200
 
     var groupedCalls: [CallGroup] {
         var groups: [CallDayGroup: [StoredCallSummary]] = [:]
@@ -585,7 +607,7 @@ final class AppController {
             }
         }
         if matched {
-            callBrowserCalls = (try? callStore.fetchCalls(limit: 200)) ?? callBrowserCalls
+            try? reloadCallBrowserCalls()
         }
     }
 
@@ -760,7 +782,7 @@ final class AppController {
         do {
             recentCalls = try callStore.fetchCalls(limit: 10)
             if !callBrowserCalls.isEmpty {
-                callBrowserCalls = try callStore.fetchCalls(limit: 200)
+                try reloadCallBrowserCalls()
             }
             // the open pane held the summary from before the retry, failure banner and all
             if let selected = selectedCallDetail,
@@ -776,7 +798,7 @@ final class AppController {
     func refreshCallBrowser(selectFirstIfNeeded: Bool = false) {
         do {
             callBrowserError = nil
-            callBrowserCalls = try callStore.fetchCalls(limit: 200)
+            try reloadCallBrowserCalls()
             if settings.calendarEnabled, calendarService.isAuthorized {
                 matchCalendarEvents()
             }
@@ -1691,13 +1713,13 @@ final class AppController {
         refreshStorageUsage()
     }
 
-    private func refreshTranscriptMatches() {
+    private func refreshSearchMatches() {
         let query = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
         guard query.count >= 2 else {
-            transcriptMatchIDs = nil
+            searchMatches = []
             return
         }
-        transcriptMatchIDs = try? callStore.searchCallIDs(matching: query)
+        searchMatches = (try? callStore.searchCalls(matching: query)) ?? []
     }
 
     /// drives the recording clock and the two level meters while a capture is open
