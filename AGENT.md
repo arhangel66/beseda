@@ -27,15 +27,16 @@
 
 ```text
 .
-├── App/               # Код macOS приложения (SwiftUI/Swift)
-│   ├── Views/         # UI: Окно разговоров, плеер, настройки, выбор модели, Menu Bar
-│   └── ...            # AppController, AppSettings и др.
-├── Audio/             # Захват звука (System Audio + Mic), детекция вызовов
-├── Storage/           # Работа с SQLite и файлами записей
-├── Transcription/     # Распознавание: каталог моделей, движок, сборка фраз, нарезка длинного аудио
-├── Runtime/           # Установка модели: скачивание с проверкой хеша → прогрев, состояние по файлам на диске
+├── Sources/Beseda/    # Исходники приложения (цель Beseda)
+│   ├── App/               # Код macOS приложения (SwiftUI/Swift)
+│   │   ├── Views/         # UI: Окно разговоров, плеер, настройки, выбор модели, Menu Bar
+│   │   └── ...            # AppController, AppSettings и др.
+│   ├── Audio/             # Захват звука (System Audio + Mic), детекция вызовов
+│   ├── Storage/           # Работа с SQLite и файлами записей
+│   ├── Transcription/     # Распознавание: каталог моделей, движок, сборка фраз, нарезка длинного аудио
+│   ├── Runtime/           # Установка модели: скачивание с проверкой хеша → прогрев, состояние по файлам на диске
+│   ├── Webhooks/          # Отправка готовой расшифровки на URL (payload, sender, очередь с повторами)
 ├── Vendor/            # Swift-обёртка transcribe.cpp (MIT, скопирована из тега v0.2.3)
-├── Webhooks/          # Отправка готовой расшифровки на URL (payload, sender, очередь с повторами)
 ├── scripts/           # Сборка (build_app.sh) и упаковка в zip (package_app.sh)
 ├── docs/              # Техническая документация и планы
 └── untracked/         # Черновики, спайки, дизайн (данные приложения живут в Application Support)
@@ -56,8 +57,8 @@
 ## 🚦 Текущее состояние и важные файлы
 
 ### Ключевые компоненты для изучения:
-*   **`App/AppController.swift`**: Сердце приложения, связывающее аудио и UI.
-*   **`Transcription/LocalTranscriber.swift`**: Реализация логики распознавания.
+*   **`Sources/Beseda/App/AppController.swift`**: Сердце приложения, связывающее аудио и UI.
+*   **`Sources/Beseda/Transcription/LocalTranscriber.swift`**: Реализация логики распознавания.
 *   **`~/Library/Application Support/Beseda/calls.sqlite`**: Основная база данных с историей вызовов (см. `docs/architecture/storage.md`).
 *   **`docs/index.md`**: Документация о продукте, архитектуре и решениях.
 

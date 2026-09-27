@@ -80,6 +80,16 @@ func lseend(_ variant: LSEENDVariant) async throws -> (URL, String) async throws
     return { url, _ in turns(of: try diarizer.processComplete(try readSamples(at: url), keepingEnrolledSpeakers: false)) }
 }
 
+func nemotron3() async throws -> (URL, String) async throws -> [Turn] {
+    let diarizer = Nemotron3Diarizer(config: .offline, models: try await Nemotron3Models.loadFromHuggingFace(config: .offline))
+    return { url, _ in
+        let (probabilities, frames) = try diarizer.processComplete(try readSamples(at: url))
+        return Nemotron3Diarizer.segments(probabilities: probabilities, frameCount: frames).map {
+            Turn(start: Double($0.startSeconds), end: Double($0.endSeconds), speaker: "spk-\($0.speakerIndex)")
+        }
+    }
+}
+
 var shortSegments = OfflineDiarizerConfig(clusteringThreshold: 0.7)
 shortSegments.embedding.minSegmentDurationSeconds = 0.3
 
@@ -94,6 +104,7 @@ let variants: [(String, () async throws -> (URL, String) async throws -> [Turn])
     ("sortformer", sortformer),
     ("lseend-dihard3", { try await lseend(.dihard3) }),
     ("lseend-callhome", { try await lseend(.callhome) }),
+    ("nemotron3-offline", nemotron3),
 ]
 let only = ProcessInfo.processInfo.environment["VARIANTS"]?.split(separator: ",").map(String.init)
 let systemFiles = try FileManager.default.contentsOfDirectory(atPath: audioDirectory.path)

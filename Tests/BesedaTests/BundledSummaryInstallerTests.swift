@@ -90,6 +90,7 @@ private struct Harness {
 
     func installer(
         downloads: Downloads,
+        freeSpace: Int64 = .max,
         warmUp: @escaping () async throws -> Void = {}
     ) -> BundledSummaryInstaller {
         BundledSummaryInstaller(
@@ -100,6 +101,7 @@ private struct Harness {
                 onProgress(1)
                 try data.write(to: destination)
             },
+            freeSpace: { _ in freeSpace },
             warmUp: warmUp
         )
     }
@@ -180,6 +182,20 @@ private struct Harness {
 
     #expect(installer.failure != nil)
     #expect(await downloads.sources == [harness.artifacts.llamaArchiveURL])
+}
+
+@MainActor
+@Test func aShortDiskDownloadsNeitherTheEngineNorTheModel() async throws {
+    let harness = try Harness()
+    defer { harness.tearDown() }
+    let downloads = Downloads(files: harness.files)
+
+    let installer = harness.installer(downloads: downloads, freeSpace: 1_000)
+    installer.install()
+    try await harness.settled(installer)
+
+    #expect(await downloads.sources.isEmpty)
+    #expect(installer.failure?.hasPrefix("Не хватает места на диске: для загрузки нужно") == true)
 }
 
 @MainActor

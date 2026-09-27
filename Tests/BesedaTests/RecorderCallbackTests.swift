@@ -160,7 +160,7 @@ func callbackTimeUnderCPUAndDiskLoad() throws {
     let buffers = syntheticBuffers(count: 1_000, frames: 480)
     let running = NSLock()
     nonisolated(unsafe) var loadRunning = true
-    let isLoadRunning = { running.withLock { loadRunning } }
+    let isLoadRunning: @Sendable () -> Bool = { running.withLock { loadRunning } }
     let load = DispatchGroup()
     for _ in 0..<ProcessInfo.processInfo.activeProcessorCount {
         DispatchQueue.global(qos: .userInitiated).async(group: load) {

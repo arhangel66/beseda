@@ -16,7 +16,7 @@ SU_PUBLIC_ED_KEY="tR1eNuK7eLy8yy+rAC+mXLGoQqNlwbj1dXktcF5C64U="
 rm -rf "$APP_DIR"
 mkdir -p "$APP_DIR/Contents/MacOS" "$APP_DIR/Contents/Resources"
 cp "$BIN_DIR/Beseda" "$APP_DIR/Contents/MacOS/Beseda"
-cp "$ROOT/Resources/Info.plist" "$APP_DIR/Contents/Info.plist"
+cp "$ROOT/Sources/Beseda/Resources/Info.plist" "$APP_DIR/Contents/Info.plist"
 VERSION="$(tr -d '[:space:]' < "$ROOT/VERSION")"
 PLIST="$APP_DIR/Contents/Info.plist"
 /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "$PLIST"
@@ -40,7 +40,7 @@ cp "$ROOT/Vendor/TranscribeCpp/LICENSE" "$APP_DIR/Contents/Resources/licenses/tr
 cp "$ROOT/.build/artifacts/sparkle/Sparkle/LICENSE" "$APP_DIR/Contents/Resources/licenses/sparkle-LICENSE"
 # actool turns the Icon Composer source into both the macOS 26 icon (Assets.car) and the
 # plain AppIcon.icns older systems fall back to
-xcrun actool "$ROOT/Resources/AppIcon.icon" --compile "$APP_DIR/Contents/Resources" \
+xcrun actool "$ROOT/Sources/Beseda/Resources/AppIcon.icon" --compile "$APP_DIR/Contents/Resources" \
     --platform macosx --minimum-deployment-target 14.2 --app-icon AppIcon \
     --output-partial-info-plist "$ROOT/.build/appicon-partial.plist" > /dev/null
 

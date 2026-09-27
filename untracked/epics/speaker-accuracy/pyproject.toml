@@ -7,5 +7,8 @@ dependencies = [
     "jiwer>=4.0.0",
     "numpy>=2.5.3",
     "pyannote-metrics>=4.1",
+    "scipy>=1.18.1",
+    "sherpa-onnx>=1.13.8",
+    "sherpa-onnx-core==1.13.8",
     "soundfile>=0.14.0",
 ]
