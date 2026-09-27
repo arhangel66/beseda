@@ -4,3 +4,4 @@
 - [Features](features.md) — what the app does today, as built.
 - [Install](install.md) — putting Beseda on a Mac, first launch, updates, uninstall.
 - [Privacy](privacy.md) — what is stored where, what protects it, what leaves the Mac.
+- [Landing message](landing-brief.md) — proposed copy and synthetic demo storyboard; not a published page.
