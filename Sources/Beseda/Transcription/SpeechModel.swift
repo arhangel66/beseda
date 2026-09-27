@@ -51,12 +51,11 @@ struct SpeechModel: Identifiable, Hashable, Sendable {
         catalogue.first { $0.id == id }
     }
 
-    /// the one wording of a model's state for onboarding, Settings and the popover;
-    /// «Готова» only when the selected model is on disk and the runtime can use it
-    static func stateLabel(isSelected: Bool, isDownloaded: Bool, isReady: Bool) -> String? {
+    /// the one wording of a model's state for onboarding and Settings
+    static func stateLabel(isSelected: Bool, isDownloaded: Bool) -> String? {
         switch (isSelected, isDownloaded) {
         case (true, true):
-            isReady ? "Готова" : "Выбрана · скачана"
+            "Готова"
         case (true, false):
             "Выбрана · не скачана"
         case (false, true):

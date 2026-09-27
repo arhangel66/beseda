@@ -99,6 +99,32 @@ private struct Harness {
 }
 
 @MainActor
+@Test func aValidSelectedModelIsUsableWithoutAWarmUpMarker() throws {
+    let harness = try Harness()
+    defer { harness.tearDown() }
+    try harness.plantModel()
+
+    let installer = harness.installer(downloads: Downloads(payload: harness.payload))
+
+    #expect(installer.isSpeechModelReady)
+    #expect(installer.state(of: .warmUp) == .pending)
+    #expect(!installer.isReady)
+}
+
+@MainActor
+@Test func anInvalidSelectedModelIsNotUsable() throws {
+    let harness = try Harness()
+    defer { harness.tearDown() }
+    try FileManager.default.createDirectory(at: harness.paths.modelsDirectory, withIntermediateDirectories: true)
+    try Data("truncated".utf8).write(to: harness.model.localURL(in: harness.paths.modelsDirectory))
+
+    let installer = harness.installer(downloads: Downloads(payload: harness.payload))
+
+    #expect(!installer.isSpeechModelReady)
+    #expect(installer.state(of: .speechModel) == .pending)
+}
+
+@MainActor
 @Test func aModelAlreadyOnDiskIsNotDownloadedAgain() async throws {
     let harness = try Harness()
     defer { harness.tearDown() }

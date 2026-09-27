@@ -77,6 +77,11 @@ final class RuntimeInstaller {
         refresh()
     }
 
+    /// Whether the selected ASR model can transcribe now. Warm-up is an independent optimization.
+    var isSpeechModelReady: Bool {
+        states[.speechModel] == .done
+    }
+
     var isReady: Bool {
         RuntimeStage.allCases.allSatisfy { states[$0] == .done }
     }
