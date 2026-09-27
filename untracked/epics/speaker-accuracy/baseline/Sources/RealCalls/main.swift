@@ -156,6 +156,61 @@ if CommandLine.arguments.count > 2, CommandLine.arguments[2] == "dump" {
     exit(0)
 }
 
+// BESEDA-114: `RealCalls <call dir or wav> chunks` prints one JSON line for ../embedding_clustering.py: the t0.70
+// timeline, the raw per-window WeSpeaker embeddings behind it (not the cluster centroids the segments carry) and
+// the timelines of FluidAudio's own clustering knobs. Of a call only them.asr.wav is read.
+struct ChunkDump: Encodable {
+    struct Chunk: Encodable { let start: Double, end: Double, speaker: String, embedding: [Float] }
+    let timeline: [VariantTimeline.Turn]
+    let chunks: [Chunk]
+    let knobs: [String: [VariantTimeline.Turn]]
+}
+
+func turns(_ result: DiarizationResult) -> [VariantTimeline.Turn] {
+    result.segments.map { .init(start: Double($0.startTimeSeconds), end: Double($0.endTimeSeconds), speaker: $0.speakerId) }
+}
+
+if CommandLine.arguments.count > 2, CommandLine.arguments[2] == "chunks" {
+    let input = URL(fileURLWithPath: CommandLine.arguments[1])
+    let wav = input.pathExtension == "wav" ? input : input.appendingPathComponent("them.asr.wav")
+    let audio = try AudioConverter().resampleAudioFile(wav)
+    func manager(_ config: OfflineDiarizerConfig) async throws -> OfflineDiarizerManager {
+        var exposed = config
+        exposed.exposeChunkEmbeddings = true
+        let manager = OfflineDiarizerManager(config: exposed)
+        try await manager.prepareModels()
+        return manager
+    }
+    let current = try await manager(OfflineDiarizerConfig(clusteringThreshold: 0.7))
+    let prepared = try await current.prepare(audio: audio)
+    let result = try current.cluster(prepared)
+    var knobs: [String: [VariantTimeline.Turn]] = [:]
+    for (name, config) in [
+        ("Fa0.2", OfflineDiarizerConfig(clusteringThreshold: 0.7, Fa: 0.2)),
+        ("Fa0.5", OfflineDiarizerConfig(clusteringThreshold: 0.7, Fa: 0.5)),
+        ("Fb0.4", OfflineDiarizerConfig(clusteringThreshold: 0.7, Fb: 0.4)),
+        ("Fb2", OfflineDiarizerConfig(clusteringThreshold: 0.7, Fb: 2)),
+        ("Fb5", OfflineDiarizerConfig(clusteringThreshold: 0.7, Fb: 5)),
+        ("VBx1iter", OfflineDiarizerConfig(clusteringThreshold: 0.7, maxVBxIterations: 1)),
+    ] {
+        knobs[name] = turns(try await manager(config).cluster(prepared))
+    }
+    // the minimum embedded span is read at extraction, so these re-run the models
+    for seconds in [2.0, 3.0] {
+        let reembedded = try await manager(OfflineDiarizerConfig(clusteringThreshold: 0.7, minSegmentDuration: seconds))
+        knobs["minEmbed\(Int(seconds))s"] = turns(try reembedded.cluster(try await reembedded.prepare(audio: audio)))
+    }
+    let dump = ChunkDump(
+        timeline: turns(result),
+        chunks: (result.chunkEmbeddings ?? []).map {
+            .init(start: $0.startTimeSeconds, end: $0.endTimeSeconds, speaker: $0.speakerId, embedding: $0.embedding256)
+        },
+        knobs: knobs
+    )
+    print(String(decoding: try JSONEncoder().encode(dump), as: UTF8.self))
+    exit(0)
+}
+
 let started = Date()
 let argument = URL(fileURLWithPath: CommandLine.arguments[1])
 if argument.pathExtension == "wav" {

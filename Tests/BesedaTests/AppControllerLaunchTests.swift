@@ -62,19 +62,13 @@ private final class Harness {
 private final class StubSummarizer {
     var calls: [String] = []
     var heldCallID: String?
-    /// the classifier's «exactly one other person» answer the stub hands back
-    var oneOtherPerson: Bool?
-    var failure: Error?
 
-    func summarize(_ detail: StoredCallDetail, _ type: CallType?) async throws -> (type: CallType, text: String, oneOtherPerson: Bool?) {
+    func summarize(_ detail: StoredCallDetail, _ type: CallType?) async throws -> (type: CallType, text: String) {
         calls.append(detail.id)
         while heldCallID == detail.id {
             try await Task.sleep(for: .milliseconds(10))
         }
-        if let failure {
-            throw failure
-        }
-        return (CallType(name: CallType.otherName, description: "", prompt: ""), "summary of \(detail.id)", oneOtherPerson)
+        return (CallType(name: CallType.otherName, description: "", prompt: ""), "summary of \(detail.id)")
     }
 }
 
@@ -268,86 +262,6 @@ private func line(_ speaker: String) -> SpeakerTranscriptSegment {
     #expect(stub.calls == ["first", "second"])
     #expect(try harness.store.fetchCall(id: "second")?.summaryText == "summary of second")
 }
-
-// MARK: - BESEDA-107: the classifier's «one other person» is stored, never relabels
-
-/// a finished call with three remote speakers auto-processed through a stub answering `oneOtherPerson`;
-/// returns the speakers in the index, the transcript file and the stored answer afterwards
-@MainActor
-private func remoteSpeakersAfterProcessing(
-    oneOtherPerson: Bool?, failure: Error? = nil
-) async throws -> (indexed: [String], transcript: String, stored: Bool?) {
-    let harness = try Harness()
-    defer { harness.cleanUp() }
-    harness.settings.autoProcessCalls = true
-    let stub = StubSummarizer()
-    stub.oneOtherPerson = oneOtherPerson
-    stub.failure = failure
-    let controller = harness.controller(summarize: stub.summarize)
-    try harness.addCall("call", status: "transcribing")
-    let folder = try harness.folder("call")
-    let speakers = ["me", "them-1", "them-2", "them-3"]
-    let lines = speakers.map(line)
-    let dialogue = speakers.map { "**\(SpeakerNaming.defaultName(for: $0))** [00:00] Долгий разговор\n\n" }.joined()
-    try "# Beseda Dual Transcript\n\n## Dialogue\n\n\(dialogue)## Channels\n"
-        .write(to: folder.appendingPathComponent("transcript.md"), atomically: true, encoding: .utf8)
-
-    try controller.finishCall("call", in: folder, segments: lines, audio: [])
-    try await waitUntil { try harness.store.fetchProcessingPendingCallIDs().isEmpty && controller.summarizingCallID == nil }
-
-    return (
-        try harness.store.fetchSegments(callID: "call").map(\.speaker),
-        try String(contentsOf: folder.appendingPathComponent("transcript.md"), encoding: .utf8),
-        storedOneOtherPerson(harness.paths.callIndexURL, callID: "call")
-    )
-}
-
-/// `calls.one_other_person` read straight from the index; nil when the column is NULL
-private func storedOneOtherPerson(_ dbURL: URL, callID: String) -> Bool? {
-    var db: OpaquePointer?
-    var statement: OpaquePointer?
-    defer { sqlite3_finalize(statement); sqlite3_close(db) }
-    sqlite3_open(dbURL.path, &db)
-    sqlite3_prepare_v2(db, "SELECT one_other_person FROM calls WHERE id = '\(callID)'", -1, &statement, nil)
-    guard sqlite3_step(statement) == SQLITE_ROW, sqlite3_column_type(statement, 0) != SQLITE_NULL else { return nil }
-    return sqlite3_column_int(statement, 0) == 1
-}
-
-@MainActor
-@Test func theClassifierSayingOneOtherPersonIsStoredAndKeepsTheDiarizerSpeakers() async throws {
-    let (indexed, transcript, stored) = try await remoteSpeakersAfterProcessing(oneOtherPerson: true)
-
-    #expect(indexed == ["me", "them-1", "them-2", "them-3"])
-    #expect(transcript.contains("Собеседник 3"))
-    #expect(stored == true)
-}
-
-@MainActor
-@Test func theClassifierSayingSeveralPeopleKeepsTheDiarizerSpeakers() async throws {
-    let (indexed, transcript, _) = try await remoteSpeakersAfterProcessing(oneOtherPerson: false)
-
-    #expect(indexed == ["me", "them-1", "them-2", "them-3"])
-    #expect(transcript.contains("Собеседник 3"))
-}
-
-@MainActor
-@Test func noClassifierAnswerKeepsTheDiarizerSpeakers() async throws {
-    let (indexed, transcript, _) = try await remoteSpeakersAfterProcessing(oneOtherPerson: nil)
-
-    #expect(indexed == ["me", "them-1", "them-2", "them-3"])
-    #expect(transcript.contains("Собеседник 3"))
-}
-
-@MainActor
-@Test func aFailedClassificationKeepsTheDiarizerSpeakers() async throws {
-    let (indexed, transcript, _) = try await remoteSpeakersAfterProcessing(
-        oneOtherPerson: true, failure: SummarizationError.unavailable("down")
-    )
-
-    #expect(indexed == ["me", "them-1", "them-2", "them-3"])
-    #expect(transcript.contains("Собеседник 3"))
-}
-
 
 // Critic item 22: a recording killed mid-call and a disk that refuses writes, each played in a child
 // process — the same test binary re-run on one test — so a SIGKILL or a file size limit hits only the child.
