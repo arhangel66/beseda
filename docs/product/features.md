@@ -21,8 +21,9 @@ What the code does today. Settings tabs are named as in the app: Основны�
   notification (`App/CallNotifications.swift`).
 - **Local transcription.** transcribe.cpp runs in the app process with a GGUF model the user picks under
   Обработка: Parakeet v3 (25 languages) or GigaAM v3 (Russian) — `Transcription/SpeechModel.swift`,
-  `Transcription/LocalTranscriber.swift`. Speakers inside the system channel are separated with FluidAudio
-  (`Transcription/Diarizer.swift`) and can be renamed. The picked model's card reads «Выбрана» until it
+  `Transcription/LocalTranscriber.swift`. Speakers inside the system channel are separated with NVIDIA's
+  Nemotron-3 Diarization via FluidAudio (`Transcription/Diarizer.swift`; 199 MB, OpenMDW-1.1, downloaded with
+  the first call and listed with its licence under Обработка) and can be renamed. The picked model's card reads «Выбрана» until it
   is on disk and «Готова» after; without a ready model the popover disables «Начать запись» and shows
   «Модель не скачана» with a link to Обработка.
 - **Archive and search.** Calls are indexed in SQLite with transcripts on disk (`Storage/CallStore.swift`).

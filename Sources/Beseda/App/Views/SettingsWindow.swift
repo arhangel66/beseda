@@ -299,10 +299,17 @@ private struct ProcessingPane: View {
         Form {
             Section {
                 SpeechModelList(controller: controller)
+                LabeledContent("Разбор голосов") {
+                    Link(
+                        "\(Diarizer.title) · \(Diarizer.licence) · \(Diarizer.bytes.byteSizeDescription)",
+                        destination: Diarizer.licenceURL
+                    )
+                }
+                .font(.caption)
             } header: {
                 Text("Распознавание речи")
             } footer: {
-                Text("Модели на диске: \(controller.runtime.diskUsage().byteSizeDescription). Модель работает на этом Mac. Смена модели не трогает уже сделанные расшифровки.")
+                Text("Модели на диске: \((controller.runtime.diskUsage() + (controller.diarizer.isDownloaded ? Diarizer.bytes : 0)).byteSizeDescription). Модели работают на этом Mac; модель разбора голосов скачивается с первым звонком. Смена модели не трогает уже сделанные расшифровки.")
             }
 
             Section {
@@ -661,6 +668,15 @@ private struct IntegrationsPane: View {
                     }
                 }
                 .disabled(!settings.calendarEnabled)
+                if settings.calendarEnabled,
+                   let problem = controller.calendarService.linkingProblem(selected: settings.calendarIdentifiers) {
+                    LabeledContent(problem) {
+                        Button("Открыть настройки…") {
+                            PermissionsModel.openPrivacySettings(pane: "Privacy_Calendars")
+                        }
+                    }
+                    .foregroundStyle(.red)
+                }
             } header: {
                 Text("Календарь")
             } footer: {

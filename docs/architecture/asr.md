@@ -28,18 +28,18 @@ the vendored Swift wrapper in `Vendor/TranscribeCpp`). No audio leaves the machi
 - **Timestamps** — Parakeet returns word times; GigaAM only token times, so `WordAssembler` rebuilds
   words from SentencePiece tokens (U+2581 starts a word). Piece offsets are added back to absolute time.
   `SentenceBuilder` groups words into sentence segments (punctuation or a long pause).
-- **Diarization** — only the system channel is diarized. `Diarizer` wraps FluidAudio's
-  `OfflineDiarizerManager` (clustering threshold 0.70); its CoreML models download and compile on first
-  use. `SpeakerAssignment.remoteTurns` labels each sentence (`them-1`,
+- **Diarization** — only the system channel is diarized. `Diarizer` wraps FluidAudio 0.17.4's
+  `Nemotron3Diarizer` (NVIDIA Nemotron-3 Diarization, offline preset, Core ML, OpenMDW-1.1). Its 199 MB
+  (five files, pinned to one Hub revision) download on the first diarized call into
+  `runtime/models/nemotron-3-diarization/`, each file checked by size and sha256 after a free-space check, with
+  progress on the «Подготовка разбора голосов» stage. `SpeakerAssignment.remoteTurns` labels each sentence (`them-1`,
   `them-2`…) with the speaker of the diarizer segment it overlaps most, or the nearest one when it lies
   outside diarizer speech; every sentence stays its own line with its own times, so clicking it seeks there.
   Per-word labels, the earlier rule, were twice as wrong ([speaker accuracy](../decisions/speaker-accuracy.md)).
   Diarization failure is logged and skipped: the transcript falls back to one `them`.
-  Before that, `mergingShortReplies` (the interim default): a speaker whose longest diarizer segment is under
-  6 s gives each segment to the nearest-in-time kept speaker; with no 6 s segment at all, the speaker with the
-  most seconds stays. On real calls such speakers are someone's short replies split off; the rule can also
-  erase a real person who only answers briefly ([speaker accuracy](../decisions/speaker-accuracy.md)).
-  A wrong split is fixed by hand with «Объединить с», which survives a rerun ([storage](storage.md)).
+  There is no merge rule: the 6 s short-reply rule of the old diarizer glued real people under Nemotron-3
+  ([speaker accuracy](../decisions/speaker-accuracy.md)). A wrong split is fixed by hand with «Объединить с»,
+  which survives a rerun with the same diarizer ([storage](storage.md)).
 - **Echo gate** — remote speech leaking from the speakers into the mic would be transcribed again as
   `me`. `EchoGate` finds the delay (FFT cross-correlation, 0–500 ms) and gain of the system channel
   inside the mic; a 20 ms mic frame is own speech only when its energy beats the predicted echo by 6 dB
@@ -78,7 +78,7 @@ row; per call: `transcript.md` and the `transcript_segments` rows (see [storage]
 
 - **Thread safety rests on the caller.** `LocalTranscriber` is `@unchecked Sendable`: its model state is
   touched on its queue, but `progressHandler`/`diagnosticsHandler` are plain vars. `Diarizer` is
-  `@unchecked Sendable` with an unguarded `modelsReady` flag. Both are safe only because the
+  `@unchecked Sendable` with an unguarded loaded-model property. Both are safe only because the
   `@MainActor` `AppController` runs one call's pipeline at a time and awaits each step.
 - **`rewriteDialogue` depends on literal headers.** It finds `"## Dialogue\n\n"` and `"## Channels"` in
   `transcript.md` and silently does nothing if either is missing. Changing those headers in

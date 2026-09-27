@@ -2,7 +2,7 @@
 
 - [Adversarial product and code review](critic-review.md) — product, architecture, speaker, privacy and release findings; proposed.
 - [Development directions](development-directions.md) — where Beseda goes next: Mikhail's answers and the phased plan; approved with changes.
-- [Speaker accuracy, local](speaker-accuracy.md) — echo gate and diarizer timeline first, models pending the benchmark; proposed.
+- [Speaker accuracy, local](speaker-accuracy.md) — echo gate, diarizer timeline, Nemotron-3 as the diarizer without the 6 s rule.
 - [Local on-device ASR](local-asr.md) — speech is transcribed on the Mac, no cloud ASR.
 - [Separate microphone and system channels](separate-channels.md) — "me" and "them" recorded to separate files.
 - [ASR engine](asr-engine.md) — transcribe.cpp with a user-picked Parakeet or GigaAM model, replacing parakeet-mlx.

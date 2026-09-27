@@ -66,39 +66,14 @@ private func makeSegment(_ text: String, _ start: Double, _ end: Double) -> Tran
     #expect(SpeakerAssignment.remoteTurns(segments: [makeSegment("Hi", 0, 0.3)], timeline: []).isEmpty)
 }
 
-@Test func aSpeakerWithOnlyShortSegmentsJoinsTheNearestInTimeKeptSpeaker() {
-    let segments = [makeSegment("Long one.", 0, 8), makeSegment("Yeah.", 9, 10), makeSegment("Other long.", 20, 30)]
-    let timeline = [
-        SpeakerInterval(speaker: "S1", start: 0, end: 8),
-        SpeakerInterval(speaker: "S3", start: 9, end: 10),
-        SpeakerInterval(speaker: "S2", start: 20, end: 30)
-    ]
-
-    let turns = SpeakerAssignment.remoteTurns(segments: segments, timeline: timeline)
-
-    #expect(turns.map(\.speaker) == ["them-1", "them-1", "them-2"])
-}
-
-@Test func aSpeakerWithOneSegmentOfSixSecondsIsKept() {
-    let segments = [makeSegment("Long one.", 0, 8), makeSegment("Six seconds.", 9, 15)]
-    let timeline = [SpeakerInterval(speaker: "S1", start: 0, end: 8), SpeakerInterval(speaker: "S2", start: 9, end: 15)]
+@Test func aSpeakerWithOnlyShortSegmentsStaysItsOwnSpeaker() {
+    // the 6 s rule is gone with Nemotron-3: it glued real people on the benchmark (docs/decisions/speaker-accuracy.md)
+    let segments = [makeSegment("Long one.", 0, 8), makeSegment("Yeah.", 9, 10)]
+    let timeline = [SpeakerInterval(speaker: "S1", start: 0, end: 8), SpeakerInterval(speaker: "S3", start: 9, end: 10)]
 
     let turns = SpeakerAssignment.remoteTurns(segments: segments, timeline: timeline)
 
     #expect(turns.map(\.speaker) == ["them-1", "them-2"])
-}
-
-@Test func withNoLongSegmentTheSpeakerWithTheMostSecondsTakesEverything() {
-    let segments = [makeSegment("A.", 0, 2), makeSegment("B.", 3, 8), makeSegment("C.", 9, 14)]
-    let timeline = [
-        SpeakerInterval(speaker: "S1", start: 0, end: 2),
-        SpeakerInterval(speaker: "S2", start: 3, end: 8),
-        SpeakerInterval(speaker: "S2", start: 9, end: 14)
-    ]
-
-    let turns = SpeakerAssignment.remoteTurns(segments: segments, timeline: timeline)
-
-    #expect(turns.map(\.speaker) == ["them-1", "them-1", "them-1"])
 }
 
 @Test func aOneSpeakerCallIsUnchanged() {

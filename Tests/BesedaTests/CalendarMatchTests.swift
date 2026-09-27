@@ -1,3 +1,4 @@
+import EventKit
 import Foundation
 import Testing
 
@@ -68,4 +69,22 @@ private func makeEvent(id: String, startMinutes: Int, lengthMinutes: Int) -> Cal
 @Test func aZoomLinkInTheEventCountsAsACall() {
     #expect(CalendarService.carriesConferenceLink("https://us02web.zoom.us/j/123"))
     #expect(CalendarService.carriesConferenceLink("Переговорка на третьем этаже") == false)
+}
+
+@Test func linkingIsBrokenWithoutFullAccess() {
+    let problem = CalendarService.linkingProblem(authorization: .writeOnly, selected: [], available: ["work"])
+
+    #expect(problem == "Нет доступа к календарю")
+}
+
+@Test func linkingIsBrokenWhenTheSelectedCalendarIsGone() {
+    let problem = CalendarService.linkingProblem(authorization: .fullAccess, selected: ["gone"], available: ["work"])
+
+    #expect(problem == "Выбранный календарь не найден — выберите другой")
+}
+
+@Test func linkingWorksWithFullAccessAndExistingCalendars() {
+    let problem = CalendarService.linkingProblem(authorization: .fullAccess, selected: ["work"], available: ["work", "home"])
+
+    #expect(problem == nil)
 }
