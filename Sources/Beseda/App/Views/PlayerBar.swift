@@ -95,8 +95,8 @@ struct PlayerBar: View {
                         player.cycleSpeed()
                     }
                     .controlSize(.small)
-                    .help("Скорость воспроизведения")
-                    .accessibilityLabel("Скорость воспроизведения")
+                    .help(ArchiveText.get("Скорость воспроизведения"))
+                    .accessibilityLabel(ArchiveText.get("Скорость воспроизведения"))
                     .accessibilityValue(player.speedLabel)
                 } else {
                     missingAudioNote
@@ -120,8 +120,8 @@ struct PlayerBar: View {
             Image(systemName: player.isPlaying ? "pause.fill" : "play.fill")
                 .frame(width: 16)
         }
-        .help(player.isPlaying ? "Пауза" : "Воспроизвести")
-        .accessibilityLabel(player.isPlaying ? "Пауза" : "Воспроизвести")
+        .help(player.isPlaying ? ArchiveText.get("Пауза") : ArchiveText.get("Воспроизвести"))
+        .accessibilityLabel(player.isPlaying ? ArchiveText.get("Пауза") : ArchiveText.get("Воспроизвести"))
         .disabled(!player.isAvailable)
     }
 
@@ -139,7 +139,7 @@ struct PlayerBar: View {
                     .controlSize(.mini)
                     .opacity(player.isAvailable ? 0.85 : 0)
                     .disabled(!player.isAvailable)
-                    .accessibilityLabel("Позиция воспроизведения")
+                    .accessibilityLabel(ArchiveText.get("Позиция воспроизведения"))
                     .accessibilityValue(player.clockLabel)
             }
             if !lanes.isEmpty {
@@ -165,10 +165,10 @@ struct PlayerBar: View {
                         .fill(lane.style.bar)
                         .frame(width: 8, height: 8)
                     Menu {
-                        Button("Переименовать…") { startRenaming(lane.speaker) }
+                        Button(ArchiveText.get("Переименовать…")) { startRenaming(lane.speaker) }
                         let targets = mergeTargets(for: lane.speaker)
                         if !targets.isEmpty {
-                            Menu("Объединить с") {
+                            Menu(ArchiveText.get("Объединить с")) {
                                 ForEach(targets) { target in
                                     Button(target.label) { controller.mergeSpeaker(lane.speaker, into: target.speaker) }
                                 }
@@ -182,21 +182,21 @@ struct PlayerBar: View {
                     .menuStyle(.borderlessButton)
                 }
                 .fixedSize()
-                .help("\(lane.label) · \(Int((lane.share * 100).rounded()))% разговора")
-                .accessibilityLabel("\(lane.label), \(Int((lane.share * 100).rounded()))% разговора")
+                .help(ArchiveText.format("%@ · %d%% разговора", lane.label, Int((lane.share * 100).rounded())))
+                .accessibilityLabel(ArchiveText.format("%@, %d%% разговора", lane.label, Int((lane.share * 100).rounded())))
             }
         }
-        .alert("Как зовут участника?", isPresented: isRenaming) {
-            TextField("Имя", text: $draftName)
-            Button("Отмена", role: .cancel) { renamedSpeaker = nil }
-            Button("Сохранить") {
+        .alert(ArchiveText.get("Как зовут участника?"), isPresented: isRenaming) {
+            TextField(ArchiveText.get("Имя"), text: $draftName)
+            Button(ArchiveText.get("Отмена"), role: .cancel) { renamedSpeaker = nil }
+            Button(ArchiveText.get("Сохранить")) {
                 if let renamedSpeaker {
                     controller.renameSpeaker(renamedSpeaker, to: draftName)
                 }
                 renamedSpeaker = nil
             }
         } message: {
-            Text("Имя видно только в этом разговоре.")
+            Text(ArchiveText.get("Имя видно только в этом разговоре."))
         }
     }
 
@@ -221,9 +221,9 @@ struct PlayerBar: View {
         HStack(spacing: 7) {
             Image(systemName: "speaker.slash")
                 .font(.caption)
-            Text("Аудио удалено по правилу хранения")
+            Text(ArchiveText.get("Аудио удалено по правилу хранения"))
             SettingsSectionLink(section: "storage", controller: controller) {
-                Text("Настроить")
+                Text(ArchiveText.get("Настроить"))
             }
             .buttonStyle(.link)
         }

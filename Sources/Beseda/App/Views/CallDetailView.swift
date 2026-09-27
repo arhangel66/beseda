@@ -12,11 +12,11 @@ enum CallDetailTab: String, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .transcript:
-            "Расшифровка"
+            ArchiveText.get("Расшифровка")
         case .summary:
-            "Итоги"
+            ArchiveText.get("Итоги")
         case .info:
-            "Сведения"
+            ArchiveText.get("Сведения")
         }
     }
 }
@@ -80,7 +80,7 @@ struct CallDetailView: View {
 
                 PlayerBar(controller: controller, detail: detail, player: player)
             } else {
-                ContentUnavailableView("Разговор не выбран", systemImage: "waveform")
+                ContentUnavailableView(ArchiveText.get("Разговор не выбран"), systemImage: "waveform")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
@@ -126,12 +126,12 @@ struct CallDetailView: View {
                         .lineLimit(2)
                         .textSelection(.enabled)
                 }
-                Text(([summary.whenHeadline, summary.appLabel, summary.isDual ? "микрофон и системный звук" : "только микрофон"] + [summary.callType].compactMap { $0 }).joined(separator: " · "))
+                Text(([summary.whenHeadline, summary.appLabel, summary.isDual ? ArchiveText.get("микрофон и системный звук") : ArchiveText.get("только микрофон")] + [summary.callType].compactMap { $0 }).joined(separator: " · "))
                     .font(.callout)
                     .foregroundStyle(.secondary)
             }
 
-            Picker("Раздел", selection: $tab) {
+            Picker(ArchiveText.get("Раздел"), selection: $tab) {
                 ForEach(CallDetailTab.allCases) { item in
                     Text(item.title).tag(item)
                 }
@@ -155,7 +155,7 @@ struct ResultActions: View {
     var body: some View {
         HStack(spacing: 8) {
             Menu {
-                Section("Обработать заново как") {
+                Section(ArchiveText.get("Обработать заново как")) {
                     ForEach(controller.settings.callTypes) { type in
                         Button(type.name) {
                             controller.generateSummary(as: type)
@@ -164,13 +164,13 @@ struct ResultActions: View {
                 }
             } label: {
                 // a renamed or deleted type still shows the name the call was processed under
-                Text("Тип: \(detail.summary.callType ?? "не выбран")")
+                Text(ArchiveText.format("Тип: %@", detail.summary.callType ?? ArchiveText.get("не выбран")))
             }
             .fixedSize()
             .disabled(controller.summarizingCallID != nil)
 
             if detail.summary.summaryText?.isEmpty == false {
-                Button("Скопировать результат", systemImage: "doc.on.doc") {
+                Button(ArchiveText.get("Скопировать результат"), systemImage: "doc.on.doc") {
                     controller.copyResult()
                 }
             }
@@ -186,7 +186,7 @@ struct LinkEventButton: View {
 
     var body: some View {
         Menu {
-            Section("События рядом с \(summary.whenDescription)") {
+            Section(ArchiveText.format("События рядом с %@", summary.whenDescription)) {
                 ForEach(controller.eventCandidates(for: summary)) { event in
                     Button {
                         controller.assignEvent(event, to: summary)
@@ -203,17 +203,17 @@ struct LinkEventButton: View {
                 controller.assignEvent(nil, to: summary)
             } label: {
                 if summary.isFromCalendar {
-                    Text("Без события")
+                    Text(ArchiveText.get("Без события"))
                 } else {
-                    Label("Без события", systemImage: "checkmark")
+                    Label(ArchiveText.get("Без события"), systemImage: "checkmark")
                 }
             }
         } label: {
-            Label(summary.isFromCalendar ? "Событие" : "Привязать событие", systemImage: "calendar.badge.plus")
+            Label(summary.isFromCalendar ? ArchiveText.get("Событие") : ArchiveText.get("Привязать событие"), systemImage: "calendar.badge.plus")
         }
-        .help(summary.isFromCalendar ? "Название взято из календаря" : "Назвать разговор по событию календаря")
-        .accessibilityLabel("Событие календаря")
-        .accessibilityValue(summary.isFromCalendar ? summary.displayTitle : "не привязано")
+        .help(summary.isFromCalendar ? ArchiveText.get("Название взято из календаря") : ArchiveText.get("Назвать разговор по событию календаря"))
+        .accessibilityLabel(ArchiveText.get("Событие календаря"))
+        .accessibilityValue(summary.isFromCalendar ? summary.displayTitle : ArchiveText.get("не привязано"))
     }
 }
 
@@ -238,11 +238,11 @@ struct SendToWebhookButton: View {
 
     var body: some View {
         Menu {
-            Button("Отправить сейчас") {
+            Button(ArchiveText.get("Отправить сейчас")) {
                 controller.webhooks.sendNow(callID: detail.id)
             }
             .disabled(!canSend)
-            Button("История доставок…") {
+            Button(ArchiveText.get("История доставок…")) {
                 isHistoryOpen = true
             }
         } label: {
@@ -254,7 +254,7 @@ struct SendToWebhookButton: View {
                     Image(systemName: icon)
                         .foregroundStyle(iconColor)
                 }
-                Text(deliveries.first?.state == "failed" ? "Повторить отправку" : "Отправить на сервис")
+                Text(deliveries.first?.state == "failed" ? ArchiveText.get("Повторить отправку") : ArchiveText.get("Отправить на сервис"))
             }
         } primaryAction: {
             // the history half of the old split button was always live; a disabled Menu would hide it
@@ -268,7 +268,7 @@ struct SendToWebhookButton: View {
         .controlSize(.large)
         .fixedSize()
         .help(statusLine)
-        .accessibilityLabel("Отправить на сервис")
+        .accessibilityLabel(ArchiveText.get("Отправить на сервис"))
         .accessibilityValue(statusLine)
         .popover(isPresented: $isHistoryOpen, arrowEdge: .bottom) {
             history
@@ -301,14 +301,14 @@ struct SendToWebhookButton: View {
 
     private var statusLine: String {
         guard let latest = deliveries.first else {
-            return controller.settings.sendsWebhooks ? "Ещё не отправлялся" : "Отправка на сервис выключена в настройках"
+            return controller.settings.sendsWebhooks ? ArchiveText.get("Ещё не отправлялся") : ArchiveText.get("Отправка на сервис выключена в настройках")
         }
-        return [latest.stateLabel, latest.detailLine].filter { !$0.isEmpty }.joined(separator: " · ")
+        return [latest.stateLabel, ArchiveText.displayError(latest.detailLine)].filter { !$0.isEmpty }.joined(separator: " · ")
     }
 
     private var history: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("Доставки")
+            Text(ArchiveText.get("Доставки"))
                 .font(.callout.weight(.semibold))
                 .padding(.bottom, 2)
             if deliveries.isEmpty {
@@ -343,15 +343,15 @@ struct CopyTranscriptButton: View {
                 }
             }
         } label: {
-            Label("Скопировать расшифровку", systemImage: "doc.on.doc")
+            Label(ArchiveText.get("Скопировать расшифровку"), systemImage: "doc.on.doc")
         } primaryAction: {
             controller.copyTranscript()
         }
         .menuStyle(.button)
         .controlSize(.large)
         .fixedSize()
-        .help("Скопировать в формате «\(controller.settings.copyFormat.title)» (⇧⌘C); в меню — другие форматы")
-        .accessibilityLabel("Скопировать расшифровку")
+        .help(ArchiveText.format("Скопировать в формате «%@» (⇧⌘C); в меню — другие форматы", controller.settings.copyFormat.title))
+        .accessibilityLabel(ArchiveText.get("Скопировать расшифровку"))
         .accessibilityValue(controller.settings.copyFormat.title)
         .accessibilityIdentifier(UIJourneyContract.Identifier.copyTranscript)
     }
@@ -400,7 +400,7 @@ private struct FailureBanner: View {
                 .padding(.top, 1)
 
             VStack(alignment: .leading, spacing: 8) {
-                Text(isRuntimeMissing ? "Расшифровка не собралась: модель не скачана" : "Расшифровка не собралась")
+                Text(isRuntimeMissing ? ArchiveText.get("Расшифровка не собралась: модель не скачана") : ArchiveText.get("Расшифровка не собралась"))
                     .font(.body.weight(.semibold))
 
                 Text(bodyText)
@@ -414,7 +414,7 @@ private struct FailureBanner: View {
                         .frame(maxWidth: 520)
                 }
 
-                Button("Расшифровать снова") {
+                Button(ArchiveText.get("Расшифровать снова")) {
                     controller.retryCall(summary)
                 }
                 .disabled(controller.isBusy)
@@ -424,11 +424,11 @@ private struct FailureBanner: View {
     }
 
     private var bodyText: String {
-        let audio = "Аудио записано и лежит на месте — \(summary.durationDescription)\(summary.isDual ? " в двух каналах" : "")."
+        let audio = ArchiveText.format("Аудио записано и лежит на месте — %@%@.", summary.durationDescription, summary.isDual ? ArchiveText.get(" в двух каналах") : "")
         if isRuntimeMissing {
-            return "\(audio) Как только модель скачается, нажмите «Расшифровать снова»."
+            return audio + ArchiveText.get(" Как только модель скачается, нажмите «Расшифровать снова».")
         }
-        return "\(audio) \(summary.error ?? "")"
+        return "\(audio) \(summary.error.map { ArchiveText.displayError($0) } ?? "")"
     }
 }
 
@@ -451,7 +451,7 @@ private struct TranscriptLines: View {
 
     var body: some View {
         if detail.segments.isEmpty {
-            Text(detail.markdownText ?? "Расшифровки пока нет.")
+            Text(detail.markdownText ?? ArchiveText.get("Расшифровки пока нет."))
                 .font(.body)
                 .lineSpacing(4)
                 .textSelection(.enabled)
@@ -478,12 +478,12 @@ private struct TranscriptLines: View {
                 }
             }
             .frame(maxWidth: 680, alignment: .leading)
-            .alert("Как зовут участника?", isPresented: isRenaming) {
-                TextField("Имя", text: $draftName)
-                Button("Отмена", role: .cancel) { renamedSpeaker = nil }
-                Button("Сохранить") { commitRename() }
+            .alert(ArchiveText.get("Как зовут участника?"), isPresented: isRenaming) {
+                TextField(ArchiveText.get("Имя"), text: $draftName)
+                Button(ArchiveText.get("Отмена"), role: .cancel) { renamedSpeaker = nil }
+                Button(ArchiveText.get("Сохранить")) { commitRename() }
             } message: {
-                Text("Имя видно только в этом разговоре.")
+                Text(ArchiveText.get("Имя видно только в этом разговоре."))
             }
         }
     }
@@ -576,17 +576,17 @@ private struct TranscriptLine: View {
         .accessibilityIdentifier(UIJourneyContract.Identifier.speakerLinePrefix + segment.speaker)
         // Context menus cannot be reached reliably while the app stays inactive, so every speaker
         // operation is also an explicit accessibility action on the transcript line.
-        .accessibilityAction(named: "Переименовать участника", onRename)
+        .accessibilityAction(named: ArchiveText.get("Переименовать участника"), onRename)
         .accessibilityActions {
             ForEach(mergeTargets, id: \.self) { target in
-                Button("Объединить с \(SpeakerNaming.name(for: target, overrides: names))") { onMerge(target) }
+                Button(ArchiveText.format("Объединить с %@", SpeakerNaming.name(for: target, overrides: names))) { onMerge(target) }
             }
         }
         .contextMenu {
-            Button("Перейти к \(CallFormatting.mmss(segment.startSec))", action: onSeek)
-            Button("Переименовать участника…", action: onRename)
+            Button(ArchiveText.format("Перейти к %@", CallFormatting.mmss(segment.startSec)), action: onSeek)
+            Button(ArchiveText.get("Переименовать участника…"), action: onRename)
             if !mergeTargets.isEmpty {
-                Menu("Объединить с") {
+                Menu(ArchiveText.get("Объединить с")) {
                     ForEach(mergeTargets, id: \.self) { target in
                         Button(SpeakerNaming.name(for: target, overrides: names)) { onMerge(target) }
                     }
@@ -600,8 +600,8 @@ private struct TranscriptLine: View {
             .buttonStyle(.plain)
             .font(.caption.monospacedDigit())
             .foregroundStyle(isActive ? Color.accentColor : Color.secondary)
-            .help("Перейти к этому месту записи")
-            .accessibilityLabel("Перейти к \(CallFormatting.mmss(segment.startSec))")
+            .help(ArchiveText.get("Перейти к этому месту записи"))
+            .accessibilityLabel(ArchiveText.format("Перейти к %@", CallFormatting.mmss(segment.startSec)))
     }
 }
 
@@ -635,7 +635,7 @@ private struct CallInfo: View {
                         Image(systemName: "chevron.right")
                             .font(.caption.weight(.bold))
                             .rotationEffect(.degrees(isLogOpen ? 90 : 0))
-                        Text("Технический лог")
+                        Text(ArchiveText.get("Технический лог"))
                     }
                     .font(.callout)
                     .foregroundStyle(Color.accentColor)
@@ -661,38 +661,38 @@ private struct CallInfo: View {
     private var rows: [(key: String, value: String)] {
         let summary = detail.summary
         var rows: [(String, String)] = [
-            ("Записан", summary.whenDescription),
-            ("Каналы", summary.isDual ? "микрофон + системный звук" : "микрофон"),
-            ("Длительность", CallFormatting.hms(summary.duration)),
-            ("Состояние", summary.statusLabel)
+            (ArchiveText.get("Записан"), summary.whenDescription),
+            (ArchiveText.get("Каналы"), summary.isDual ? ArchiveText.get("микрофон + системный звук") : ArchiveText.get("микрофон")),
+            (ArchiveText.get("Длительность"), CallFormatting.hms(summary.duration)),
+            (ArchiveText.get("Состояние"), summary.statusLabel)
         ]
         if let eventTitle = summary.eventTitle {
-            rows.append(("Событие календаря", eventTitle))
+            rows.append((ArchiveText.get("Событие календаря"), eventTitle))
         }
         if let stats = detail.jobStats {
-            rows.append(("Скорость", stats.description))
-            rows.append(("Модель", stats.model.flatMap { SpeechModel.named($0)?.title } ?? stats.model ?? "неизвестно"))
+            rows.append((ArchiveText.get("Скорость"), stats.description))
+            rows.append((ArchiveText.get("Модель"), stats.model.flatMap { SpeechModel.named($0)?.title } ?? stats.model ?? ArchiveText.get("неизвестно")))
         }
         rows.append(("Отправка на сервис", webhookLine))
-        rows.append(("Папка", summary.audioDirectoryPath))
+        rows.append((ArchiveText.get("Папка"), summary.audioDirectoryPath))
         if let error = summary.error, !error.isEmpty {
-            rows.append(("Ошибка", error))
+            rows.append((ArchiveText.get("Ошибка"), error))
         }
-        return rows.map { (key: $0.0, value: $0.1) }
+        return rows.map { (key: ArchiveText.get($0.0), value: $0.1) }
     }
 
     private var webhookLine: String {
         guard let latest = controller.webhooks.selected.first else {
-            return controller.settings.sendsWebhooks ? "не отправлялся" : "выключен"
+            return controller.settings.sendsWebhooks ? ArchiveText.get("не отправлялся") : ArchiveText.get("выключен")
         }
-        return [latest.stateLabel, latest.detailLine].filter { !$0.isEmpty }.joined(separator: " · ")
+        return [latest.stateLabel, ArchiveText.displayError(latest.detailLine)].filter { !$0.isEmpty }.joined(separator: " · ")
     }
 
     /// the capture writes session.json next to the audio: the only per-call technical record
     private var logText: String {
         let sessionURL = detail.summary.audioDirectoryURL.appendingPathComponent("session.json")
         guard let text = try? String(contentsOf: sessionURL, encoding: .utf8) else {
-            return "session.json не найден в папке разговора"
+            return ArchiveText.get("session.json не найден в папке разговора")
         }
         return text
     }
