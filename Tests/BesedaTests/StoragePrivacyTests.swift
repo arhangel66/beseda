@@ -50,6 +50,31 @@ private func permissions(_ url: URL) throws -> Int {
     }
 }
 
+@Test func successiveDeniedExportsSurviveRelaunch() throws {
+    let root = try temporaryDirectory()
+    let store = CallStore(dbURL: root.appendingPathComponent("calls.sqlite"))
+    try store.prepare()
+    try store.upsertCall(id: "id", kind: "dual", startedAt: Date(), endedAt: nil, durationSec: nil,
+                         status: "ready", transcriptURL: nil, audioDirectoryURL: root.appendingPathComponent("calls/id"),
+                         error: nil, appName: nil)
+    let paths = ["A", "B", "C"].map { root.appendingPathComponent("\($0).md") }
+    for path in paths { try "copy".write(to: path, atomically: true, encoding: .utf8) }
+    try store.replaceExportCopy(callID: "id", with: paths[0])
+    struct Denied: Error {}
+    for path in paths.dropFirst() {
+        #expect(throws: Denied.self) {
+            try store.replaceExportCopy(callID: "id", with: path) { _, _ in throw Denied() }
+        }
+    }
+    let relaunched = CallStore(dbURL: root.appendingPathComponent("calls.sqlite"))
+    try relaunched.prepare()
+    try relaunched.retryPendingExports()
+    #expect(!FileManager.default.fileExists(atPath: paths[0].path))
+    #expect(!FileManager.default.fileExists(atPath: paths[1].path))
+    #expect(FileManager.default.fileExists(atPath: paths[2].path))
+    try relaunched.retryPendingExports()
+}
+
 @Test func deniedOldExportKeepsNewPathAndRetries() throws {
     let root = try temporaryDirectory()
     let a = root.appendingPathComponent("A", isDirectory: true)

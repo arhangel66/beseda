@@ -106,8 +106,10 @@ folder is moved here once by `LegacyDataMigration`.
   with security-scoped access to each external folder and shows unresolved failures in the existing
   delete error UI; it then empties trash. The recorded `export_path` is authoritative when present. Legacy rows without one use the
   selected folder and the call's old export filename; failure to remove it remains in pending cleanup.
-  Re-export records the new path before removing the old copy, and records old-copy cleanup durably
-  before changing the row. Changing folders does not change the recorded path. Segments, jobs, speakers and webhook deliveries go by
+  Re-export records each replaced copy in `pending-export-cleanup.json` before changing the row;
+  retries remove each path independently under its previous folder's scope. Call-folder deletion
+  remains in `pending-deletions.json` and is retried only after the row is gone. A current export
+  path is never removed by replacement cleanup. Changing folders does not change the recorded path. Segments, jobs, speakers and webhook deliveries go by
   `ON DELETE CASCADE`; `secure_delete` and WAL truncation scrub deleted text. Sandbox/TCC checks
   with real revoked or stale bookmarks remain parked pending owner-granted runtime access.
 
