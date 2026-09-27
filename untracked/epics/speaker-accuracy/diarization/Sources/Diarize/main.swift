@@ -80,14 +80,26 @@ func lseend(_ variant: LSEENDVariant) async throws -> (URL, String) async throws
     return { url, _ in turns(of: try diarizer.processComplete(try readSamples(at: url), keepingEnrolledSpeakers: false)) }
 }
 
-func nemotron3() async throws -> (URL, String) async throws -> [Turn] {
-    let diarizer = Nemotron3Diarizer(config: .offline, models: try await Nemotron3Models.loadFromHuggingFace(config: .offline))
-    return { url, _ in
+/// BESEDA-163: `probabilitiesDir` keeps the raw [frames * 8] float32 slot activities as <id>.f32 for threshold sweeps
+func nemotron3(_ config: Nemotron3Config = .offline, probabilitiesDir: String? = nil) async throws -> (URL, String) async throws -> [Turn] {
+    let diarizer = Nemotron3Diarizer(config: config, models: try await Nemotron3Models.loadFromHuggingFace(config: config))
+    return { url, fileID in
         let (probabilities, frames) = try diarizer.processComplete(try readSamples(at: url))
+        if let probabilitiesDir {
+            let directory = outputRoot.appendingPathComponent(probabilitiesDir)
+            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+            try probabilities.withUnsafeBufferPointer { Data(buffer: $0) }.write(to: directory.appendingPathComponent("\(fileID).f32"))
+        }
         return Nemotron3Diarizer.segments(probabilities: probabilities, frameCount: frames).map {
             Turn(start: Double($0.startSeconds), end: Double($0.endSeconds), speaker: "spk-\($0.speakerIndex)")
         }
     }
+}
+
+func tuned(_ change: (inout Nemotron3Config) -> Void) -> Nemotron3Config {
+    var config = Nemotron3Config.offline
+    change(&config)
+    return config
 }
 
 var shortSegments = OfflineDiarizerConfig(clusteringThreshold: 0.7)
@@ -104,7 +116,13 @@ let variants: [(String, () async throws -> (URL, String) async throws -> [Turn])
     ("sortformer", sortformer),
     ("lseend-dihard3", { try await lseend(.dihard3) }),
     ("lseend-callhome", { try await lseend(.callhome) }),
-    ("nemotron3-offline", nemotron3),
+    ("nemotron3-offline", { try await nemotron3() }),
+    // BESEDA-163: the preset's host-side knobs (speaker-cache compression) and the other published presets
+    ("nemotron3-probs", { try await nemotron3(probabilitiesDir: "nemotron3-probs-f32") }),
+    ("nemotron3-pred0.1", { try await nemotron3(tuned { $0.predScoreThreshold = 0.1 }) }),
+    ("nemotron3-minpos0.2", { try await nemotron3(tuned { $0.minPosScoresRate = 0.2 }) }),
+    ("nemotron3-sil3", { try await nemotron3(tuned { $0.spkcacheSilFramesPerSpk = 3 }) }),
+    ("nemotron3-fast128", { try await nemotron3(.fast128, probabilitiesDir: "nemotron3-fast128-f32") }),
 ]
 let only = ProcessInfo.processInfo.environment["VARIANTS"]?.split(separator: ",").map(String.init)
 let systemFiles = try FileManager.default.contentsOfDirectory(atPath: audioDirectory.path)
