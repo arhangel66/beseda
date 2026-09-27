@@ -39,10 +39,11 @@ build: fast 27.2 → 11.0 s, full 102.6 s.
 - `scripts/release.sh` — publishes a release (below); runs `full_check.sh` before the release build.
   `scripts/test_release.sh` checks its syntax and exercises the step-6 recovery path with local command stubs.
 - `scripts/screenshot_copy.sh` — builds a copy with a random bundle id `app.beseda.shot.<random>` per run from this checkout's own
-  `.build` into `.build/Beseda-shot.app` (including Sparkle, ad-hoc signed without a timestamp or keychain access) and opens it hidden with a fresh
-  `CFFIXED_USER_HOME` and `BESEDA_CLEAN_DEFAULTS=1`; the latter prevents the isolated copy importing the old
-  `app.podushka.Podushka` domain from the owner's cfprefsd. The random defaults domain is deleted when the copy
-  quits. Never touches `/Applications/Beseda.app` or its data.
+  `.build` into `.build/Beseda-shot.app` (including Sparkle, ad-hoc signed without a timestamp or keychain access) and uses the kit's copied
+  `scripts/macos-isolated-launch.sh` with `--clean-defaults`. The helper opens it hidden with a fresh
+  `CFFIXED_USER_HOME`, sets `IOS_KIT_CLEAN_DEFAULTS=1` to prevent import from the old `app.podushka.Podushka`
+  domain, and deletes the random defaults domain before and after the run. It never touches
+  `/Applications/Beseda.app` or its data.
 - `scripts/nightly_check.sh` — the nightly full check: native-ui in its own detached worktree
   `~/Library/Caches/beseda-nightly-check`, `nice -n 19`, skipped when free memory is under 20 % or a
   Beseda call is recording (an open `*.raw.wav`). Log: `~/Library/Logs/beseda-nightly-check.log`. On
@@ -204,10 +205,10 @@ stable accessibility surface is:
 | Speaker | `call.speaker-line.<speaker-key>` | «Переименовать участника» and «Объединить с <name>» actions |
 | Delete | `call.delete` | «Удалить разговор» |
 
-No app was launched or signed for this contract. It does not claim a driven end-to-end UI run. When launch
-verification resumes, host the views in a never-ordered-front window (or use external AX only when
-`AXIsProcessTrusted()` is true without prompting), walk the rendered NSAccessibility tree, traverse onboarding
-and all controls by keyboard, invoke the hidden speaker merge action, confirm deletion, and verify copied text.
+No app is launched or signed for this contract. The kit's copied `AccessibilityHarness` hosts a representative
+journey action in a transparent, ordered-back `NSWindow`; the test reads its NSAccessibility identifier and label,
+presses it in-process without TCC, and proves the window never becomes key or main. This does not claim a driven
+end-to-end UI run. External AX remains allowed only when `AXIsProcessTrusted()` is already true without prompting.
 
 ## ios kit
 
