@@ -192,8 +192,8 @@ struct OnboardingWindow: View {
     }
 
     private var runtimeHint: String {
-        if controller.runtime.isReady {
-            return "Всё на месте, расшифровка работает без интернета"
+        if controller.runtime.isSpeechModelReady {
+            return "Модель скачана, расшифровка работает без интернета"
         }
         if controller.runtime.isInstalling {
             return "Можно идти дальше, скачивание не прервётся"
@@ -216,7 +216,7 @@ struct OnboardingWindow: View {
 
     private var advanceTitle: String {
         switch step {
-        case 3 where !controller.runtime.isReady:
+        case 3 where !controller.runtime.isSpeechModelReady:
             "Пропустить"
         case Self.stepCount:
             "Готово"

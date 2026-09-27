@@ -18,7 +18,9 @@ the vendored Swift wrapper in `Vendor/TranscribeCpp`). No audio leaves the machi
 - **Runtime installer** — `RuntimeInstaller` (`@MainActor`) runs two resumable stages: `speechModel`
   downloads beside the target and moves the file in only after the hash matches; `warmUp` loads the model
   once and writes a marker naming the model. Switching models re-runs both. Models live in
-  `Application Support/Beseda/runtime/models`.
+  `Application Support/Beseda/runtime/models`. ASR availability and recording controls depend only on
+  the selected model file passing its installed-file check; a missing warm-up marker does not make the
+  model unavailable. Warm-up progress remains a separate installer state.
 - **Transcription** — `LocalTranscriber` loads the selected model on its serial queue, reads the 16 kHz
   mono file as Float32 through `SampleSource` one window at a time, cuts it with
   `UtteranceSplitter.forEachPiece` (at the quietest moment in the window tail; GigaAM windows, 120 s pieces

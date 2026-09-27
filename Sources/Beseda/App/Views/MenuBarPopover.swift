@@ -51,21 +51,9 @@ struct MenuBarPopover: View {
         }
     }
 
-    /// no speech model on disk and none coming down: a recording would end without text
+    /// Without the selected model, a recording would end without text.
     private var isSpeechModelMissing: Bool {
-        guard case .running = controller.runtime.state(of: .speechModel) else {
-            return !controller.runtime.isReady
-        }
-        return false
-    }
-
-    private var missingModelLine: String {
-        // the title above already says «Нет модели распознавания», so the line carries only the state
-        SpeechModel.stateLabel(
-            isSelected: true,
-            isDownloaded: controller.runtime.isDownloaded(controller.runtime.model),
-            isReady: controller.runtime.isReady
-        ) ?? ""
+        !controller.runtime.isSpeechModelReady
     }
 
     private var lastCall: StoredCallSummary? {
@@ -169,6 +157,9 @@ struct MenuBarPopover: View {
             if microphoneDenied {
                 return "Нет доступа к микрофону"
             }
+            if isSpeechModelMissing {
+                return "Откройте Настройки → Обработка и скачайте модель"
+            }
             return controller.settings.autoDetectEnabled
                 ? "Автозапись включена, ожидание звонка"
                 : "Автозапись выключена"
@@ -221,18 +212,6 @@ struct MenuBarPopover: View {
                 Toggle("Автозапись", isOn: Bindable(controller.settings).autoDetectEnabled)
                     .toggleStyle(.switch)
                     .controlSize(.small)
-            }
-            if isSpeechModelMissing {
-                HStack(spacing: 6) {
-                    Label(missingModelLine, systemImage: "exclamationmark.triangle.fill")
-                        .foregroundStyle(.orange)
-                    Spacer(minLength: 0)
-                    SettingsSectionLink(section: "processing", controller: controller) {
-                        Text("Открыть «Обработку»")
-                    }
-                    .buttonStyle(.link)
-                }
-                .font(.caption)
             }
             if controller.jobStage != nil {
                 Text("Разговор сохранён. Меню можно закрыть — расшифровка закончится в фоне.")

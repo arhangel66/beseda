@@ -389,7 +389,7 @@ private struct FailureBanner: View {
     let summary: StoredCallSummary
 
     private var isRuntimeMissing: Bool {
-        summary.error == BesedaError.runtimeMissingMessage && !controller.runtime.isReady
+        summary.error == BesedaError.runtimeMissingMessage && !controller.runtime.isSpeechModelReady
     }
 
     var body: some View {
