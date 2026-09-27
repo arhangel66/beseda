@@ -69,7 +69,7 @@ struct StoredCallSummary: Identifiable, Hashable {
         if let appName, !appName.isEmpty {
             return appName
         }
-        return kind == "mic" ? "Микрофон" : "Звонок"
+        return kind == "mic" ? ArchiveText.get("Микрофон") : ArchiveText.get("Звонок")
     }
 
     var isFromCalendar: Bool {
@@ -84,7 +84,7 @@ struct StoredCallSummary: Identifiable, Hashable {
             return title
         }
         if kind == "mic" {
-            return "Заметка с микрофона"
+            return ArchiveText.get("Заметка с микрофона")
         }
         guard let startedDate else {
             return appLabel
@@ -129,12 +129,12 @@ struct StoredCallSummary: Identifiable, Hashable {
     /// the sidebar's second line: what went wrong, or where the call came from
     var metaDescription: String {
         if isFailed {
-            return "не расшифрован · \(error ?? "ошибка")"
+            return ArchiveText.format("не расшифрован · %@", error.map { ArchiveText.displayError($0) } ?? ArchiveText.get("ошибка"))
         }
         if status != "ready" {
             return "\(appLabel) · \(statusLabel)"
         }
-        return "\(appLabel) · \(isDual ? "два канала" : "микрофон")"
+        return "\(appLabel) · \(isDual ? ArchiveText.get("два канала") : ArchiveText.get("микрофон"))"
     }
 
     /// the stored status in Russian: a call left mid-way by a crash still has to read as Russian
@@ -143,11 +143,11 @@ struct StoredCallSummary: Identifiable, Hashable {
     }
 
     private static let statusLabels = [
-        "recording": "записываю",
-        "normalizing": "готовлю запись",
-        "transcribing": "расшифровываю",
-        "ready": "готов",
-        "failed": "ошибка"
+        "recording": ArchiveText.get("записываю"),
+        "normalizing": ArchiveText.get("готовлю запись"),
+        "transcribing": ArchiveText.get("расшифровываю"),
+        "ready": ArchiveText.get("готов"),
+        "failed": ArchiveText.get("ошибка")
     ]
 
     var searchableText: String {
@@ -188,13 +188,13 @@ struct StoredJobStats: Hashable {
 
     var description: String {
         guard let realTimeFactor else {
-            return "\(String(format: "%.0f", wallTimeSec)) с"
+            return ArchiveText.format("%@ с", String(format: "%.0f", wallTimeSec))
         }
-        let wallTime = "расшифровка за \(String(format: "%.0f", wallTimeSec)) с"
+        let wallTime = ArchiveText.format("расшифровка за %@ с", String(format: "%.0f", wallTimeSec))
         guard realTimeFactor > 0 else {
             return wallTime
         }
-        return "\(wallTime) · в \(String(format: "%.0f", 1 / realTimeFactor)) раз быстрее записи"
+        return ArchiveText.format("%@ · в %@ раз быстрее записи", wallTime, String(format: "%.0f", 1 / realTimeFactor))
     }
 }
 
@@ -241,13 +241,13 @@ struct StoredWebhookDelivery: Identifiable, Hashable {
     var stateLabel: String {
         switch state {
         case "queued":
-            "в очереди"
+            ArchiveText.get("в очереди")
         case "sending":
-            "отправляю"
+            ArchiveText.get("отправляю")
         case "delivered":
-            "доставлено"
+            ArchiveText.get("доставлено")
         default:
-            "ошибка"
+            ArchiveText.get("ошибка")
         }
     }
 
@@ -256,13 +256,13 @@ struct StoredWebhookDelivery: Identifiable, Hashable {
         switch state {
         case "queued":
             if let date = nextRetryAt.flatMap(CallFormatting.parseISO8601) {
-                return "повтор в \(CallFormatting.clock(date))"
+                return ArchiveText.format("повтор в %@", CallFormatting.clock(date))
             }
             return ""
         case "delivered":
             return [httpStatus.map { "HTTP \($0)" }, responseAction].compactMap { $0 }.joined(separator: " · ")
         default:
-            return error ?? ""
+            return error.map { ArchiveText.displayError($0) } ?? ""
         }
     }
 }
@@ -824,7 +824,7 @@ final class CallStore: @unchecked Sendable {
         )
     }
 
-    /// nil title clears the link, so "Без события" is stored rather than left to the matcher
+    /// nil title clears the link, so ArchiveText.get("Без события") is stored rather than left to the matcher
     func setEvent(
         callID: String,
         title: String?,

@@ -34,11 +34,11 @@ struct CallSummaryView: View {
 
     private var empty: some View {
         VStack(spacing: 10) {
-            Button("Составить итоги", systemImage: "sparkles", action: onGenerate)
+            Button(ArchiveText.get("Составить итоги"), systemImage: "sparkles", action: onGenerate)
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
 
-            Text("Коротко: о чём говорили, о чём договорились и что осталось открытым.")
+            Text(ArchiveText.get("Коротко: о чём говорили, о чём договорились и что осталось открытым."))
                 .font(.callout)
                 .foregroundStyle(Color.secondary)
                 .multilineTextAlignment(.center)
@@ -52,9 +52,9 @@ struct CallSummaryView: View {
             ProgressView()
                 .controlSize(.small)
 
-            runningLine("Модель читает расшифровку")
+            runningLine(ArchiveText.get("Модель читает расшифровку"))
 
-            Button("Составить итоги", systemImage: "sparkles", action: onGenerate)
+            Button(ArchiveText.get("Составить итоги"), systemImage: "sparkles", action: onGenerate)
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
                 .disabled(true)
@@ -69,7 +69,7 @@ struct CallSummaryView: View {
             if let startedAt {
                 TimelineView(.periodic(from: startedAt, by: 1)) { timeline in
                     let elapsed = Int(timeline.date.timeIntervalSince(startedAt))
-                    Text(elapsed >= 10 ? "Модель ещё думает, первый раз это долго…" : "\(base)… \(elapsed) с")
+                    Text(elapsed >= 10 ? ArchiveText.get("Модель ещё думает, первый раз это долго…") : ArchiveText.format("%@… %d с", base, elapsed))
                 }
             } else {
                 Text("\(base)…")
@@ -91,10 +91,10 @@ struct CallSummaryView: View {
                 HStack(spacing: 8) {
                     ProgressView()
                         .controlSize(.small)
-                    runningLine("Итоги составляются заново")
+                    runningLine(ArchiveText.get("Итоги составляются заново"))
                 }
             } else {
-                Button("Составить заново", action: onGenerate)
+                Button(ArchiveText.get("Составить заново"), action: onGenerate)
                     .controlSize(.small)
             }
         }
@@ -117,10 +117,10 @@ struct CallSummaryView: View {
                 .padding(.top, 1)
 
             VStack(alignment: .leading, spacing: 8) {
-                Text("Итоги не получились")
+                Text(ArchiveText.get("Итоги не получились"))
                     .font(.body.weight(.semibold))
 
-                Text(message)
+                Text(ArchiveText.displayError(message))
                     .font(.callout)
                     .lineSpacing(3)
                     .foregroundStyle(Color.secondary)
@@ -129,7 +129,7 @@ struct CallSummaryView: View {
                 HStack(spacing: 8) {
                     recoveryButton
 
-                    Button("Повторить", action: onGenerate)
+                    Button(ArchiveText.get("Повторить"), action: onGenerate)
                         .disabled(isRunning)
                 }
             }
@@ -141,20 +141,20 @@ struct CallSummaryView: View {
     private var recoveryButton: some View {
         switch recovery {
         case .startServer:
-            Button("Запустить LM Studio", action: onRecover)
+            Button(ArchiveText.get("Запустить LM Studio"), action: onRecover)
                 .buttonStyle(.borderedProminent)
         case .downloadModel:
             // the download lives in Settings with its progress bar; a second one here would be a lie
             if let controller {
                 SettingsSectionLink(section: "processing", controller: controller) {
-                    Text("Скачать модель")
+                    Text(ArchiveText.get("Скачать модель"))
                 }
                 .buttonStyle(.borderedProminent)
             }
         case .openSettings:
             if let controller {
                 SettingsSectionLink(section: "processing", controller: controller) {
-                    Text("Открыть настройки")
+                    Text(ArchiveText.get("Открыть настройки"))
                 }
                 .buttonStyle(.borderedProminent)
             }
