@@ -546,8 +546,8 @@ final class CallStore: @unchecked Sendable {
             try fileManager.createDirectory(at: trashedFolder.deletingLastPathComponent(), withIntermediateDirectories: true)
             try fileManager.copyItem(at: folder, to: trashedFolder)
         }
-        // Legacy rows have no authoritative external path: the current selection may be unrelated.
-        let looseFiles = [call.transcriptURL, previousExport]
+        let legacyExport = previousExport == nil ? exportFolder?.appendingPathComponent(CallExport.fileName(call)) : nil
+        let looseFiles = [call.transcriptURL, previousExport, legacyExport]
         var movedFiles: [(from: URL, to: URL)] = []
         do {
             for url in looseFiles.compactMap({ $0 }) where fileManager.fileExists(atPath: url.path)
@@ -584,7 +584,9 @@ final class CallStore: @unchecked Sendable {
 
     private func savePendingCleanup(_ paths: [URL], id: String) throws {
         var pending = try loadPendingCleanup()
-        pending[id] = paths.map(\.path)
+        pending[id] = ((pending[id] ?? []) + paths.map(\.path)).reduce(into: [String]()) { result, path in
+            if !result.contains(path) { result.append(path) }
+        }
         try JSONEncoder().encode(pending).write(to: pendingCleanupURL, options: .atomic)
     }
 
@@ -594,15 +596,19 @@ final class CallStore: @unchecked Sendable {
     }
 
     /// A record is written before the row is removed. Never clean originals while its row exists.
-    func retryPendingCleanup(remove: (URL) throws -> Void = { try FileManager.default.removeItem(at: $0) }) throws {
+    func retryPendingCleanup(remove: (URL) throws -> Void = { try FileManager.default.removeItem(at: $0) },
+                             only retryID: String? = nil) throws {
         var pending = try loadPendingCleanup()
         for (id, paths) in pending {
-            guard try fetchCall(id: id) == nil else { continue }
+            if let retryID, id != retryID { continue }
+            let currentExport = try exportPath(callID: id)
+            if try fetchCall(id: id) != nil && (currentExport == nil || paths.contains(currentExport!) || paths.count != 1) { continue }
             for path in paths {
                 let url = URL(fileURLWithPath: path)
-                guard FileManager.default.fileExists(atPath: path) else { continue }
-                do { try remove(url) }
-                catch { throw ExportDeletionError.residual(path) }
+                if FileManager.default.fileExists(atPath: path) {
+                    do { try remove(url) }
+                    catch { throw ExportDeletionError.residual(path) }
+                }
             }
             pending.removeValue(forKey: id)
             try JSONEncoder().encode(pending).write(to: pendingCleanupURL, options: .atomic)
@@ -916,13 +922,18 @@ final class CallStore: @unchecked Sendable {
     }
 
     /// a renamed call is written under a new name: the copy under the old one goes, or it lingers
-    func replaceExportCopy(callID: String, with url: URL) throws {
-        if let oldPath = try exportPath(callID: callID), oldPath != url.path,
-           FileManager.default.fileExists(atPath: oldPath) {
-            try FileManager.default.removeItem(atPath: oldPath)
+    func replaceExportCopy(callID: String, with url: URL,
+                           withOldFolder: (String, () throws -> Void) throws -> Void = { _, body in try body() }) throws {
+        let oldPath = try exportPath(callID: callID)
+        if let oldPath, oldPath != url.path, FileManager.default.fileExists(atPath: oldPath) {
+            try savePendingCleanup([URL(fileURLWithPath: oldPath)], id: callID)
         }
         try database { db in
             try run(db, "UPDATE calls SET export_path = ? WHERE id = ?", url.path, callID)
+        }
+        guard let oldPath, oldPath != url.path, FileManager.default.fileExists(atPath: oldPath) else { return }
+        try withOldFolder(URL(fileURLWithPath: oldPath).deletingLastPathComponent().path) {
+            try retryPendingCleanup(only: callID)
         }
     }
 

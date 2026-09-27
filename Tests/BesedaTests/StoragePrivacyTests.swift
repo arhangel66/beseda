@@ -43,11 +43,39 @@ private func permissions(_ url: URL) throws -> Int {
     #expect(try store.fetchCall(id: "20260926-101500") == nil)
     #expect(try store.fetchSegments(callID: "20260926-101500").isEmpty)
     #expect(!FileManager.default.fileExists(atPath: callFolder.path))
-    #expect(FileManager.default.fileExists(atPath: exportCopy.path)) // legacy row has no authoritative export path
+    #expect(!FileManager.default.fileExists(atPath: exportCopy.path))
     for name in ["calls.sqlite", "calls.sqlite-wal"] {
         let bytes = (try? Data(contentsOf: root.appendingPathComponent(name))) ?? Data()
         #expect(bytes.range(of: Data("секретныйпланрелиза".utf8)) == nil)
     }
+}
+
+@Test func deniedOldExportKeepsNewPathAndRetries() throws {
+    let root = try temporaryDirectory()
+    let a = root.appendingPathComponent("A", isDirectory: true)
+    let b = root.appendingPathComponent("B", isDirectory: true)
+    try FileManager.default.createDirectory(at: a, withIntermediateDirectories: true)
+    try FileManager.default.createDirectory(at: b, withIntermediateDirectories: true)
+    let store = CallStore(dbURL: root.appendingPathComponent("calls.sqlite"))
+    try store.prepare()
+    try store.upsertCall(id: "id", kind: "dual", startedAt: Date(), endedAt: nil, durationSec: nil,
+                         status: "ready", transcriptURL: nil, audioDirectoryURL: root.appendingPathComponent("calls/id"),
+                         error: nil, appName: nil)
+    let old = a.appendingPathComponent("old.md")
+    let new = b.appendingPathComponent("new.md")
+    try Data("old".utf8).write(to: old)
+    try Data("new".utf8).write(to: new)
+    try store.replaceExportCopy(callID: "id", with: old)
+    struct Denied: Error {}
+    #expect(throws: Denied.self) {
+        try store.replaceExportCopy(callID: "id", with: new) { _, _ in throw Denied() }
+    }
+    #expect(try store.exportPath(callID: "id") == new.path)
+    #expect(FileManager.default.fileExists(atPath: old.path))
+    try store.replaceExportCopy(callID: "id", with: new) { _, remove in try remove() }
+    try store.retryPendingCleanup { url in try FileManager.default.removeItem(at: url) }
+    #expect(!FileManager.default.fileExists(atPath: old.path))
+    #expect(FileManager.default.fileExists(atPath: new.path))
 }
 
 @Test func protectedStorageIsOwnerOnlyForOldAndNewFiles() throws {
