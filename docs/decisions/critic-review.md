@@ -236,7 +236,10 @@ Effort is S (hours), M (days), or L (weeks). Priority is P0 (blocks safe sale or
     about 3 GB free, while the same page says the built-in model alone is 4.6 GB at lines 32-34, before ASR,
     runtime, temporary downloads and calls. State separate minimums for transcription-only and local-summary
     installs, including temporary download headroom, and enforce them before downloads.
-    Addressed in BESEDA-90: separate minimums in [install.md](../product/install.md); no free-space check before downloads.
+    Addressed in BESEDA-90: separate minimums in [install.md](../product/install.md).
+    Fixed in BESEDA-122: the speech model and the built-in summary installers check
+    `volumeAvailableCapacityForImportantUsage` against the model size plus 500 MB before downloading
+    and show how much is needed instead of starting.
 
 ## Anything else
 

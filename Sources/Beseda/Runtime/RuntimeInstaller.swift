@@ -24,6 +24,30 @@ typealias RuntimeDownloader = @Sendable (
     _ onProgress: @escaping @Sendable (Double) -> Void
 ) async throws -> Void
 
+/// Bytes the volume holding a folder can still take; nil when it cannot be read. Injected for tests.
+typealias FreeSpaceReader = @Sendable (URL) -> Int64?
+
+enum FreeSpace {
+    /// headroom for the engine archive and the first calls on top of the model itself
+    static let margin: Int64 = 500_000_000
+
+    static let read: FreeSpaceReader = { directory in
+        try? directory.resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey])
+            .volumeAvailableCapacityForImportantUsage
+    }
+
+    /// Throws before a download of `bytes` into `directory` that the disk cannot hold.
+    static func ensure(_ bytes: Int64, in directory: URL, reader: FreeSpaceReader) throws {
+        let needed = bytes + margin
+        guard let available = reader(directory), available < needed else {
+            return
+        }
+        throw BesedaError.processFailed(
+            "Не хватает места на диске: для загрузки нужно \(needed.byteSizeDescription), свободно \(available.byteSizeDescription). Освободите место и повторите."
+        )
+    }
+}
+
 @MainActor
 @Observable
 final class RuntimeInstaller {
@@ -35,17 +59,20 @@ final class RuntimeInstaller {
     @ObservationIgnored var log: (String) -> Void = { _ in }
     @ObservationIgnored private let paths: AppPaths
     @ObservationIgnored private let downloader: RuntimeDownloader
+    @ObservationIgnored private let freeSpace: FreeSpaceReader
     @ObservationIgnored private let warmUp: () async throws -> Void
 
     init(
         paths: AppPaths,
         model: SpeechModel = .default,
         downloader: @escaping RuntimeDownloader = FileDownloader.download,
+        freeSpace: @escaping FreeSpaceReader = FreeSpace.read,
         warmUp: @escaping () async throws -> Void
     ) {
         self.paths = paths
         self.model = model
         self.downloader = downloader
+        self.freeSpace = freeSpace
         self.warmUp = warmUp
         refresh()
     }
@@ -155,6 +182,7 @@ final class RuntimeInstaller {
     private func download(_ model: SpeechModel) async throws {
         let directory = paths.modelsDirectory
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        try FreeSpace.ensure(model.bytes, in: directory, reader: freeSpace)
         let target = model.localURL(in: directory)
         let partial = target.appendingPathExtension("partial")
         try? FileManager.default.removeItem(at: partial)
