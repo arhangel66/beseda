@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Assembles and signs Beseda.app from a SwiftPM bin dir.
-# Usage: bundle_app.sh <bin-dir> <app-dir> [release|screenshot]
+# Usage: bundle_app.sh <bin-dir> <app-dir> [release|screenshot|store]
 # Only a release bundle gets the Sparkle keys: a dev build with a feed URL would
 # replace itself with the published version at the next scheduled check.
 set -euo pipefail
@@ -36,15 +36,24 @@ fi
 # the speech engine and Sparkle ship as dynamic frameworks the binary loads through @rpath
 mkdir -p "$APP_DIR/Contents/Frameworks" "$APP_DIR/Contents/Resources/licenses"
 cp -R "$BIN_DIR/CTranscribe.framework" "$APP_DIR/Contents/Frameworks/"
-cp -R "$BIN_DIR/Sparkle.framework" "$APP_DIR/Contents/Frameworks/"
+if [ "$FLAVOR" != "store" ]; then
+    cp -R "$BIN_DIR/Sparkle.framework" "$APP_DIR/Contents/Frameworks/"
+fi
 install_name_tool -add_rpath "@executable_path/../Frameworks" "$APP_DIR/Contents/MacOS/Beseda"
 cp "$ROOT/Vendor/TranscribeCpp/LICENSE" "$APP_DIR/Contents/Resources/licenses/transcribe-cpp-LICENSE-MIT"
-cp "$ROOT/.build/artifacts/sparkle/Sparkle/LICENSE" "$APP_DIR/Contents/Resources/licenses/sparkle-LICENSE"
+if [ "$FLAVOR" != "store" ]; then
+    cp "$ROOT/.build/artifacts/sparkle/Sparkle/LICENSE" "$APP_DIR/Contents/Resources/licenses/sparkle-LICENSE"
+fi
 # actool turns the Icon Composer source into both the macOS 26 icon (Assets.car) and the
 # plain AppIcon.icns older systems fall back to
 xcrun actool "$ROOT/Sources/Beseda/Resources/AppIcon.icon" --compile "$APP_DIR/Contents/Resources" \
     --platform macosx --minimum-deployment-target 14.2 --app-icon AppIcon \
     --output-partial-info-plist "$ROOT/.build/appicon-partial.plist" > /dev/null
+
+# The store helper packaging script signs the assembled app after embedding its helper.
+if [ "$FLAVOR" = "store" ]; then
+    exit 0
+fi
 
 # Screenshot copies must never consult the keychain: a locked Developer ID private key makes
 # codesign wait for a password dialog. Other flavours retain their release-capable signing path.

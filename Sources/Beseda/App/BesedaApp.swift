@@ -89,11 +89,13 @@ struct BesedaApp: App {
                 Button("О Беседе") {
                     NSApplication.shared.orderFrontStandardAboutPanel(nil)
                 }
+                #if !BESEDA_STORE
                 if controller.updater.isAvailable {
                     Button("Проверить обновления…") {
                         controller.updater.checkForUpdates()
                     }
                 }
+                #endif
             }
             // the menu items do not read app state: a commands builder is not guaranteed to
             // re-evaluate on observation changes, so each action decides at the moment it runs

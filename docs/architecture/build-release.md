@@ -15,6 +15,25 @@ transcribe.cpp as the `CTranscribe` binary xcframework (pinned v0.2.3 with check
 never walks the rest of the checkout, so no `exclude` list is needed and `.factory/`, `untracked/` or a
 scratch folder at the root do not slow the build.
 
+## Private store artifact (BESEDA-257)
+
+`BESEDA_STORE=1 swift build --jobs 2 --scratch-path .build/store` selects a manifest without
+Sparkle and excludes `Runtime/AppUpdater.swift`. The store compile flag removes update commands
+and settings; the direct build (`swift build --jobs 2`) retains them. Keep separate scratch paths:
+SwiftPM reuses object paths when only the manifest environment changes.
+
+`scripts/build_store_app.sh <pinned-llama-archive.tar.gz> <signing-identity>` builds and assembles
+`.build/Beseda-store.app`, then invokes `package_store_summary.sh` to embed and sign the pinned
+helper. This is a private artifact, not an App Store upload. Store assembly omits Sparkle framework,
+license, feed and SU keys. The app signature uses `scripts/store_summary_app.entitlements`: sandbox,
+network client, microphone, calendars and user-selected read/write only. The helper keeps its own
+entitlements. The direct release assembly and feed are unchanged.
+
+Verified locally: both flavor builds with `--jobs 2`. Parked: assembled bundle signature and
+resource assertions until the exact pinned helper archive is available; no app launch, sandbox
+capture, Apple provisioning, TestFlight or review was attempted. A build alone is not proof of
+sandbox compatibility.
+
 ## Check
 
 `swift test --jobs 2` (from `AGENTS.md`) builds the app and runs every test except the heavy ones gated by

@@ -1,6 +1,9 @@
 // swift-tools-version: 6.0
 
 import PackageDescription
+import Foundation
+
+let store = ProcessInfo.processInfo.environment["BESEDA_STORE"] == "1"
 
 let package = Package(
     name: "Beseda",
@@ -11,9 +14,10 @@ let package = Package(
         .executable(name: "Beseda", targets: ["Beseda"])
     ],
     dependencies: [
-        .package(url: "https://github.com/FluidInference/FluidAudio.git", from: "0.17.4"),
+        .package(url: "https://github.com/FluidInference/FluidAudio.git", from: "0.17.4")
+    ] + (store ? [] : [
         .package(url: "https://github.com/sparkle-project/Sparkle", from: "2.9.6")
-    ],
+    ]),
     targets: [
         // transcribe.cpp's native library, pinned to the release the vendored wrapper was taken from
         .binaryTarget(
@@ -39,12 +43,15 @@ let package = Package(
             name: "Beseda",
             dependencies: [
                 .product(name: "FluidAudio", package: "FluidAudio"),
-                .product(name: "Sparkle", package: "Sparkle"),
                 "TranscribeCpp"
-            ],
+            ] + (store ? [] : [
+                .product(name: "Sparkle", package: "Sparkle")
+            ]),
+            exclude: store ? ["Runtime/AppUpdater.swift"] : [],
             resources: [
                 .copy("Resources")
             ],
+            swiftSettings: store ? [.define("BESEDA_STORE")] : [],
             linkerSettings: [
                 .linkedFramework("AVFAudio"),
                 .linkedFramework("EventKit"),

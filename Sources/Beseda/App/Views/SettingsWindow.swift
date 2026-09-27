@@ -126,6 +126,7 @@ private struct GeneralPane: View {
                 Text(loginItemNote ?? SettingsText.get("Беседа ждёт звонка в строке меню и не показывается в Dock."))
             }
 
+            #if !BESEDA_STORE
             Section(SettingsText.get("Обновления")) {
                 if updater.isAvailable {
                     Toggle(SettingsText.get("Устанавливать обновления автоматически"), isOn: Binding(
@@ -146,16 +147,21 @@ private struct GeneralPane: View {
                         .foregroundStyle(.secondary)
                 }
             }
+            #else
+            LabeledContent(SettingsText.get("Версия"), value: updater.version)
+            #endif
         }
         .formStyle(.grouped)
     }
 
+    #if !BESEDA_STORE
     private var lastCheckNote: String {
         guard let date = updater.lastCheckDate else {
             return SettingsText.get("ещё не было")
         }
         return date.formatted(date: .abbreviated, time: .shortened)
     }
+    #endif
 
     private var isLoginItemOn: Bool {
         loginItemStatus == .enabled || loginItemStatus == .requiresApproval
