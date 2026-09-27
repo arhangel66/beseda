@@ -37,11 +37,11 @@ struct PreviousCallBlock: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 6) {
-                Label("В прошлый раз · \(content.dateLine)", systemImage: "clock.arrow.circlepath")
+                Label(String(format: ArchiveText.get("В прошлый раз · %@"), content.dateLine), systemImage: "clock.arrow.circlepath")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
                 // right beside the label: on a wide pane a trailing button drifts far from what it opens
-                Button("Открыть") { open(content.callID) }
+                Button(ArchiveText.get("Открыть")) { open(content.callID) }
                     .buttonStyle(.link)
                     .font(.caption)
             }
@@ -51,7 +51,7 @@ struct PreviousCallBlock: View {
                 .lineLimit(lineLimit)
                 .textSelection(.enabled)
             if digestLineLimit == nil {
-                Button(isExpanded ? "Свернуть" : "Показать полностью") { isExpanded.toggle() }
+                Button(ArchiveText.get(isExpanded ? "Свернуть" : "Показать полностью")) { isExpanded.toggle() }
                     .buttonStyle(.link)
                     .font(.caption)
             }
