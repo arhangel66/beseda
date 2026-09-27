@@ -115,6 +115,7 @@ final class AppController {
     @ObservationIgnored private let diarizationQueue = DiarizationQueue()
     /// one background download per launch; a failed or cancelled one is redone by processing
     @ObservationIgnored private(set) var diarizerPrefetch: Task<Void, Never>?
+    private(set) var diarizerPrefetchStatus: String?
     @ObservationIgnored private var speakerResplit: Task<Void, Never>?
     /// Settings → Обработка: old calls whose remote speakers the current diarizer has redone
     private(set) var speakerResplitProgress: (done: Int, total: Int)?
@@ -292,7 +293,7 @@ final class AppController {
                 paths: paths,
                 store: callStore
             )
-            let sweptDirectories = try callStore.failInterruptedCalls(reason: "Interrupted before the app restarted")
+            let sweptDirectories = try callStore.failInterruptedCalls(reason: "Обработка прервалась при перезапуске приложения")
             if !sweptDirectories.isEmpty {
                 appendLog("Marked \(sweptDirectories.count) interrupted call(s) as failed")
             }
@@ -701,7 +702,9 @@ final class AppController {
             return
         }
         let diarizer = diarizer
+        diarizerPrefetchStatus = "Скачивается модель разбора голосов…"
         diarizerPrefetch = Task(priority: .background) { [weak self] in
+            defer { self?.diarizerPrefetchStatus = nil }
             do {
                 try await self?.diarizationQueue.perform(priority: .background) {
                     try await diarizer.download()

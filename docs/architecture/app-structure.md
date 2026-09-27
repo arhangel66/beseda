@@ -35,6 +35,14 @@ and keeps the app alive when the last window closes; `applicationWillTerminate` 
 `ready`, `failed`). `runRetry` reruns a failed call from its saved audio (`mic` or `dual` kind), skipping
 capture.
 
+**User-visible status audit (BESEDA-184).** The interrupted-call error stored in the archive was the one
+confirmed English status and now says «Обработка прервалась при перезапуске приложения». Diagnostic log
+lines remain English because users do not see them. Error details supplied by macOS, SQLite, model runtimes
+and servers remain as `localizedDescription`: replacing them without a confirmed translation would hide the
+concrete failure and recovery clue. Webhook delivery history keeps its existing English interruption detail;
+it is owned by `WebhookService`, not an `AppController` status, and changing its persisted contract was left
+out deliberately.
+
 ## Windows and views (`Sources/Beseda/App/Views/`)
 
 - **Menu bar popover** — `MenuBarPopover`: status, record/pause/stop, the latest call, commands.

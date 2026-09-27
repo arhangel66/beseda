@@ -49,6 +49,16 @@ struct MenuBarPopover: View {
             }
             .accessibilityElement(children: .combine)
         }
+        if let status = controller.diarizerPrefetchStatus {
+            HStack(spacing: 8) {
+                ProgressView()
+                    .controlSize(.small)
+                Text(status)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .accessibilityElement(children: .combine)
+        }
     }
 
     /// Without the selected model, a recording would end without text.

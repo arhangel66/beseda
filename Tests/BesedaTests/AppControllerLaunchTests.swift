@@ -201,7 +201,7 @@ private func line(_ speaker: String) -> SpeakerTranscriptSegment {
 
     let call = try #require(try harness.store.fetchCall(id: "call"))
     #expect(call.status == "failed")
-    #expect(call.error?.contains("Interrupted") == true)
+    #expect(call.error?.contains("Обработка прервалась при перезапуске приложения") == true)
     #expect(call.error?.contains("them.raw.wav") == true)
 }
 
@@ -396,7 +396,7 @@ func aRecordingKilledMidCallIsReadableAndFailedAfterRelaunch() async throws {
 
     let call = try #require(try harness.store.fetchCall(id: killedCallID))
     #expect(call.status == "failed")
-    #expect(call.error?.contains("Interrupted") == true)
+    #expect(call.error?.contains("Обработка прервалась при перезапуске приложения") == true)
     #expect(call.error?.contains(".raw.wav") == false)
     #expect(controller.recentCalls.map(\.id) == [killedCallID])
     for name in ["me.raw.wav", "them.raw.wav"] {
@@ -490,9 +490,11 @@ private final class DownloadLog: @unchecked Sendable {
     let controller = harness.controller(
         diarizer: Diarizer(paths: harness.paths, downloader: downloads.downloader(), freeSpace: { _ in nil })
     )
+    #expect(controller.diarizerPrefetchStatus == "Скачивается модель разбора голосов…")
     await controller.diarizerPrefetch?.value
 
     #expect(downloads.count == 1)
+    #expect(controller.diarizerPrefetchStatus == nil)
 }
 
 @MainActor
@@ -506,5 +508,6 @@ private final class DownloadLog: @unchecked Sendable {
     )
 
     #expect(controller.diarizerPrefetch == nil)
+    #expect(controller.diarizerPrefetchStatus == nil)
     #expect(downloads.count == 0)
 }

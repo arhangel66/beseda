@@ -35,7 +35,8 @@ the vendored Swift wrapper in `Vendor/TranscribeCpp`). No audio leaves the machi
   (five files, pinned to one Hub revision) download into `runtime/models/nemotron-3-diarization/`, each file
   checked by size and sha256 after a free-space check: at background priority after launch once the speech
   model is on disk (or right after a model is picked), never started during a recording and cancelled when one
-  starts; a failed or cancelled fetch is redone on the first diarized call, with progress on the
+  starts; while this prefetch runs, the menu shows an indeterminate «Скачивается модель разбора голосов…»
+  line. A failed or cancelled fetch is redone on the first diarized call, with progress on the
   «Подготовка разбора голосов» stage. The app never reads FluidAudio's own cache
   (`~/Library/Application Support/FluidAudio/Models`): models an earlier version left there are dead weight. `SpeakerAssignment.remoteTurns` labels each sentence (`them-1`,
   `them-2`…) with the speaker of the diarizer segment it overlaps most, or the nearest one when it lies
