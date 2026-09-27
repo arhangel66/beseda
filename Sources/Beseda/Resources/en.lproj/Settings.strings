@@ -183,3 +183,4 @@
 "Summary server returned HTTP %d. Check the server and try again." = "Summary server returned HTTP %d. Check the server and try again.";
 
 "Выберите папку экспорта снова в настройках" = "Select the export folder again in Settings";
+"Для удаления старой копии выберите прежнюю папку и повторите удаление. Затем можно вернуть текущую папку." = "To delete an old copy, select its previous folder and retry deletion. You can then restore the current folder.";

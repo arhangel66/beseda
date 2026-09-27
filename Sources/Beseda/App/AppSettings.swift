@@ -74,6 +74,7 @@ final class AppSettings {
     private let autoProcessCallsKey = "beseda.autoProcessCalls"
     private let exportFolderKey = "beseda.exportFolder"
     private let exportBookmarkKey = "beseda.exportBookmark"
+    private let exportBookmarksKey = "beseda.exportBookmarks"
     private let webhookEnabledKey = "beseda.webhookEnabled"
     private let webhookURLKey = "beseda.webhookURL"
     private let webhookSecretKey = "beseda.webhookSecret"
@@ -271,14 +272,23 @@ final class AppSettings {
         if sandboxed {
             let bookmark = try url.bookmarkData(options: .withSecurityScope, includingResourceValuesForKeys: nil, relativeTo: nil)
             defaults.set(bookmark, forKey: exportBookmarkKey)
+            var bookmarks = defaults.dictionary(forKey: exportBookmarksKey) as? [String: Data] ?? [:]
+            bookmarks[url.standardizedFileURL.path] = bookmark
+            defaults.set(bookmarks, forKey: exportBookmarksKey)
         }
         exportFolder = url.path
         exportNeedsReselection = false
     }
 
     func withExportFolder<T>(_ body: (URL) throws -> T) throws -> T {
-        if !sandboxed { return try body(URL(fileURLWithPath: exportFolder)) }
-        guard let bookmark = defaults.data(forKey: exportBookmarkKey) else {
+        try withExportFolder(at: exportFolder, body)
+    }
+
+    func withExportFolder<T>(at path: String, _ body: (URL) throws -> T) throws -> T {
+        if !sandboxed { return try body(URL(fileURLWithPath: path)) }
+        let bookmarks = defaults.dictionary(forKey: exportBookmarksKey) as? [String: Data] ?? [:]
+        guard let bookmark = bookmarks[URL(fileURLWithPath: path).standardizedFileURL.path]
+            ?? (path == exportFolder ? defaults.data(forKey: exportBookmarkKey) : nil) else {
             exportNeedsReselection = true
             throw ExportAccessError.reselect
         }
@@ -291,14 +301,18 @@ final class AppSettings {
             exportNeedsReselection = true
             throw ExportAccessError.reselect
         }
-        guard url.startAccessingSecurityScopedResource() else {
+        guard url.standardizedFileURL.path == URL(fileURLWithPath: path).standardizedFileURL.path,
+              url.startAccessingSecurityScopedResource() else {
             exportNeedsReselection = true
             throw ExportAccessError.reselect
         }
         defer { url.stopAccessingSecurityScopedResource() }
         if stale {
             if let renewed = try? url.bookmarkData(options: .withSecurityScope, includingResourceValuesForKeys: nil, relativeTo: nil) {
-                defaults.set(renewed, forKey: exportBookmarkKey)
+                var bookmarks = defaults.dictionary(forKey: exportBookmarksKey) as? [String: Data] ?? [:]
+                bookmarks[url.standardizedFileURL.path] = renewed
+                defaults.set(bookmarks, forKey: exportBookmarksKey)
+                if path == exportFolder { defaults.set(renewed, forKey: exportBookmarkKey) }
             } else {
                 exportNeedsReselection = true
             }
