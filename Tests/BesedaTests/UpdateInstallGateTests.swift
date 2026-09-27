@@ -1,3 +1,4 @@
+#if !BESEDA_STORE
 import Testing
 
 @testable import Beseda
@@ -30,3 +31,4 @@ import Testing
 
     gate.recordingDidStop()
 }
+#endif

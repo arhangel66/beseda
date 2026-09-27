@@ -20,7 +20,9 @@ scratch folder at the root do not slow the build.
 `BESEDA_STORE=1 swift build --jobs 2 --scratch-path .build/store` selects a manifest without
 Sparkle and excludes `Runtime/AppUpdater.swift`. The store compile flag removes update commands
 and settings; the direct build (`swift build --jobs 2`) retains them. Keep separate scratch paths:
-SwiftPM reuses object paths when only the manifest environment changes.
+SwiftPM reuses object paths when only the manifest environment changes. The store test target
+also receives `BESEDA_STORE`, so direct-only `UpdateInstallGateTests` are not compiled against
+the excluded updater; direct builds retain those tests.
 
 `scripts/build_store_app.sh <pinned-llama-archive.tar.gz> <signing-identity>` builds and assembles
 `.build/Beseda-store.app`, then invokes `package_store_summary.sh` to embed and sign the pinned
@@ -31,16 +33,18 @@ entitlements. The direct release assembly and feed are unchanged.
 
 Verified locally: both flavor builds with `--jobs 2`; pinned b10819 archive SHA-256
 `8933e736495eadfef0731ae32054acfaa75699bf4a6ccba77cd8475db085ec66`.
-Private ad-hoc artifact: `.build/Beseda-store.app` (this worktree only). Its resource bundle lives
+Private ad-hoc artifact from the earlier assembly check: `.build/Beseda-store.app` in that check's worktree only (not a distributable artifact). Its resource bundle lives
 at `Contents/Resources/Beseda_Beseda.bundle`, with `Resources/en.lproj/Menu.strings` inside.
 SwiftPM generates an accessor that looks beside the app root; store calls instead use
 `Bundle.besedaResources` to resolve `Bundle.main.resourceURL` while direct calls continue to use
-SwiftPM's generated accessor. Shell stubs reject missing resources and stray root content.
+SwiftPM's generated accessor. When running the store executable target under SwiftPM tests,
+`Bundle.besedaResources` falls back to `.module` because the test runner has no app resource URL.
+Shell stubs reject missing resources and stray root content.
 The assembled app passes `codesign --verify --strict --deep`; its helper has sandbox inheritance,
 and app entitlements include sandbox, network client, microphone, calendars and user-selected
 read/write. No Sparkle framework, feed or SU keys are present. Runtime resource lookup remains
 parked: no app launch, sandbox capture, Apple provisioning, TestFlight or review was attempted.
-A build alone is not proof of sandbox compatibility.
+These are assembled ad-hoc signature and resource checks, not provisioned signing or sandbox runtime evidence. A build alone is not proof of sandbox compatibility.
 
 ## Check
 

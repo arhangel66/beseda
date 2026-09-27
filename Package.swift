@@ -63,7 +63,8 @@ let package = Package(
         ),
         .testTarget(
             name: "BesedaTests",
-            dependencies: ["Beseda"]
+            dependencies: ["Beseda"],
+            swiftSettings: store ? [.define("BESEDA_STORE")] : []
         )
     ]
 )
