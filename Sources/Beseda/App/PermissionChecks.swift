@@ -36,6 +36,10 @@ final class PermissionsModel {
             return
         }
 
+        if IsolatedCopy.skips("AVAudioApplication.requestRecordPermission") {
+            microphone = .denied("Доступ к микрофону не выдан")
+            return
+        }
         microphone = .checking
         let granted = await withCheckedContinuation { continuation in
             AVAudioApplication.requestRecordPermission { continuation.resume(returning: $0) }

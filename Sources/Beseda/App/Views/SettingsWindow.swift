@@ -173,6 +173,9 @@ private struct GeneralPane: View {
 
     private func setLoginItem(_ enabled: Bool) {
         loginItemError = nil
+        if IsolatedCopy.skips("SMAppService.mainApp.register") {
+            return
+        }
         do {
             if enabled {
                 try SMAppService.mainApp.register()

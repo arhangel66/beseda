@@ -40,6 +40,9 @@ final class CalendarService {
     }
 
     func requestAccess() async {
+        if IsolatedCopy.skips("EKEventStore.requestFullAccessToEvents") {
+            return
+        }
         // macOS 14 split calendar access in two, and reading events needs the full kind
         _ = try? await store.requestFullAccessToEvents()
         authorization = EKEventStore.authorizationStatus(for: .event)

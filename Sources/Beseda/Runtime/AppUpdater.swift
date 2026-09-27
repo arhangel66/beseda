@@ -63,7 +63,7 @@ final class AppUpdater: NSObject {
 
     func checkForUpdates() {
         // an LSUIElement agent is not active, so Sparkle's panel would open behind other windows
-        NSApplication.shared.activate(ignoringOtherApps: true)
+        IsolatedCopy.activateApp()
         controller?.checkForUpdates(nil)
     }
 
