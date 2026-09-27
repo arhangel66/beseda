@@ -179,4 +179,5 @@
 "Retry at %@" = "Retry at %@";
 "Service rejected the request: HTTP %@" = "Service rejected the request: HTTP %@";
 "Service did not respond within %@" = "Service did not respond within %@ seconds";
-"Service responded %@" = "Service responded %@";
+"Webhook response %d%@ in %@ seconds" = "Service responded %d%@ in %@ seconds";
+"Summary server returned HTTP %d. Check the server and try again." = "Summary server returned HTTP %d. Check the server and try again.";
