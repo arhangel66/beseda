@@ -4,7 +4,6 @@ import SwiftUI
 struct SpeakerLane: Identifiable {
     let speaker: String
     let label: String
-    let initial: String
     let style: SpeakerStyle
     /// start and width as fractions of the call, ready to draw without touching the segments again
     let bars: [(start: Double, width: Double)]
@@ -53,7 +52,6 @@ struct SpeakerLane: Identifiable {
                 SpeakerLane(
                     speaker: speaker,
                     label: SpeakerNaming.name(for: speaker, overrides: names),
-                    initial: SpeakerNaming.initial(for: speaker, overrides: names),
                     style: .of(speaker: speaker),
                     bars: bars[speaker] ?? [],
                     share: talk[speaker] ?? 0
@@ -68,10 +66,11 @@ struct PlayerBar: View {
     let player: CallPlayer
 
     @State private var lanes: [SpeakerLane] = []
+    @State private var renamedSpeaker: String?
+    @State private var draftName = ""
 
     private static let legendGap: CGFloat = 12
     private static let avatarSize: CGFloat = 20
-    private static let avatarOverlap: CGFloat = 4
 
     private var duration: TimeInterval {
         player.duration > 0 ? player.duration : detail.summary.duration
@@ -157,22 +156,65 @@ struct PlayerBar: View {
         )
     }
 
-    /// Krisp's row of initials: who is in the call, hover for the name and share.
+    /// who is in the call, each a named control: the name beside its colour, rename and merge in its menu
     private var legend: some View {
-        HStack(spacing: -Self.avatarOverlap) {
+        HStack(spacing: 10) {
             ForEach(lanes) { lane in
-                Text(lane.initial)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(lane.style.ink)
-                    .frame(width: Self.avatarSize, height: Self.avatarSize)
-                    .background(lane.style.soft, in: .circle)
-                    .overlay {
-                        Circle().strokeBorder(Color(nsColor: .windowBackgroundColor), lineWidth: 1.5)
+                Menu {
+                    Button("Переименовать…") { startRenaming(lane.speaker) }
+                    let targets = mergeTargets(for: lane.speaker)
+                    if !targets.isEmpty {
+                        Menu("Объединить с") {
+                            ForEach(targets) { target in
+                                Button(target.label) { controller.mergeSpeaker(lane.speaker, into: target.speaker) }
+                            }
+                        }
                     }
-                    .help("\(lane.label) · \(Int((lane.share * 100).rounded()))%")
-                    .accessibilityLabel("\(lane.label), \(Int((lane.share * 100).rounded()))% разговора")
+                } label: {
+                    HStack(spacing: 5) {
+                        Circle()
+                            .fill(lane.style.bar)
+                            .frame(width: 8, height: 8)
+                        Text(lane.label)
+                            .font(.caption)
+                            .lineLimit(1)
+                    }
+                }
+                .menuStyle(.borderlessButton)
+                .fixedSize()
+                .help("\(lane.label) · \(Int((lane.share * 100).rounded()))% разговора")
+                .accessibilityLabel("\(lane.label), \(Int((lane.share * 100).rounded()))% разговора")
             }
         }
+        .alert("Как зовут участника?", isPresented: isRenaming) {
+            TextField("Имя", text: $draftName)
+            Button("Отмена", role: .cancel) { renamedSpeaker = nil }
+            Button("Сохранить") {
+                if let renamedSpeaker {
+                    controller.renameSpeaker(renamedSpeaker, to: draftName)
+                }
+                renamedSpeaker = nil
+            }
+        } message: {
+            Text("Имя видно только в этом разговоре.")
+        }
+    }
+
+    /// `me` is never merged, so only a remote speaker gets the other remote speakers
+    private func mergeTargets(for speaker: String) -> [SpeakerLane] {
+        guard SpeakerNaming.remoteIndex(of: speaker) != nil else {
+            return []
+        }
+        return lanes.filter { $0.speaker != speaker && SpeakerNaming.remoteIndex(of: $0.speaker) != nil }
+    }
+
+    private var isRenaming: Binding<Bool> {
+        Binding(get: { renamedSpeaker != nil }, set: { if !$0 { renamedSpeaker = nil } })
+    }
+
+    private func startRenaming(_ speaker: String) {
+        draftName = detail.speakerNames[speaker] ?? ""
+        renamedSpeaker = speaker
     }
 
     private var missingAudioNote: some View {

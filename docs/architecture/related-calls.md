@@ -35,6 +35,7 @@ the sections **Договорились**, **Кто что делает**, **О�
 (`ChatCompletionsProvider.defaultPrompt`), or **Главное**, **Что делать** of the one before BESEDA-94,
 with their headings. A result without **Договорились**, **Кто что делает** or **Что делать** came from a
 custom prompt, even if it has **Открытые вопросы**: `PreviousRelatedCall` then
-carries the whole summary with `isWholeSummary`, and `PreviousCallBlock` shows four lines (fewer if the
-place asks) with «Показать полностью». No structured fields are stored. No summary — nil, and the call is
+carries the whole summary with `isWholeSummary`. Either way the call screen's `PreviousCallBlock` starts
+collapsed to its header and one line, so the current result is the first whole document; «Показать
+полностью» / «Свернуть» toggle it (BESEDA-156, never hidden). The sidebar keeps three lines. No structured fields are stored. No summary — nil, and the call is
 not offered at all.

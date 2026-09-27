@@ -108,3 +108,49 @@ import Testing
 
     #expect(try store.fetchSegments(callID: "call-1").map(\.speaker) == ["me", "them-1", "them-2"])
 }
+
+@Test func aRenameSurvivesARerunOfTheSameDiarizerAndReachesTheFile() throws {
+    let directory = FileManager.default.temporaryDirectory
+        .appendingPathComponent("beseda-rename-rerun-\(UUID().uuidString)", isDirectory: true)
+    try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: directory) }
+    let store = CallStore(dbURL: directory.appendingPathComponent("calls.sqlite"))
+    try store.prepare()
+    try store.upsertCall(
+        id: "call-1", kind: "dual", startedAt: Date(), endedAt: nil, durationSec: 60, status: "transcribing",
+        transcriptURL: nil, audioDirectoryURL: directory, error: nil, appName: nil
+    )
+    let transcriptURL = directory.appendingPathComponent("transcript.md")
+    let diarized = ["me", "them-1"].enumerated().map {
+        StoredTranscriptSegment(speaker: $1, startSec: Double($0), endSec: Double($0) + 1, text: "t", orderIndex: $0)
+    }
+    try store.markReady(callID: "call-1", transcriptURL: transcriptURL, diarizer: Diarizer.id, segments: diarized)
+    try store.setSpeakerName(callID: "call-1", speakerKey: "them-1", displayName: "Аня")
+    try "## Dialogue\n\n**Собеседник 1** [00:01] t\n\n## Channels\n".write(to: transcriptURL, atomically: true, encoding: .utf8)
+
+    try store.markReady(callID: "call-1", transcriptURL: transcriptURL, diarizer: Diarizer.id, segments: diarized)
+
+    #expect(try store.fetchSpeakerNames(callID: "call-1") == ["them-1": "Аня"])
+    #expect(try String(contentsOf: transcriptURL, encoding: .utf8).contains("**Аня**"))
+}
+
+@Test func aRenameIsDroppedWhenAnotherDiarizerRelabelsTheCall() throws {
+    let directory = FileManager.default.temporaryDirectory
+        .appendingPathComponent("beseda-rename-diarizer-\(UUID().uuidString)", isDirectory: true)
+    try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: directory) }
+    let store = CallStore(dbURL: directory.appendingPathComponent("calls.sqlite"))
+    try store.prepare()
+    try store.upsertCall(
+        id: "call-1", kind: "dual", startedAt: Date(), endedAt: nil, durationSec: 60, status: "transcribing",
+        transcriptURL: nil, audioDirectoryURL: directory, error: nil, appName: nil
+    )
+    let transcriptURL = directory.appendingPathComponent("transcript.md")
+    let diarized = [StoredTranscriptSegment(speaker: "them-1", startSec: 0, endSec: 1, text: "t", orderIndex: 0)]
+    try store.markReady(callID: "call-1", transcriptURL: transcriptURL, segments: diarized)
+    try store.setSpeakerName(callID: "call-1", speakerKey: "them-1", displayName: "Аня")
+
+    try store.markReady(callID: "call-1", transcriptURL: transcriptURL, diarizer: Diarizer.id, segments: diarized)
+
+    #expect(try store.fetchSpeakerNames(callID: "call-1").isEmpty)
+}

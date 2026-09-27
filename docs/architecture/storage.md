@@ -68,6 +68,12 @@ folder is moved here once by `LegacyDataMigration`.
   the same diarizer only: when the written segments come from another diarizer than `calls.diarizer`, the
   call's merges are deleted first, so they never glue the new model's people.
   Before/after: [evidence/beseda-80-before-merge.png](evidence/beseda-80-before-merge.png), [evidence/beseda-80-after-merge.png](evidence/beseda-80-after-merge.png).
+- **Speaker names** — the player footer shows each speaker as a named control (colour dot + name, never the
+  raw key: an unknown key reads «Участник»); its menu has «Переименовать…» and «Объединить с», as does a
+  transcript line's context menu. A rename is a `call_speakers` row per call and follows the merge's rule
+  exactly: kept across «Расшифровать снова» with the same diarizer (transcript.md is rewritten with it),
+  deleted when another diarizer writes the call (BESEDA-156). Names are not carried to later calls: the
+  `them-N` keys of two calls are not the same people, even in one calendar series.
 - **Paging** — the sidebar loads 200 calls, newest first; «Показать ещё» fetches the next 200 by offset,
   and refreshes keep however many are loaded.
 - **Search** — the sidebar filters loaded calls by `StoredCallSummary.searchableText` (title, app, date,
