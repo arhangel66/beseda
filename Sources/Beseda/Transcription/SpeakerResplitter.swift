@@ -4,10 +4,11 @@ import Foundation
 /// its ASR words: the speaker step of «Расшифровать снова» only, no ASR, summary or webhook.
 /// `calls.diarizer` is the progress mark, so a quit resumes where it stopped.
 final class SpeakerResplitter: @unchecked Sendable {
-    typealias Timeline = (URL) async throws -> [SpeakerInterval]
+    typealias Timeline = @Sendable (URL) async throws -> [SpeakerInterval]
 
     private let store: CallStore
     private let timeline: Timeline
+    private let diarizationQueue: DiarizationQueue
     private let isPaused: @Sendable () async -> Bool
     private let log: @Sendable (String) -> Void
     private let progress: @Sendable (_ done: Int, _ total: Int) -> Void
@@ -16,6 +17,7 @@ final class SpeakerResplitter: @unchecked Sendable {
     init(
         store: CallStore,
         timeline: @escaping Timeline,
+        diarizationQueue: DiarizationQueue = DiarizationQueue(),
         isPaused: @escaping @Sendable () async -> Bool,
         log: @escaping @Sendable (String) -> Void,
         progress: @escaping @Sendable (_ done: Int, _ total: Int) -> Void,
@@ -23,6 +25,7 @@ final class SpeakerResplitter: @unchecked Sendable {
     ) {
         self.store = store
         self.timeline = timeline
+        self.diarizationQueue = diarizationQueue
         self.isPaused = isPaused
         self.log = log
         self.progress = progress
@@ -59,8 +62,8 @@ final class SpeakerResplitter: @unchecked Sendable {
                 return
             }
             do {
-                if try store.hasSpeakerMerges(callID: call.id) {
-                    log("Speaker re-split skipped \(call.id): it has manual merges")
+                if try store.hasSpeakerEdits(callID: call.id) {
+                    log("Speaker re-split skipped \(call.id): it has manual speaker edits")
                 } else {
                     let speakers = try await resplit(call)
                     log("Speaker re-split \(call.id): \(speakers) remote speakers")
@@ -79,12 +82,15 @@ final class SpeakerResplitter: @unchecked Sendable {
         let words = try JSONDecoder().decode(
             ASRTranscription.self, from: Data(contentsOf: folder.appendingPathComponent("them.asr.json"))
         )
-        let turns = SpeakerAssignment.remoteTurns(
-            segments: words.segments,
-            timeline: try await timeline(folder.appendingPathComponent(AppController.DualFiles.systemASR))
-        )
+        let timeline = timeline
+        let intervals = try await diarizationQueue.perform(priority: .background) {
+            try await timeline(folder.appendingPathComponent(AppController.DualFiles.systemASR))
+        }
+        let turns = SpeakerAssignment.remoteTurns(segments: words.segments, timeline: intervals)
         guard !turns.isEmpty else {
-            throw BesedaError.processFailed("the diarizer found no speech")
+            // No speech is a completed result, not an error to retry on every launch.
+            try store.replaceSegments(callID: call.id, segments: store.fetchSegments(callID: call.id), diarizer: Diarizer.id)
+            return 0
         }
         // the mic lines stay as stored: the echo gate already trimmed them
         let mine = try store.fetchSegments(callID: call.id).filter { $0.speaker == TranscriptChannel.microphone.speakerID }

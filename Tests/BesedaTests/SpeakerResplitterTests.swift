@@ -1,4 +1,5 @@
 import Foundation
+import SQLite3
 import Testing
 
 @testable import Beseda
@@ -41,6 +42,7 @@ private func makeStore(withAudio: [String], withoutAudio: [String] = []) throws 
 private final class Calls: @unchecked Sendable {
     var diarized: [URL] = []
     var paused = false
+    var logs: [String] = []
 }
 
 private func makeResplitter(_ store: CallStore, _ calls: Calls, fails: Bool = false) -> SpeakerResplitter {
@@ -54,7 +56,7 @@ private func makeResplitter(_ store: CallStore, _ calls: Calls, fails: Bool = fa
             return [SpeakerInterval(speaker: "spk-0", start: 0, end: 10)]
         },
         isPaused: { calls.paused },
-        log: { _ in },
+        log: { calls.logs.append($0) },
         progress: { _, _ in },
         pausePoll: .milliseconds(5)
     )
@@ -74,6 +76,34 @@ private func makeResplitter(_ store: CallStore, _ calls: Calls, fails: Bool = fa
     #expect(try store.fetchSegments(callID: "no-audio").map(\.speaker) == ["me", "them-1", "them-2"])
     #expect(try store.fetchSegments(callID: "merged").map(\.speaker) == ["me", "them-1", "them-1"])
     #expect(try store.hasSpeakerMerges(callID: "merged"))
+}
+
+@Test func resplitSkipsRenamedSpeakers() async throws {
+    let (store, root) = try makeStore(withAudio: ["renamed"])
+    defer { try? FileManager.default.removeItem(at: root) }
+    try store.setSpeakerName(callID: "renamed", speakerKey: "them-1", displayName: "Анна")
+    let calls = Calls()
+
+    await makeResplitter(store, calls).run()
+
+    #expect(calls.diarized.isEmpty)
+    #expect(calls.logs.contains { $0.contains("manual speaker edits") })
+    #expect(try store.fetchSpeakerNames(callID: "renamed") == ["them-1": "Анна"])
+}
+
+@Test func resplitWithNoDiarizerSpeechIsNotRepeated() async throws {
+    let (store, root) = try makeStore(withAudio: ["silent"])
+    defer { try? FileManager.default.removeItem(at: root) }
+    let before = try store.fetchSegments(callID: "silent")
+    let calls = Calls()
+    let resplitter = SpeakerResplitter(
+        store: store, timeline: { _ in [] }, isPaused: { false }, log: { _ in }, progress: { _, _ in }
+    )
+
+    await resplitter.run()
+
+    #expect(try store.fetchSegments(callID: "silent") == before)
+    #expect(try resplitter.pendingCalls().isEmpty)
 }
 
 @Test func resplitIsNotRepeatedAfterARestart() async throws {
@@ -103,6 +133,40 @@ private func makeResplitter(_ store: CallStore, _ calls: Calls, fails: Bool = fa
     await job.value
 
     #expect(calls.diarized.count == 1)
+}
+
+@Test func aUserDiarizationJumpsAheadOfWaitingBackgroundWork() async throws {
+    let queue = DiarizationQueue()
+    let events = Calls()
+    let first = Task {
+        try await queue.perform(priority: .background) {
+            events.logs.append("background-1-start")
+            try await Task.sleep(for: .milliseconds(100))
+            events.logs.append("background-1-end")
+        }
+    }
+    try await Task.sleep(for: .milliseconds(20))
+    let second = Task { try await queue.perform(priority: .background) { events.logs.append("background-2") } }
+    let user = Task { try await queue.perform(priority: .user) { events.logs.append("user") } }
+    _ = try await (first.value, second.value, user.value)
+
+    #expect(events.logs == ["background-1-start", "background-1-end", "user", "background-2"])
+}
+
+@Test func aLegacyDatabaseMissingSpeakerMergeTableIsRepairedWithoutLosingCalls() throws {
+    let (_, root) = try makeStore(withAudio: ["legacy"])
+    defer { try? FileManager.default.removeItem(at: root) }
+    let dbURL = root.appendingPathComponent("calls.sqlite")
+    var db: OpaquePointer?
+    #expect(sqlite3_open(dbURL.path, &db) == SQLITE_OK)
+    defer { sqlite3_close(db) }
+    #expect(sqlite3_exec(db, "DROP TABLE call_speaker_merges; PRAGMA user_version = 3", nil, nil, nil) == SQLITE_OK)
+
+    let reopened = CallStore(dbURL: dbURL)
+    try reopened.prepare()
+
+    #expect(try reopened.fetchCall(id: "legacy") != nil)
+    #expect(try !reopened.hasSpeakerEdits(callID: "legacy"))
 }
 
 @Test func failedResplitLeavesTheCallUntouched() async throws {

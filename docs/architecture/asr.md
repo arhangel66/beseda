@@ -48,9 +48,11 @@ the vendored Swift wrapper in `Vendor/TranscribeCpp`). No audio leaves the machi
   the stored `them.asr.json` sentences go through `diarizer.timeline` and `SpeakerAssignment.remoteTurns`,
   the stored `me` lines are kept as they are, and nothing else runs (no ASR, summary, webhook or Jev). It
   starts at launch when the diarizer model is on disk, or when its prefetch finishes; one call at a time, at
-  background priority, waiting between calls while the app is busy (a recording or a retry). A call with
-  manual merges is skipped and logged; a failed one is logged and retried on the next launch; a call
-  without that audio keeps its speakers. transcript.md's dialogue, then the segments and `calls.diarizer`
+  background priority, waiting between calls while the app is busy (a recording or a retry). All model use
+  goes through `DiarizationQueue`: runs never overlap, and a waiting user retry goes before background work.
+  A call with manual merges or renamed speakers is skipped and logged. A failed call is logged and retried
+  on the next launch; a successful result with no speech is marked with the current diarizer without changing
+  its segments, so it is not retried. A call without the retained audio keeps its speakers. transcript.md's dialogue, then the segments and `calls.diarizer`
   in one transaction, then the export copy (if the export path has one) are rewritten; progress is one log
   line per call and «Обновлено разбиение голосов: N из M» under Обработка → Распознавание речи.
 - **Echo gate** — remote speech leaking from the speakers into the mic would be transcribed again as
@@ -91,8 +93,8 @@ row; per call: `transcript.md` and the `transcript_segments` rows (see [storage]
 
 - **Thread safety rests on the caller.** `LocalTranscriber` is `@unchecked Sendable`: its model state is
   touched on its queue, but `progressHandler`/`diagnosticsHandler` are plain vars. `Diarizer` is
-  `@unchecked Sendable` with an unguarded loaded-model property. Both are safe only because the
-  `@MainActor` `AppController` runs one call's pipeline at a time and awaits each step.
+  `@unchecked Sendable` with an unguarded loaded-model property; `AppController` routes downloads and
+  timelines through its one `DiarizationQueue`, shared with `SpeakerResplitter`.
 - **`rewriteDialogue` depends on literal headers.** It finds `"## Dialogue\n\n"` and `"## Channels"` in
   `transcript.md` and silently does nothing if either is missing. Changing those headers in
   `writeDualTranscript` breaks renaming for every existing call.
