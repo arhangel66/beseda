@@ -205,7 +205,7 @@ stable accessibility surface is:
 | Speaker | `call.speaker-line.<speaker-key>` | «Переименовать участника» and «Объединить с <name>» actions |
 | Delete | `call.delete` | «Удалить разговор» |
 
-No app is launched or signed for this contract. The kit's copied `AccessibilityHarness` hosts a representative
+No app is launched or signed for this contract. Native SwiftUI descendants remain inaccessible in the never-key/non-main harness window on the tested macOS; the kit's regression records this limit. The kit's copied `AccessibilityHarness` hosts a representative
 journey action in a transparent, ordered-back `NSWindow`; the test reads its NSAccessibility identifier and label,
 presses it in-process without TCC, and proves the window never becomes key or main. This does not claim a driven
 end-to-end UI run. External AX remains allowed only when `AXIsProcessTrusted()` is already true without prompting.
