@@ -26,6 +26,7 @@ import Testing
     let secondPage = try store.fetchCalls(limit: 200, offset: 200)
 
     #expect(!firstPage.contains { $0.id == "call-0" })
+    #expect(try store.eventCoverage().total == 205)
     #expect(secondPage.map(\.id) == ["call-4", "call-3", "call-2", "call-1", "call-0"])
     #expect(try store.searchCalls(matching: "архив").map(\.id) == ["call-0"])
     #expect(try store.searchCalls(matching: "Телемост").map(\.id) == ["call-0"])
