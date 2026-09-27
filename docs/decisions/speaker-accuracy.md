@@ -248,8 +248,20 @@ The app switched to it; rerun on the final code ([nemotron-switch.md][^switch]):
   (47 lost the audio to retention). Against a count read from each transcript, the shown number of other
   people is exactly right on 51 of 70 with Nemotron against 12 before, within one on 64 against 31; the 1:1
   calls go from 5/44 to 40/44 exact, multi-person from 4/23 to 8/23. No call had manual merges.[^allCalls]
+- **Tuning Nemotron for multi-person calls: nothing wins, the app keeps the offline preset as is (BESEDA-163).**
+  Nemotron has no clustering threshold and no min/max speaker count: it is an end-to-end model with 8 slots.
+  Its knobs — slot activity threshold 0.3–0.6, minimum segment 0.5/1 s, speaker-cache compression
+  (`predScoreThreshold`, `minPosScoresRate`, `spkcacheSilFramesPerSpk`), the `fast128` preset — leave the 70-call
+  counts unchanged or worse, except `fast128` (multi-person 7 → 9 exact of 23, one daily better, one call
+  worse; too small against an LLM-read truth to justify a second model). The people are glued inside the model,
+  not lost at a threshold. Splitting a speaker whose WeSpeaker embeddings are bimodal fails for the same reason:
+  inside a glued daily speaker the two halves sit 0.10–0.24 apart (cosine), inside 1:1 speakers up to 0.57, so no
+  distance splits the first without the second. A count hint (type «Дейли»; no call has calendar attendees)
+  has nothing to act on without a knob that takes a count. Against Mikhail's range for the 13:00 dailies (3–6),
+  Nemotron is already inside it on 6 of 7; 20260924-130017 (2) is the one miss.[^tuning]
 
 [^allCalls]: [results/all-calls-nemotron.md](../../untracked/epics/speaker-accuracy/results/all-calls-nemotron.md)
+[^tuning]: [results/nemotron-tuning.md](../../untracked/epics/speaker-accuracy/results/nemotron-tuning.md)
 [^other]: [results/other-diarizers.md](../../untracked/epics/speaker-accuracy/results/other-diarizers.md)
 [^switch]: [results/nemotron-switch.md](../../untracked/epics/speaker-accuracy/results/nemotron-switch.md)
 [^cause]: [results/extra-speaker-cause.md](../../untracked/epics/speaker-accuracy/results/extra-speaker-cause.md)

@@ -37,7 +37,10 @@ def embed_file(extractor: sherpa_onnx.SpeakerEmbeddingExtractor, wav: Path, segm
 
 
 def main(audio_dir: Path) -> None:
-    for name, model in MODELS.items():
+    # BESEDA-163: SEGMENTS=<variant> embeds that variant's segments with WeSpeaker ResNet34 into emb-nemotron
+    source = os.environ.get("SEGMENTS", "offline-t0.7")
+    models = {"nemotron": MODELS["resnet34"]} if source != "offline-t0.7" else MODELS
+    for name, model in models.items():
         config = sherpa_onnx.SpeakerEmbeddingExtractorConfig(model=str(OTHER.parent / "models" / model), num_threads=4)
         extractor = sherpa_onnx.SpeakerEmbeddingExtractor(config)
         (OTHER / f"emb-{name}").mkdir(parents=True, exist_ok=True)
@@ -46,7 +49,7 @@ def main(audio_dir: Path) -> None:
             out = OTHER / f"emb-{name}" / f"{file_id}.json"
             if out.exists():
                 continue
-            segments = json.loads((OTHER / "offline-t0.7" / f"{file_id}.json").read_text())["segments"]
+            segments = json.loads((OTHER / source / f"{file_id}.json").read_text())["segments"]
             started = time.monotonic()
             embedded = embed_file(extractor, wav, segments)
             out.write_text(json.dumps({"segments": embedded, "processing_seconds": time.monotonic() - started}))
