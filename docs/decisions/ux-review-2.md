@@ -114,7 +114,7 @@ system appearance was Light. Screenshots are in `.factory/shots/BESEDA-ux2/`.
 
 ### P2 — The product name switches alphabets throughout the first run
 
-**Fixed in BESEDA-175.** User-facing Russian prose uses «Беседа»; technical identifiers retain `Beseda`.
+**Fixed in BESEDA-175; completed by the BESEDA-183 sweep.** User-facing Russian prose and permission prompts use «Беседа»; a source guard prevents Latin `Beseda` from returning to Cyrillic UI literals. Technical identifiers, paths, logs, the bundle name, and English UI retain `Beseda`.
 
 - **Screen and shot:** [onboarding-1](../../.factory/shots/BESEDA-ux2/onboarding-1-добро-пожаловать-в-beseda.png), [general settings](../../.factory/shots/BESEDA-ux2/settings-general-основные.png), [idle popover](../../.factory/shots/BESEDA-ux2/popover-idle-popover-preview.png).
 - **What is wrong:** Russian sentences use Latin «Beseda» («Добро пожаловать в Beseda», «Завершить Beseda»). It is
