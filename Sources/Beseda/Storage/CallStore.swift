@@ -290,7 +290,7 @@ final class CallStore {
     typealias Migration = (OpaquePointer) throws -> Void
 
     var migrations: [Migration] {
-        [createSchemaV1, addProcessingPending, addDiarizer]
+        [createSchemaV1, addProcessingPending, addDiarizer, addSpeakerEdits]
     }
 
     func prepare() throws {
@@ -464,6 +464,27 @@ final class CallStore {
         try execute(db, "ALTER TABLE calls DROP COLUMN one_other_person")
     }
 
+    /// Version 1 was changed before versioned migrations were enforced. Some released databases therefore
+    /// claim to have it but lack these tables; create them in a new migration without touching call data.
+    private func addSpeakerEdits(_ db: OpaquePointer) throws {
+        try execute(db, """
+            CREATE TABLE IF NOT EXISTS call_speakers (
+                call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE,
+                speaker_key TEXT NOT NULL,
+                display_name TEXT NOT NULL,
+                PRIMARY KEY (call_id, speaker_key)
+            )
+            """)
+        try execute(db, """
+            CREATE TABLE IF NOT EXISTS call_speaker_merges (
+                call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE,
+                from_key TEXT NOT NULL,
+                into_key TEXT NOT NULL,
+                PRIMARY KEY (call_id, from_key)
+            )
+            """)
+    }
+
     /// audio folders of the calls it marked failed
     func failInterruptedCalls(reason: String) throws -> [String] {
         // a call left mid-flight belongs to a process that is gone, so the row can never move
@@ -623,6 +644,14 @@ final class CallStore {
                 WHERE c.kind = 'dual' AND c.status = 'ready' AND c.diarizer IS NOT ?
                 ORDER BY c.started_at DESC
                 """, diarizer, row: makeSummary)
+        }
+    }
+
+    func hasSpeakerEdits(callID: String) throws -> Bool {
+        try database { db in
+            let merges = try query(db, "SELECT 1 FROM call_speaker_merges WHERE call_id = ? LIMIT 1", callID) { _ in true }
+            let names = try query(db, "SELECT 1 FROM call_speakers WHERE call_id = ? LIMIT 1", callID) { _ in true }
+            return merges.first == true || names.first == true
         }
     }
 

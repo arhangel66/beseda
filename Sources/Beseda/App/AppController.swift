@@ -112,6 +112,7 @@ final class AppController {
     @ObservationIgnored let paths: AppPaths
     @ObservationIgnored private let transcriber: LocalTranscriber
     @ObservationIgnored let diarizer: Diarizer
+    @ObservationIgnored private let diarizationQueue = DiarizationQueue()
     /// one background download per launch; a failed or cancelled one is redone by processing
     @ObservationIgnored private(set) var diarizerPrefetch: Task<Void, Never>?
     @ObservationIgnored private var speakerResplit: Task<Void, Never>?
@@ -696,7 +697,9 @@ final class AppController {
         let diarizer = diarizer
         diarizerPrefetch = Task(priority: .background) { [weak self] in
             do {
-                try await diarizer.download()
+                try await self?.diarizationQueue.perform(priority: .background) {
+                    try await diarizer.download()
+                }
                 self?.appendLog("Diarizer model downloaded")
                 self?.startSpeakerResplit()
             } catch {
@@ -714,6 +717,7 @@ final class AppController {
         let resplitter = SpeakerResplitter(
             store: callStore,
             timeline: { try await diarizer.timeline(for: $0) },
+            diarizationQueue: diarizationQueue,
             isPaused: { [weak self] in await self?.isBusy ?? false },
             log: { [weak self] message in Task { @MainActor in self?.appendLog(message) } },
             progress: { [weak self] done, total in
@@ -1336,13 +1340,16 @@ final class AppController {
             beginStage("Подготовка разбора голосов", step, of: total)
             // two downloads would write the same partial files
             await diarizerPrefetch?.value
-            try await diarizer.prepareModels { [weak self] fraction in
-                Task { @MainActor in
-                    self?.advanceStage(to: fraction)
+            let diarizer = diarizer
+            let timeline = try await diarizationQueue.perform(priority: .user) { [weak self] in
+                try await diarizer.prepareModels { fraction in
+                    Task { @MainActor in
+                        self?.advanceStage(to: fraction)
+                    }
                 }
+                await self?.beginStage("Разбор голосов", step, of: total)
+                return try await diarizer.timeline(for: audioURL)
             }
-            beginStage("Разбор голосов", step, of: total)
-            let timeline = try await diarizer.timeline(for: audioURL)
             let turns = SpeakerAssignment.remoteTurns(segments: segments, timeline: timeline)
             let elapsed = Int(Date().timeIntervalSince(started))
             appendLog("Diarized system audio in \(elapsed)s: \(Set(turns.map(\.speaker)).count) remote speakers")
