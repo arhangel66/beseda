@@ -35,11 +35,11 @@ the vendored Swift wrapper in `Vendor/TranscribeCpp`). No audio leaves the machi
   outside diarizer speech; every sentence stays its own line with its own times, so clicking it seeks there.
   Per-word labels, the earlier rule, were twice as wrong ([speaker accuracy](../decisions/speaker-accuracy.md)).
   Diarization failure is logged and skipped: the transcript falls back to one `them`.
-  A call whose calendar event has exactly one other attendee, or whose call-type classification answered
-  «one other person» (`calls.one_other_person`, [summarization](summarization.md)), is known 1:1:
-  `CallStore` relabels all its `them-N` as `them-1` when segments are written, the event is linked or the
-  answer is stored, and rewrites the dialogue of transcript.md from the relabelled lines
-  ([speaker accuracy](../decisions/speaker-accuracy.md)).
+  A call whose calendar event has exactly one other attendee is known 1:1: `CallStore` relabels all its
+  `them-N` as `them-1` when segments are written or the event is linked, and rewrites the dialogue of
+  transcript.md from the relabelled lines ([speaker accuracy](../decisions/speaker-accuracy.md)).
+  The classifier's «one other person» (`calls.one_other_person`, [summarization](summarization.md)) is
+  stored but does not relabel: the local model said «один» on 3 of 5 dailies, Jev is unmeasured.
 - **Echo gate** — remote speech leaking from the speakers into the mic would be transcribed again as
   `me`. `EchoGate` finds the delay (FFT cross-correlation, 0–500 ms) and gain of the system channel
   inside the mic; a 20 ms mic frame is own speech only when its energy beats the predicted echo by 6 dB
