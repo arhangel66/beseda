@@ -48,8 +48,8 @@ import Testing
 }
 
 @Test func stateLabelDependsOnlyOnTheSelectedModelFile() {
-    #expect(SpeechModel.stateLabel(isSelected: true, isDownloaded: true) == "Ready")
-    #expect(SpeechModel.stateLabel(isSelected: true, isDownloaded: false) == "Selected · not downloaded")
-    #expect(SpeechModel.stateLabel(isSelected: false, isDownloaded: true) == "Downloaded")
+    #expect(SpeechModel.stateLabel(isSelected: true, isDownloaded: true) == SettingsText.get("Готова"))
+    #expect(SpeechModel.stateLabel(isSelected: true, isDownloaded: false) == SettingsText.get("Выбрана · не скачана"))
+    #expect(SpeechModel.stateLabel(isSelected: false, isDownloaded: true) == SettingsText.get("Скачана"))
     #expect(SpeechModel.stateLabel(isSelected: false, isDownloaded: false) == nil)
 }

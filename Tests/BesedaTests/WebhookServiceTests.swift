@@ -103,7 +103,7 @@ private struct Harness {
     let body = try #require(await harness.transport.bodies.first)
     let json = try #require(JSONSerialization.jsonObject(with: body) as? [String: Any])
     #expect(json["event"] as? String == "transcript_created")
-    #expect((json["transcript"] as? [String: Any])?["text"] as? String == "You: Привет.\nOther speaker: Привет.")
+    #expect((json["transcript"] as? [String: Any])?["text"] as? String == "\(SpeakerNaming.defaultName(for: "me")): Привет.\n\(SpeakerNaming.defaultName(for: "them")): Привет.")
     #expect(harness.service.recent.map(\.id) == rows.map(\.id))
 }
 
@@ -215,7 +215,7 @@ private struct Harness {
     #expect(rows[1].error == "HTTP 503")
     let retryAt = try #require(rows[0].nextRetryAt.flatMap(CallFormatting.parseISO8601))
     #expect(abs(retryAt.timeIntervalSinceNow - 60) < 5)
-    #expect(rows[0].detailLine.hasPrefix("retry at "))
+    #expect(rows[0].detailLine.hasPrefix(ArchiveText.get("повтор в %@").components(separatedBy: "%@")[0]))
 }
 
 @MainActor

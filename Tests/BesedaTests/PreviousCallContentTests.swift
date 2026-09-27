@@ -11,7 +11,7 @@ import Testing
 
     #expect(content.callID == "call-1")
     #expect(content.dateLine == CallFormatting.when(call.startedAt, now: now))
-    #expect(content.dateLine.hasPrefix("today"))
+    #expect(content.dateLine.hasPrefix(Locale.current.language.languageCode?.identifier == "ru" ? "сегодня" : "today"))
     #expect(content.digest == "**Главное**\nДоговорились")
 }
 

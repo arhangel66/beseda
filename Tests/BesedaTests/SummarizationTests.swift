@@ -78,7 +78,7 @@ private func detail(
         )
     )
 
-    #expect(await spy.receivedText == "You: Начнём.\nИра: Давай.")
+    #expect(await spy.receivedText == "\(SpeakerNaming.defaultName(for: "me")): Начнём.\nИра: Давай.")
 }
 
 @Test func aTranscriptUnderBudgetReachesTheProviderUntouched() async throws {
@@ -91,7 +91,7 @@ private func detail(
         ])
     )
 
-    #expect(await spy.receivedText == "You: Начнём.")
+    #expect(await spy.receivedText == "\(SpeakerNaming.defaultName(for: "me")): Начнём.")
     #expect(result == "саммари")
 }
 
@@ -108,7 +108,7 @@ private func detail(
     )
 
     let received = try #require(await spy.receivedText)
-    #expect(received == "You: \(firstLine)")
+    #expect(received == "\(SpeakerNaming.defaultName(for: "me")): \(firstLine)")
     #expect(received.count <= 40)
     #expect(result == "Пересказано только начало разговора — целиком в модель не поместилось.\n\nсаммари")
 }
