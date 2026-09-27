@@ -317,5 +317,7 @@ private let schemaBefore022 = """
     #expect(try store.fetchSegments(callID: "previous").map(\.text) == ["строка версии 1"])
     #expect(userVersion(dbURL) == store.migrations.count)
     #expect(columnNames(dbURL, table: "calls").contains("processing_pending"))
+    #expect(columnNames(dbURL, table: "calls").contains("diarizer"))
+    #expect(!columnNames(dbURL, table: "calls").contains("one_other_person"))
     #expect(FileManager.default.fileExists(atPath: store.backupURL(fromVersion: 1).path))
 }

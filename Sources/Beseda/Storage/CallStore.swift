@@ -290,7 +290,7 @@ final class CallStore {
     typealias Migration = (OpaquePointer) throws -> Void
 
     var migrations: [Migration] {
-        [createSchemaV1, addProcessingPending]
+        [createSchemaV1, addProcessingPending, addDiarizer]
     }
 
     func prepare() throws {
@@ -358,7 +358,7 @@ final class CallStore {
             ("event_series_id", "TEXT"),
             ("participants", "TEXT"),
             ("export_path", "TEXT"),
-            // unused since BESEDA-120 (the 1:1 variant is gone); left in place because dropping a column is riskier
+            // unused since BESEDA-120 (the 1:1 variant is gone); version 3 drops it
             ("one_other_person", "INTEGER")
         ] where !callColumns.contains(column) {
             try execute(db, "ALTER TABLE calls ADD COLUMN \(column) \(type)")
@@ -456,6 +456,12 @@ final class CallStore {
     /// version 2: a call waiting for auto-processing, so a quit does not drop the job
     private func addProcessingPending(_ db: OpaquePointer) throws {
         try execute(db, "ALTER TABLE calls ADD COLUMN processing_pending INTEGER NOT NULL DEFAULT 0")
+    }
+
+    /// version 3: which diarizer labelled a call's `them-N` speakers; NULL is the one before Nemotron-3
+    private func addDiarizer(_ db: OpaquePointer) throws {
+        try execute(db, "ALTER TABLE calls ADD COLUMN diarizer TEXT")
+        try execute(db, "ALTER TABLE calls DROP COLUMN one_other_person")
     }
 
     /// audio folders of the calls it marked failed
@@ -609,16 +615,16 @@ final class CallStore {
         }
     }
 
-    func replaceSegments(callID: String, segments: [StoredTranscriptSegment]) throws {
+    func replaceSegments(callID: String, segments: [StoredTranscriptSegment], diarizer: String? = nil) throws {
         try database { db in
             try transaction(db) {
-                try writeSegments(db, callID: callID, segments: segments)
+                try writeSegments(db, callID: callID, segments: segments, diarizer: diarizer)
             }
         }
     }
 
     /// the transcript's lines and the ready status land together or not at all
-    func markReady(callID: String, transcriptURL: URL, segments: [StoredTranscriptSegment]) throws {
+    func markReady(callID: String, transcriptURL: URL, diarizer: String? = nil, segments: [StoredTranscriptSegment]) throws {
         try database { db in
             try transaction(db) {
                 try run(db, "UPDATE calls SET status = 'ready', transcript_path = ?, error = NULL, updated_at = ? WHERE id = ?",
@@ -627,12 +633,20 @@ final class CallStore {
                     throw CallStoreError.sqlite("No call \(callID) to mark ready")
                 }
                 // after the path is set: reapplying a manual merge rewrites that file
-                try writeSegments(db, callID: callID, segments: segments)
+                try writeSegments(db, callID: callID, segments: segments, diarizer: diarizer)
             }
         }
     }
 
-    private func writeSegments(_ db: OpaquePointer, callID: String, segments: [StoredTranscriptSegment]) throws {
+    private func writeSegments(
+        _ db: OpaquePointer, callID: String, segments: [StoredTranscriptSegment], diarizer: String?
+    ) throws {
+        // merges name another model's labels: kept, they would glue the wrong people
+        try run(db, """
+            DELETE FROM call_speaker_merges WHERE call_id = ?
+            AND (SELECT diarizer FROM calls WHERE id = ?) IS NOT ?
+            """, callID, callID, diarizer)
+        try run(db, "UPDATE calls SET diarizer = ? WHERE id = ?", diarizer, callID)
         try run(db, "DELETE FROM transcript_segments WHERE call_id = ?", callID)
         // a retry renumbers the speakers, so names pinned to the old keys are gone
         try run(db, "DELETE FROM call_speakers WHERE call_id = ?", callID)

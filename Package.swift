@@ -11,7 +11,7 @@ let package = Package(
         .executable(name: "Beseda", targets: ["Beseda"])
     ],
     dependencies: [
-        .package(url: "https://github.com/FluidInference/FluidAudio.git", from: "0.15.6"),
+        .package(url: "https://github.com/FluidInference/FluidAudio.git", from: "0.17.4"),
         .package(url: "https://github.com/sparkle-project/Sparkle", from: "2.9.6")
     ],
     targets: [

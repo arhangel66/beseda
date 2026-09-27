@@ -1,7 +1,7 @@
 ---
 type: Decision Record
 title: Speaker accuracy, local
-description: How to make Beseda tell speakers apart and transcribe the remote side better, all on the Mac — proposed; part measured, part waiting for the benchmark.
+description: How Beseda tells speakers apart and transcribes the remote side, all on the Mac — echo gate, diarizer timeline, and since BESEDA-131 Nemotron-3 as the diarizer without the 6 s rule.
 status: proposed
 tags: [asr, diarization, research]
 generated:
@@ -23,6 +23,11 @@ sources:
 ---
 
 # Speaker accuracy, local
+
+**Diarizer since BESEDA-131: Nemotron-3 Diarization (offline preset, FluidAudio 0.17.4), no 6 s rule.**
+It gets all ten 1:1 calls right on its own and the benchmark speaker count exactly; the 6 s rule on top of it
+glues 9 benchmark people, so it is gone. See [Nemotron-3 as the diarizer](#nemotron-3-as-the-diarizer-beseda-131).
+Sections below it are the history that led there.
 
 **Status: proposed; the two no-model fixes (echo gate, diarizer timeline) are implemented** in the app
 (BESEDA-45, see [ASR](../architecture/asr.md)), not rescored through the app pipeline yet. Part of the table is measured, the rest waits for the benchmark rerun
@@ -176,7 +181,7 @@ embeddings are too short and distorted to join the main cluster. Longest diarize
 extras, ≥ 10 s on 9 of 10 main speakers. Not echo of Mikhail (cosine to his voice ≤ 0.15), not music or
 notifications.[^cause]
 
-**Rule: the 6 s merge, interim default (BESEDA-84, restored in BESEDA-120).** A remote speaker whose longest
+**Rule: the 6 s merge, interim default (BESEDA-84, restored in BESEDA-120, dropped in BESEDA-131).** A remote speaker whose longest
 diarizer segment is under 6 s gives each of its segments to the nearest-in-time kept speaker; if no speaker has
 a 6 s segment, the one with the most seconds stays. t0.70 is unchanged. It lives in
 `SpeakerAssignment.mergingShortReplies`, before sentences get their speakers.
@@ -209,6 +214,38 @@ the diarizer on the same audio gives the same keys, checked on the 15 calls in B
 **Caveat (critic finding 15).** The real counts are inferred from transcript text by an LLM, not hand-labelled,
 and counts cannot show a merge and a split that cancel out.
 
+## Nemotron-3 as the diarizer (BESEDA-131)
+
+BESEDA-115 compared other local diarizers ([other-diarizers.md][^other]): only NVIDIA's Nemotron-3
+Diarization (offline preset) got the 1:1 calls right with no rule and no threshold fitted to Mikhail's calls.
+The app switched to it; rerun on the final code ([nemotron-switch.md][^switch]):
+
+| | 0.4.0 t0.70 | 0.4.0 app (t0.70 + 6 s) | **Nemotron-3 (app now)** | Nemotron-3 + 6 s |
+|---|---|---|---|---|
+| 1:1 calls exact (of 10) | 0 | 9 | **10** | 10 |
+| dailies exact (of 5) | 1 | 3 | 2 | 3 |
+| total speaker-count error, 15 calls | 20 | 4 | 5 | 3 |
+| benchmark DER real | 0.119 | 0.118 | 0.127 | 0.223 |
+| benchmark speaker-count error | 0.60 | 0.80 | **0.00** | 1.80 |
+| benchmark people glued | 4 | 4 | **2** | 9 |
+| × realtime (diarizer alone) | 160 | 160 | 347 | 347 |
+| peak memory, longest call (51 min) | 0.56 GB | | 0.59 GB | |
+| model on disk | 21 MB | | 199 MB | |
+
+- **The 6 s rule is dropped.** On Nemotron it fixes one daily and glues 7 more benchmark people: both AMI
+  meetings fall to one speaker, whose people talk in turns under 6 s. It was a rule fitted to the old
+  diarizer's short-reply splits, which Nemotron does not make.
+- The dailies are where it is still wrong: 20260924-130017 4 → 2 (no diarizer measured gets above 3 there),
+  20260923-130021 4 → 6, 20260921-125925 4 → 5. «Объединить с» covers the extra people; a glued one has no fix.
+- Licence: OpenMDW-1.1 (NVIDIA), commercial use allowed; shown under Обработка → Распознавание речи.
+- Download: 199 MB, pinned to one revision of `FluidInference/nemotron-3-diarization-coreml`, into the app's
+  models folder with a size and sha256 check per file and a free-space check, on the first diarized call.
+- Manual merges name the old model's labels: `calls.diarizer` records which diarizer labelled a call, and a
+  rerun with another one drops the call's merges ([storage](../architecture/storage.md)). Calls transcribed
+  before the switch keep their stored speakers until «Расшифровать снова».
+
+[^other]: [results/other-diarizers.md](../../untracked/epics/speaker-accuracy/results/other-diarizers.md)
+[^switch]: [results/nemotron-switch.md](../../untracked/epics/speaker-accuracy/results/nemotron-switch.md)
 [^cause]: [results/extra-speaker-cause.md](../../untracked/epics/speaker-accuracy/results/extra-speaker-cause.md)
 [^merge]: [results/short-reply-merge.md](../../untracked/epics/speaker-accuracy/results/short-reply-merge.md), [results/app-merge.md](../../untracked/epics/speaker-accuracy/results/app-merge.md)
 [^oneToOne]: [results/one-to-one-forced.md](../../untracked/epics/speaker-accuracy/results/one-to-one-forced.md)

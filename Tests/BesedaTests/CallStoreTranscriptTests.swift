@@ -84,3 +84,27 @@ import Testing
     #expect(try store.fetchSegments(callID: "call-1").map(\.speaker) == ["me", "them-1", "them-1", "them-1"])
     #expect(!(try String(contentsOf: transcriptURL, encoding: .utf8)).contains("Собеседник 3"))
 }
+
+@Test func aManualMergeIsDroppedWhenAnotherDiarizerRelabelsTheCall() throws {
+    let directory = FileManager.default.temporaryDirectory
+        .appendingPathComponent("beseda-merge-diarizer-\(UUID().uuidString)", isDirectory: true)
+    try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: directory) }
+    let store = CallStore(dbURL: directory.appendingPathComponent("calls.sqlite"))
+    try store.prepare()
+    try store.upsertCall(
+        id: "call-1", kind: "dual", startedAt: Date(), endedAt: nil, durationSec: 60, status: "transcribing",
+        transcriptURL: nil, audioDirectoryURL: directory, error: nil, appName: nil
+    )
+    let transcriptURL = directory.appendingPathComponent("transcript.md")
+    let diarized = ["me", "them-1", "them-2"].enumerated().map {
+        StoredTranscriptSegment(speaker: $1, startSec: Double($0), endSec: Double($0) + 1, text: "t", orderIndex: $0)
+    }
+    try store.markReady(callID: "call-1", transcriptURL: transcriptURL, segments: diarized)
+    try store.mergeSpeaker(callID: "call-1", speakerKey: "them-2", into: "them-1")
+
+    try store.markReady(callID: "call-1", transcriptURL: transcriptURL, diarizer: Diarizer.id, segments: diarized)
+    try store.markReady(callID: "call-1", transcriptURL: transcriptURL, diarizer: Diarizer.id, segments: diarized)
+
+    #expect(try store.fetchSegments(callID: "call-1").map(\.speaker) == ["me", "them-1", "them-2"])
+}

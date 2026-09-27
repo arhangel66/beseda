@@ -111,7 +111,7 @@ final class AppController {
     @ObservationIgnored private let fileManager = FileManager.default
     @ObservationIgnored let paths: AppPaths
     @ObservationIgnored private let transcriber: LocalTranscriber
-    @ObservationIgnored private let diarizer = Diarizer()
+    @ObservationIgnored let diarizer: Diarizer
     @ObservationIgnored private let callStore: CallStore
     @ObservationIgnored private let callDetector = CallDetector()
     @ObservationIgnored private let notifier = CallNotifier()
@@ -209,6 +209,7 @@ final class AppController {
         self.settings = settings
         self.summarize = summarize
         transcriber = LocalTranscriber(paths: paths)
+        diarizer = Diarizer(paths: paths)
         callStore = CallStore(dbURL: paths.callIndexURL)
         llamaServer = LlamaServer(paths: paths)
         janitor = StorageJanitor(callsDirectory: paths.callsDirectory)
@@ -1122,6 +1123,7 @@ final class AppController {
         try TranscriptMerger.writeDualTranscript(dualResult, to: transcriptURL)
         try finishCall(
             callID, in: sessionDir, segments: dualResult.speakerSegments,
+            diarizer: remoteTurns.isEmpty ? nil : Diarizer.id,
             audio: [microphone.rawAudioURL, systemAudio.rawAudioURL, microphone.normalizedAudioURL, systemAudio.normalizedAudioURL]
         )
         appendLog("Wrote dual transcript to \(transcriptURL.path)")
@@ -1202,12 +1204,14 @@ final class AppController {
         _ callID: String,
         in sessionDir: URL,
         segments: [SpeakerTranscriptSegment],
+        diarizer: String? = nil,
         audio: [URL]
     ) throws {
         // a failed write throws before the audio goes or the webhook fires: the call stays retryable
         try callStore.markReady(
             callID: callID,
             transcriptURL: sessionDir.appendingPathComponent(DualFiles.transcript),
+            diarizer: diarizer,
             segments: segments.enumerated().map { index, line in
                 StoredTranscriptSegment(
                     speaker: line.speaker,
@@ -1263,16 +1267,15 @@ final class AppController {
         do {
             appendLog("Diarizing system audio")
             let started = Date()
-            // the first run downloads and compiles the models: the longest wait of them all,
-            // and the one that reports nothing, so at least it says its own name
+            // the first run downloads the model: the longest wait of them all
             beginStage("Подготовка разбора голосов", step, of: total)
-            try await diarizer.prepareModels()
-            beginStage("Разбор голосов", step, of: total)
-            let timeline = try await diarizer.timeline(for: audioURL) { [weak self] fraction in
+            try await diarizer.prepareModels { [weak self] fraction in
                 Task { @MainActor in
                     self?.advanceStage(to: fraction)
                 }
             }
+            beginStage("Разбор голосов", step, of: total)
+            let timeline = try await diarizer.timeline(for: audioURL)
             let turns = SpeakerAssignment.remoteTurns(segments: segments, timeline: timeline)
             let elapsed = Int(Date().timeIntervalSince(started))
             appendLog("Diarized system audio in \(elapsed)s: \(Set(turns.map(\.speaker)).count) remote speakers")
