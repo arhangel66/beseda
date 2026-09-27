@@ -1,5 +1,5 @@
 {
-  "originHash" : "3e82a00112a58c2997191412da28bdc3f6aab7cfb65487edfdfe38bbfcce71fd",
+  "originHash" : "4ff7c22117deace24314da92f10b6f640af3393f60354d3a009bd13b5efcaf6e",
   "pins" : [
     {
       "identity" : "fluidaudio",
@@ -8,15 +8,6 @@
       "state" : {
         "revision" : "21493f8dac5a97e65742e6ff26f42f164c2fda0f",
         "version" : "0.17.4"
-      }
-    },
-    {
-      "identity" : "sparkle",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/sparkle-project/Sparkle",
-      "state" : {
-        "revision" : "ac2def288cbff5cfc7df3ffef6abdf45b72bcb0a",
-        "version" : "2.9.6"
       }
     }
   ],
