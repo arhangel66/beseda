@@ -211,6 +211,8 @@ struct LinkEventButton: View {
             Label(summary.isFromCalendar ? "Событие" : "Привязать событие", systemImage: "calendar.badge.plus")
         }
         .help(summary.isFromCalendar ? "Название взято из календаря" : "Назвать разговор по событию календаря")
+        .accessibilityLabel("Событие календаря")
+        .accessibilityValue(summary.isFromCalendar ? summary.displayTitle : "не привязано")
     }
 }
 
@@ -265,6 +267,8 @@ struct SendToWebhookButton: View {
         .controlSize(.large)
         .fixedSize()
         .help(statusLine)
+        .accessibilityLabel("Отправить на сервис")
+        .accessibilityValue(statusLine)
         .popover(isPresented: $isHistoryOpen, arrowEdge: .bottom) {
             history
         }
@@ -346,6 +350,8 @@ struct CopyTranscriptButton: View {
         .controlSize(.large)
         .fixedSize()
         .help("Скопировать в формате «\(controller.settings.copyFormat.title)» (⇧⌘C); в меню — другие форматы")
+        .accessibilityLabel("Скопировать расшифровку")
+        .accessibilityValue(controller.settings.copyFormat.title)
     }
 }
 
@@ -565,6 +571,8 @@ private struct TranscriptLine: View {
         .padding(.vertical, 2)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(isActive ? Color.accentColor.opacity(0.1) : .clear, in: .rect(cornerRadius: Metrics.rowCorner))
+        // the rename lives in the context menu, which VoiceOver does not reach on its own
+        .accessibilityAction(named: "Переименовать участника", onRename)
         .contextMenu {
             Button("Перейти к \(CallFormatting.mmss(segment.startSec))", action: onSeek)
             Button("Переименовать участника…", action: onRename)
@@ -584,6 +592,7 @@ private struct TranscriptLine: View {
             .font(.caption.monospacedDigit())
             .foregroundStyle(isActive ? Color.accentColor : Color.secondary)
             .help("Перейти к этому месту записи")
+            .accessibilityLabel("Перейти к \(CallFormatting.mmss(segment.startSec))")
     }
 }
 

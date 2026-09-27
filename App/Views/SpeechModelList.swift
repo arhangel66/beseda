@@ -37,12 +37,14 @@ private struct SpeechModelCard: View {
                 Text(model.title)
                     .font(.body.weight(.semibold))
                 if isActive {
-                    Text("Активная")
+                    // a selected model that is not on disk transcribes nothing, so it must not look ready
+                    let badgeColor = isDownloaded ? Color.green : Color.orange
+                    Text(isDownloaded ? "Готова" : "Выбрана")
                         .font(.caption.weight(.medium))
-                        .foregroundStyle(Color.green)
+                        .foregroundStyle(badgeColor)
                         .padding(.horizontal, 7)
                         .padding(.vertical, 2)
-                        .background(Color.green.opacity(0.14), in: .capsule)
+                        .background(badgeColor.opacity(0.14), in: .capsule)
                 }
                 Spacer(minLength: 0)
                 trailingControl
@@ -65,6 +67,7 @@ private struct SpeechModelCard: View {
                     Button("Удалить") {
                         controller.removeSpeechModel(model)
                     }
+                    .accessibilityLabel("Удалить \(model.title)")
                     .buttonStyle(.plain)
                     .foregroundStyle(Color.red)
                 }
@@ -82,6 +85,7 @@ private struct SpeechModelCard: View {
             HStack(spacing: 8) {
                 if let fraction {
                     ProgressView(value: fraction).frame(width: 90)
+                        .accessibilityLabel("Скачивание \(model.title)")
                     Text("\(Int((fraction * 100).rounded()))%")
                         .monospacedDigit()
                 } else {
@@ -110,6 +114,7 @@ private struct SpeechModelCard: View {
                 Button(isDownloaded ? "Выбрать" : "Скачать") {
                     controller.selectSpeechModel(model)
                 }
+                .accessibilityLabel(isDownloaded ? "Выбрать \(model.title)" : "Скачать \(model.title)")
                 .buttonStyle(.borderedProminent)
                 .controlSize(.small)
             }

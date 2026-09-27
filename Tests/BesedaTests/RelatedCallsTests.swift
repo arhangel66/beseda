@@ -187,3 +187,13 @@ private func makeTarget(
     #expect(previous?.callID == "old")
     #expect(previous?.digest == "**Что делать**\n— отправить план")
 }
+
+@Test func aCustomResultWithOnlyOpenQuestionsIsShownWhole() {
+    let summary = "**Настроение**\nСпокойное.\n\n**Открытые вопросы**\n— отпуск\n\n**Решили**\n— меньше встреч"
+    let calls = [makeCall(id: "custom", daysAgo: 7, title: "1:1", summary: summary)]
+
+    let previous = RelatedCalls.previousRelatedCall(to: makeTarget(title: "1:1"), among: calls)
+
+    #expect(previous?.digest == summary)
+    #expect(previous?.isWholeSummary == true)
+}

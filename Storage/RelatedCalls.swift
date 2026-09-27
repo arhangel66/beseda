@@ -70,6 +70,10 @@ enum RelatedCalls {
                 bodies[currentHeading, default: []].append(line)
             }
         }
+        // a custom prompt may happen to have «Открытые вопросы»; only the agreements and tasks mark a default one
+        guard ["Договорились", "Кто что делает", "Что делать"].contains(where: { bodies[$0] != nil }) else {
+            return nil
+        }
         let sections = digestSections.compactMap { heading in
             bodies[heading].map { "**\(heading)**\n" + $0.joined(separator: "\n") }
         }

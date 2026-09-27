@@ -60,7 +60,7 @@ enum SummarizationError: LocalizedError {
         case .emptyTranscript:
             "В этом разговоре нечего пересказывать: расшифровка пустая."
         case .modelMissing:
-            "Встроенная модель ещё не скачана."
+            "Встроенная модель ещё не скачана. Скачайте её в Настройках → Обработка."
         case .serverDown(let message), .unauthorized(let message), .unavailable(let message):
             message
         }

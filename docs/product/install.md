@@ -16,6 +16,17 @@ download needs its own size free and no more; the engine archive is unpacked in 
 scratch folder that is deleted afterwards (well under 100 MB). The minimums leave a few
 hundred MB for this and for the first calls; recordings need their own space on top
 (the raw WAVs stay until the retention rule under Настройки → Хранение removes them).
+
+An hour of a call takes, from the formats in `Audio/`:
+- raw audio: two WAVs of 32-bit float samples at the device rate and channel count
+  (`PCMFloatRecorder`). At 48 kHz that is ~0.7 GB/h for a mono microphone and ~1.4 GB/h
+  for the stereo system-audio tap, so ~2 GB per recorded hour;
+- normalized audio: 16 kHz mono 16-bit (`AudioNormalizer`), ~115 MB/h per channel,
+  ~230 MB for a two-channel call;
+- transcripts and summaries: kilobytes.
+
+The retention rules under Хранение («Исходное аудио», «Подготовленное аудио») delete the
+audio and free this space; «Очистить сейчас» applies them at once.
 The app does not check free space before a download: a full disk shows as a failed
 download.
 

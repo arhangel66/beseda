@@ -120,3 +120,9 @@ private let openRouter = URL(string: "https://openrouter.ai/api/v1")!
     #expect(AppController.recovery(for: SummarizationError.serverDown("молчит"), provider: .lmStudio, isLMStudioInstalled: false) == .openSettings)
     #expect(AppController.recovery(for: SummarizationError.serverDown("молчит"), provider: .builtIn, isLMStudioInstalled: true) == .openSettings)
 }
+
+@Test func theMissingBuiltInModelErrorSaysWhereToDownloadIt() {
+    let message = SummarizationError.modelMissing.localizedDescription
+
+    #expect(message.contains("Настройках → Обработка"))
+}

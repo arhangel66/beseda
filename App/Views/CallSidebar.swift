@@ -137,6 +137,7 @@ private struct LiveRecordingRow: View {
     var body: some View {
         HStack(spacing: 10) {
             PulsingDot(size: 9)
+                .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 2) {
                 Text(controller.isPaused ? "Пауза" : "Идёт запись")
                     .font(.body.weight(.semibold))
@@ -147,6 +148,7 @@ private struct LiveRecordingRow: View {
             Spacer(minLength: 0)
         }
         .padding(.vertical, 4)
+        .accessibilityElement(children: .combine)
     }
 }
 

@@ -267,8 +267,8 @@ private struct ProcessingPane: View {
         controller.settings
     }
 
-    /// what leaves this Mac under the settings as they are now; the one privacy note in Settings
-    private var privacyNote: String {
+    /// what leaves this Mac under the settings as they are now
+    private var privacySinks: [String] {
         var sinks: [String] = []
         if settings.effectiveSummaryProvider == .openRouter {
             sinks.append("в OpenRouter (openrouter.ai) уходит текст расшифровки — для итогов и ключевых моментов во время звонка")
@@ -281,6 +281,12 @@ private struct ProcessingPane: View {
         if settings.sendsWebhooks {
             sinks.append("расшифровка уходит на ваш сервис из раздела «Интеграции»")
         }
+        return sinks
+    }
+
+    /// the one privacy note in Settings
+    private var privacyNote: String {
+        let sinks = privacySinks
         if sinks.isEmpty {
             return settings.effectiveSummaryProvider == settings.summaryProvider
                 ? "Всё обрабатывается на этом Mac: ни звук, ни текст не уходят в сеть."
@@ -308,10 +314,18 @@ private struct ProcessingPane: View {
                 .pickerStyle(.segmented)
 
                 Toggle("Только локально", isOn: Bindable(settings).localOnly)
-                Label(privacyNote, systemImage: privacyNote.hasPrefix("Всё") ? "lock" : "icloud.and.arrow.up")
+                Label(privacyNote, systemImage: privacySinks.isEmpty ? "lock" : "icloud.and.arrow.up")
                     .foregroundStyle(.secondary)
+                if settings.effectiveSummaryProvider != settings.summaryProvider {
+                    Label(
+                        "Пока включено «Только локально», итоги пишет встроенная модель, а не \(settings.summaryProvider.title).",
+                        systemImage: "info.circle"
+                    )
+                    .foregroundStyle(.secondary)
+                }
 
-                switch settings.summaryProvider {
+                // under «Только локально» the rows are the ones of the model that actually runs
+                switch settings.effectiveSummaryProvider {
                 case .openRouter:
                     openRouterRows
                 case .builtIn:
@@ -331,7 +345,7 @@ private struct ProcessingPane: View {
                     }
                     .disabled(controller.isCheckingSummary)
                 }
-                if settings.summaryProvider == .lmStudio {
+                if settings.effectiveSummaryProvider == .lmStudio {
                     DisclosureGroup("Дополнительно", isExpanded: $isAdvancedOpen) {
                         TextField("Адрес сервера", text: Bindable(settings).summaryServerURL, prompt: Text("определяется сам"))
                     }
@@ -422,7 +436,7 @@ private struct ProcessingPane: View {
 
     /// what this provider costs the user: money, memory, or another app to keep running
     private var providerNote: String {
-        switch settings.summaryProvider {
+        switch settings.effectiveSummaryProvider {
         case .openRouter:
             "Ключ создаётся на openrouter.ai, оплата по факту: час разговора на gemini-flash стоит несколько центов."
         case .builtIn:
@@ -470,6 +484,7 @@ private struct BundledSummaryRow: View {
                         .monospacedDigit()
                     ProgressView(value: fraction)
                         .frame(width: 90)
+                        .accessibilityLabel(stage.title)
                 } else {
                     Text(stage.title)
                         .foregroundStyle(.secondary)
@@ -719,6 +734,7 @@ private struct SecretField: View {
             Button(isShown ? "Скрыть" : "Показать") {
                 isShown.toggle()
             }
+            .accessibilityLabel(isShown ? "Скрыть \(title.lowercased())" : "Показать \(title.lowercased())")
             .controlSize(.small)
         }
     }
