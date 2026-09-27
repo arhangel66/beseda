@@ -359,3 +359,16 @@ final class BlockingKeychain: Keychain, @unchecked Sendable {
     #expect(settings.openRouterAPIKey == "sk-or-v1-saved")
     #expect(keychain.read(account: "beseda.webhookSecret") == nil)
 }
+
+@Test func testsNeverReachTheLoginKeychain() {
+    let service = "beseda-test-\(UUID().uuidString)"
+    let keychain = Keychain(service: service)
+    defer { keychain.deleteAll() }
+
+    let saved = keychain.save("secret", account: "beseda.webhookSecret")
+    keychain.deleteAll()
+
+    #expect(!Keychain.usesLoginKeychain)
+    #expect(saved)
+    #expect(keychain.read(account: "beseda.webhookSecret") == nil)
+}

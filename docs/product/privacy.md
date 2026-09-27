@@ -20,7 +20,8 @@ All under `~/Library/Application Support/Beseda` ([Storage](../architecture/stor
   encrypted.
 - `calls.sqlite.v<n>.backup` — a copy written before a schema migration.
 - `beseda-app.log` — the app log.
-- The OpenRouter key and the webhook secret are in the Keychain.
+- The OpenRouter key and the webhook secret are in the Keychain. A copy under another bundle id, one
+  launched with `CFFIXED_USER_HOME` or `BESEDA_NO_KEYCHAIN`, and the tests keep them in memory instead.
 
 Outside that folder: the **export folder** picked in Settings, one Markdown file per
 processed call.
