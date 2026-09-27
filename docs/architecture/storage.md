@@ -98,6 +98,7 @@ folder is moved here once by `LegacyDataMigration`.
   bits kept, so built binaries stay executable) and setting `completeUntilFirstUserAuthentication` file
   protection where the volume supports it. Right after it `BackupExclusion.apply` sets or clears
   `isExcludedFromBackup` on the data folder from the «резервные копии» setting ([Privacy](../product/privacy.md)).
+- **Export access** — Settings saves a security-scoped folder bookmark in sandboxed builds; export and deletion resolve it and balance access around file operations. An invalid or revoked bookmark requires reselection rather than falling back to an untrusted path. A stale bookmark is renewed while access is active. Direct builds continue using the stored path. If a copy belongs to an older folder outside the current scope, deletion stops before removing the call row; the old folder must be recovered before that copy can be removed.
 - **Deletion** — `CallStore.deleteCallAndFiles` moves the call folder to `trash/<uuid>/<call id>` next to
   the index (a rename), deletes the row, then removes the export copies — the one at the stored
   `calls.export_path` (the last written, whatever the title was then) and the one named by

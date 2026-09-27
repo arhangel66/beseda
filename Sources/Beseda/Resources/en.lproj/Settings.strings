@@ -181,3 +181,5 @@
 "Service did not respond within %@" = "Service did not respond within %@ seconds";
 "Webhook response %d%@ in %@ seconds" = "Service responded %d%@ in %@ seconds";
 "Summary server returned HTTP %d. Check the server and try again." = "Summary server returned HTTP %d. Check the server and try again.";
+
+"Выберите папку экспорта снова в настройках" = "Select the export folder again in Settings";
