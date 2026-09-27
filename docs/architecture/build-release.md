@@ -60,8 +60,10 @@ skipping what an earlier run already did:
    for byte with step 4 and checks the feed's `edSignature` with `sign_update --verify`.
 6. Only then copies the feed to `appcast.xml`, commits `Beseda <version>` and pushes `main`.
 
-A failure at any step leaves the feed untouched (or, at step 6, committed but not pushed), so the fix is to
-rerun; a published release without the feed is finished by the rerun, not refused.
+A failure at any step leaves the feed untouched (or, at step 6, copied but not committed, or committed but
+not pushed), so the fix is to rerun; a published release without the feed is finished by the rerun, not
+refused. The clean-tree check lets through exactly one leftover: an `appcast.xml`, staged or not, equal to
+`dist/v<version>/appcast.xml`; the rerun then only commits and pushes it. Any other change still refuses.
 
 Installed release copies check the feed hourly; `AppUpdater` holds the install until no call is being
 recorded. Dev builds carry no feed and never update themselves.
