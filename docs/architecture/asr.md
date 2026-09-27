@@ -30,9 +30,12 @@ the vendored Swift wrapper in `Vendor/TranscribeCpp`). No audio leaves the machi
   `SentenceBuilder` groups words into sentence segments (punctuation or a long pause).
 - **Diarization** — only the system channel is diarized. `Diarizer` wraps FluidAudio 0.17.4's
   `Nemotron3Diarizer` (NVIDIA Nemotron-3 Diarization, offline preset, Core ML, OpenMDW-1.1). Its 199 MB
-  (five files, pinned to one Hub revision) download on the first diarized call into
-  `runtime/models/nemotron-3-diarization/`, each file checked by size and sha256 after a free-space check, with
-  progress on the «Подготовка разбора голосов» stage. `SpeakerAssignment.remoteTurns` labels each sentence (`them-1`,
+  (five files, pinned to one Hub revision) download into `runtime/models/nemotron-3-diarization/`, each file
+  checked by size and sha256 after a free-space check: at background priority after launch once the speech
+  model is on disk (or right after a model is picked), never started during a recording and cancelled when one
+  starts; a failed or cancelled fetch is redone on the first diarized call, with progress on the
+  «Подготовка разбора голосов» stage. The app never reads FluidAudio's own cache
+  (`~/Library/Application Support/FluidAudio/Models`): models an earlier version left there are dead weight. `SpeakerAssignment.remoteTurns` labels each sentence (`them-1`,
   `them-2`…) with the speaker of the diarizer segment it overlaps most, or the nearest one when it lies
   outside diarizer speech; every sentence stays its own line with its own times, so clicking it seeks there.
   Per-word labels, the earlier rule, were twice as wrong ([speaker accuracy](../decisions/speaker-accuracy.md)).

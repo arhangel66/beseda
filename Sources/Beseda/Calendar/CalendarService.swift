@@ -25,7 +25,13 @@ struct CalendarEvent: Identifiable, Hashable, Sendable {
 @MainActor
 @Observable
 final class CalendarService {
+    #if DEBUG
+    // screenshots: an isolated copy is never granted access, so it can only pretend to have it
+    private(set) var authorization = ProcessInfo.processInfo.environment["BESEDA_PREVIEW_CALENDAR_ACCESS"] != nil
+        ? .fullAccess : EKEventStore.authorizationStatus(for: .event)
+    #else
     private(set) var authorization = EKEventStore.authorizationStatus(for: .event)
+    #endif
 
     @ObservationIgnored private let store = EKEventStore()
 

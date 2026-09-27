@@ -112,6 +112,8 @@ final class AppController {
     @ObservationIgnored let paths: AppPaths
     @ObservationIgnored private let transcriber: LocalTranscriber
     @ObservationIgnored let diarizer: Diarizer
+    /// one background download per launch; a failed or cancelled one is redone by processing
+    @ObservationIgnored private(set) var diarizerPrefetch: Task<Void, Never>?
     @ObservationIgnored private let callStore: CallStore
     @ObservationIgnored private let callDetector = CallDetector()
     @ObservationIgnored private let notifier = CallNotifier()
@@ -204,12 +206,17 @@ final class AppController {
 
     typealias Summarize = (StoredCallDetail, CallType?) async throws -> (type: CallType, text: String)
 
-    init(paths: AppPaths = .current, settings: AppSettings = AppSettings(), summarize: Summarize? = nil) {
+    init(
+        paths: AppPaths = .current,
+        settings: AppSettings = AppSettings(),
+        summarize: Summarize? = nil,
+        diarizer: Diarizer? = nil
+    ) {
         self.paths = paths
         self.settings = settings
         self.summarize = summarize
         transcriber = LocalTranscriber(paths: paths)
-        diarizer = Diarizer(paths: paths)
+        self.diarizer = diarizer ?? Diarizer(paths: paths)
         callStore = CallStore(dbURL: paths.callIndexURL)
         llamaServer = LlamaServer(paths: paths)
         janitor = StorageJanitor(callsDirectory: paths.callsDirectory)
@@ -303,6 +310,9 @@ final class AppController {
         if settings.calendarEnabled,
            let problem = calendarService.linkingProblem(selected: settings.calendarIdentifiers) {
             appendLog("Calendar linking off: \(problem)")
+        }
+        if runtime.isDownloaded(runtime.model) {
+            prefetchDiarizerModel()
         }
 
 
@@ -407,6 +417,8 @@ final class AppController {
             return
         }
 
+        // the recording gets the network and the disk to itself
+        diarizerPrefetch?.cancel()
         let silenceStop: TimeInterval? = settings.stopOnSilence ? 60 : nil
         activeTask = Task { [weak self] in
             await self?.runDualRecording(
@@ -664,6 +676,23 @@ final class AppController {
         runtime.select(model)
         if !runtime.isReady {
             runtime.install()
+        }
+        prefetchDiarizerModel()
+    }
+
+    /// the diarizer model, fetched at low priority so the first processed call does not wait for it
+    private func prefetchDiarizerModel() {
+        guard diarizerPrefetch == nil, !isRecording, !diarizer.isDownloaded else {
+            return
+        }
+        let diarizer = diarizer
+        diarizerPrefetch = Task(priority: .background) { [weak self] in
+            do {
+                try await diarizer.download()
+                self?.appendLog("Diarizer model downloaded")
+            } catch {
+                self?.appendLog("Diarizer model prefetch failed: \(error.localizedDescription)")
+            }
         }
     }
 
@@ -1269,6 +1298,8 @@ final class AppController {
             let started = Date()
             // the first run downloads the model: the longest wait of them all
             beginStage("Подготовка разбора голосов", step, of: total)
+            // two downloads would write the same partial files
+            await diarizerPrefetch?.value
             try await diarizer.prepareModels { [weak self] fraction in
                 Task { @MainActor in
                     self?.advanceStage(to: fraction)

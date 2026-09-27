@@ -22,8 +22,8 @@ private final class Harness {
         settings = AppSettings(defaults: UserDefaults(suiteName: suiteName)!, keychain: keychain ?? Keychain(service: suiteName))
     }
 
-    func controller(summarize: AppController.Summarize? = nil) -> AppController {
-        AppController(paths: paths, settings: settings, summarize: summarize)
+    func controller(summarize: AppController.Summarize? = nil, diarizer: Diarizer? = nil) -> AppController {
+        AppController(paths: paths, settings: settings, summarize: summarize, diarizer: diarizer)
     }
 
     func folder(_ id: String) throws -> URL {
@@ -436,4 +436,54 @@ func aDiskThatRefusesWritesStopsTheRecordingVisiblyAndKeepsWhatWasWritten() thro
     // the child's own expectations decide its exit status
     #expect(child.terminationReason == .exit)
     #expect(child.terminationStatus == 0)
+}
+
+/// the diarizer files a controller asked the network for
+private final class DownloadLog: @unchecked Sendable {
+    private let lock = NSLock()
+    private var sources: [URL] = []
+
+    var count: Int { lock.withLock { sources.count } }
+
+    func downloader() -> RuntimeDownloader {
+        { [self] source, _, _ in
+            lock.withLock { sources.append(source) }
+            throw BesedaError.processFailed("offline")
+        }
+    }
+}
+
+@MainActor
+@Test func aLaunchWithTheSpeechModelOnDiskPrefetchesTheDiarizerModel() async throws {
+    let harness = try Harness()
+    defer { harness.cleanUp() }
+    let model = harness.settings.speechModel
+    try FileManager.default.createDirectory(at: harness.paths.modelsDirectory, withIntermediateDirectories: true)
+    let modelURL = model.localURL(in: harness.paths.modelsDirectory)
+    FileManager.default.createFile(atPath: modelURL.path, contents: nil)
+    let modelFile = try FileHandle(forWritingTo: modelURL)
+    try modelFile.truncate(atOffset: UInt64(model.bytes))
+    try modelFile.close()
+    let downloads = DownloadLog()
+
+    let controller = harness.controller(
+        diarizer: Diarizer(paths: harness.paths, downloader: downloads.downloader(), freeSpace: { _ in nil })
+    )
+    await controller.diarizerPrefetch?.value
+
+    #expect(downloads.count == 1)
+}
+
+@MainActor
+@Test func aLaunchBeforeAnySpeechModelIsDownloadedLeavesTheDiarizerModelAlone() async throws {
+    let harness = try Harness()
+    defer { harness.cleanUp() }
+    let downloads = DownloadLog()
+
+    let controller = harness.controller(
+        diarizer: Diarizer(paths: harness.paths, downloader: downloads.downloader(), freeSpace: { _ in nil })
+    )
+
+    #expect(controller.diarizerPrefetch == nil)
+    #expect(downloads.count == 0)
 }
