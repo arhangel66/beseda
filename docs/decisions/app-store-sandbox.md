@@ -1,7 +1,7 @@
 ---
 type: Decision Record
 title: App Store sandbox audit
-description: Source-only audit of the App Sandbox effects on Beseda's current macOS features.
+description: Source audit and private stub-signing evidence for Beseda's App Sandbox route.
 status: proposed
 tags: [distribution, macos, sandbox, app-store]
 generated:
@@ -35,9 +35,9 @@ sources:
 
 ## Scope and evidence
 
-This is a local source and documentation audit. It did not build, sign, launch or install an app and did
-not use the network or live user data. Consequently, every runtime, signing, TCC and App Review check below
-is **parked**, not failed. The status labels mean:
+This is a local source audit with the private packaging checks recorded below. The archive was downloaded,
+but no app was launched or installed, no live user data was used, and no provisioned signature, runtime,
+TCC or App Review check was performed. Those checks are **parked**, not failed. The status labels mean:
 
 - **works** — the implementation shape is compatible, subject to the listed parked check;
 - **needs change** — known code or packaging work is required;
@@ -77,9 +77,14 @@ permission and Keychain behavior cannot be inferred from an isolated launch
 
 ## Proposed decision
 
-A store-specific runtime path now selects a signed bundle helper via `BesedaStoreSummary` and does not
-fetch or execute Application Support code. `scripts/package_store_summary.sh` prepares that helper from
-the pinned archive, but no signed store build or sandbox runtime test has been performed. The App Store
+A store-specific runtime path now selects a bundle helper via `BesedaStoreSummary` and does not
+fetch or execute Application Support code. A deterministic fixture check (`bash scripts/test_package_store_summary.sh`)
+rejected a wrong hash and confirmed helper/dylib placement, plist flag and inheritance-entitlement signing
+arguments without running the helper. On 2026-09-28, the pinned b10819 archive matched SHA-256
+`8933e736495eadfef0731ae32054acfaa75699bf4a6ccba77cd8475db085ec66`;
+`package_store_summary.sh` embedded it into a private minimal stub app, ad-hoc signed it (`-`), and
+`codesign --verify --strict --deep` passed. This is **not** a Developer ID or provisioned store signature,
+a full Beseda bundle, or a sandbox launch. No signed store build or sandbox runtime test has been performed. The App Store
 route remains **blocked pending a complete store build** (including the independent Sparkle split). Before submission it also
 requires persistent security-scoped export access, a store build without Sparkle, store entitlements and a
 provisioned Keychain access-group decision. In-process CTranscribe, EventKit and the resource-value backup
@@ -87,7 +92,7 @@ exclusion fit the sandbox based on current source. Process tap, login item and `
 unproven until the parked signed/live checks run; available local evidence does not justify a stronger
 claim.
 
-No signing or runtime result is recorded by this audit. When an App Store target exists, run the exact
+Only private ad-hoc stub signing is recorded above; no app was launched. When an App Store target exists, run the exact
 checks in the table and update this proposed record with observed results and the target's final
 entitlements.
 

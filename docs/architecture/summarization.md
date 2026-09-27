@@ -97,7 +97,11 @@ Store mode is selected by the signed bundle's `BesedaStoreSummary` plist flag: i
 `Contents/Helpers/llama-server`, never downloads a runtime and never executes the Application Support
 copy, even if one exists. The model remains downloadable data. `scripts/package_store_summary.sh`
 embeds the hash-checked archive's executable and dylibs and signs them with sandbox inheritance; it
-requires a separately prepared store app and signing identity. Both modes warm up once and `remove()`
+requires a separately prepared store app and signing identity. `bash scripts/test_package_store_summary.sh`
+checks hash rejection, embedded paths, plist flag and signing commands with private stubs. The pinned
+b10819 archive's SHA-256 matched the script on 2026-09-28; packaging into a private minimal app with
+ad-hoc signing passed `codesign --verify --strict --deep`. Neither check proves sandbox execution or a
+provisioned App Store build. Both modes warm up once and `remove()`
 deletes only the model.
 
 ## Main files
