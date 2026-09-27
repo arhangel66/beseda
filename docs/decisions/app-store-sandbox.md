@@ -73,6 +73,22 @@ calendar, network and user-selected read/write entitlements, an inherited-sandbo
 (including 18 resolving symlinks). No Sparkle files, appcast, feed keys or Sparkle executable dependency
 were found. This is still only ad-hoc static evidence, not a provisioned or runtime-tested Store build.
 
+BESEDA-307 rebuilt from `728b9f7027f1431b9c3ca5c46481e70c7e6c6e2d` (the only changes since the
+BESEDA-306 gate at `faa2152341677f70b4a9eef1e9bd2741c889be55` are that gate's logs/report
+and merge; no source, manifest, script or test changes). The retained private ad-hoc app is
+`.factory/private/BESEDA-307/Beseda-store.app`; its transport snapshot is
+`.factory/private/BESEDA-307/Beseda-store.zip` (SHA-256
+`d789ddd84e3dd95030bd2b92f315b4a52a7e481cc928b15f051aa086b69e91e0`). The archive's
+SHA-256 matched the pinned b10819 digest before packaging. The Store compiler build completed here;
+the direct (320), Store (317), and full (320 plus memory) test gate belongs to BESEDA-306's
+`faa2152` source revision, not a new runtime check. Strict deep app verification and strict helper
+and every non-symlink dylib verification passed on the retained copy. App sandbox, audio input,
+network client, calendars, user-selected read/write and helper sandbox inheritance were inspected;
+EN/RU resources and the Store helper plist marker were present. Static inspection found no Sparkle
+or appcast files or Sparkle linkage; Store source routes the helper to `Contents/Helpers` and guards
+runtime archive installation while retaining model downloads. Shell packaging and release stubs passed.
+This is static ad-hoc evidence only: no app launch, TCC, audio or provisioned sandbox runtime check.
+
 Still parked: owner-assisted full `swift test --jobs 2` including AppControllerLaunchTests; process-tap
 capture, sandbox runtime and permission prompts; provisioned Keychain/re-entry and login-item/FileVault
 checks; provisioned Apple signing, TestFlight and App Review. No launch, full suite, release or upload was

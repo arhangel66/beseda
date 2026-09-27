@@ -50,6 +50,19 @@ read/write. No Sparkle framework, feed or SU keys are present. Runtime resource 
 parked: no app launch, sandbox capture, Apple provisioning, TestFlight or review was attempted.
 These are assembled ad-hoc signature and resource checks, not provisioned signing or sandbox runtime evidence. A build alone is not proof of sandbox compatibility.
 
+BESEDA-307 assembled the current private Store candidate from source commit
+`728b9f7027f1431b9c3ca5c46481e70c7e6c6e2d`, whose code matches the BESEDA-306 green
+compiler/test gate revision `faa2152341677f70b4a9eef1e9bd2741c889be55` (intervening commits
+only add gate evidence). The pinned b10819 archive passed SHA-256 verification before packaging.
+The retained ignored artifact is `.factory/private/BESEDA-307/Beseda-store.app`, with a transport
+snapshot `.factory/private/BESEDA-307/Beseda-store.zip` (SHA-256
+`d789ddd84e3dd95030bd2b92f315b4a52a7e481cc928b15f051aa086b69e91e0`). Store compile,
+packaging/release shell stubs, strict deep app and strict helper/dylib codesign verification passed.
+EN/RU resources, sandbox/helper inheritance entitlements and Store-only bundled helper were checked;
+no Sparkle/feed assets, Sparkle linkage or Store runtime executable download route was found.
+This does not establish runtime sandbox compatibility or provisioned Apple signing; nothing was launched.
+The BESEDA-255 retained artifact remains separate historical evidence.
+
 ## Check
 
 `swift test --jobs 2` (from `AGENTS.md`) builds the app and runs every test except the heavy ones gated by
