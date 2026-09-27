@@ -42,7 +42,11 @@ swift test --jobs 2
 
 Agents in this repo do not use Serena/LSP tools (sourcekit-lsp indexing eats tens of GB of RAM); they use grep/read, and `swift test` runs with `--jobs 2`.
 
-It builds the app and runs every test. `theInstalledModelTranscribesRealSpeech` is skipped unless the
+Run builds and checks only in your own worktree, never in the main checkout
+/Users/mikhail/w/learning/beseda: SwiftPM locks `.build`, and waiting on another agent's lock costs 20–40 min a day.
+
+It builds the app and runs every test except the heavy ones gated by `BESEDA_FULL_CHECK=1`
+(`noReadGrowsWithTheLengthOfTheCall`, `liveLoopLogsOnceAndStopsWhenTheSpeechModelIsMissing`); ~11 s after the build. `theInstalledModelTranscribesRealSpeech` is skipped unless the
 speech model is installed in Application Support and `samples/jfk.wav` (gitignored) is in the checkout.
 
 The app sources live in `Sources/Beseda` and the tests in `Tests/BesedaTests`, so SwiftPM never walks the
@@ -50,11 +54,18 @@ rest of the checkout: `.factory/`, `untracked/` or a large scratch folder at the
 If the check still stalls before compiling and `.build/build.db` is gigabytes, delete `.build` and rerun: a
 clean run takes ~1.5 min and ~1.2 GB of `.build`.
 
+The full check is `scripts/full_check.sh` (~1.7 min after the build): every test with `BESEDA_FULL_CHECK=1`,
+then the 1 h synthetic-call memory tests. Run it when `Package.swift`, `Storage` migrations, `Audio/` capture
+or the long-call read path (`EchoGate`, `UtteranceSplitter`, `GrowingWAVFile`) change. `release.sh` always
+runs it, and a LaunchAgent runs it nightly on native-ui (`scripts/install_nightly_check.sh`; see
+docs/architecture/build-release.md).
+
 ## No-focus, no-sound
 
 Someone works on this Mac. Never bring a window to the front and never play into the Mac's output device:
-launch Beseda only with `open -n -g -j --env CFFIXED_USER_HOME="$(mktemp -d)"` on a copy with its own bundle
-id, shoot windows with the kit's `scripts/window-shot.swift` (it never activates), and send audio to files or
+launch Beseda only through `scripts/screenshot_copy.sh`: it bundles a copy with its own bundle id from this
+worktree's `.build` (incremental after the check, never a scratch build path) and opens it with
+`open -n -g -j --env CFFIXED_USER_HOME="$(mktemp -d)"`; shoot windows with the kit's `scripts/window-shot.swift` (it never activates), and send audio to files or
 BlackHole only. See the kit's `docs/headless.md` and `docs/macos.md`.
 The login keychain is shared even so: `Keychain` keeps secrets in memory unless the bundle id is
 `app.beseda.Beseda` with no `CFFIXED_USER_HOME` or `BESEDA_NO_KEYCHAIN`, so copies and tests never prompt.

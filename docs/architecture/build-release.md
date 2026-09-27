@@ -17,7 +17,10 @@ scratch folder at the root do not slow the build.
 
 ## Check
 
-`swift test --jobs 2` (from `AGENTS.md`) builds the app and runs every test.
+`swift test --jobs 2` (from `AGENTS.md`) builds the app and runs every test except the heavy ones gated by
+`BESEDA_FULL_CHECK=1`. `scripts/full_check.sh` is the full check: all tests with that flag, then the 1 h
+synthetic-call memory tests (`BESEDA_LONG_CALL_MEMORY=echo|asr`). Measured 2026-09-27, M2 Max, after the
+build: fast 27.2 → 11.0 s, full 102.6 s.
 `theInstalledModelTranscribesRealSpeech` is skipped unless the speech model is installed and
 `samples/jfk.wav` is present.
 
@@ -33,7 +36,18 @@ scratch folder at the root do not slow the build.
   with the first "Developer ID Application" identity, or the first "Apple Development" one when there is
   none. Only the `release` flavour adds the Sparkle feed, public EdDSA key and hourly automatic checks.
 - `scripts/Beseda.entitlements` — the app's hardened-runtime entitlements.
-- `scripts/release.sh` — publishes a release (below).
+- `scripts/release.sh` — publishes a release (below); runs `full_check.sh` before the release build.
+- `scripts/screenshot_copy.sh` — builds a copy with bundle id `app.beseda.shot` from this checkout's own
+  `.build` into `.build/Beseda-shot.app` (ad-hoc signed) and opens it hidden with a fresh
+  `CFFIXED_USER_HOME`. Never touches `/Applications/Beseda.app` or its data.
+- `scripts/nightly_check.sh` — the nightly full check: native-ui in its own detached worktree
+  `~/Library/Caches/beseda-nightly-check`, `nice -n 19`, skipped when free memory is under 20 % or a
+  Beseda call is recording (an open `*.raw.wav`). Log: `~/Library/Logs/beseda-nightly-check.log`. On
+  failure only, one `bb notify` (digest, source and dedupe key `beseda-nightly-check`).
+- `scripts/install_nightly_check.sh` — writes and loads the LaunchAgent
+  `~/Library/LaunchAgents/app.beseda.nightly-check.plist` (03:30 daily, Nice 19, background). Uninstall:
+  `launchctl bootout gui/$(id -u)/app.beseda.nightly-check` then
+  `rm ~/Library/LaunchAgents/app.beseda.nightly-check.plist`.
 
 ## Releasing
 
