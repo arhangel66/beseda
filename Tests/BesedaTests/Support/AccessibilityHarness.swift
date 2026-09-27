@@ -24,7 +24,8 @@ public final class AccessibilityHarness<Content: View> {
     }
 
     public var elements: [NSObject] {
-        Self.walk(NSAccessibility.unignoredDescendant(of: window.contentView) as? NSObject)
+        var visited = Set<ObjectIdentifier>()
+        return Self.walk(NSAccessibility.unignoredDescendant(of: window.contentView) as? NSObject, visited: &visited)
     }
 
     public func element(identifier: String) -> NSObject? {
@@ -48,13 +49,13 @@ public final class AccessibilityHarness<Content: View> {
         return true
     }
 
-    private static func walk(_ element: NSObject?) -> [NSObject] {
-        guard let element else { return [] }
+    private static func walk(_ element: NSObject?, visited: inout Set<ObjectIdentifier>) -> [NSObject] {
+        guard let element, visited.insert(ObjectIdentifier(element)).inserted else { return [] }
         let accessibilityChildren = (element as? NSView)?.accessibilityChildren()
             ?? element.accessibilityAttributeValue(.children) as? [Any]
             ?? []
         let viewChildren = (element as? NSView)?.subviews ?? []
         let children = accessibilityChildren.compactMap { $0 as? NSObject } + viewChildren
-        return [element] + children.flatMap(walk)
+        return [element] + children.flatMap { walk($0, visited: &visited) }
     }
 }
