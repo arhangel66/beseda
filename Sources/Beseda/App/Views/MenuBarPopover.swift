@@ -1,8 +1,7 @@
 import AVFAudio
 import SwiftUI
 
-/// The menu-bar window. Its shape never changes with the app state: status, recording
-/// controls, the latest call, then the same commands in the same place.
+/// The menu-bar window shows recording controls in place of recent calls and commands.
 struct MenuBarPopover: View {
     let controller: AppController
     let openConversations: () -> Void
@@ -17,9 +16,9 @@ struct MenuBarPopover: View {
             if !controller.isRecording {
                 Divider()
                 latestCalls
+                Divider()
+                commands
             }
-            Divider()
-            commands
         }
         .padding(14)
         .frame(width: 340)
