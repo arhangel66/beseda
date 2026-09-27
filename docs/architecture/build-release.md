@@ -123,16 +123,20 @@ Microphone/BlackHole capture and a full transcription were not run: a new bundle
    survives a password change, can be revoked alone. An app-specific password works too but breaks
    when the Apple ID password is reset.
 
+   The shared credentials file is `~/.config/apple/asc.env`, mode `0600`. It contains `ASC_KEY_ID`,
+   `ASC_ISSUER_ID`, `ASC_KEY_P8_PATH` and `DEVELOPMENT_TEAM`; the key path points to the existing
+   mode-`0600` `.p8` file in the same mode-`0700` directory. WholeBook uses the same files, so do not
+   move, copy, rewrite or change their permissions. After confirming `DEVELOPMENT_TEAM` is
+   `PRH5UQNC57`, load the file without printing it and store the profile with:
+
    ```
+   set -a; source ~/.config/apple/asc.env; set +a
    xcrun notarytool store-credentials beseda-notary \
-       --key ~/secrets/AuthKey_<KEY_ID>.p8 --key-id <KEY_ID> --issuer <ISSUER_ID>
+       --key "$ASC_KEY_P8_PATH" --key-id "$ASC_KEY_ID" --issuer "$ASC_ISSUER_ID"
+   xcrun notarytool history --keychain-profile beseda-notary
    ```
 
-   Secrets for the bb secrets form: `ASC_API_KEY_P8` (the `.p8` file contents), `ASC_API_KEY_ID`
-   (10 characters), `ASC_API_ISSUER_ID` (UUID). The alternative instead: `APPLE_ID`,
-   `APPLE_APP_SPECIFIC_PASSWORD`, team id `PRH5UQNC57`
-   (`store-credentials beseda-notary --apple-id … --team-id PRH5UQNC57 --password …`).
-   The certificate itself is not a secret for the form: it is created in the account on this Mac.
+   The certificate itself is not in this file: it was created in the account on this Mac.
 
 ### Release with notarization
 
