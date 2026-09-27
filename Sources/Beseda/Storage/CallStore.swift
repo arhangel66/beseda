@@ -532,9 +532,14 @@ final class CallStore: @unchecked Sendable {
             return
         }
         let previousExport = try exportPath(callID: id).map { URL(fileURLWithPath: $0) }
-        if requireExportScope, let previousExport,
-           previousExport.deletingLastPathComponent().standardizedFileURL != exportFolder?.standardizedFileURL {
-            throw ExportDeletionError.oldFolder
+        if requireExportScope {
+            if let previousExport,
+               previousExport.deletingLastPathComponent().standardizedFileURL != exportFolder?.standardizedFileURL {
+                throw ExportDeletionError.oldFolder
+            }
+            if previousExport == nil && exportFolder == nil {
+                throw ExportDeletionError.oldFolder
+            }
         }
         // Copy before deleting the row: a failed database write must never require a fallible restore.
         let fileManager = FileManager.default

@@ -75,6 +75,30 @@ private func permissions(_ url: URL) throws -> Int {
     try relaunched.retryPendingExports()
 }
 
+@Test func legacyDeletionWithoutFolderScopeRetainsCallAndCopy() throws {
+    let root = try temporaryDirectory()
+    let folder = root.appendingPathComponent("calls/id", isDirectory: true)
+    let export = root.appendingPathComponent("export", isDirectory: true)
+    try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+    try FileManager.default.createDirectory(at: export, withIntermediateDirectories: true)
+    let store = CallStore(dbURL: root.appendingPathComponent("calls.sqlite"))
+    try store.prepare()
+    try store.upsertCall(id: "id", kind: "dual", startedAt: Date(), endedAt: nil, durationSec: nil,
+                         status: "ready", transcriptURL: nil, audioDirectoryURL: folder, error: nil, appName: nil)
+    let call = try #require(try store.fetchCall(id: "id"))
+    let copy = export.appendingPathComponent(CallExport.fileName(call))
+    try Data("copy".utf8).write(to: copy)
+    #expect(throws: CallStore.ExportDeletionError.self) {
+        try store.deleteCallAndFiles(id: "id", exportFolder: nil, requireExportScope: true)
+    }
+    #expect(try store.fetchCall(id: "id") != nil)
+    #expect(FileManager.default.fileExists(atPath: folder.path))
+    #expect(FileManager.default.fileExists(atPath: copy.path))
+    try store.deleteCallAndFiles(id: "id", exportFolder: export, requireExportScope: true)
+    #expect(try store.fetchCall(id: "id") == nil)
+    #expect(!FileManager.default.fileExists(atPath: copy.path))
+}
+
 @Test func deniedOldExportKeepsNewPathAndRetries() throws {
     let root = try temporaryDirectory()
     let a = root.appendingPathComponent("A", isDirectory: true)
