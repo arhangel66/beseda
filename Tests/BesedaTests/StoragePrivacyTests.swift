@@ -75,6 +75,61 @@ private func permissions(_ url: URL) throws -> Int {
     try relaunched.retryPendingExports()
 }
 
+@Test func eachDeniedExportFolderRetriesOnlyUnderItsOwnScope() throws {
+    let root = try temporaryDirectory()
+    defer { try? FileManager.default.removeItem(at: root) }
+    let database = root.appendingPathComponent("calls.sqlite")
+    let store = CallStore(dbURL: database)
+    try store.prepare()
+    try store.upsertCall(id: "id", kind: "dual", startedAt: Date(), endedAt: nil, durationSec: nil,
+                         status: "ready", transcriptURL: nil, audioDirectoryURL: root.appendingPathComponent("calls/id"),
+                         error: nil, appName: nil)
+    let folders = ["A", "B", "C"].map { root.appendingPathComponent($0, isDirectory: true) }
+    for folder in folders { try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true) }
+    let paths = folders.map { $0.appendingPathComponent("copy.md") }
+    for path in paths { try Data("copy".utf8).write(to: path) }
+    let ledger = root.appendingPathComponent("pending-export-cleanup.json")
+    func pending() throws -> Set<String> {
+        Set(try JSONDecoder().decode([String: [String]].self, from: Data(contentsOf: ledger))["id"] ?? [])
+    }
+    struct Denied: Error {}
+    var allowed = Set<String>()
+    var starts: [String] = []
+    var stops: [String] = []
+    func scoped(_ folder: String, _ remove: () throws -> Void) throws {
+        if !allowed.contains(folder) { throw Denied() }
+        starts.append(folder)
+        defer { stops.append(folder) }
+        try remove()
+    }
+    try store.replaceExportCopy(callID: "id", with: paths[0])
+    for path in paths.dropFirst() {
+        #expect(throws: Denied.self) {
+            try store.replaceExportCopy(callID: "id", with: path, withOldFolder: scoped)
+        }
+    }
+    #expect(try pending() == Set(paths.prefix(2).map(\.path)))
+    #expect(try store.exportPath(callID: "id") == paths[2].path)
+    #expect(paths.allSatisfy { FileManager.default.fileExists(atPath: $0.path) })
+
+    let relaunched = CallStore(dbURL: database)
+    try relaunched.prepare()
+    allowed.insert(folders[0].path)
+    #expect(throws: Denied.self) { try relaunched.retryPendingExports(withOldFolder: scoped) }
+    #expect(try pending() == [paths[1].path])
+    #expect(!FileManager.default.fileExists(atPath: paths[0].path))
+    #expect(FileManager.default.fileExists(atPath: paths[1].path))
+    #expect(FileManager.default.fileExists(atPath: paths[2].path))
+    allowed.insert(folders[1].path)
+    try relaunched.retryPendingExports(withOldFolder: scoped)
+    #expect(try pending().isEmpty)
+    #expect(!FileManager.default.fileExists(atPath: paths[1].path))
+    #expect(FileManager.default.fileExists(atPath: paths[2].path))
+    #expect(try relaunched.exportPath(callID: "id") == paths[2].path)
+    #expect(Set(starts) == Set(folders.prefix(2).map(\.path)))
+    #expect(starts == stops)
+}
+
 @Test func legacyDeletionWithoutFolderScopeRetainsCallAndCopy() throws {
     let root = try temporaryDirectory()
     let folder = root.appendingPathComponent("calls/id", isDirectory: true)

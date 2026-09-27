@@ -939,19 +939,25 @@ final class CallStore: @unchecked Sendable {
 
     func retryPendingExports(withOldFolder: (String, () throws -> Void) throws -> Void = { _, body in try body() }) throws {
         var pending = try pendingExports()
+        var firstError: Error?
         for (id, paths) in pending {
             for path in paths {
-                // A path reused for a live export must never be removed.
-                if try exportPath(callID: id) != path, FileManager.default.fileExists(atPath: path) {
-                    try withOldFolder(URL(fileURLWithPath: path).deletingLastPathComponent().path) {
-                        try FileManager.default.removeItem(atPath: path)
+                do {
+                    // A path reused for a live export must never be removed.
+                    if try exportPath(callID: id) != path, FileManager.default.fileExists(atPath: path) {
+                        try withOldFolder(URL(fileURLWithPath: path).deletingLastPathComponent().path) {
+                            try FileManager.default.removeItem(atPath: path)
+                        }
                     }
+                    pending[id]?.removeAll { $0 == path }
+                    if pending[id]?.isEmpty == true { pending.removeValue(forKey: id) }
+                    try JSONEncoder().encode(pending).write(to: pendingExportsURL, options: .atomic)
+                } catch {
+                    if firstError == nil { firstError = error }
                 }
-                pending[id]?.removeAll { $0 == path }
-                if pending[id]?.isEmpty == true { pending.removeValue(forKey: id) }
-                try JSONEncoder().encode(pending).write(to: pendingExportsURL, options: .atomic)
             }
         }
+        if let firstError { throw firstError }
     }
 
     /// a renamed call is written under a new name: the copy under the old one goes, or it lingers
