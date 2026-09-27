@@ -213,6 +213,8 @@ Effort is S (hours), M (days), or L (weeks). Priority is P0 (blocks safe sale or
     the feed; make reruns idempotent.
     Fixed in BESEDA-88: the release is uploaded on a pushed tag, downloaded back and compared with the local
     zip before the appcast is written into the repo, committed and pushed; a rerun needs the tag deleted.
+    Rerunnable since BESEDA-103: draft release first, the feed signed from the uploaded bytes, the public
+    URL and signature checked after publishing, the feed pushed last; a rerun at the same commit resumes.
 
 22. **Tests do not prove the destructive and distributable paths — P1, M.** The suite has unit coverage for
     copied WAV repair and storage helpers, but no subprocess-kill test spanning capture → crash → relaunch →
