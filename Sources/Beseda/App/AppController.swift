@@ -299,6 +299,10 @@ final class AppController {
         } catch {
             appendLog("Could not empty the deleted calls' trash: \(error.localizedDescription)")
         }
+        if settings.calendarEnabled,
+           let problem = calendarService.linkingProblem(selected: settings.calendarIdentifiers) {
+            appendLog("Calendar linking off: \(problem)")
+        }
 
 
         startDailySweep()
