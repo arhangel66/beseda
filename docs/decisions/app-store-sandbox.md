@@ -63,15 +63,20 @@ binary text occurrence of “sparkles” was an unrelated localized word). Both 
 Store bookmark/deletion/localization tests, three direct updater tests and packaging/release shell stubs
 passed. This is **ad-hoc full-bundle static evidence**, not provisioned Store signing or runtime proof.[^verification]
 
-The BESEDA-288 worktree was removed before this record was updated. Its ignored artifact was not available
-to copy to a stable private location; the absolute path above is historical evidence, **not an extant
-inspectable artifact**. Reassemble and verify an artifact in a retained private location before any later
-inspection; do not treat the handoff alone as a release artifact.
+The BESEDA-288 worktree was removed; its path above is historical evidence. BESEDA-290 downloaded the
+pinned archive again, verified the same SHA-256, built direct and Store variants with `swift build --jobs 2`
+in its own worktree, then assembled the full ad-hoc app. The inspectable retained copy is
+`/Users/mikhail/w/learning/beseda/.factory/private/BESEDA-255/Beseda-store.app`, outside worker
+worktrees in the ignored factory private directory. Both source and copy passed
+`codesign --verify --strict --deep`. Both have English and Russian resources, a sandboxed app with audio,
+calendar, network and user-selected read/write entitlements, an inherited-sandbox helper, and 35 dylibs
+(including 18 resolving symlinks). No Sparkle files, appcast, feed keys or Sparkle executable dependency
+were found. This is still only ad-hoc static evidence, not a provisioned or runtime-tested Store build.
 
 Still parked: owner-assisted full `swift test --jobs 2` including AppControllerLaunchTests; process-tap
 capture, sandbox runtime and permission prompts; provisioned Keychain/re-entry and login-item/FileVault
 checks; provisioned Apple signing, TestFlight and App Review. No launch, full suite, release or upload was
-performed for this documentation update.
+performed for this retained artifact rebuild.
 
 [^verification]: BESEDA-288 verification handoff supplied the artifact path, digest, static checks and
-filtered test results. Its ignored worktree artifact is no longer present; those checks were not rerun here.
+filtered test results. Its ignored worktree artifact is no longer present; BESEDA-290 repeated the archive, build and full-bundle static checks on a new copy.
