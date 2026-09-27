@@ -39,8 +39,9 @@ build: fast 27.2 → 11.0 s, full 102.6 s.
 - `scripts/release.sh` — publishes a release (below); runs `full_check.sh` before the release build.
 - `scripts/screenshot_copy.sh` — builds a copy with a random bundle id `app.beseda.shot.<random>` per run from this checkout's own
   `.build` into `.build/Beseda-shot.app` (including Sparkle, ad-hoc signed without a timestamp or keychain access) and opens it hidden with a fresh
-  `CFFIXED_USER_HOME`; the defaults domain is deleted when the copy quits (cfprefsd ignores
-  `CFFIXED_USER_HOME`, so a fixed id would share defaults across runs). Never touches `/Applications/Beseda.app` or its data.
+  `CFFIXED_USER_HOME` and `BESEDA_CLEAN_DEFAULTS=1`; the latter prevents the isolated copy importing the old
+  `app.podushka.Podushka` domain from the owner's cfprefsd. The random defaults domain is deleted when the copy
+  quits. Never touches `/Applications/Beseda.app` or its data.
 - `scripts/nightly_check.sh` — the nightly full check: native-ui in its own detached worktree
   `~/Library/Caches/beseda-nightly-check`, `nice -n 19`, skipped when free memory is under 20 % or a
   Beseda call is recording (an open `*.raw.wav`). Log: `~/Library/Logs/beseda-nightly-check.log`. On
@@ -185,6 +186,27 @@ up; the keys read "" until it returns, and recording never needs them.
   `.build/artifacts/sparkle/Sparkle/bin/generate_keys -x <file>` into 1Password and delete the file.
 - Podushka (up to 0.2.2) is a different app and never updates into Beseda; it is replaced by installing
   Beseda by hand once.
+
+## Headless UI journey
+
+`swift test --jobs 2` runs `UIJourneyContractTests`: an isolated-only `BESEDA_SEEDED_JOURNEY=1` fixture
+creates a deterministic two-speaker archived call, and the test verifies archive lookup, search, stored summary,
+copy rendering, speaker merge and deletion without recording, network, dialogs or clipboard writes. The app's
+stable accessibility surface is:
+
+| Screen | Identifier | Label/action |
+| --- | --- | --- |
+| Onboarding | `onboarding.window`, `onboarding.advance` | visible step text; «Назад» and the visible advance title |
+| Archive | `archive.sidebar`, `archive.search` | call title; «Искать в разговорах» |
+| Call result | `call.summary` | picker label «Раздел», segment «Итоги» |
+| Copy | `call.copy-transcript` | «Скопировать расшифровку», selected format as value; ⇧⌘C |
+| Speaker | `call.speaker-line.<speaker-key>` | «Переименовать участника» and «Объединить с <name>» actions |
+| Delete | `call.delete` | «Удалить разговор» |
+
+No app was launched or signed for this contract. It does not claim a driven end-to-end UI run. When launch
+verification resumes, host the views in a never-ordered-front window (or use external AX only when
+`AXIsProcessTrusted()` is true without prompting), walk the rendered NSAccessibility tree, traverse onboarding
+and all controls by keyboard, invoke the hidden speaker merge action, confirm deletion, and verify copied text.
 
 ## ios kit
 

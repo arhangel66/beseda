@@ -328,7 +328,9 @@ final class AppSettings {
     }
 
     init(defaults: UserDefaults = .standard, keychain: Keychain = .app) {
-        if defaults === UserDefaults.standard, let legacy = UserDefaults(suiteName: "app.podushka.Podushka") {
+        if defaults === UserDefaults.standard,
+           ProcessInfo.processInfo.environment["BESEDA_CLEAN_DEFAULTS"] == nil,
+           let legacy = UserDefaults(suiteName: "app.podushka.Podushka") {
             AppSettings.importLegacyValues(from: legacy, into: defaults)
         }
         self.defaults = defaults

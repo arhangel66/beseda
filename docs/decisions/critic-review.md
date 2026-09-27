@@ -261,4 +261,10 @@ Effort is S (hours), M (days), or L (weeks). Priority is P0 (blocks safe sale or
     be driven reliably by a release smoke test. Add labels/values to icon-only and dynamic controls, then one
     XCUITest journey for onboarding, record state, archive navigation, copy and delete.
     Labels done in BESEDA-96: accessibility labels/values on icon-only and dynamic controls in `App/Views/`.
-    No UI-test target: the XCUITest journey is not done.
+    BESEDA-176 adds stable identifiers for onboarding, archive, search, summary, copy, speaker rows and delete;
+    speaker merge is an accessibility action rather than a context-menu-only operation. `swift test` now runs a
+    seeded, isolated integration journey through archive storage, search, stored summary, copy rendering, speaker
+    merge and deletion, plus the real-app seed guard. It does not launch or sign the app, order a window, inspect
+    the rendered NSAccessibility tree, type keys or click controls. Once the launch pause ends, the remaining
+    verification is a no-focus driver run over these identifiers and labels, including onboarding keyboard
+    traversal, the hidden participant action, confirmation-dialog deletion and clipboard output.
