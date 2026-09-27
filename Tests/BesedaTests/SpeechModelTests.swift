@@ -46,3 +46,11 @@ import Testing
     try Data("truncated".utf8).write(to: model.localURL(in: directory))
     #expect(!model.isDownloaded(in: directory))
 }
+
+@Test func stateLabelCallsOnlyTheSelectedUsableModelReady() {
+    #expect(SpeechModel.stateLabel(isSelected: true, isDownloaded: true, isReady: true) == "Готова")
+    #expect(SpeechModel.stateLabel(isSelected: true, isDownloaded: true, isReady: false) == "Выбрана · скачана")
+    #expect(SpeechModel.stateLabel(isSelected: true, isDownloaded: false, isReady: false) == "Выбрана · не скачана")
+    #expect(SpeechModel.stateLabel(isSelected: false, isDownloaded: true, isReady: true) == "Скачана")
+    #expect(SpeechModel.stateLabel(isSelected: false, isDownloaded: false, isReady: true) == nil)
+}

@@ -55,6 +55,15 @@ struct MenuBarPopover: View {
         return false
     }
 
+    private var missingModelLine: String {
+        // the title above already says «Нет модели распознавания», so the line carries only the state
+        SpeechModel.stateLabel(
+            isSelected: true,
+            isDownloaded: controller.runtime.isDownloaded(controller.runtime.model),
+            isReady: controller.runtime.isReady
+        ) ?? ""
+    }
+
     private var lastCall: StoredCallSummary? {
         guard let id = controller.lastReadyCallID else {
             return nil
@@ -207,7 +216,7 @@ struct MenuBarPopover: View {
             }
             if isSpeechModelMissing {
                 HStack(spacing: 6) {
-                    Label("Модель не скачана", systemImage: "exclamationmark.triangle.fill")
+                    Label(missingModelLine, systemImage: "exclamationmark.triangle.fill")
                         .foregroundStyle(.orange)
                     Spacer(minLength: 0)
                     SettingsSectionLink(section: "processing", controller: controller) {

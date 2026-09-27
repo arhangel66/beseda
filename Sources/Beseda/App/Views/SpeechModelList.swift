@@ -36,10 +36,12 @@ private struct SpeechModelCard: View {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
                 Text(model.title)
                     .font(.body.weight(.semibold))
-                if isActive {
-                    // a selected model that is not on disk transcribes nothing, so it must not look ready
-                    let badgeColor = isDownloaded ? Color.green : Color.orange
-                    Text(isDownloaded ? "Готова" : "Выбрана")
+                if let stateLabel = SpeechModel.stateLabel(
+                    isSelected: isActive, isDownloaded: isDownloaded, isReady: controller.runtime.isReady
+                ) {
+                    // a selected model that is not ready transcribes nothing, so it must not look ready
+                    let badgeColor = stateLabel == "Готова" ? Color.green : isActive ? Color.orange : Color.secondary
+                    Text(stateLabel)
                         .font(.caption.weight(.medium))
                         .foregroundStyle(badgeColor)
                         .padding(.horizontal, 7)

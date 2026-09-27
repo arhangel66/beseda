@@ -23,9 +23,11 @@ What the code does today. Settings tabs are named as in the app: Основны�
   Обработка: Parakeet v3 (25 languages) or GigaAM v3 (Russian) — `Transcription/SpeechModel.swift`,
   `Transcription/LocalTranscriber.swift`. Speakers inside the system channel are separated with NVIDIA's
   Nemotron-3 Diarization via FluidAudio (`Transcription/Diarizer.swift`; 199 MB, OpenMDW-1.1, downloaded in the
-  background once a speech model is picked, and listed with its licence under Обработка) and can be renamed. The picked model's card reads «Выбрана» until it
-  is on disk and «Готова» after; without a ready model the popover disables «Начать запись» and shows
-  «Модель не скачана» with a link to Обработка.
+  background once a speech model is picked, and listed with its licence under Обработка) and can be renamed. One set of state words
+  (`SpeechModel.stateLabel`) is shown on the cards in onboarding and Обработка and in the popover: «Выбрана · не
+  скачана», «Выбрана · скачана» (on disk, not yet usable), «Скачана» (another model on disk), and «Готова» only
+  for the selected, usable model; without a ready model the popover disables «Начать запись» and shows
+  the state with a link to Обработка.
 - **Archive and search.** Calls are indexed in SQLite with transcripts on disk (`Storage/CallStore.swift`).
   The conversations window groups calls by day, plays the audio (`Audio/CallPlayer.swift`) and searches
   call metadata and transcript text. Under Хранение, retention rules delete raw or normalized audio and
@@ -61,7 +63,9 @@ What the code does today. Settings tabs are named as in the app: Основны�
   fixes it: «Открыть доступ…» without access, «Выбрать календари…» when a picked calendar is gone.
 - **Webhook.** A finished transcript is POSTed as JSON to a URL set under Интеграции → «Свой сервис», with an optional secret
   as the bare `Authorization` header value (https only, http just for localhost), retried on failure, with a delivery log (`Webhooks/`).
-- **Onboarding.** A first-run window: welcome, microphone and system audio permissions, speech model
+- **Onboarding.** A first-run window: welcome (headline «Аудио остаётся на этом Mac», with the exception —
+  text goes to the cloud only for features the user turns on — in the same block), «Два источника звука»
+  (microphone and system sound, each with its own action; the footer points to Настройки → Запись), speech model
   download, a test recording that shows both channels (`App/Views/OnboardingWindow.swift`).
 - **Updates.** Sparkle checks hourly and installs when no call is being recorded; Основные → Обновления
   checks by hand (`Runtime/AppUpdater.swift`).
