@@ -169,6 +169,8 @@ system appearance was Light. Screenshots are in `.factory/shots/BESEDA-ux2/`.
 
 BESEDA-155 changed the onboarding and model-state copy described above. The referenced after shots under `.factory/shots/BESEDA-153/` are not present in this checkout, so no visual verification or working after-shot links can be cited here; the fixed markers reflect the source changes, not a new screenshot review.
 
+A later live recording screenshot showed the bottom commands still visible despite the BESEDA-175 claim above. BESEDA-191 now gates both recent calls and bottom commands on `!isRecording`; this is a source change, not a screenshot verification. The in-process AccessibilityHarness test window exposed no SwiftUI descendants for `MenuBarPopover` (even its stop button was absent), so AX assertions against this view would be vacuous. Onboarding, Settings, live disclosure, and previous-call visual states remain unverified by AX; no screenshots were taken for this change.
+
 No screenshots were taken for BESEDA-175 because signing, installation, and app launch were paused. Exact shots left for the follow-up: recording popover with the live disclosure collapsed and expanded; Settings → Основные; Settings → Запись with automatic recording on; Settings → Запись during and after «Проверить звук»; Settings → Обработка with model details collapsed and expanded; Settings → Интеграции with a missing selected calendar; Settings → Интеграции with webhook developer details collapsed and expanded.
 
 The host process did not have Accessibility permission. AX tree queries returned no descendants, AX actions could
