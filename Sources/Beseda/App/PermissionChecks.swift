@@ -37,14 +37,14 @@ final class PermissionsModel {
         }
 
         if IsolatedCopy.skips("AVAudioApplication.requestRecordPermission") {
-            microphone = .denied("Доступ к микрофону не выдан")
+            microphone = .denied(FirstRunText.get("Доступ к микрофону не выдан"))
             return
         }
         microphone = .checking
         let granted = await withCheckedContinuation { continuation in
             AVAudioApplication.requestRecordPermission { continuation.resume(returning: $0) }
         }
-        microphone = granted ? .granted : .denied("Доступ к микрофону не выдан")
+        microphone = granted ? .granted : .denied(FirstRunText.get("Доступ к микрофону не выдан"))
     }
 
     /// the only honest check is opening a tap: macOS grants system audio per app, silently
@@ -63,8 +63,8 @@ final class PermissionsModel {
         }.value
 
         if let result {
-            systemAudio = .denied(result)
-            Self.openPrivacySettings(pane: "Privacy_Microphone")
+            systemAudio = .denied("\(FirstRunText.get("System audio check failed")): \(result). \(FirstRunText.get("Check System Settings → Privacy & Security → Screen & System Audio Recording, then retry."))")
+            Self.openPrivacySettings(pane: "Privacy_ScreenCapture")
         } else {
             systemAudio = .granted
         }
@@ -75,7 +75,7 @@ final class PermissionsModel {
         case .granted:
             .granted
         case .denied:
-            .denied("Доступ к микрофону запрещён в системных настройках")
+            .denied(FirstRunText.get("Доступ к микрофону запрещён в системных настройках"))
         default:
             .idle
         }

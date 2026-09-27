@@ -15,14 +15,14 @@ struct OnboardingWindow: View {
     @State private var monitor = LevelMonitor()
 
     private static let texts = [
-        ("Аудио остаётся на этом Mac",
-         "Беседа записывает звонки и превращает их в текст прямо здесь, аудио в сеть не уходит. Текст уходит в облако, только если вы сами включите: итоги через OpenRouter, Jev или живые тезисы с ключом."),
-        ("Два источника звука",
-         "Микрофон пишет вас, системный звук — собеседника. Проверю оба сразу, чтобы первая настоящая встреча не оказалась первой попыткой."),
-        ("Модель распознавания",
-         "Речь превращается в текст на этом Mac. Для этого нужно один раз скачать модель распознавания — от 270 до 490 МБ, смотря какую выбрать."),
-        ("Проверим, что вас слышно",
-         "Скажите пару слов: если полоска двигается, микрофон и системный звук пойдут в запись.")
+        (FirstRunText.get("Аудио остаётся на этом Mac"),
+         FirstRunText.get("Беседа записывает звонки и превращает их в текст прямо здесь, аудио в сеть не уходит. Текст уходит в облако, только если вы сами включите: итоги через OpenRouter, Jev или живые тезисы с ключом.")),
+        (FirstRunText.get("Два источника звука"),
+         FirstRunText.get("Микрофон пишет вас, системный звук — собеседника. Проверю оба сразу, чтобы первая настоящая встреча не оказалась первой попыткой.")),
+        (FirstRunText.get("Модель распознавания"),
+         FirstRunText.get("Речь превращается в текст на этом Mac. Для этого нужно один раз скачать модель распознавания — от 270 до 490 МБ, смотря какую выбрать.")),
+        (FirstRunText.get("Проверим, что вас слышно"),
+         FirstRunText.get("Скажите пару слов: если полоска двигается, микрофон и системный звук пойдут в запись."))
     ]
 
     var body: some View {
@@ -63,7 +63,7 @@ struct OnboardingWindow: View {
 
                 Spacer()
 
-                Button("Назад") {
+                Button(FirstRunText.get("Назад")) {
                     step -= 1
                 }
                 .disabled(step == 1)
@@ -118,17 +118,17 @@ struct OnboardingWindow: View {
         case 2:
             VStack(spacing: 8) {
                 PermissionRow(
-                    label: "Микрофон",
-                    hint: "Чтобы записывать вас",
-                    action: "Разрешить доступ",
+                    label: FirstRunText.get("Микрофон"),
+                    hint: FirstRunText.get("Чтобы записывать вас"),
+                    action: FirstRunText.get("Разрешить доступ"),
                     state: permissions.microphone
                 ) {
                     Task { await permissions.requestMicrophone() }
                 }
                 PermissionRow(
-                    label: "Системный звук",
-                    hint: "Чтобы записывать собеседника — без этого получится монолог",
-                    action: "Проверить звук",
+                    label: FirstRunText.get("Системный звук"),
+                    hint: FirstRunText.get("Чтобы записывать собеседника — без этого получится монолог"),
+                    action: FirstRunText.get("Проверить звук"),
                     state: permissions.systemAudio
                 ) {
                     Task { await permissions.checkSystemAudio() }
@@ -163,16 +163,16 @@ struct OnboardingWindow: View {
     }
 
     private static let promises = [
-        "Аудио и текст лежат в папке на этом компьютере — их видно в Finder.",
-        "Расшифровка делается без интернета, моделью на этом Mac.",
-        "Аудио можно удалять автоматически, оставляя только текст."
+        FirstRunText.get("Аудио и текст лежат в папке на этом компьютере — их видно в Finder."),
+        FirstRunText.get("Расшифровка делается без интернета, моделью на этом Mac."),
+        FirstRunText.get("Аудио можно удалять автоматически, оставляя только текст.")
     ]
 
     private var testButtonTitle: String {
         if monitor.isRunning {
-            return "Слушаю…"
+            return FirstRunText.get("Слушаю…")
         }
-        return monitor.heardMicrophone ? "Записать ещё раз" : "Записать 10 секунд"
+        return monitor.heardMicrophone ? FirstRunText.get("Записать ещё раз") : FirstRunText.get("Записать 10 секунд")
     }
 
     private var testHint: String {
@@ -180,48 +180,48 @@ struct OnboardingWindow: View {
             return failure
         }
         if monitor.isRunning {
-            return "Скажите что-нибудь"
+            return FirstRunText.get("Скажите что-нибудь")
         }
         if monitor.heardMicrophone && monitor.heardSystemAudio {
-            return "Оба канала слышны — можно записывать встречи"
+            return FirstRunText.get("Оба канала слышны — можно записывать встречи")
         }
         if monitor.heardMicrophone {
-            return "Микрофон слышен, системный звук молчал — включите музыку и проверьте ещё раз"
+            return FirstRunText.get("Микрофон слышен, системный звук молчал — включите музыку и проверьте ещё раз")
         }
-        return "Проверю оба канала сразу"
+        return FirstRunText.get("Проверю оба канала сразу")
     }
 
     private var runtimeHint: String {
         if controller.runtime.isSpeechModelReady {
-            return "Модель скачана, расшифровка работает без интернета"
+            return FirstRunText.get("Модель скачана, расшифровка работает без интернета")
         }
         if controller.runtime.isInstalling {
-            return "Можно идти дальше, скачивание не прервётся"
+            return FirstRunText.get("Можно идти дальше, скачивание не прервётся")
         }
-        return "Parakeet понимает 25 языков, GigaAM — только русский, зато почти вдвое легче"
+        return FirstRunText.get("Parakeet понимает 25 языков, GigaAM — только русский, зато почти вдвое легче")
     }
 
     private var footnote: String {
         switch step {
         case 2:
-            "Системный звук можно проверить и позже: Настройки → Запись"
+            FirstRunText.get("Системный звук можно проверить и позже: Настройки → Запись")
         case 3:
-            "Без модели записи останутся без текста. Скачать её можно и потом: Настройки → Обработка"
+            FirstRunText.get("Без модели записи останутся без текста. Скачать её можно и потом: Настройки → Обработка")
         case 4:
-            "Эта запись никуда не сохранится"
+            FirstRunText.get("Эта запись никуда не сохранится")
         default:
-            "Шаг \(step) из \(Self.stepCount)"
+            String(format: FirstRunText.get("Шаг %d из %d"), step, Self.stepCount)
         }
     }
 
     private var advanceTitle: String {
         switch step {
         case 3 where !controller.runtime.isSpeechModelReady:
-            "Пропустить"
+            FirstRunText.get("Пропустить")
         case Self.stepCount:
-            "Готово"
+            FirstRunText.get("Готово")
         default:
-            "Дальше"
+            FirstRunText.get("Дальше")
         }
     }
 
@@ -280,14 +280,14 @@ private struct PermissionRow: View {
                 HStack(spacing: 7) {
                     Image(systemName: "checkmark")
                         .font(.callout.weight(.bold))
-                    Text("Готово")
+                    Text(FirstRunText.get("Готово"))
                 }
                 .font(.callout)
                 .foregroundStyle(Color.green)
             case .checking:
                 HStack(spacing: 8) {
                     ProgressView().controlSize(.small)
-                    Text("Проверка…")
+                    Text(FirstRunText.get("Проверка…"))
                         .font(.callout)
                         .foregroundStyle(.tertiary)
                 }
