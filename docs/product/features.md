@@ -22,7 +22,9 @@ What the code does today. Settings tabs are named as in the app: Основны�
 - **Local transcription.** transcribe.cpp runs in the app process with a GGUF model the user picks under
   Обработка: Parakeet v3 (25 languages) or GigaAM v3 (Russian) — `Transcription/SpeechModel.swift`,
   `Transcription/LocalTranscriber.swift`. Speakers inside the system channel are separated with FluidAudio
-  (`Transcription/Diarizer.swift`) and can be renamed.
+  (`Transcription/Diarizer.swift`) and can be renamed. The picked model's card reads «Выбрана» until it
+  is on disk and «Готова» after; without a ready model the popover disables «Начать запись» and shows
+  «Модель не скачана» with a link to Обработка.
 - **Archive and search.** Calls are indexed in SQLite with transcripts on disk (`Storage/CallStore.swift`).
   The conversations window groups calls by day, plays the audio (`Audio/CallPlayer.swift`) and searches
   call metadata and transcript text. Under Хранение, retention rules delete raw or normalized audio and
@@ -49,7 +51,10 @@ What the code does today. Settings tabs are named as in the app: Основны�
   «Удалить» in the conversations toolbar or a sidebar row's context menu, after a confirmation, removes the
   call's row and transcript, its folder and its export copy (`CallStore.deleteCallAndFiles`); a call being
   recorded or processed cannot be deleted. Under Обработка → «Кто пишет итоги», one note says what leaves the Mac
-  (OpenRouter for summaries or Jev, a remote LM Studio host, the webhook) or that nothing does.
+  (OpenRouter for summaries or Jev, a remote LM Studio host, the webhook) or that nothing does. With
+  «Только локально» on and a cloud or remote provider picked, a second note says the built-in model writes
+  the summaries and the rows below are that model's, with its «Скачать»; its missing-model error says
+  «Скачайте её в Настройках → Обработка».
 - **Calendar.** With calendar access, a call is named after the matching calendar event from the calendars
   picked under Интеграции (`Calendar/CalendarService.swift`).
 - **Webhook.** A finished transcript is POSTed as JSON to a URL set under Интеграции → «Свой сервис», with an optional secret

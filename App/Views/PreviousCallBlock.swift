@@ -24,7 +24,12 @@ struct PreviousCallBlock: View {
     /// the sidebar has little room, so it shows a few lines only
     var digestLineLimit: Int?
     let open: (String) -> Void
+    #if DEBUG
+    // screenshots: BESEDA_PREVIEW_WHOLE_SUMMARY opens the block as if «Показать полностью» was pressed
+    @State private var showsWholeSummary = ProcessInfo.processInfo.environment["BESEDA_PREVIEW_WHOLE_SUMMARY"] != nil
+    #else
     @State private var showsWholeSummary = false
+    #endif
 
     /// a whole custom-prompt result could fill the pane, so it starts at a few lines
     private var lineLimit: Int? {

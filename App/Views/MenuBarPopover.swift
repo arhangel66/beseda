@@ -43,7 +43,16 @@ struct MenuBarPopover: View {
                         .foregroundStyle(.secondary)
                 }
             }
+            .accessibilityElement(children: .combine)
         }
+    }
+
+    /// no speech model on disk and none coming down: a recording would end without text
+    private var isSpeechModelMissing: Bool {
+        guard case .running = controller.runtime.state(of: .speechModel) else {
+            return !controller.runtime.isReady
+        }
+        return false
     }
 
     private var lastCall: StoredCallSummary? {
@@ -72,10 +81,13 @@ struct MenuBarPopover: View {
                 if controller.isRecording {
                     Text(CallFormatting.mmss(controller.elapsedRecordingSeconds))
                         .font(.title3.monospacedDigit())
+                        .accessibilityLabel("Длительность")
                 }
             }
+            .accessibilityElement(children: .combine)
             if let stage = controller.jobStage {
                 ProgressView(value: stage.overall)
+                    .accessibilityLabel(stage.title)
             }
             if let warning = controller.recordingWarning {
                 Label(warning, systemImage: "exclamationmark.triangle.fill")
@@ -118,7 +130,7 @@ struct MenuBarPopover: View {
         case .completed where lastCall != nil:
             "Расшифровка готова"
         case .idle, .completed:
-            "Готова к записи"
+            isSpeechModelMissing ? "Нет модели распознавания" : "Готова к записи"
         }
     }
 
@@ -181,12 +193,24 @@ struct MenuBarPopover: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .keyboardShortcut("r", modifiers: .command)
-                .disabled(controller.isBusy)
+                .disabled(controller.isBusy || isSpeechModelMissing)
                 .help(controller.isBusy ? "Новую запись можно начать после расшифровки" : "")
                 Spacer(minLength: 0)
                 Toggle("Автозапись", isOn: Bindable(controller.settings).autoDetectEnabled)
                     .toggleStyle(.switch)
                     .controlSize(.small)
+            }
+            if isSpeechModelMissing {
+                HStack(spacing: 6) {
+                    Label("Модель не скачана", systemImage: "exclamationmark.triangle.fill")
+                        .foregroundStyle(.orange)
+                    Spacer(minLength: 0)
+                    SettingsSectionLink(section: "processing", controller: controller) {
+                        Text("Открыть «Обработку»")
+                    }
+                    .buttonStyle(.link)
+                }
+                .font(.caption)
             }
             if controller.jobStage != nil {
                 Text("Разговор сохранён. Меню можно закрыть — расшифровка закончится в фоне.")
@@ -252,6 +276,9 @@ struct MenuBarPopover: View {
                 .foregroundStyle(.secondary)
                 .frame(width: 66, alignment: .trailing)
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Уровень звука: \(label)")
+        .accessibilityValue("\(Int((level * 100).rounded()))%")
     }
 
     // MARK: - Latest calls

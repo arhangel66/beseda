@@ -1756,18 +1756,23 @@ final class AppController {
 
     /// a failed write (disk full, the 4 GB WAV limit) keeps what reached the disk and ends the call there
     private func stopRecording(after writeError: any Error, capture: DualCapture) {
-        let warning = Self.recordingWarning(forWriteError: writeError)
-        recordingWarning = warning
+        recordingWarning = Self.recordingWarning(forWriteError: writeError)
         appendLog("Recording write failed: \(writeError.localizedDescription)")
-        notifier.recordingStopped(reason: warning)
+        // the notification's title already says «Запись остановлена»
+        let reason = Self.recordingStopReason(forWriteError: writeError)
+        notifier.recordingStopped(reason: reason.prefix(1).uppercased() + reason.dropFirst())
         capture.stop(reason: .writeFailed)
     }
 
     nonisolated static func recordingWarning(forWriteError writeError: any Error) -> String {
+        "Запись остановлена: " + recordingStopReason(forWriteError: writeError)
+    }
+
+    nonisolated static func recordingStopReason(forWriteError writeError: any Error) -> String {
         if case AudioCaptureError.fileFull = writeError {
-            return "Запись остановлена: файл достиг предела в 4 ГБ (около 3 часов). Всё записанное до этого будет расшифровано."
+            return "файл достиг предела в 4 ГБ (около 3 часов). Всё записанное до этого будет расшифровано."
         }
-        return "Запись остановлена: не удалось записать звук на диск (\(writeError.localizedDescription)). Всё записанное до этого будет расшифровано."
+        return "не удалось записать звук на диск (\(writeError.localizedDescription)). Всё записанное до этого будет расшифровано."
     }
 
     private func stopLiveTicker() {

@@ -234,9 +234,13 @@ Effort is S (hours), M (days), or L (weeks). Priority is P0 (blocks safe sale or
     (`.factory/BESEDA-83-shots/settings-обработка.png`). “Selected” and “installed/ready” are different states;
     calling the former active makes a user expect recording to work. Rename it “Выбрана”, reserve “Готова”
     for a verified model, and put the blocking state beside the record control.
+    Addressed in BESEDA-96: «Выбрана» / «Готова» badges; the popover disables «Начать запись» and shows
+    «Модель не скачана» with a link to Обработка. The built-in summary model already read «Скачать» / «Скачана».
 
 25. **The native UI has no automated accessibility contract — P2, M.** Only the player position has an
     explicit accessibility label in `App/Views/` (`PlayerBar.swift:140`), and there is no UI-test target.
     Icon-only recording, status, speaker editing and navigation controls can regress for VoiceOver and cannot
     be driven reliably by a release smoke test. Add labels/values to icon-only and dynamic controls, then one
     XCUITest journey for onboarding, record state, archive navigation, copy and delete.
+    Labels done in BESEDA-96: accessibility labels/values on icon-only and dynamic controls in `App/Views/`.
+    No UI-test target: the XCUITest journey is not done.

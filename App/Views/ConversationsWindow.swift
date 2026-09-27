@@ -33,6 +33,7 @@ struct ConversationsWindow: View {
                     }
                     .disabled(!controller.canDelete(detail.summary))
                     .help("Удалить разговор со всеми файлами")
+                    .accessibilityLabel("Удалить разговор")
                 }
                 RecordingToolbarButton(controller: controller)
             }
@@ -117,6 +118,8 @@ private struct RecordingToolbarButton: View {
                     .foregroundStyle(.red)
             }
             .help(controller.isPaused ? "Пауза. Остановить запись (⌘R)" : "Идёт запись. Остановить (⌘R)")
+            .accessibilityLabel("Остановить запись")
+            .accessibilityValue((controller.isPaused ? "Пауза, " : "Идёт запись, ") + CallFormatting.mmss(controller.elapsedRecordingSeconds))
         } else {
             Button {
                 controller.startCallRecording()
@@ -125,6 +128,7 @@ private struct RecordingToolbarButton: View {
             }
             .disabled(controller.isBusy)
             .help(controller.isBusy ? "Дождитесь конца расшифровки" : "Начать запись (⌘R)")
+            .accessibilityLabel("Начать запись")
         }
     }
 }

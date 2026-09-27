@@ -97,6 +97,8 @@ struct PlayerBar: View {
                     }
                     .controlSize(.small)
                     .help("Скорость воспроизведения")
+                    .accessibilityLabel("Скорость воспроизведения")
+                    .accessibilityValue(player.speedLabel)
                 } else {
                     missingAudioNote
                 }
@@ -120,6 +122,7 @@ struct PlayerBar: View {
                 .frame(width: 16)
         }
         .help(player.isPlaying ? "Пауза" : "Воспроизвести")
+        .accessibilityLabel(player.isPlaying ? "Пауза" : "Воспроизвести")
         .disabled(!player.isAvailable)
     }
 
@@ -138,6 +141,7 @@ struct PlayerBar: View {
                     .opacity(player.isAvailable ? 0.85 : 0)
                     .disabled(!player.isAvailable)
                     .accessibilityLabel("Позиция воспроизведения")
+                    .accessibilityValue(player.clockLabel)
             }
             if !lanes.isEmpty {
                 legend
@@ -166,6 +170,7 @@ struct PlayerBar: View {
                         Circle().strokeBorder(Color(nsColor: .windowBackgroundColor), lineWidth: 1.5)
                     }
                     .help("\(lane.label) · \(Int((lane.share * 100).rounded()))%")
+                    .accessibilityLabel("\(lane.label), \(Int((lane.share * 100).rounded()))% разговора")
             }
         }
     }
