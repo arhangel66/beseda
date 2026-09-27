@@ -1618,7 +1618,9 @@ final class AppController {
         do {
             try settings.withExportFolder { folder in
                 let url = try CallExport.write(detail, result: result, type: type, to: folder)
-                try callStore.replaceExportCopy(callID: detail.id, with: url)
+                try callStore.replaceExportCopy(callID: detail.id, with: url) { oldFolder, remove in
+                    try settings.withExportFolder(at: oldFolder) { _ in try remove() }
+                }
                 appendLog("Exported \(detail.id) to \(url.path)")
             }
         } catch {

@@ -104,9 +104,10 @@ folder is moved here once by `LegacyDataMigration`.
   originals intact and the pending entry cannot remove them while the row exists. After a successful
   row delete, removal failures retain the entry and surface an error. Launch retries pending paths
   with security-scoped access to each external folder and shows unresolved failures in the existing
-  delete error UI; it then empties trash. Only the recorded `export_path` is authoritative: legacy
-  rows without one do not infer an old export from the currently selected folder. Changing folders
-  does not change the recorded path. Segments, jobs, speakers and webhook deliveries go by
+  delete error UI; it then empties trash. The recorded `export_path` is authoritative when present. Legacy rows without one use the
+  selected folder and the call's old export filename; failure to remove it remains in pending cleanup.
+  Re-export records the new path before removing the old copy, and records old-copy cleanup durably
+  before changing the row. Changing folders does not change the recorded path. Segments, jobs, speakers and webhook deliveries go by
   `ON DELETE CASCADE`; `secure_delete` and WAL truncation scrub deleted text. Sandbox/TCC checks
   with real revoked or stale bookmarks remain parked pending owner-granted runtime access.
 
