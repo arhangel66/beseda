@@ -40,8 +40,9 @@ folder is moved here once by `LegacyDataMigration`.
   `calendarItemExternalIdentifier` of a recurring event) and `calls.participants` (event attendees except
   the user, lowercased emails, newline-joined) are nullable TEXT written by `setEvent` whenever an event
   is matched or picked; calls linked before them stay null.
-  `calls.one_other_person` (nullable INTEGER) is the classifier's «exactly one other person» answer
-  (`setOneOtherPerson`, BESEDA-104), a measurement that relabels nothing (BESEDA-107); null means never answered.
+  `calls.one_other_person` (nullable INTEGER) is unused since BESEDA-120 removed the 1:1 variant; it held the
+  classifier's «exactly one other person» answer (BESEDA-104). It stays in the schema: dropping a column means
+  rebuilding `calls` in SQLite, a riskier migration than an unused nullable column.
 - **Writes throw** — every index write in the recording and retry pipeline (`saveCall`,
   `upsertTranscriptJob`) throws into the job's error path, which shows the failure in the status line. A
   finished transcript goes in through `markReady`: segments and `status = 'ready'` in one transaction; only
@@ -60,7 +61,10 @@ folder is moved here once by `LegacyDataMigration`.
   line's context menu «Объединить с» folds its speaker into another remote one: `mergeSpeaker` rewrites
   `transcript_segments.speaker` and drops the merged key's rename in one transaction, then
   `transcript.md` is rewritten. `me` is never offered. The speaker count is not stored anywhere; lanes and
-  names are derived from the segments, so they follow. A retry re-diarizes and undoes the merge.
+  names are derived from the segments, so they follow. Each merge is also kept in `call_speaker_merges`
+  (`call_id`, `from_key` → `into_key`, in the order made); whenever segments are written (`markReady` after
+  «Расшифровать снова»), they are reapplied in that order and transcript.md's dialogue is rewritten. This holds
+  because re-diarizing the same audio gives the same keys (checked on the 15 truth calls, BESEDA-120).
   Before/after: [evidence/beseda-80-before-merge.png](evidence/beseda-80-before-merge.png), [evidence/beseda-80-after-merge.png](evidence/beseda-80-after-merge.png).
 - **Paging** — the sidebar loads 200 calls, newest first; «Показать ещё» fetches the next 200 by offset,
   and refreshes keep however many are loaded.

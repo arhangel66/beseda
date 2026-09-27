@@ -358,6 +358,7 @@ final class CallStore {
             ("event_series_id", "TEXT"),
             ("participants", "TEXT"),
             ("export_path", "TEXT"),
+            // unused since BESEDA-120 (the 1:1 variant is gone); left in place because dropping a column is riskier
             ("one_other_person", "INTEGER")
         ] where !callColumns.contains(column) {
             try execute(db, "ALTER TABLE calls ADD COLUMN \(column) \(type)")
@@ -412,6 +413,15 @@ final class CallStore {
                 speaker_key TEXT NOT NULL,
                 display_name TEXT NOT NULL,
                 PRIMARY KEY (call_id, speaker_key)
+            )
+            """)
+        // «Объединить с» per call, reapplied when a rerun writes the diarizer's keys again
+        try execute(db, """
+            CREATE TABLE IF NOT EXISTS call_speaker_merges (
+                call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE,
+                from_key TEXT NOT NULL,
+                into_key TEXT NOT NULL,
+                PRIMARY KEY (call_id, from_key)
             )
             """)
         try execute(db, """
@@ -616,7 +626,7 @@ final class CallStore {
                 guard sqlite3_changes(db) == 1 else {
                     throw CallStoreError.sqlite("No call \(callID) to mark ready")
                 }
-                // after the path is set: a known 1:1 call's merge rewrites that file
+                // after the path is set: reapplying a manual merge rewrites that file
                 try writeSegments(db, callID: callID, segments: segments)
             }
         }
@@ -634,19 +644,20 @@ final class CallStore {
                 "\(callID)-\(segment.orderIndex)", callID, segment.speaker,
                 segment.startSec, segment.endSec, segment.text, segment.orderIndex)
         }
-        try mergeRemoteSpeakersOfOneToOneCall(db, callID: callID)
+        try applyStoredSpeakerMerges(db, callID: callID)
     }
 
-    private func mergeRemoteSpeakersOfOneToOneCall(_ db: OpaquePointer, callID: String) throws {
-        // a calendar event with exactly one other attendee: the diarizer's extra `them-N` are that person's short
-        // replies (docs/decisions/speaker-accuracy.md). Not `one_other_person`: the local model said «один» on 3 of 5
-        // dailies, and this relabel is one-way. Plain `them` (no diarization) and group calls stay as they are
-        try run(db, """
-            UPDATE transcript_segments SET speaker = 'them-1'
-            WHERE call_id = ? AND speaker LIKE 'them-%' AND speaker != 'them-1'
-              AND (SELECT instr(participants, char(10)) = 0 FROM calls WHERE id = ?)
-            """, callID, callID)
-        guard sqlite3_changes(db) > 0,
+    private func applyStoredSpeakerMerges(_ db: OpaquePointer, callID: String) throws {
+        // a rerun of the same audio gives the same keys (checked in BESEDA-120), so the user's merges still hold
+        let merges = try query(db, "SELECT from_key, into_key FROM call_speaker_merges WHERE call_id = ? ORDER BY rowid", callID) {
+            (columnString($0, 0) ?? "", columnString($0, 1) ?? "")
+        }
+        var changed = false
+        for (fromKey, intoKey) in merges {
+            try run(db, "UPDATE transcript_segments SET speaker = ? WHERE call_id = ? AND speaker = ?", intoKey, callID, fromKey)
+            changed = changed || sqlite3_changes(db) > 0
+        }
+        guard changed,
               let path = try query(db, "SELECT transcript_path FROM calls WHERE id = ?", callID, row: { columnString($0, 0) })
                 .first ?? nil
         else {
@@ -656,14 +667,6 @@ final class CallStore {
         try TranscriptMerger.rewriteDialogue(
             in: URL(fileURLWithPath: path), segments: try segments(db, callID: callID), names: try speakerNames(db, callID: callID)
         )
-    }
-
-    /// the classifier's «exactly one other person» answer, stored as a measurement only: it does not relabel speakers
-    func setOneOtherPerson(callID: String, _ oneOtherPerson: Bool) throws {
-        try database { db in
-            try run(db, "UPDATE calls SET one_other_person = ?, updated_at = ? WHERE id = ?",
-                    oneOtherPerson, Date().iso8601WithFractions, callID)
-        }
     }
 
     func upsertTranscriptJob(
@@ -770,7 +773,6 @@ final class CallStore {
                     updated_at = ?
                 WHERE id = ?
                 """, title, eventID, pinned, seriesID, joinedParticipants, Date().iso8601WithFractions, callID)
-            try mergeRemoteSpeakersOfOneToOneCall(db, callID: callID)
         }
     }
 
@@ -973,7 +975,7 @@ final class CallStore {
         }
     }
 
-    /// relabels every segment of `speakerKey` as `targetKey`; the merged speaker's name goes with it
+    /// relabels every segment of `speakerKey` as `targetKey` and remembers it for reruns; the merged speaker's name goes with it
     func mergeSpeaker(callID: String, speakerKey: String, into targetKey: String) throws {
         try database { db in
             try execute(db, "BEGIN IMMEDIATE TRANSACTION")
@@ -981,6 +983,8 @@ final class CallStore {
                 try run(db, "UPDATE transcript_segments SET speaker = ? WHERE call_id = ? AND speaker = ?",
                         targetKey, callID, speakerKey)
                 try run(db, "DELETE FROM call_speakers WHERE call_id = ? AND speaker_key = ?", callID, speakerKey)
+                try run(db, "INSERT OR REPLACE INTO call_speaker_merges (call_id, from_key, into_key) VALUES (?, ?, ?)",
+                        callID, speakerKey, targetKey)
                 try execute(db, "COMMIT")
             } catch {
                 try? execute(db, "ROLLBACK")

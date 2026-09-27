@@ -176,46 +176,38 @@ embeddings are too short and distorted to join the main cluster. Longest diarize
 extras, ≥ 10 s on 9 of 10 main speakers. Not echo of Mikhail (cosine to his voice ≤ 0.15), not music or
 notifications.[^cause]
 
-**6 s merge dropped (BESEDA-93).** BESEDA-84 merged every `them` speaker whose longest segment was under 6 s.
-It fixed 9 of 10 one-to-one calls, but it is a fitted deletion rule: a real participant who only gives short
-replies is erased on any call (critic review, finding 14), and 7 s already erased a real colleague on a daily.
-Diarization of every call is back to plain t0.70 + sentence assignment.
+**Rule: the 6 s merge, interim default (BESEDA-84, restored in BESEDA-120).** A remote speaker whose longest
+diarizer segment is under 6 s gives each of its segments to the nearest-in-time kept speaker; if no speaker has
+a 6 s segment, the one with the most seconds stays. t0.70 is unchanged. It lives in
+`SpeakerAssignment.mergingShortReplies`, before sentences get their speakers.
 
-**Rule (implemented, BESEDA-93).** Only a call known to be 1:1 gets one remote speaker: every `them-N` of its
-stored segments becomes `them-1`. `CallStore` applies it whenever segments are written and whenever an event is
-linked, so an event matched after diarization relabels too. Signals the app has:
+It is a fitted deletion rule: a real participant who only gives short replies is erased on any call (critic
+review, finding 14), and 7 s already erased a real colleague on a daily. BESEDA-93 dropped it for a
+"one remote speaker only on known 1:1 calls" variant; on 2026-09-27 Mikhail brought the 6 s rule back as the
+default because it cuts the real-call error from 20 to 4 and the 1:1 variant had nothing reliable to fire on:
 
-- calendar event with exactly one attendee besides Mikhail (`calls.participants`) — **used**;
-- a 1:1 call type — **not there**: the defaults hold only «Другое», Mikhail's own list only adds «Дейли»;
-  types are user-defined names with no "1:1" meaning, so a later type change relabels nothing;
-- inferred participant count — **stored, not used** (BESEDA-104, BESEDA-107): the call-type classification also
-  answers «exactly one other person?» on a transcript with every remote speaker labelled «Удалённо», and the
-  answer is kept in `calls.one_other_person` as a measurement. It does not relabel: the bundled local model said
-  «один» on 3 of 5 dailies (20260925-125945, 20260924-130017, 20260922-125838;
-  untracked/epics/speaker-accuracy/results/one-to-one-forced.md), the relabel is one-way, and the Jev answer is
-  unmeasured. Only the calendar signal is known, not guessed (critic review, finding 14).
+- the calendar has no event for ad-hoc calls, so none of the 15 stored calls had one linked and the variant
+  equalled t0.70;
+- the local LLM's «exactly one other person?» answered «один» on 3 of 5 dailies (20260925-125945,
+  20260924-130017, 20260922-125838), so relabelling on it erased real people.[^oneToOne]
 
-Unlinking the event or switching to a group event does not split the speakers back (re-transcribe to undo).
+Both the calendar path and the classifier question are removed (BESEDA-120).
 
-| | t0.70 | 6 s merge (dropped) | this rule |
-|---|---|---|---|
-| real calls, total speaker-count error (15 calls) | 20 | 4 | 20 |
-| 1:1 calls exact (of 10) | 0 | 9 | 0 |
-| benchmark DER real (VoxConverse + AMI) | 0.119 | 0.118 | 0.119 |
-| benchmark speaker-count error real | 0.60 | 0.80 | 0.60 |
+| | t0.70 | 6 s merge (default) |
+|---|---|---|
+| real calls, total speaker-count error (15 calls) | 20 | 4 |
+| 1:1 calls exact (of 10) | 0 | 9 |
+| benchmark DER real (VoxConverse + AMI) | 0.119 | 0.118 |
+| benchmark speaker-count error real | 0.60 | 0.80 |
 
-The rule fires on none of the 15 stored calls: none of them has a calendar event linked, so today it equals
-t0.70. With a linked two-person event it would give 10 of 10 one-to-one calls exact and leave the dailies as
-they are. The benchmark has no call metadata, so it equals t0.70 by construction.[^oneToOne]
+The app path gives the same counts as the harness ([app-merge.md][^merge], rerun in BESEDA-120).
+
+**Escape hatch.** When the rule glues or splits wrongly, «Объединить с» in the call view merges two remote
+speakers (BESEDA-80). Each merge is stored per call and applied again after «Расшифровать снова»: rerunning
+the diarizer on the same audio gives the same keys, checked on the 15 calls in BESEDA-120. There is no split.
 
 **Caveat (critic finding 15).** The real counts are inferred from transcript text by an LLM, not hand-labelled,
 and counts cannot show a merge and a split that cancel out.
-
-**Inferred count measured (BESEDA-104), bundled model only.** 10 of 10 one-to-one calls answered «один» → one
-remote speaker, but 3 of 5 dailies also answered «один» and collapse to one remote speaker; a count-asking
-prompt was worse (9/10, 3 dailies) and was reverted. So with the bundled model the rule erases real people on
-dailies; the Jev path is unmeasured (no cloud in the harness). Open decision: relabel on the local answer at
-all, or only on Jev once it is measured.[^oneToOne]
 
 [^cause]: [results/extra-speaker-cause.md](../../untracked/epics/speaker-accuracy/results/extra-speaker-cause.md)
 [^merge]: [results/short-reply-merge.md](../../untracked/epics/speaker-accuracy/results/short-reply-merge.md), [results/app-merge.md](../../untracked/epics/speaker-accuracy/results/app-merge.md)
