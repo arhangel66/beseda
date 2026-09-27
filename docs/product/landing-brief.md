@@ -5,44 +5,46 @@ status: proposed
 ---
 # Beseda landing message
 
-**Headline:** Помните, о чём договорились на рабочем звонке.
+**Audience:** Independent consultants and developers who need to remember what was agreed in client calls, dailies and other work conversations. Write for Western-market Mac users; do not imply an English-only interface.
 
-**Subhead:** Беседа записывает разговоры на Mac и расшифровывает их локально. После звонка — поиск по тексту и итоги по вашему шаблону; перед следующим связанным звонком — напоминание о прошлых договорённостях.
+**Headline:** Remember what you agreed on in your last work call.
 
-Для психолога это может быть личный архив с собственным шаблоном итогов, **не** клиническая документация, диагноз или обещание конфиденциальности без действий пользователя. Не смешивать этот сценарий с обещанием продуктивности рабочих встреч.
+**Subhead:** Beseda records calls on your Mac and transcribes them locally. After a call, search the transcript or create a summary with your own prompt. Before the next related call, revisit what was agreed last time.
 
-## Три момента
+**Optional, separate use case — psychologists:** A personal archive with a custom summary prompt, **not** clinical documentation, a diagnosis, or a promise of confidentiality without action by the user. Do not blend this use case into the work-call productivity message.
 
-- **После:** открыть расшифровку, найти слова или составить итоги выбранным способом; автоматическая обработка выключена по умолчанию.
-- **Во время:** по желанию включить черновую расшифровку и ключевые моменты; это предварительный просмотр, который может отставать.
-- **Перед следующим звонком:** увидеть сохранённые решения, следующие шаги и вопросы из предыдущего связанного разговора, если такой разговор с итогами найден. Не обещать напоминание для каждой встречи.
+## Three moments
 
-## Чем отличается
+- **After:** Open the transcript, search for words or create a summary in your chosen format; automatic processing is off by default.
+- **During:** Optionally turn on draft transcription and key points; this is a preview and may fall behind.
+- **Before the next call:** See stored decisions, next steps and questions from a previous related conversation, if one with a summary is found. Do not promise a reminder for every meeting.
 
-Не строить сравнение на «без бота», «локально» или «есть итоги»: такие возможности есть и у других. На фоне Granola, MacWhisper и Weeve показывать собственный сценарий Беседы — раздельная запись микрофона и системного звука, локальная расшифровка, настраиваемые типы и шаблоны итогов, возврат к прошлому разговору. Не утверждать, что конкуренты этого не умеют, и не обещать лучшую точность без измерений. См. [направления развития](../decisions/development-directions.md) и [текущие функции](features.md).
+## What makes it different
 
-## Честное демо
+Do not base comparisons on “no bot”, “local” or “has summaries”: others offer these too. Against Granola, MacWhisper and Weeve, show Beseda's own flow: separate microphone and system-audio recording, local transcription, configurable call types and summary prompts, and a return to the previous conversation. Do not claim competitors cannot do this or promise better accuracy without measurements. See [development directions](../decisions/development-directions.md) and [current features](features.md).
 
-Только синтетический разговор без реальных имён, клиентов, пациентов и календарных адресов. Снять заново из fixture-данных, не выдавая макет за работающий экран:
+## Honest demo
 
-1. **Запись:** меню с двумя источниками звука и свёрнутым блоком «Ключевые моменты и черновик». Не подставлять готовую расшифровку в пустой экран и не показывать ещё не проверенные подсказки во время звонка.
-2. **После:** экран «Разговоры» с синтетической расшифровкой и короткими итогами по шаблону; пометить данные «Пример разговора». Текущий контрольный кадр `seeded-call-разговоры.png` из `.factory/shots/BESEDA-ux2-final/` показывает вкладку «Итоги», но только одну строку результата, не богатую карточку задач.
-3. **Перед:** снять блок «В прошлый раз» на действительно связанных синтетических звонках; пока такого проверенного кадра в указанном наборе нет, не рисовать и не публиковать его как скриншот приложения.
+Use only a synthetic conversation without real names, clients, patients or calendar addresses. Capture again from fixture data; never present a mockup as a working screen:
 
-Контрольные кадры набора также показывают `popover-live-no-commands.png` со свёрнутым блоком и `popover-idle-popover-preview.png` без скачанной модели: не выдавать их за полностью настроенный пользовательский сеанс. Перед публикацией проверить кадры против работающей сборки.
+1. **Recording:** Show the menu with two audio sources and a collapsed “Key points and draft” section. Do not put a finished transcript in an empty screen or show unverified in-call hints.
+2. **After:** Show the Conversations screen with a synthetic transcript and a short prompt-based summary; label the data “Example conversation”. The current reference frame `seeded-call-разговоры.png` in `.factory/shots/BESEDA-ux2-final/` shows the “Итоги” tab but only one line of output, not a rich task card.
+3. **Before:** Capture the “В прошлый раз” section from genuinely related synthetic calls. Until a verified frame exists in that set, do not draw or publish it as an app screenshot.
 
-## FAQ для страницы
+The reference set also contains `popover-live-no-commands.png` with its section collapsed and `popover-idle-popover-preview.png` without a downloaded model: do not present either as a fully configured user session. Check frames against a running build before publication.
 
-**Уходит ли запись в облако?** Аудио и локальная расшифровка остаются на Mac. Текст может уйти при включении OpenRouter (итоги, классификация или живые тезисы), удалённого LM Studio или webhook; модели и обновления скачиваются из сети. См. [Privacy](privacy.md).
+## Page FAQ
 
-**Можно ли записывать любой звонок?** Пользователь сам отвечает за законность записи, согласие участников и хранение данных. Беседа не уведомляет собеседников вместо него.
+**Does the recording go to the cloud?** Audio and local transcription stay on the Mac. Text may leave it when OpenRouter (summaries, classification or live key points), a remote LM Studio server or a webhook is enabled; models and updates are downloaded from the internet. See [Privacy](privacy.md).
 
-**Можно ли использовать для чувствительных разговоров?** Есть локальный режим и правила хранения, но файлы не защищены от человека за разблокированным Mac, программ того же пользователя и нешифрованных резервных копий. См. [Privacy](privacy.md).
+**Can I record any call?** The user is responsible for recording lawfully, obtaining participants' consent and storing the data. Beseda does not notify other participants on the user's behalf.
 
-**Нужен ли интернет?** Для скачивания моделей и обновлений — да; расшифровка с установленной моделью работает локально. Облачные функции требуют подключения.
+**Can I use it for sensitive conversations?** There is a local-only mode and retention controls, but files are not protected from someone using an unlocked Mac, programs running as the same user or unencrypted backups. See [Privacy](privacy.md).
 
-**Сколько стоит и как купить?** Способ продажи ещё не выбран; не показывать цену или форму оплаты до подтверждения канала.
+**Do I need internet?** Yes, to download models and updates; transcription with an installed model works locally. Cloud features require a connection.
 
-## CTA (пока без продажи)
+**What does it cost, and how can I buy it?** Payment provider and sales channel are not confirmed; do not display a price or payment form until the channel is confirmed.
 
-**«Посмотреть, как работает Беседа»** — переход к синтетическому демо на странице, без формы, оплаты или сбора контактов. Не публиковать страницу и не регистрировать домен в рамках этого предложения.
+## CTA (not a sale yet)
+
+**“See how Beseda works”** — jump to the synthetic demo on the page, without a form, payment or contact collection. Do not publish the page or register a domain as part of this proposal.
