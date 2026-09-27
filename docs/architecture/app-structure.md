@@ -10,11 +10,11 @@ description: The menu bar app, AppController and its transcription pipeline, the
 The app target's sources are in `Sources/Beseda` (paths below are relative to it; `Resources/` holds
 `Info.plist` and the icon that `scripts/lib/bundle_app.sh` reads), the tests in `Tests/BesedaTests`.
 
-Beseda is a SwiftUI menu bar app (`App/BesedaApp.swift`). `AppDelegate` owns the single `AppController`
+Beseda is a SwiftUI menu bar app (`Sources/Beseda/App/BesedaApp.swift`). `AppDelegate` owns the single `AppController`
 and keeps the app alive when the last window closes; `applicationWillTerminate` calls
 `controller.shutdown()`, which stops the child `llama-server` and unloads the speech model.
 
-**`AppController`** (`App/AppController.swift`, `@MainActor @Observable`) holds the app state
+**`AppController`** (`Sources/Beseda/App/AppController.swift`, `@MainActor @Observable`) holds the app state
 (`status`: idle, recording, working with a `JobStage`, completed, failed) and wires the services: capture,
 `CallDetector`, the transcriber and diarizer, `CallStore`, `WebhookService`, `CalendarService`,
 `RuntimeInstaller`, `BundledSummaryInstaller`, `LlamaServer`, `AppUpdater`, notifications.
@@ -35,7 +35,7 @@ and keeps the app alive when the last window closes; `applicationWillTerminate` 
 `ready`, `failed`). `runRetry` reruns a failed call from its saved audio (`mic` or `dual` kind), skipping
 capture.
 
-## Windows and views (`App/Views/`)
+## Windows and views (`Sources/Beseda/App/Views/`)
 
 - **Menu bar popover** — `MenuBarPopover`: status, record/pause/stop, the latest call, commands.
 - **Onboarding** — `OnboardingWindow`, four steps (promises, permissions, speech model, finish), opened on
@@ -52,7 +52,7 @@ capture.
 ## Settings and permissions
 
 `AppSettings` stores every setting in `UserDefaults` under `beseda.*` keys, each written in `didSet`.
-The two secrets, `openRouterAPIKey` and `webhookSecret`, go to the login Keychain instead (`App/Keychain.swift`,
+The two secrets, `openRouterAPIKey` and `webhookSecret`, go to the login Keychain instead (`Sources/Beseda/App/Keychain.swift`,
 generic password, service = `<bundle id>.keys`, account = the same `beseda.*` key). They load in a
 background task started by `init` (`secretsLoad`), since a Keychain prompt must not block launch; until it
 returns they read "", and a value typed meanwhile wins. Everything that sends a secret (the summary provider,
@@ -64,7 +64,7 @@ refuses, the value stays in defaults and keeps working, and the move is retried 
 Items are readable by later builds without a prompt as long as they are signed with the same Apple
 Development identity: the designated requirement is the bundle id plus the certificate's CN, which survives
 certificate renewal (`scripts/lib/bundle_app.sh`).
-`PermissionsModel` (`App/PermissionChecks.swift`) checks the microphone (`AVAudioApplication`) and
+`PermissionsModel` (`Sources/Beseda/App/PermissionChecks.swift`) checks the microphone (`AVAudioApplication`) and
 system audio by actually opening a `SystemAudioTap` for a second, since macOS grants it silently per app;
 a denied permission opens the matching Privacy pane. Paths live in `AppPaths`.
 

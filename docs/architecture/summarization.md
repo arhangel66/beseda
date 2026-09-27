@@ -98,9 +98,9 @@ shaders and writes a marker. `remove()` deletes only the model.
 
 ## Main files
 
-`Summarization/SummarizationService.swift`, `JevClassifier.swift`, `ChatCompletionsProvider.swift`, `SummaryProvider.swift`
+`Sources/Beseda/Summarization/SummarizationService.swift`, `JevClassifier.swift`, `ChatCompletionsProvider.swift`, `SummaryProvider.swift`
 (provider enum, `BundledSummary` pins), `LlamaServer.swift`, `LocalModelSupport.swift` (`lms`,
-`ProcessRunner`), `BundledSummaryInstaller.swift`; `App/ExecutableResolver.swift`.
+`ProcessRunner`), `BundledSummaryInstaller.swift`; `Sources/Beseda/App/ExecutableResolver.swift`.
 
 ## Constraints
 

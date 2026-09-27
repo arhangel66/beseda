@@ -35,9 +35,9 @@ track.
 
 ## Main files
 
-`Audio/DualCapture.swift`, `Audio/MicrophoneCapture.swift`, `Audio/SystemAudioTap.swift`,
-`Audio/PCMFloatRecorder.swift`, `Audio/AudioActivityTracker.swift`, `Audio/CallDetector.swift`,
-`Audio/CallRecordingPolicy.swift`, `Audio/LevelMonitor.swift`, `Audio/AudioNormalizer.swift`.
+`Sources/Beseda/Audio/DualCapture.swift`, `Sources/Beseda/Audio/MicrophoneCapture.swift`, `Sources/Beseda/Audio/SystemAudioTap.swift`,
+`Sources/Beseda/Audio/PCMFloatRecorder.swift`, `Sources/Beseda/Audio/AudioActivityTracker.swift`, `Sources/Beseda/Audio/CallDetector.swift`,
+`Sources/Beseda/Audio/CallRecordingPolicy.swift`, `Sources/Beseda/Audio/LevelMonitor.swift`, `Sources/Beseda/Audio/AudioNormalizer.swift`.
 
 ## Data flow
 

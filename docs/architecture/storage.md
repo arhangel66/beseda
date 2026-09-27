@@ -96,8 +96,8 @@ folder is moved here once by `LegacyDataMigration`.
 
 ## Main files
 
-`Storage/CallStore.swift` (schema, queries, `StoredCallSummary` and friends), `Storage/StorageJanitor.swift`,
-`App/AppPaths.swift`, `Storage/CallFormatting.swift`, `Storage/TranscriptCopy.swift`.
+`Sources/Beseda/Storage/CallStore.swift` (schema, queries, `StoredCallSummary` and friends), `Sources/Beseda/Storage/StorageJanitor.swift`,
+`Sources/Beseda/App/AppPaths.swift`, `Sources/Beseda/Storage/CallFormatting.swift`, `Sources/Beseda/Storage/TranscriptCopy.swift`.
 
 ## Data flow
 

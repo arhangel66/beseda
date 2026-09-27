@@ -177,9 +177,9 @@ Raw samples (seconds since start, CPU %, RSS MB, llama-server RSS MB):
 
 ## Main files
 
-`Transcription/LiveTranscriptPolicy.swift` (pure: `LiveLine`, `LiveChunkMerge`, `LiveBackoff`,
-`KeyPointsSchedule`), `Transcription/LiveTranscriptionLoop.swift` (`LiveTranscriptionLoop`,
-`GrowingWAVFile`), `App/LiveTranscription.swift`, the view in `App/Views/MenuBarPopover.swift`.
+`Sources/Beseda/Transcription/LiveTranscriptPolicy.swift` (pure: `LiveLine`, `LiveChunkMerge`, `LiveBackoff`,
+`KeyPointsSchedule`), `Sources/Beseda/Transcription/LiveTranscriptionLoop.swift` (`LiveTranscriptionLoop`,
+`GrowingWAVFile`), `Sources/Beseda/App/LiveTranscription.swift`, the view in `Sources/Beseda/App/Views/MenuBarPopover.swift`.
 
 ## Constraints
 
