@@ -29,9 +29,9 @@
 	<key>NSAudioCaptureUsageDescription</key>
 	<string>Beseda can capture system call audio for local transcription.</string>
 	<key>NSCalendarsFullAccessUsageDescription</key>
-	<string>Beseda использует события календаря, чтобы называть разговоры и показывать предстоящие встречи.</string>
+	<string>Беседа использует события календаря, чтобы называть разговоры и показывать предстоящие встречи.</string>
 	<key>NSCalendarsUsageDescription</key>
-	<string>Beseda использует события календаря, чтобы называть разговоры и показывать предстоящие встречи.</string>
+	<string>Беседа использует события календаря, чтобы называть разговоры и показывать предстоящие встречи.</string>
 	<key>NSHighResolutionCapable</key>
 	<true/>
 	<key>NSMicrophoneUsageDescription</key>
