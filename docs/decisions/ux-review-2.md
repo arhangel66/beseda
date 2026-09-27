@@ -49,6 +49,8 @@ system appearance was Light. Screenshots are in `.factory/shots/BESEDA-ux2/`.
 
 ### P1 — Speaker controls are unexplained tokens
 
+**Fixed in BESEDA-156.**
+
 - **Screen and shot:** Разговоры → Итоги — [call summary](../../.factory/shots/BESEDA-ux2/call-default-разговоры.png).
 - **What is wrong:** the player footer shows tiny circles «В», «С», and raw-looking «t», with no visible legend or
   affordance. For a psychologist, speaker identity is core data; a letter that looks like an implementation key
@@ -113,6 +115,8 @@ system appearance was Light. Screenshots are in `.factory/shots/BESEDA-ux2/`.
 - **Priority:** P2.
 
 ### P3 — Summary history duplicates the current page before the current result
+
+**Fixed in BESEDA-156.**
 
 - **Screen and shot:** Разговоры → Итоги — [call summary](../../.factory/shots/BESEDA-ux2/call-default-разговоры.png); [expanded previous summary](../../.factory/shots/BESEDA-ux2/call-previous-whole-разговоры.png).
 - **What is wrong:** «В прошлый раз» occupies the first large card and repeats the same headings as the current

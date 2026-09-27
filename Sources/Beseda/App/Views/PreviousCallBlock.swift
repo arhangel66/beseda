@@ -5,7 +5,6 @@ struct PreviousCallContent: Equatable {
     let callID: String
     let dateLine: String
     let digest: String
-    let isWholeSummary: Bool
 
     init?(_ call: PreviousRelatedCall?, now: Date = Date()) {
         guard let call, !call.digest.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
@@ -14,7 +13,6 @@ struct PreviousCallContent: Equatable {
         callID = call.callID
         dateLine = CallFormatting.when(call.startedAt, now: now)
         digest = call.digest
-        isWholeSummary = call.isWholeSummary
     }
 }
 
@@ -26,14 +24,14 @@ struct PreviousCallBlock: View {
     let open: (String) -> Void
     #if DEBUG
     // screenshots: BESEDA_PREVIEW_WHOLE_SUMMARY opens the block as if «Показать полностью» was pressed
-    @State private var showsWholeSummary = ProcessInfo.processInfo.environment["BESEDA_PREVIEW_WHOLE_SUMMARY"] != nil
+    @State private var isExpanded = ProcessInfo.processInfo.environment["BESEDA_PREVIEW_WHOLE_SUMMARY"] != nil
     #else
-    @State private var showsWholeSummary = false
+    @State private var isExpanded = false
     #endif
 
-    /// a whole custom-prompt result could fill the pane, so it starts at a few lines
+    /// collapsed to one line in the call pane, so the current result is the first whole document on it
     private var lineLimit: Int? {
-        content.isWholeSummary && !showsWholeSummary ? min(digestLineLimit ?? 4, 4) : digestLineLimit
+        isExpanded ? nil : digestLineLimit ?? 1
     }
 
     var body: some View {
@@ -47,12 +45,13 @@ struct PreviousCallBlock: View {
                     .buttonStyle(.link)
                     .font(.caption)
             }
-            Text(CallSummaryView.rendered(content.digest))
+            // collapsed, the lines run together: the first line alone is only a heading
+            Text(CallSummaryView.rendered(isExpanded ? content.digest : content.digest.replacingOccurrences(of: "\n", with: " ")))
                 .font(.callout)
                 .lineLimit(lineLimit)
                 .textSelection(.enabled)
-            if content.isWholeSummary && !showsWholeSummary {
-                Button("Показать полностью") { showsWholeSummary = true }
+            if digestLineLimit == nil {
+                Button(isExpanded ? "Свернуть" : "Показать полностью") { isExpanded.toggle() }
                     .buttonStyle(.link)
                     .font(.caption)
             }

@@ -18,8 +18,9 @@ enum SpeakerNaming {
         if speaker == TranscriptChannel.microphone.speakerID {
             return "Вы"
         }
+        // an unknown key is never shown as is: it reads like a program's label, not a person
         guard let index = remoteIndex(of: speaker) else {
-            return speaker
+            return "Участник"
         }
         // an undiarized call keeps the plain name it always had
         return speaker == TranscriptChannel.systemAudio.speakerID ? "Собеседник" : "Собеседник \(index)"

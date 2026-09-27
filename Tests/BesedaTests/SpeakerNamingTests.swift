@@ -31,3 +31,8 @@ import Testing
     #expect(bars[0] == SpeakerStyle.mine.bar)
     #expect(Set(bars).count == 3)
 }
+
+@Test func anUnknownSpeakerKeyNeverShowsUpAsItsName() {
+    #expect(SpeakerNaming.defaultName(for: "t") == "Участник")
+    #expect(SpeakerNaming.initial(for: "t", overrides: [:]) == "У")
+}

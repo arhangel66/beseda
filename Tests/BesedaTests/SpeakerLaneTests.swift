@@ -63,5 +63,5 @@ private func makeSegment(_ speaker: String, _ start: Double, _ end: Double, _ in
 
     #expect(lanes[0].bars.map(\.start) == [0, 0.75])
     #expect(lanes[0].bars.map(\.width) == [0.5, 0.25])
-    #expect(lanes[0].initial == "В")
+    #expect(lanes[0].label == "Вы")
 }

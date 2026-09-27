@@ -641,15 +641,15 @@ final class CallStore {
     private func writeSegments(
         _ db: OpaquePointer, callID: String, segments: [StoredTranscriptSegment], diarizer: String?
     ) throws {
-        // merges name another model's labels: kept, they would glue the wrong people
-        try run(db, """
-            DELETE FROM call_speaker_merges WHERE call_id = ?
-            AND (SELECT diarizer FROM calls WHERE id = ?) IS NOT ?
-            """, callID, callID, diarizer)
+        // merges and names pin another model's labels: kept, they would glue or name the wrong people
+        for table in ["call_speaker_merges", "call_speakers"] {
+            try run(db, """
+                DELETE FROM \(table) WHERE call_id = ?
+                AND (SELECT diarizer FROM calls WHERE id = ?) IS NOT ?
+                """, callID, callID, diarizer)
+        }
         try run(db, "UPDATE calls SET diarizer = ? WHERE id = ?", diarizer, callID)
         try run(db, "DELETE FROM transcript_segments WHERE call_id = ?", callID)
-        // a retry renumbers the speakers, so names pinned to the old keys are gone
-        try run(db, "DELETE FROM call_speakers WHERE call_id = ?", callID)
         for segment in segments {
             try run(db, """
                 INSERT INTO transcript_segments (id, call_id, speaker, start_sec, end_sec, text, order_idx)
@@ -658,15 +658,16 @@ final class CallStore {
                 "\(callID)-\(segment.orderIndex)", callID, segment.speaker,
                 segment.startSec, segment.endSec, segment.text, segment.orderIndex)
         }
-        try applyStoredSpeakerMerges(db, callID: callID)
+        try applyStoredSpeakerMergesAndNames(db, callID: callID)
     }
 
-    private func applyStoredSpeakerMerges(_ db: OpaquePointer, callID: String) throws {
+    private func applyStoredSpeakerMergesAndNames(_ db: OpaquePointer, callID: String) throws {
         // a rerun of the same audio gives the same keys (checked in BESEDA-120), so the user's merges still hold
         let merges = try query(db, "SELECT from_key, into_key FROM call_speaker_merges WHERE call_id = ? ORDER BY rowid", callID) {
             (columnString($0, 0) ?? "", columnString($0, 1) ?? "")
         }
-        var changed = false
+        // the rerun wrote transcript.md with default names, so a kept rename also needs the file rewritten
+        var changed = try !speakerNames(db, callID: callID).isEmpty
         for (fromKey, intoKey) in merges {
             try run(db, "UPDATE transcript_segments SET speaker = ? WHERE call_id = ? AND speaker = ?", intoKey, callID, fromKey)
             changed = changed || sqlite3_changes(db) > 0
