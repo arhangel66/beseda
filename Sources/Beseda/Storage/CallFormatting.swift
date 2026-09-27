@@ -1,4 +1,5 @@
 import Foundation
+import os
 
 /// The sidebar's day headings, in the order the prototype lists them.
 enum CallDayGroup: Int, CaseIterable, Comparable {
@@ -48,6 +49,7 @@ struct CallGroup: Identifiable {
 
 enum CallFormatting {
     static let locale = Locale(identifier: "ru_RU")
+    private static let logger = Logger(subsystem: "app.beseda.Beseda", category: "dates")
 
     static func mmss(_ seconds: TimeInterval) -> String {
         let total = Int(max(0, seconds).rounded())
@@ -120,7 +122,11 @@ enum CallFormatting {
         }
         let plain = ISO8601DateFormatter()
         plain.formatOptions = [.withInternetDateTime]
-        return plain.date(from: value)
+        if let date = plain.date(from: value) {
+            return date
+        }
+        logger.error("Unparseable stored date: \(value, privacy: .public)")
+        return nil
     }
 
     private static let timeFormatter: DateFormatter = {

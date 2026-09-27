@@ -469,7 +469,7 @@ final class AppController {
 
     func loadMoreCalls() {
         do {
-            let page = try callStore.fetchCalls(limit: Self.callPageSize, offset: callBrowserCalls.count)
+            let page = try callStore.fetchCalls(limit: Self.callPageSize, before: callBrowserCalls.last)
             callBrowserCalls += page
             hasMoreCalls = page.count == Self.callPageSize
         } catch {
@@ -1797,7 +1797,6 @@ final class AppController {
         refreshStorageUsage()
     }
 
-    /// the SQLite search runs on the main thread, so it waits for a pause in typing
     private func refreshSearchMatches() {
         searchTask?.cancel()
         let query = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -1805,12 +1804,19 @@ final class AppController {
             searchMatches = []
             return
         }
+        let store = callStore
         searchTask = Task { [weak self] in
             try? await Task.sleep(for: .seconds(0.3))
-            guard !Task.isCancelled, let self else {
+            guard !Task.isCancelled else {
                 return
             }
-            searchMatches = (try? callStore.searchCalls(matching: query)) ?? []
+            let matches = await Task.detached {
+                (try? store.searchCalls(matching: query)) ?? []
+            }.value
+            guard !Task.isCancelled, self?.searchQuery.trimmingCharacters(in: .whitespacesAndNewlines) == query else {
+                return
+            }
+            self?.searchMatches = matches
         }
     }
 

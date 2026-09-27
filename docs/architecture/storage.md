@@ -76,15 +76,17 @@ folder is moved here once by `LegacyDataMigration`.
   exactly: kept across «Расшифровать снова» with the same diarizer (transcript.md is rewritten with it),
   deleted when another diarizer writes the call (BESEDA-156). Names are not carried to later calls: the
   `them-N` keys of two calls are not the same people, even in one calendar series.
-- **Paging** — the sidebar loads 200 calls, newest first; «Показать ещё» fetches the next 200 by offset,
-  and refreshes keep however many are loaded.
+- **Paging** — the sidebar loads 200 calls, newest first; «Показать ещё» fetches the next 200 with a
+  `(started_at, id)` keyset cursor. Inserts and deletes between page loads therefore neither skip nor
+  duplicate older calls. Refreshes keep however many are loaded.
 - **Search** — the sidebar filters loaded calls by `StoredCallSummary.searchableText` (title, app, date,
   preview, error). From two characters on, `searchCalls` adds every call, loaded or not, whose event title,
   app, summary, participants, error or transcript text match an escaped `LIKE '%query%'`; such rows open
   through `fetchCall(id:)`. No full-text index: the scan takes ~0.1 s over 2000 calls × 200 segments.
   SQLite `LIKE` folds case for ASCII only, so both sides go through `unicode_lower`, a function every
   connection registers with Swift's `lowercased()`: «иван» finds «Иван». `AppController` runs the search
-  0.3 s after the last keystroke, not on every one.
+  off the main actor 0.3 s after the last keystroke, not on every one. Stored timestamps that cannot be
+  parsed are logged and shown as «—» instead of exposing corrupt text in the archive.
 - **StorageJanitor** — classifies files by suffix (`.raw.wav` raw, `.asr.wav`/`.16k-mono.wav`
   normalized, `.md`/`.json` text, kept forever), measures usage, and deletes audio older than the
   retention rule (`immediately`, 30, 90 days, `forever`) by modification date. Folders of calls in
