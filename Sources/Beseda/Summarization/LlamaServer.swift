@@ -1,6 +1,6 @@
 import Foundation
 
-/// The downloaded `llama-server` as a child process: started when a summary needs it, stopped
+/// The bundled or direct-distribution `llama-server` as a child process: started when a summary needs it, stopped
 /// ten minutes after the last one. The model takes about 5 GB of memory while it runs, and the
 /// app runs from login, so it does not stay loaded.
 @MainActor
@@ -20,15 +20,20 @@ final class LlamaServer {
 
     private let paths: AppPaths
     private let artifacts: BundledSummary
+    private let storeMode: Bool
+    private let bundleURL: URL
     private var process: Process?
     private var logHandle: FileHandle?
     /// a second caller waits for the start already in flight instead of spawning a rival
     private var starting: Task<URL, Error>?
     private var idleStop: Task<Void, Never>?
 
-    init(paths: AppPaths, artifacts: BundledSummary = .current) {
+    init(paths: AppPaths, artifacts: BundledSummary = .current,
+         storeMode: Bool = BundledSummary.storeMode, bundleURL: URL = Bundle.main.bundleURL) {
         self.paths = paths
         self.artifacts = artifacts
+        self.storeMode = storeMode
+        self.bundleURL = bundleURL
     }
 
     var isRunning: Bool {
@@ -80,7 +85,8 @@ final class LlamaServer {
     }
 
     private func spawn() throws -> Process {
-        guard artifacts.isInstalled(paths) else {
+        let executable = storeMode ? BundledSummary.bundledServer(in: bundleURL) : artifacts.serverExecutable(paths)
+        guard FileManager.default.isExecutableFile(atPath: executable.path), artifacts.isModelDownloaded(paths) else {
             throw SummarizationError.modelMissing
         }
         let logURL = artifacts.serverLog(paths)
@@ -92,7 +98,7 @@ final class LlamaServer {
         let handle = try FileHandle(forWritingTo: logURL)
 
         let process = Process()
-        process.executableURL = artifacts.serverExecutable(paths)
+        process.executableURL = executable
         process.arguments = [
             "-m", artifacts.modelFile(paths).path,
             "--host", "127.0.0.1",

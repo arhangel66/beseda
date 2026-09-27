@@ -91,10 +91,14 @@ re-reads «В прошлый раз» for the open call and the upcoming events,
 
 ## Built-in runtime install
 
-`BundledSummaryInstaller` downloads, per `BundledSummary.current`, a pinned llama.cpp macOS arm64
-release (keeps only `llama-server` and dylibs, in `runtime/llama/<build>`) and the Gemma GGUF (into
-`runtime/models`), checking SHA-256 before moving each in, then starts the server once to warm up Metal
-shaders and writes a marker. `remove()` deletes only the model.
+Direct distribution: `BundledSummaryInstaller` downloads a pinned llama.cpp macOS arm64 release
+(keeps only `llama-server` and dylibs in `runtime/llama/<build>`) and the Gemma GGUF in `runtime/models`.
+Store mode is selected by the signed bundle's `BesedaStoreSummary` plist flag: it requires
+`Contents/Helpers/llama-server`, never downloads a runtime and never executes the Application Support
+copy, even if one exists. The model remains downloadable data. `scripts/package_store_summary.sh`
+embeds the hash-checked archive's executable and dylibs and signs them with sandbox inheritance; it
+requires a separately prepared store app and signing identity. Both modes warm up once and `remove()`
+deletes only the model.
 
 ## Main files
 

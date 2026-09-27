@@ -37,20 +37,23 @@ final class BundledSummaryInstaller {
     @ObservationIgnored private let downloader: RuntimeDownloader
     @ObservationIgnored private let freeSpace: FreeSpaceReader
     @ObservationIgnored private let warmUp: () async throws -> Void
+    @ObservationIgnored private let storeMode: Bool
 
     init(
         paths: AppPaths,
         artifacts: BundledSummary = .current,
         downloader: @escaping RuntimeDownloader = FileDownloader.download,
         freeSpace: @escaping FreeSpaceReader = FreeSpace.read,
-        warmUp: @escaping () async throws -> Void
+        warmUp: @escaping () async throws -> Void,
+        storeMode: Bool = BundledSummary.storeMode
     ) {
         self.paths = paths
         self.artifacts = artifacts
         self.downloader = downloader
         self.freeSpace = freeSpace
         self.warmUp = warmUp
-        self.isReady = artifacts.isInstalled(paths)
+        self.storeMode = storeMode
+        self.isReady = (storeMode ? FileManager.default.isExecutableFile(atPath: BundledSummary.bundledServer(in: Bundle.main.bundleURL).path) : artifacts.isRuntimeInstalled(paths)) && artifacts.isModelDownloaded(paths)
     }
 
     /// the stages that are still missing, in order; stops at the first failure
@@ -68,15 +71,18 @@ final class BundledSummaryInstaller {
                 isInstalling = false
                 stage = nil
                 fraction = nil
-                isReady = artifacts.isInstalled(paths)
+                isReady = runtimeReady && artifacts.isModelDownloaded(paths)
             }
             do {
+                guard !storeMode || runtimeReady else {
+                    throw BesedaError.processFailed("В приложении отсутствует движок итогов")
+                }
                 if !artifacts.isModelDownloaded(paths) {
                     // checked before the engine too, so a short disk downloads nothing
                     try FileManager.default.createDirectory(at: paths.modelsDirectory, withIntermediateDirectories: true)
                     try FreeSpace.ensure(artifacts.modelBytes, in: paths.modelsDirectory, reader: freeSpace)
                 }
-                if !artifacts.isRuntimeInstalled(paths) {
+                if !runtimeReady && !storeMode {
                     try await run(.runtime, installRuntime)
                 }
                 if !artifacts.isModelDownloaded(paths) {
@@ -103,13 +109,17 @@ final class BundledSummaryInstaller {
         if FileManager.default.fileExists(atPath: marker.path) {
             try FileManager.default.removeItem(at: marker)
         }
-        isReady = artifacts.isInstalled(paths)
+        isReady = runtimeReady && artifacts.isModelDownloaded(paths)
     }
 
     private func run(_ stage: Stage, _ body: () async throws -> Void) async throws {
         self.stage = stage
         fraction = nil
         try await body()
+    }
+
+    private var runtimeReady: Bool {
+        storeMode ? FileManager.default.isExecutableFile(atPath: BundledSummary.bundledServer(in: Bundle.main.bundleURL).path) : artifacts.isRuntimeInstalled(paths)
     }
 
     private var isWarmedUp: Bool {

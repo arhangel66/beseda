@@ -77,7 +77,10 @@ permission and Keychain behavior cannot be inferred from an isolated launch
 
 ## Proposed decision
 
-The App Store route is **blocked by the downloaded `llama-server` architecture**. Before submission it also
+A store-specific runtime path now selects a signed bundle helper via `BesedaStoreSummary` and does not
+fetch or execute Application Support code. `scripts/package_store_summary.sh` prepares that helper from
+the pinned archive, but no signed store build or sandbox runtime test has been performed. The App Store
+route remains **blocked pending a complete store build** (including the independent Sparkle split). Before submission it also
 requires persistent security-scoped export access, a store build without Sparkle, store entitlements and a
 provisioned Keychain access-group decision. In-process CTranscribe, EventKit and the resource-value backup
 exclusion fit the sandbox based on current source. Process tap, login item and `fdesetup` remain explicitly
