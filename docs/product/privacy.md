@@ -73,8 +73,12 @@ processed call.
   summary provider every few minutes.
 - **Webhook**: when set, the transcript, title, time and summary go to its URL (HTTPS
   only, except localhost).
-- **Downloads**: models, the llama.cpp engine and updates are fetched from Hugging Face
-  and GitHub; no call data is sent.
+- **Downloads**: Beseda downloads speech and summary model data from Hugging Face.
+  The Store build ships a pinned signed llama.cpp helper with the app; it does not
+  download that executable. The direct build may download the llama.cpp engine from
+  GitHub and uses Sparkle for app updates. Apple handles Store app updates; Store
+  update behavior has not been tested in a provisioned app. The app requests model
+  files for downloads; this is not a guarantee about every field in a network request.
 
 The line under the provider in Настройки → Обработка says what goes to the cloud now.
 «Только локально» there turns off Jev and webhooks and moves summaries and live key
