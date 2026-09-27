@@ -114,6 +114,9 @@ final class AppController {
     @ObservationIgnored let diarizer: Diarizer
     /// one background download per launch; a failed or cancelled one is redone by processing
     @ObservationIgnored private(set) var diarizerPrefetch: Task<Void, Never>?
+    @ObservationIgnored private var speakerResplit: Task<Void, Never>?
+    /// Settings → Обработка: old calls whose remote speakers the current diarizer has redone
+    private(set) var speakerResplitProgress: (done: Int, total: Int)?
     @ObservationIgnored private let callStore: CallStore
     @ObservationIgnored private let callDetector = CallDetector()
     @ObservationIgnored private let notifier = CallNotifier()
@@ -314,6 +317,9 @@ final class AppController {
         }
         if runtime.isDownloaded(runtime.model) {
             prefetchDiarizerModel()
+        }
+        if self.diarizer.isDownloaded {
+            startSpeakerResplit()
         }
 
 
@@ -691,9 +697,33 @@ final class AppController {
             do {
                 try await diarizer.download()
                 self?.appendLog("Diarizer model downloaded")
+                self?.startSpeakerResplit()
             } catch {
                 self?.appendLog("Diarizer model prefetch failed: \(error.localizedDescription)")
             }
+        }
+    }
+
+    /// once per launch, at background priority; waits out recordings and processing so the diarizer is never shared
+    private func startSpeakerResplit() {
+        guard speakerResplit == nil else {
+            return
+        }
+        let diarizer = diarizer
+        let resplitter = SpeakerResplitter(
+            store: callStore,
+            timeline: { try await diarizer.timeline(for: $0) },
+            isPaused: { [weak self] in await self?.isBusy ?? false },
+            log: { [weak self] message in Task { @MainActor in self?.appendLog(message) } },
+            progress: { [weak self] done, total in
+                Task { @MainActor in
+                    self?.speakerResplitProgress = (done, total)
+                    self?.refreshRecentCalls()
+                }
+            }
+        )
+        speakerResplit = Task(priority: .background) {
+            await resplitter.run()
         }
     }
 
@@ -1102,7 +1132,7 @@ final class AppController {
     }
 
     /// the file names inside a dual call's folder; the audio sweep and old calls rely on them
-    private enum DualFiles {
+    enum DualFiles {
         static let microphoneRaw = "me.raw.wav"
         static let systemRaw = "them.raw.wav"
         static let microphoneASR = "me.asr.wav"

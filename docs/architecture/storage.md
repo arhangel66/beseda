@@ -42,7 +42,9 @@ folder is moved here once by `LegacyDataMigration`.
   is matched or picked; calls linked before them stay null.
   `calls.diarizer` (nullable TEXT, schema version 3) names the diarizer that labelled the call's `them-N`
   speakers (`Diarizer.id`, e.g. `nemotron3-offline-ga-2026-09-23`); null means the pre-Nemotron diarizer or no
-  diarization. Version 3 also drops `calls.one_other_person`, unused since BESEDA-120.
+  diarization. Version 3 also drops `calls.one_other_person`, unused since BESEDA-120. It is also the
+  progress mark of the background re-split of old calls ([asr](asr.md)): `replaceSegments` writes the new
+  segments and the id together, so a call is either done or picked up again after a quit.
 - **Writes throw** — every index write in the recording and retry pipeline (`saveCall`,
   `upsertTranscriptJob`) throws into the job's error path, which shows the failure in the status line. A
   finished transcript goes in through `markReady`: segments and `status = 'ready'` in one transaction; only

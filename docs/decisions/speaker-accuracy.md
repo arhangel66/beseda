@@ -242,8 +242,14 @@ The app switched to it; rerun on the final code ([nemotron-switch.md][^switch]):
   models folder with a size and sha256 check per file and a free-space check, on the first diarized call.
 - Manual merges name the old model's labels: `calls.diarizer` records which diarizer labelled a call, and a
   rerun with another one drops the call's merges ([storage](../architecture/storage.md)). Calls transcribed
-  before the switch keep their stored speakers until «Расшифровать снова».
+  before the switch are re-split in the background from their kept audio (BESEDA-161,
+  [asr](../architecture/asr.md)); calls whose audio is gone keep their stored speakers.
+- **Re-split of old calls, measured.** On Mikhail's 123 calls, 70 still have `them.asr.wav` + `them.asr.json`
+  (47 lost the audio to retention). Against a count read from each transcript, the shown number of other
+  people is exactly right on 51 of 70 with Nemotron against 12 before, within one on 64 against 31; the 1:1
+  calls go from 5/44 to 40/44 exact, multi-person from 4/23 to 8/23. No call had manual merges.[^allCalls]
 
+[^allCalls]: [results/all-calls-nemotron.md](../../untracked/epics/speaker-accuracy/results/all-calls-nemotron.md)
 [^other]: [results/other-diarizers.md](../../untracked/epics/speaker-accuracy/results/other-diarizers.md)
 [^switch]: [results/nemotron-switch.md](../../untracked/epics/speaker-accuracy/results/nemotron-switch.md)
 [^cause]: [results/extra-speaker-cause.md](../../untracked/epics/speaker-accuracy/results/extra-speaker-cause.md)

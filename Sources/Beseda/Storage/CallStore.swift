@@ -615,6 +615,23 @@ final class CallStore {
         }
     }
 
+    /// finished two-channel calls whose remote speakers were split by another diarizer, newest first
+    func fetchCallsSplitByAnotherDiarizer(than diarizer: String) throws -> [StoredCallSummary] {
+        try database { db in
+            try query(db, """
+                \(Self.callSelect)
+                WHERE c.kind = 'dual' AND c.status = 'ready' AND c.diarizer IS NOT ?
+                ORDER BY c.started_at DESC
+                """, diarizer, row: makeSummary)
+        }
+    }
+
+    func hasSpeakerMerges(callID: String) throws -> Bool {
+        try database { db in
+            try query(db, "SELECT 1 FROM call_speaker_merges WHERE call_id = ? LIMIT 1", callID) { _ in true }.first ?? false
+        }
+    }
+
     func replaceSegments(callID: String, segments: [StoredTranscriptSegment], diarizer: String? = nil) throws {
         try database { db in
             try transaction(db) {
