@@ -1457,6 +1457,8 @@ final class AppController {
             summaryStartedAt = nil
         }
         defer { llamaServer.noteIdle() }
+        // a job resumed at launch runs while the Keychain read may still be out: wait for the real key
+        await settings.secretsLoad?.value
         do {
             let (type, text) = if let summarize {
                 try await summarize(detail, chosenType)
@@ -1554,6 +1556,7 @@ final class AppController {
     /// The provider the settings point at, and how much transcript it can be given: the built-in
     /// model has a 64k context, the other two take the whole call.
     private func makeSummaryProvider() async throws -> (provider: ChatCompletionsProvider, characterBudget: Int) {
+        await settings.secretsLoad?.value
         let prompt = settings.callTypes.other.prompt
         switch settings.effectiveSummaryProvider {
         case .openRouter:

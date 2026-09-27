@@ -391,7 +391,7 @@ private struct ProcessingPane: View {
                 }
                 // Jev needs the key even when another provider writes summaries.
                 if !settings.classifyLocally && settings.summaryProvider != .openRouter {
-                    SecretField(title: "Ключ OpenRouter", text: Bindable(settings).openRouterAPIKey)
+                    SecretField(title: "Ключ OpenRouter", text: Bindable(settings).openRouterAPIKey, isLoading: !settings.secretsLoaded)
                 }
             } header: {
                 Text("Типы звонков")
@@ -407,7 +407,7 @@ private struct ProcessingPane: View {
 
     @ViewBuilder
     private var openRouterRows: some View {
-        SecretField(title: "Ключ", text: Bindable(settings).openRouterAPIKey)
+        SecretField(title: "Ключ", text: Bindable(settings).openRouterAPIKey, isLoading: !settings.secretsLoaded)
         TextField("Модель", text: Bindable(settings).openRouterModel, prompt: Text(OpenRouter.defaultModel))
     }
 
@@ -674,7 +674,7 @@ private struct IntegrationsPane: View {
                     Text("Не отправляется. \(EndpointRefusal.plainHTTP.rawValue)")
                         .foregroundStyle(.red)
                 }
-                SecretField(title: "Секрет", text: Bindable(settings).webhookSecret)
+                SecretField(title: "Секрет", text: Bindable(settings).webhookSecret, isLoading: !settings.secretsLoaded)
                 HStack {
                     Text(webhooks.testResult ?? "Сервис должен принять пробный запрос.")
                         .foregroundStyle(.secondary)
@@ -721,15 +721,16 @@ private struct IntegrationsPane: View {
 private struct SecretField: View {
     let title: String
     let text: Binding<String>
+    let isLoading: Bool
 
     @State private var isShown = false
 
     var body: some View {
         HStack {
             if isShown {
-                TextField(title, text: text)
+                TextField(title, text: text, prompt: isLoading ? Text("Загрузка…") : nil)
             } else {
-                SecureField(title, text: text)
+                SecureField(title, text: text, prompt: isLoading ? Text("Загрузка…") : nil)
             }
             Button(isShown ? "Скрыть" : "Показать") {
                 isShown.toggle()

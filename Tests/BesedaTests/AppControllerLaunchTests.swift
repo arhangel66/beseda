@@ -14,12 +14,12 @@ private final class Harness {
     let suiteName = "beseda-test-\(UUID().uuidString)"
     let settings: AppSettings
 
-    init() throws {
+    init(keychain: Keychain? = nil) throws {
         root = FileManager.default.temporaryDirectory.appendingPathComponent("beseda-launch-\(UUID().uuidString)", isDirectory: true)
         paths = AppPaths(dataDirectory: root)
         try FileManager.default.createDirectory(at: paths.callsDirectory, withIntermediateDirectories: true)
         store = CallStore(dbURL: paths.callIndexURL)
-        settings = AppSettings(defaults: UserDefaults(suiteName: suiteName)!, keychain: Keychain(service: suiteName))
+        settings = AppSettings(defaults: UserDefaults(suiteName: suiteName)!, keychain: keychain ?? Keychain(service: suiteName))
     }
 
     func controller(summarize: AppController.Summarize? = nil) -> AppController {
@@ -239,6 +239,33 @@ private func line(_ speaker: String) -> SpeakerTranscriptSegment {
 
     #expect(stub.calls == ["call"])
     #expect(try harness.store.fetchCall(id: "call")?.summaryText == "summary of call")
+}
+
+@MainActor
+@Test func aPendingJobResumedAtLaunchWaitsForTheKeychainKey() async throws {
+    let keychain = BlockingKeychain(service: "beseda-test-\(UUID().uuidString)")
+    let harness = try Harness(keychain: keychain)
+    defer {
+        keychain.deleteAll()
+        harness.cleanUp()
+    }
+    try harness.store.prepare()
+    try harness.addCall("call", status: "ready")
+    try harness.store.setProcessingPending(callID: "call", true)
+    var keysSeen: [String] = []
+    let settings = harness.settings
+
+    let controller = harness.controller { _, _ in
+        keysSeen.append(settings.openRouterAPIKey)
+        return (CallType(name: CallType.otherName, description: "", prompt: ""), "summary")
+    }
+    try await Task.sleep(for: .milliseconds(200))
+    let keysSeenWhilePromptIsUp = keysSeen
+    keychain.prompt.signal()
+    try await waitUntil { try harness.store.fetchProcessingPendingCallIDs().isEmpty && controller.summarizingCallID == nil }
+
+    #expect(keysSeenWhilePromptIsUp.isEmpty)
+    #expect(keysSeen == ["sk-or-v1-saved"])
 }
 
 @MainActor

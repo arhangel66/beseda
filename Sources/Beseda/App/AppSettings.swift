@@ -48,6 +48,8 @@ final class AppSettings {
     /// the background Keychain read started by `init`; tests await it
     @ObservationIgnored private(set) var secretsLoad: Task<Void, Never>?
     @ObservationIgnored private var isLoadingSecrets = false
+    /// false until the Keychain read returns; the settings key fields say «Загрузка…» meanwhile
+    private(set) var secretsLoaded = false
     private let autoDetectKey = "beseda.autoDetectEnabled"
     private let enabledCallAppsKey = "beseda.enabledCallApps"
     private let rawRetentionKey = "beseda.rawAudioRetention"
@@ -349,6 +351,7 @@ final class AppSettings {
             }
             isLoadingSecrets = false
         }
+        secretsLoaded = true
     }
 
     private func storeSecret(_ value: String, key: String) {

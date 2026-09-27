@@ -55,7 +55,10 @@ capture.
 The two secrets, `openRouterAPIKey` and `webhookSecret`, go to the login Keychain instead (`App/Keychain.swift`,
 generic password, service = `<bundle id>.keys`, account = the same `beseda.*` key). They load in a
 background task started by `init` (`secretsLoad`), since a Keychain prompt must not block launch; until it
-returns they read "", and a value typed meanwhile wins. At launch a secret still in
+returns they read "", and a value typed meanwhile wins. Everything that sends a secret (the summary provider,
+Jev, live key points, webhook deliveries and the webhook test) awaits `secretsLoad` first, so a job resumed at
+launch waits for the real key instead of going out with "" — for as long as a prompt stays open; recording
+never touches a secret. The settings key fields show «Загрузка…» until then (`secretsLoaded`). At launch a secret still in
 `UserDefaults` is copied to the Keychain, read back, and only then removed from defaults; if the Keychain
 refuses, the value stays in defaults and keeps working, and the move is retried at the next launch or edit.
 Items are readable by later builds without a prompt as long as they are signed with the same Apple
