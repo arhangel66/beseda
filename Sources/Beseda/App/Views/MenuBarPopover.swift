@@ -35,7 +35,7 @@ struct MenuBarPopover: View {
             HStack(spacing: 8) {
                 ProgressView(value: fraction ?? 0)
                     .frame(width: 90)
-                Text("Скачивается \(controller.runtime.model.title)")
+                Text(MenuText.format("Скачивается %@", controller.runtime.model.title))
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 Spacer(minLength: 0)
@@ -91,7 +91,7 @@ struct MenuBarPopover: View {
                 if controller.isRecording {
                     Text(CallFormatting.mmss(controller.elapsedRecordingSeconds))
                         .font(.title3.monospacedDigit())
-                        .accessibilityLabel("Длительность")
+                        .accessibilityLabel(MenuText.get("Длительность"))
                 }
             }
             .accessibilityElement(children: .combine)
@@ -135,17 +135,17 @@ struct MenuBarPopover: View {
     private var statusTitle: String {
         switch controller.status {
         case .recording, .callRecording:
-            controller.isPaused ? "Пауза" : "Идёт запись"
+            controller.isPaused ? MenuText.get("Пауза") : MenuText.get("Идёт запись")
         case .autoRecording(let app):
-            controller.isPaused ? "Пауза · \(app)" : "Идёт запись · \(app)"
+            controller.isPaused ? MenuText.format("Пауза · %@", app) : MenuText.format("Идёт запись · %@", app)
         case .working(let stage):
             stage.title
         case .failed:
-            "Не получилось"
+            MenuText.get("Не получилось")
         case .completed where lastCall != nil:
-            "Расшифровка готова"
+            MenuText.get("Расшифровка готова")
         case .idle, .completed:
-            isSpeechModelMissing ? "Нет модели распознавания" : "Готова к записи"
+            isSpeechModelMissing ? MenuText.get("Нет модели распознавания") : MenuText.get("Готова к записи")
         }
     }
 
@@ -153,25 +153,25 @@ struct MenuBarPopover: View {
         switch controller.status {
         case .recording, .callRecording, .autoRecording:
             if controller.isPaused {
-                return "Аудио не пишется"
+                return MenuText.get("Аудио не пишется")
             }
             return controller.settings.stopOnSilence
-                ? "Остановится после минуты тишины"
-                : "Остановите вручную"
+                ? MenuText.get("Остановится после минуты тишины")
+                : MenuText.get("Остановите вручную")
         case .working(let stage):
             return stage.caption()
         case .failed(let message):
             return message
         case .idle, .completed:
             if microphoneDenied {
-                return "Нет доступа к микрофону"
+                return MenuText.get("Нет доступа к микрофону")
             }
             if isSpeechModelMissing {
-                return "Откройте Настройки → Обработка и скачайте модель"
+                return MenuText.get("Откройте Настройки → Обработка и скачайте модель")
             }
             return controller.settings.autoDetectEnabled
-                ? "Автозапись включена, ожидание звонка"
-                : "Автозапись выключена"
+                ? MenuText.get("Автозапись включена, ожидание звонка")
+                : MenuText.get("Автозапись выключена")
         }
     }
 
@@ -187,10 +187,10 @@ struct MenuBarPopover: View {
     private var controls: some View {
         if controller.isRecording {
             HStack(spacing: 8) {
-                Button(controller.isPaused ? "Продолжить" : "Пауза") {
+                Button(controller.isPaused ? MenuText.get("Продолжить") : MenuText.get("Пауза")) {
                     controller.togglePause()
                 }
-                Button("Остановить") {
+                Button(MenuText.get("Остановить")) {
                     controller.stopActiveRecording()
                 }
                 .buttonStyle(.borderedProminent)
@@ -198,11 +198,11 @@ struct MenuBarPopover: View {
                 .keyboardShortcut("r", modifiers: .command)
             }
             VStack(spacing: 8) {
-                meterRow(icon: "mic", level: controller.microphoneLevel, color: .green, label: "микрофон")
-                meterRow(icon: "speaker.wave.2", level: controller.systemAudioLevel, color: .accentColor, label: "собеседник")
+                meterRow(icon: "mic", level: controller.microphoneLevel, color: .green, label: MenuText.get("микрофон"))
+                meterRow(icon: "speaker.wave.2", level: controller.systemAudioLevel, color: .accentColor, label: MenuText.get("собеседник"))
             }
             if let live = controller.liveTranscription {
-                DisclosureGroup("Ключевые моменты и черновик", isExpanded: $isLivePreviewOpen) {
+                DisclosureGroup(MenuText.get("Ключевые моменты и черновик"), isExpanded: $isLivePreviewOpen) {
                     liveTranscript(live)
                         .padding(.top, 6)
                 }
@@ -210,20 +210,20 @@ struct MenuBarPopover: View {
             }
         } else {
             HStack(spacing: 10) {
-                Button("Начать запись") {
+                Button(MenuText.get("Начать запись")) {
                     controller.startCallRecording()
                 }
                 .buttonStyle(.borderedProminent)
                 .keyboardShortcut("r", modifiers: .command)
                 .disabled(controller.isBusy || isSpeechModelMissing)
-                .help(controller.isBusy ? "Новую запись можно начать после расшифровки" : "")
+                .help(controller.isBusy ? MenuText.get("Новую запись можно начать после расшифровки") : "")
                 Spacer(minLength: 0)
-                Toggle("Автозапись", isOn: Bindable(controller.settings).autoDetectEnabled)
+                Toggle(MenuText.get("Автозапись"), isOn: Bindable(controller.settings).autoDetectEnabled)
                     .toggleStyle(.switch)
                     .controlSize(.small)
             }
             if controller.jobStage != nil {
-                Text("Разговор сохранён. Меню можно закрыть — расшифровка закончится в фоне.")
+                Text(MenuText.get("Разговор сохранён. Меню можно закрыть — расшифровка закончится в фоне."))
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -235,7 +235,7 @@ struct MenuBarPopover: View {
     private func liveTranscript(_ live: LiveTranscription) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             if !live.keyPoints.isEmpty {
-                Text("Ключевые моменты")
+                Text(MenuText.get("Ключевые моменты"))
                     .font(.caption.weight(.semibold))
                 Text(live.keyPoints)
                     .font(.caption)
@@ -245,7 +245,7 @@ struct MenuBarPopover: View {
                     .padding(.bottom, 4)
             }
             if live.lines.isEmpty {
-                Text("Черновик появится примерно через 20 секунд")
+                Text(MenuText.get("Черновик появится примерно через 20 секунд"))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             } else {
@@ -253,7 +253,7 @@ struct MenuBarPopover: View {
                     ScrollView {
                         LazyVStack(alignment: .leading, spacing: 4) {
                             ForEach(live.lines.suffix(8)) { line in
-                                (Text(line.channel == .microphone ? "Я: " : "Собеседник: ").bold() + Text(line.text))
+                                (Text(line.channel == .microphone ? MenuText.get("Я: ") : MenuText.get("Собеседник: ")).bold() + Text(line.text))
                                     .font(.caption)
                                     .foregroundStyle(line.channel == .microphone ? .primary : .secondary)
                                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -287,7 +287,7 @@ struct MenuBarPopover: View {
                 .frame(width: 66, alignment: .trailing)
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Уровень звука: \(label)")
+        .accessibilityLabel(MenuText.format("Уровень звука: %@", label))
         .accessibilityValue("\(Int((level * 100).rounded()))%")
     }
 
@@ -299,7 +299,7 @@ struct MenuBarPopover: View {
             readyCard(call)
         } else if !controller.recentCalls.isEmpty {
             VStack(alignment: .leading, spacing: 2) {
-                Text("Последние")
+                Text(MenuText.get("Последние"))
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .padding(.horizontal, 8)
@@ -312,7 +312,7 @@ struct MenuBarPopover: View {
                 }
             }
         } else {
-            Text("Разговоров пока нет")
+            Text(MenuText.get("Разговоров пока нет"))
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .padding(.horizontal, 8)
@@ -336,12 +336,12 @@ struct MenuBarPopover: View {
                 }
             }
             HStack(spacing: 8) {
-                Button("Открыть") {
+                Button(MenuText.get("Открыть")) {
                     controller.selectCall(call)
                     controller.lastReadyCallID = nil
                     openConversations()
                 }
-                Button("Скопировать расшифровку") {
+                Button(MenuText.get("Скопировать расшифровку")) {
                     controller.selectCall(call)
                     controller.copyTranscript()
                 }
@@ -357,12 +357,12 @@ struct MenuBarPopover: View {
 
     private var commands: some View {
         VStack(spacing: 1) {
-            MenuRow(title: "Разговоры…", action: openConversations)
+            MenuRow(title: MenuText.get("Разговоры…"), action: openConversations)
             SettingsLink {
-                MenuRowLabel(title: "Настройки…", shortcut: "⌘,")
+                MenuRowLabel(title: MenuText.get("Настройки…"), shortcut: "⌘,")
             }
             .buttonStyle(.plain)
-            MenuRow(title: "Завершить Беседу", shortcut: "⌘Q") { controller.quit() }
+            MenuRow(title: MenuText.get("Завершить Беседу"), shortcut: "⌘Q") { controller.quit() }
                 .keyboardShortcut("q", modifiers: .command)
         }
     }
@@ -419,7 +419,7 @@ private struct RecentRow: View {
                 VStack(alignment: .leading, spacing: 1) {
                     Text(call.displayTitle)
                         .lineLimit(1)
-                    Text(call.isFailed ? "не расшифрован" : "\(call.whenDescription) · \(call.durationDescription)")
+                    Text(call.isFailed ? MenuText.get("не расшифрован") : "\(call.whenDescription) · \(call.durationDescription)")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)

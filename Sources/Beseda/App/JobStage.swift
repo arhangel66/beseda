@@ -16,7 +16,7 @@ struct JobStage: Equatable {
 
     /// the line under the title: which step this is, and how much of it is left
     func caption(now: Date = Date()) -> String {
-        ["Шаг \(index) из \(total)", remainingDescription(now: now)]
+        [MenuText.format("Шаг %d из %d", index, total), remainingDescription(now: now)]
             .compactMap { $0 }
             .joined(separator: " · ")
     }
@@ -36,8 +36,8 @@ struct JobStage: Equatable {
             return nil
         }
         if seconds < 60 {
-            return "осталось \(max(Int(seconds.rounded()), 1)) сек"
+            return MenuText.format("осталось %d сек", max(Int(seconds.rounded()), 1))
         }
-        return "осталось \(Int((seconds / 60).rounded(.up))) мин"
+        return MenuText.format("осталось %d мин", Int((seconds / 60).rounded(.up)))
     }
 }
