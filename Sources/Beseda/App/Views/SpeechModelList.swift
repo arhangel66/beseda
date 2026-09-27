@@ -37,7 +37,7 @@ private struct SpeechModelCard: View {
                 Text(model.title)
                     .font(.body.weight(.semibold))
                 if let stateLabel = SpeechModel.stateLabel(isSelected: isActive, isDownloaded: isDownloaded) {
-                    let badgeColor = stateLabel == "Готова" ? Color.green : isActive ? Color.orange : Color.secondary
+                    let badgeColor = isActive && isDownloaded ? Color.green : isActive ? Color.orange : Color.secondary
                     Text(stateLabel)
                         .font(.caption.weight(.medium))
                         .foregroundStyle(badgeColor)
@@ -63,10 +63,10 @@ private struct SpeechModelCard: View {
                 Spacer(minLength: 0)
                 Label(model.sizeDescription, systemImage: "internaldrive")
                 if isDownloaded && !isActive {
-                    Button("Удалить") {
+                    Button(SettingsText.get("Удалить")) {
                         controller.removeSpeechModel(model)
                     }
-                    .accessibilityLabel("Удалить \(model.title)")
+                    .accessibilityLabel(String(format: SettingsText.get("Delete %@"), model.title))
                     .buttonStyle(.plain)
                     .foregroundStyle(Color.red)
                 }
@@ -84,7 +84,7 @@ private struct SpeechModelCard: View {
             HStack(spacing: 8) {
                 if let fraction {
                     ProgressView(value: fraction).frame(width: 90)
-                        .accessibilityLabel("Скачивание \(model.title)")
+                        .accessibilityLabel(String(format: SettingsText.get("Downloading %@"), model.title))
                     Text("\(Int((fraction * 100).rounded()))%")
                         .monospacedDigit()
                 } else {
@@ -100,7 +100,7 @@ private struct SpeechModelCard: View {
                     .lineLimit(1)
                     .foregroundStyle(Color.red)
                     .help(message)
-                Button("Повторить") {
+                Button(SettingsText.get("Повторить")) {
                     controller.selectSpeechModel(model)
                 }
                 .controlSize(.small)
@@ -110,10 +110,10 @@ private struct SpeechModelCard: View {
             if isActive && isDownloaded {
                 EmptyView()
             } else {
-                Button(isDownloaded ? "Выбрать" : "Скачать") {
+                Button(isDownloaded ? SettingsText.get("Выбрать") : SettingsText.get("Скачать")) {
                     controller.selectSpeechModel(model)
                 }
-                .accessibilityLabel(isDownloaded ? "Выбрать \(model.title)" : "Скачать \(model.title)")
+                .accessibilityLabel(isDownloaded ? String(format: SettingsText.get("Select %@"), model.title) : String(format: SettingsText.get("Download %@"), model.title))
                 .buttonStyle(.borderedProminent)
                 .controlSize(.small)
             }

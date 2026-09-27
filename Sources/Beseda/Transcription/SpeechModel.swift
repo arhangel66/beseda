@@ -22,8 +22,8 @@ struct SpeechModel: Identifiable, Hashable, Sendable {
     static let parakeetV3 = SpeechModel(
         id: "parakeet-tdt-0.6b-v3",
         title: "Parakeet v3",
-        subtitle: "Быстрая и точная, пишет латиницу как есть",
-        languages: "25 языков",
+        subtitle: SettingsText.get("Быстрая и точная, пишет латиницу как есть"),
+        languages: SettingsText.get("25 языков"),
         bytes: 485_425_504,
         filename: "parakeet-tdt-0.6b-v3-Q4_K_M.gguf",
         downloadURL: URL(string: "https://huggingface.co/handy-computer/parakeet-tdt-0.6b-v3-gguf/resolve/85ac09ea12fc4b1112fa76810059364bc6adc9de/parakeet-tdt-0.6b-v3-Q4_K_M.gguf")!,
@@ -35,8 +35,8 @@ struct SpeechModel: Identifiable, Hashable, Sendable {
     static let gigaamV3 = SpeechModel(
         id: "gigaam-v3-e2e-rnnt",
         title: "GigaAM v3",
-        subtitle: "Сбер, со знаками препинания. Английские слова пишет на слух",
-        languages: "только русский",
+        subtitle: SettingsText.get("Сбер, со знаками препинания. Английские слова пишет на слух"),
+        languages: SettingsText.get("только русский"),
         bytes: 273_724_832,
         filename: "gigaam-v3-e2e-rnnt-Q8_0.gguf",
         downloadURL: URL(string: "https://huggingface.co/handy-computer/gigaam-v3-e2e-rnnt-gguf/resolve/f719d70812344f4d0fb8c11c0887b190501a7465/gigaam-v3-e2e-rnnt-Q8_0.gguf")!,
@@ -55,11 +55,11 @@ struct SpeechModel: Identifiable, Hashable, Sendable {
     static func stateLabel(isSelected: Bool, isDownloaded: Bool) -> String? {
         switch (isSelected, isDownloaded) {
         case (true, true):
-            "Готова"
+            SettingsText.get("Готова")
         case (true, false):
-            "Выбрана · не скачана"
+            SettingsText.get("Выбрана · не скачана")
         case (false, true):
-            "Скачана"
+            SettingsText.get("Скачана")
         case (false, false):
             nil
         }
