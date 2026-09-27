@@ -82,7 +82,9 @@ private func largestReadOnTheEchoGateAndPiecePaths(seconds: Int) throws -> Int {
     return call.largestRead
 }
 
-@Test func noReadGrowsWithTheLengthOfTheCall() throws {
+// 20 s of synthesis: full check only (BESEDA_FULL_CHECK=1, see AGENTS.md)
+@Test(.enabled(if: ProcessInfo.processInfo.environment["BESEDA_FULL_CHECK"] == "1"))
+func noReadGrowsWithTheLengthOfTheCall() throws {
     let short = try largestReadOnTheEchoGateAndPiecePaths(seconds: 5 * 60)
     let long = try largestReadOnTheEchoGateAndPiecePaths(seconds: 20 * 60)
 

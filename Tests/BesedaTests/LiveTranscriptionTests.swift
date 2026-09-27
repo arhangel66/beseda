@@ -164,7 +164,9 @@ private func recordingInProgress(seconds: Int, at url: URL) throws -> PCMFloatRe
     _ = try them.finish()
 }
 
-@Test func liveLoopLogsOnceAndStopsWhenTheSpeechModelIsMissing() async throws {
+// waits ~6 s on the live loop: full check only
+@Test(.enabled(if: ProcessInfo.processInfo.environment["BESEDA_FULL_CHECK"] == "1"))
+func liveLoopLogsOnceAndStopsWhenTheSpeechModelIsMissing() async throws {
     let directory = FileManager.default.temporaryDirectory.appendingPathComponent("beseda-live-\(UUID().uuidString)")
     defer { try? FileManager.default.removeItem(at: directory) }
     let me = try recordingInProgress(seconds: 60, at: directory.appendingPathComponent("me.raw.wav"))

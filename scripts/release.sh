@@ -80,7 +80,7 @@ HAS_ASSET="$(gh release view "$TAG" --repo "$REPO" --json assets \
 
 # a build is needed only while GitHub has no zip: a rebuilt zip differs from the uploaded one
 if [ "$HAS_ASSET" != "true" ]; then
-    swift test --jobs 2 --package-path "$ROOT"
+    "$ROOT/scripts/full_check.sh"
     swift build --package-path "$ROOT" -c release --product Beseda
     BIN_DIR="$(swift build --package-path "$ROOT" -c release --show-bin-path)"
     rm -rf "$DIST"
