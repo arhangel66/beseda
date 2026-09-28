@@ -1,6 +1,6 @@
 # Decisions
 
-- [Native macOS visual directions](native-macos-design.md) — two unselected offscreen SwiftUI proposals for menu and archive.
+- [Failed native macOS design research](native-macos-design.md) — neither offscreen SwiftUI direction passed the design gate; no candidate was selected.
 
 - [Sales UX screen audit and design proposals](design-review-sales.md) — source-bounded screen review and three static concepts; proposed.
 
