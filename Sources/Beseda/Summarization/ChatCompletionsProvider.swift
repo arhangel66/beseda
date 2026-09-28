@@ -42,6 +42,24 @@ struct ChatCompletionsProvider: SummarizationProvider, Sendable {
         на тебе», «записываю», «договорились»).
         """
 
+    static let englishDefaultPrompt = """
+        Read the call transcript and write the summary in English. No introduction or `#` headings. Use bold only for the four section names, with plain text elsewhere. Use exactly these sections in order:
+
+        **What we discussed**
+        A couple of sentences about the conversation.
+
+        **Decisions**
+        — each decision on its own line, including dates and numbers. Do not omit or combine decisions.
+
+        **Who does what**
+        — Name — task — deadline, if given. One task per line, including small tasks. Use names from the transcript; “You” is the person recording the call.
+
+        **Open questions**
+        — matters discussed but not resolved.
+
+        Read the entire transcript before answering; agreements and assignments may be mentioned in passing.
+        """
+
     /// the default until BESEDA-94; a type still holding it word for word gets `defaultPrompt`
     static let previousDefaultPrompt = """
         Прочитай расшифровку созвона и напиши по-русски краткое саммари. Без вступления и без \

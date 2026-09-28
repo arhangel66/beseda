@@ -20,7 +20,7 @@ struct PreviousRelatedCall: Hashable {
 enum RelatedCalls {
     /// the sections that say what was agreed and what is left, as ChatCompletionsProvider.defaultPrompt
     /// names them now and as previousDefaultPrompt named them before BESEDA-94
-    static let digestSections = ["Договорились", "Главное", "Кто что делает", "Что делать", "Открытые вопросы"]
+    static let digestSections = ["Договорились", "Главное", "Кто что делает", "Что делать", "Открытые вопросы", "Decisions", "Who does what", "Open questions"]
 
     /// Most recent `ready` call before the target: same series or title first, then same type
     /// plus a shared participant. Rule (a) over the whole history wins before rule (b) is tried.
@@ -69,7 +69,7 @@ enum RelatedCalls {
             }
         }
         // a custom prompt may happen to have «Открытые вопросы»; only the agreements and tasks mark a default one
-        guard ["Договорились", "Кто что делает", "Что делать"].contains(where: { bodies[$0] != nil }) else {
+        guard ["Договорились", "Кто что делает", "Что делать", "Decisions", "Who does what"].contains(where: { bodies[$0] != nil }) else {
             return nil
         }
         let sections = digestSections.compactMap { heading in

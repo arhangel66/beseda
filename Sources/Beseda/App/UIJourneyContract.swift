@@ -26,7 +26,7 @@ enum UIJourneyContract {
         for (id, time, lines, summary) in [
             (seededPreviousCallID, 1_700_000_000.0,
              ["Example conversation: sketch the lighthouse route.", "Let's check the map next time."],
-             "**Договорились**\nUse the paper map for the lighthouse route.\n\n**Что делать**\nCheck the route at the next call."),
+             "**Decisions**\n— Use the paper map for the lighthouse route.\n\n**Who does what**\n— You — check the route — next call.\n\n**Open questions**\n— Is the route safe?"),
             (seededCallID, 1_700_604_800.0,
              ["Example conversation: review the lighthouse route.", "The paper map shows a shorter path."],
              "The shorter route is ready to review; check the map before leaving.")

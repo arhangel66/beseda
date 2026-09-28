@@ -145,6 +145,27 @@ private func makeTarget(
     #expect(previous?.digest == "**Договорились**\n— релиз 17 октября\n\n**Кто что делает**\n— Ольга — макеты — к среде\n\n**Открытые вопросы**\n— что с данными")
 }
 
+@Test func englishStoredSummaryProvidesPreviousDecisionsTasksAndQuestions() {
+    let summary = """
+        **What we discussed**
+        The lighthouse route.
+
+        **Decisions**
+        — Use the paper map.
+
+        **Who does what**
+        — You — check the route — Friday.
+
+        **Open questions**
+        — Is the path safe?
+        """
+    let previous = RelatedCalls.previousRelatedCall(
+        to: makeTarget(title: "Sync"), among: [makeCall(id: "en", daysAgo: 7, title: "Sync", summary: summary)]
+    )
+    #expect(previous?.digest == "**Decisions**\n— Use the paper map.\n\n**Who does what**\n— You — check the route — Friday.\n\n**Open questions**\n— Is the path safe?")
+    #expect(RelatedCalls.digest(ofSummary: "**Open questions**\n— custom question") == nil)
+}
+
 @Test func aCustomPromptResultIsShownWhole() {
     let summary = "**Настроение**\nСпокойное.\n\n**Темы**\n— отпуск\n— нагрузка\n— обучение\n— ревью\n\n**Решили**\n— меньше встреч"
     let calls = [makeCall(id: "custom", daysAgo: 7, title: "1:1", summary: summary)]

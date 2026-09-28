@@ -21,8 +21,8 @@ marked, oldest first. So a quit mid-queue resumes the rest at the next launch, e
 for the classifier, prompt; never empty. The one type with `isOther` is the built-in «Другое» (`CallType.otherName`,
 found by `callTypes.other`, not by position):
 editable, but `deleteCallType` refuses it; it holds the general prompt and is the fallback. On a fresh
-install it is seeded with the old `beseda.summaryPrompt` if that was edited, else
-`ChatCompletionsProvider.defaultPrompt`. Migration: a first type still named «Созвон» (the BESEDA-46
+install it is seeded with the old `beseda.summaryPrompt` if that was edited, else the Russian
+`ChatCompletionsProvider.defaultPrompt` on Russian systems or `englishDefaultPrompt` elsewhere. Migration: a first type still named «Созвон» (the BESEDA-46
 default) is renamed «Другое» on load, prompt and id kept; types stored before the `isOther` flag give it
 to their first type, which was «Другое» by position then.
 `SummarizationService.process` picks the type and then summarizes with its prompt:
@@ -64,12 +64,15 @@ The chosen type's name is stored on the call (`callStore.setCallType`, column `c
 3. The text is stored on the call row (`callStore.setSummary`). Errors map to `SummarizationError`; the
    error card offers a recovery (`SummaryRecovery`), e.g. starting LM Studio with `lms server start`.
 
-The default prompt (`ChatCompletionsProvider.defaultPrompt`, the starting prompt of every type) asks for four Russian
+The Russian default prompt (`ChatCompletionsProvider.defaultPrompt`) asks for four Russian
 sections with bold names only: «О чём говорили», «Договорились» (every decision on its own line, with dates),
 «Кто что делает» (`Имя — что — срок`, one task per line), «Открытые вопросы». BESEDA-94 replaced the
 earlier «Главное»/«Что делать» prompt, kept as `previousDefaultPrompt`: on load
 `AppSettings.migratingStoredCallTypes` gives a type whose prompt equals it word for word the new one;
-edited prompts stay. The check behind it — one synthetic call, three runs per variant, hand-scored — is in
+edited prompts stay. New English-system installs use `englishDefaultPrompt`, with **What we discussed**,
+**Decisions**, **Who does what**, and **Open questions**. The previous-call digest recognizes the
+English decision/task/question headings as well as both generations of Russian headings. Existing
+stored summaries and edited prompts are not translated. The check behind the Russian prompt — one synthetic call, three runs per variant, hand-scored — is in
 `untracked/epics/summary-quality/README.md`: both prompts kept 5 of 6 agreements and named all five
 assignees; the new one kept 23 of 27 assignments against 21, within run-to-run noise.
 
@@ -81,7 +84,8 @@ stored type and reruns with a picked one through `generateSummary(as:)`, and cop
 After `setSummary`/`setCallType`, `AppController.exportResult` writes `CallExport.markdown` into
 `AppSettings.exportFolder` when it is set, as `yyyy-MM-dd HH-mm <title>.md` (title stripped of
 `/\:*?"<>|` and newlines, max 120 chars). A write error is logged and does not fail processing. The folder
-is a plain path, not a security-scoped bookmark: the app is not sandboxed; sandboxing would need one.
+is backed by a security-scoped bookmark in Store mode; `AppSettings.withExportFolder` resolves
+and scopes access for exports, while direct distribution can use the path without a bookmark.
 `CallStore.replaceExportCopy` keeps the written path in `calls.export_path`: after a title change (e.g.
 linking a calendar event) the new file is written and the one under the old title removed, so a call has
 one copy.
@@ -101,9 +105,8 @@ embeds the hash-checked archive's executable and top-level dylibs in `Contents/H
 It requires a separately assembled unsigned store app with `Contents/MacOS/Beseda` and no existing
 `Contents/Helpers`; the caller supplies the signing identity. The pinned b10819 archive's SHA-256 was
 verified on 2026-09-28. `bash scripts/test_package_store_summary.sh` verifies hash rejection,
-exact stub helper contents, plist flag and signing order using private stubs. A private full assembled
-Beseda store app was not available in this worktree, so its ad-hoc full-bundle signature and sandbox
-execution remain unverified. No helper or app was launched. Both modes warm up once and `remove()`
+exact stub helper contents, plist flag and signing order using private stubs. Static verification covers the pinned archive hash, stub helper contents, plist flag and signing
+order only; full-bundle sandbox execution is not established here. No helper or app was launched. Both modes warm up once and `remove()`
 deletes only the model.
 
 ## Main files
