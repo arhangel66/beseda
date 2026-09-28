@@ -8,9 +8,11 @@ ARCHIVE="$2"
 IDENTITY="$3"
 if [[ $# == 4 ]]; then
     [[ -f "$4" && "$IDENTITY" =~ ^[[:xdigit:]]{40}$ ]] || { echo 'provisioned mode requires a profile and 40-digit identity fingerprint' >&2; exit 1; }
+    PROFILE_COPY="$(mktemp)"
     PROFILE_PLIST="$(mktemp)"
-    trap 'rm -f "$PROFILE_PLIST"' EXIT
-    security cms -D -i "$4" > "$PROFILE_PLIST" || { echo 'profile decoding failed' >&2; exit 1; }
+    trap 'rm -f "$PROFILE_COPY" "$PROFILE_PLIST"' EXIT
+    cp "$4" "$PROFILE_COPY"
+    security cms -D -i "$PROFILE_COPY" > "$PROFILE_PLIST" || { echo 'profile decoding failed' >&2; exit 1; }
     swift "$ROOT/scripts/validate_store_profile.swift" "$PROFILE_PLIST" "$IDENTITY"
     echo 'Provisioned Store mode (static verification only)' >&2
 else
@@ -42,7 +44,7 @@ while IFS= read -r entry; do
     case "/$entry/" in */../*|*/./*) echo "unsafe archive entry: $entry" >&2; exit 1 ;; esac
 done < <(tar tzf "$ARCHIVE")
 STAGING="$(mktemp -d)"
-trap 'rm -rf "$STAGING"; if [[ $# == 4 ]]; then rm -f "$PROFILE_PLIST"; fi' EXIT
+trap 'rm -rf "$STAGING"; if [[ $# == 4 ]]; then rm -f "$PROFILE_COPY" "$PROFILE_PLIST"; fi' EXIT
 tar xzf "$ARCHIVE" -C "$STAGING"
 SOURCE="$(realpath "$STAGING/llama-b10819")"
 [[ -f "$SOURCE/llama-server" && ! -L "$SOURCE/llama-server" ]] || {
@@ -72,13 +74,13 @@ for file in "$HELPERS"/*.dylib; do
     [[ -L "$file" ]] || codesign --force --sign "$IDENTITY" "$file"
 done
 codesign --force --sign "$IDENTITY" --entitlements "$ROOT/scripts/store_summary.entitlements" "$HELPERS/llama-server"
-if [[ $# == 4 ]]; then cp "$4" "$APP/Contents/embedded.provisionprofile"; fi
+if [[ $# == 4 ]]; then install -m 644 "$PROFILE_COPY" "$APP/Contents/embedded.provisionprofile"; fi
 codesign --force --sign "$IDENTITY" --entitlements "$ROOT/scripts/store_summary_app.entitlements" "$APP"
 codesign --verify --strict --deep "$APP"
 if [[ $# == 4 ]]; then
     codesign --verify --strict "$HELPERS/llama-server"
     ENTITLEMENTS="$(mktemp)"
-    trap 'rm -rf "$STAGING"; rm -f "$PROFILE_PLIST" "$ENTITLEMENTS"' EXIT
+    trap 'rm -rf "$STAGING"; rm -f "$PROFILE_COPY" "$PROFILE_PLIST" "$ENTITLEMENTS"' EXIT
     codesign -d --entitlements :- "$APP" > "$ENTITLEMENTS" 2>/dev/null
     for key in com.apple.security.app-sandbox com.apple.security.device.audio-input com.apple.security.network.client com.apple.security.files.user-selected.read-write com.apple.security.personal-information.calendars; do
         [[ "$(/usr/libexec/PlistBuddy -c "Print :$key" "$ENTITLEMENTS" 2>/dev/null)" == true ]] || { echo "signed app missing $key" >&2; exit 1; }
