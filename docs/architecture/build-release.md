@@ -26,7 +26,7 @@ the excluded updater; direct builds retain those tests.
 
 `scripts/build_store_app.sh <pinned-llama-archive.tar.gz> <signing-identity>` builds and assembles
 `.build/Beseda-store.app`, then invokes `package_store_summary.sh` to embed and sign the pinned
-helper. This is a private artifact, not an App Store upload. Store assembly omits Sparkle framework,
+helper. This is a private artifact, not an App Store upload. The three-argument command is **ad-hoc/static mode, not representative of a provisioned Store sandbox**. For a provisioned candidate use `scripts/build_store_app.sh <pinned-llama-archive.tar.gz> <40-hex-character-codesigning-certificate-SHA1> <macOS.mobileprovision>`. Obtain the identity fingerprint from `security find-identity -v -p codesigning`; do not pass a certificate name. Packaging decodes the CMS profile, requires an unexpired macOS (`OSX`) profile with one team, exact `TEAM.app.beseda.Beseda` application identifier and the signing certificate in `DeveloperCertificates` before copying the profile or signing. It embeds `Contents/embedded.provisionprofile` before final app signing, then verifies strict/deep app, strict helper and the signed app/helper entitlements. No profile-gated capability beyond explicit App ID is inferred from ordinary sandbox entitlement booleans absent from a profile. These are static checks only: no launch, TCC, TestFlight or App Review proof. Store assembly omits Sparkle framework,
 license, feed and SU keys. The app signature uses `scripts/store_summary_app.entitlements`: sandbox,
 network client, microphone, calendars and user-selected read/write only. The helper keeps its own
 entitlements. The direct release assembly and feed are unchanged.
