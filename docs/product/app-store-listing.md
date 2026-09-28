@@ -10,21 +10,21 @@ Not submitted. This copy describes the current app, not an approved store build:
 ## English metadata
 
 - **App name:** Beseda
-- **Subtitle:** Record and revisit work calls
-- **Keywords:** meeting,transcription,call notes,summary,conversation,offline,audio,search
+- **Subtitle:** Recall what your calls decided
+- **Keywords:** meeting,transcript,call notes,summary,conversation,audio,search,recap,client
 - **Description (plain text):**
 
 > Remember what you agreed on in your last work call.
 >
-> Beseda records microphone and system audio separately on your Mac, then transcribes the conversation on-device with a downloaded speech model. Search past transcripts, play back audio and review what was said.
+> Beseda records your microphone and system audio as separate channels on your Mac. With a downloaded speech model, it transcribes calls on-device. Search past transcripts and play back recordings to revisit a client call or daily stand-up.
 >
-> When you need a summary, choose a call type and prompt to shape the result. Processing after a call is manual by default; you can opt into automatic processing. Optional live draft transcription and key points are a preview, not a finished transcript. If a related earlier call has a summary, Beseda can show its stored decisions, next steps and open questions before the next conversation.
+> After a call, create a summary using a call type and prompt you choose. Processing is manual by default; automatic processing is optional. If a related earlier call has a summary, revisit its stored decisions, next steps and open questions. Optional live draft transcription and key points are previews and may fall behind.
 >
-> Audio and local transcription stay on your Mac. Built-in summaries run locally after their model and engine are downloaded. If you choose OpenRouter, a remote LM Studio server or a webhook, conversation text can leave your Mac. Models and updates require internet access to download.
+> Recordings and local transcripts stay on your Mac by default. Built-in summaries run locally after you download the required model and engine. If you select OpenRouter or a remote LM Studio server, conversation text may leave your Mac; a configured webhook sends transcript and result text to its destination. Classification can send a transcript excerpt to OpenRouter when a key is set and local classification is not used. Model and app updates require internet access.
 >
-> You are responsible for recording lawfully and obtaining participants' consent. Beseda does not notify them for you.
+> Record only when lawful and obtain any consent required from call participants. Beseda does not notify them for you.
 
-This draft avoids accuracy percentages, guarantees of security, competitor comparisons, medical claims and testimonials. The name, subtitle, keywords and description are within Apple's 30-character, 30-character, 100-byte and 4,000-character limits respectively; recheck them in App Store Connect at submission. [Features](features.md) and [privacy](privacy.md) are the source for product claims.
+This draft avoids accuracy percentages, security guarantees, competitor trademarks, medical claims and testimonials. Apple's limits are 30 characters for name and subtitle, 100 bytes for keywords (each keyword longer than two characters), and 4,000 characters for the plain-text description; recheck in App Store Connect at submission. [Features](features.md) and [privacy](privacy.md) are the source for product claims.
 
 ## Privacy and consent copy
 
@@ -36,7 +36,7 @@ Recording notice: “Before you record, tell everyone on the call and obtain any
 
 - **Support URL — missing.** Apple requires a reachable full URL with actual contact information for support. No domain or support page has been selected; do not insert a placeholder into App Store Connect.
 - **Privacy Policy URL — missing.** Apple requires this for macOS; [project privacy notes](privacy.md) are not yet a published user-facing policy at a stable URL. Verify the store build and disclosures before hosting it.
-- **Price (internal only):** planned **USD $39.99 one-time paid download**, no introductory discount or subscription, per [first-sale decision](../decisions/first-sale-price.md). Not public or entered in App Store Connect; confirm the available US price point and regional storefront prices when eligible.
+- **Price (internal only):** planned **USD $39.99 one-time paid download**, no introductory discount or subscription, per [first-sale decision](../decisions/first-sale-price.md). Keep this out of public copy and App Store Connect until Paid Apps is Active and the owner approves the public listing. Confirm the US price point and regional prices then.
 
 ## Screenshot storyboard (not assets)
 
@@ -55,4 +55,5 @@ Capture actual UI from a verified build and synthetic fixtures only, following t
 - [Platform version information](https://developer.apple.com/help/app-store-connect/reference/app-information/platform-version-information) — description, keywords, required support URL and screenshots.
 - [Screenshot specifications](https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications) — Mac 16:10 pixel dimensions.
 - [Upload app previews and screenshots](https://developer.apple.com/help/app-store-connect/manage-app-information/upload-app-previews-and-screenshots) — localization and upload workflow.
+- [App Review Guidelines §2.3](https://developer.apple.com/app-store/review/guidelines/#accurate-metadata) — accurate, non-misleading metadata.
 - [Manage app privacy](https://developer.apple.com/help/app-store-connect/manage-app-information/manage-app-privacy/) — disclosure workflow, separate from this draft.
