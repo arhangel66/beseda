@@ -165,8 +165,13 @@ public struct NativeConcept: View {
                         Text("The team reviewed the current draft and agreed to share feedback before Friday. The next discussion will focus on the revised version. The review identified two open questions: whether the introduction explains the audience clearly and which examples should remain in the final draft. The team will collect written comments before the next discussion. Friday’s review will compare the revised opening with the original and decide which examples to keep. No changes to the release date were agreed in this call.")
                             .textSelection(.enabled)
                             .fixedSize(horizontal: false, vertical: true)
-                        Text("Previous related call · Planning review")
-                            .font(.callout).foregroundStyle(.secondary)
+                        Divider()
+                        Text("Previous call · Planning review")
+                            .font(.callout.weight(.semibold))
+                        Text("Open the previous call to read its result.")
+                            .font(.caption).foregroundStyle(.secondary)
+                        Button("Open previous call") {}
+                            .accessibilityIdentifier("concept.previousCall")
                     }
                     .frame(maxWidth: direction == .focus ? 620 : 760, alignment: .leading)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -202,5 +207,6 @@ public struct NativeConcept: View {
         }
         .tag(call.id)
         .accessibilityLabel("\(call.title), \(call.time), \(call.minutes) minutes, \(call.app)")
+        .accessibilityIdentifier("concept.call.\(call.id)")
     }
 }
