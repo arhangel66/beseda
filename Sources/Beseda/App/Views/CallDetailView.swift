@@ -676,7 +676,7 @@ private struct CallInfo: View {
         rows.append(("Отправка на сервис", webhookLine))
         rows.append((ArchiveText.get("Папка"), summary.audioDirectoryPath))
         if let error = summary.error, !error.isEmpty {
-            rows.append((ArchiveText.get("Ошибка"), error))
+            rows.append((ArchiveText.get("Ошибка"), ArchiveText.displayError(error)))
         }
         return rows.map { (key: ArchiveText.get($0.0), value: $0.1) }
     }
