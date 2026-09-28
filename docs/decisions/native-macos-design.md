@@ -1,15 +1,15 @@
 ---
 type: Design Proposal
-status: proposed
-title: Native macOS visual directions
+status: failed
+title: Failed native macOS design research
 ---
-# Native macOS visual directions
+# Failed native macOS design research
 
 **Failed design gate: neither Focus nor Ledger is a candidate to present to Mikhail.** Both directions fail independent review, native offscreen-control fidelity, and archive detail legibility at 390 px. [The reproducible negative native-rendering experiment](../../.factory/shots/BESEDA-macos-design/native-proof-notes.md) shows that a never-ordered window cannot capture trustworthy native controls in either appearance. Establishing their real appearance would require ordering a window, which is forbidden here; this is a limitation, not a request to waive that rule.
 
-**Proposals, not app captures or a selected design.** The synthetic call, times, result and levels are illustrative. Mikhail rejected BESEDA-240 as “слабые схемы а не дизайн мак апп”; he did not choose a screen priority or direction. These are isolated SwiftUI bitmap renders, not a launched application. [Source constraints and unknowns](../../.factory/shots/BESEDA-macos-design/source-baseline.md) and [verified public reference sheet](../../.factory/shots/BESEDA-macos-design/reference-sheet.md) bound the exercise. The HIG topic pages returned JavaScript shells over HTTP: their prose was not verified. MacWhisper's promotional screenshot supplies a concrete transcript/inspector comparison, Granola's composite only a separation-of-status visual cue; CleanShot's inspected asset is an icon, not a UI benchmark. See [sales review](design-review-sales.md), [native-menu decision](native-menubar-app.md), and [English buyer gate](english-first-buyers.md).
+**Failed research artifacts, not app captures or a selected design.** The synthetic call, times, result and levels are illustrative. Mikhail rejected BESEDA-240 as “слабые схемы а не дизайн мак апп”; he did not choose a screen priority or direction. These are isolated SwiftUI bitmap renders, not a launched application. [Source constraints and unknowns](../../.factory/shots/BESEDA-macos-design/source-baseline.md) and [verified public reference sheet](../../.factory/shots/BESEDA-macos-design/reference-sheet.md) bound the exercise. The HIG topic pages returned JavaScript shells over HTTP: their prose was not verified. MacWhisper's promotional screenshot supplies a concrete transcript/inspector comparison, Granola's composite only a separation-of-status visual cue; CleanShot's inspected asset is an icon, not a UI benchmark. See [sales review](design-review-sales.md), [native-menu decision](native-menubar-app.md), and [English buyer gate](english-first-buyers.md).
 
-## Two systems
+## Tested systems
 
 **Focus** gives the current task a large rounded system-font heading, restrained indigo selection, a generous result reading column and compact two-source levels. Recording shows Pause and Stop before the two meters and closed live disclosure. Results lead while a previous related call stays subordinate. Its large text consumes vertical space; longer localized strings need a real-window check. The large result line is proposed presentation of synthetic summary content, not a new extraction feature.
 
