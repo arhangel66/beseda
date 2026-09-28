@@ -19,8 +19,15 @@ import Testing
     )
 
     let call = try #require(try store.fetchCall(id: UIJourneyContract.seededCallID))
-    #expect(try store.searchCalls(matching: "маяк путешествия").map(\.id) == [call.id])
-    #expect(call.summaryText == "Решили продолжить путешествие.")
+    let previous = try #require(try store.fetchCall(id: UIJourneyContract.seededPreviousCallID))
+    #expect(try store.searchCalls(matching: "shorter path").map(\.id) == [call.id])
+    #expect(try store.searchCalls(matching: "sketch the lighthouse").map(\.id) == [previous.id])
+    #expect(call.displayTitle != previous.displayTitle)
+    #expect(call.startedDate! > previous.startedDate!)
+    #expect(try store.previousRelatedCall(toCallID: call.id)?.callID == previous.id)
+    #expect(try store.previousRelatedCall(toCallID: previous.id) == nil)
+    #expect(call.summaryText == "The shorter route is ready to review; check the map before leaving.")
+    #expect(try #require(try store.previousRelatedCall(toCallID: call.id)).digest.contains("Check the route at the next call."))
     let detail = StoredCallDetail(
         summary: call,
         segments: try store.fetchSegments(callID: call.id),
@@ -28,7 +35,13 @@ import Testing
         markdownText: try String(contentsOf: #require(call.transcriptURL), encoding: .utf8),
         jobStats: nil
     )
-    #expect(TranscriptCopy.render(detail, format: .clean).contains("\(SpeakerNaming.defaultName(for: "them-1")): Обсудили маяк путешествия"))
+    #expect(TranscriptCopy.render(detail, format: .clean) == "\(SpeakerNaming.defaultName(for: "them-1")): Example conversation: review the lighthouse route.\n\(SpeakerNaming.defaultName(for: "them-2")): The paper map shows a shorter path.")
+    let snapshot = try [previous, call].map { try Data(contentsOf: #require($0.transcriptURL)) }
+    try UIJourneyContract.seedIfRequested(environment: [UIJourneyContract.seededJourneyEnvironment: "1"], isolated: true, paths: paths, store: store)
+    let reread = try [previous.id, call.id].map { try #require(try store.fetchCall(id: $0)) }
+    #expect(snapshot == (try reread.map { try Data(contentsOf: #require($0.transcriptURL)) }))
+    #expect([previous, call].map(\.startedAt) == reread.map(\.startedAt))
+    #expect([previous, call].map(\.summaryText) == reread.map(\.summaryText))
 
     try store.mergeSpeaker(callID: call.id, speakerKey: "them-2", into: "them-1")
     #expect(Set(try store.fetchSegments(callID: call.id).map(\.speaker)) == ["them-1"])
@@ -52,6 +65,7 @@ import Testing
     )
 
     #expect(try store.fetchCall(id: UIJourneyContract.seededCallID) == nil)
+    #expect(try store.fetchCall(id: UIJourneyContract.seededPreviousCallID) == nil)
 }
 
 @Test func journeyAccessibilityNamesAreStableAndUnique() {
