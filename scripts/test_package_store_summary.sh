@@ -68,7 +68,7 @@ profile = dict(TeamIdentifier=['TEAM'], Platform=['OSX'],
 profile['ExpirationDate'] = datetime.datetime(2000, 1, 1)
 (p/'expired').write_bytes(plistlib.dumps(profile))
 PY
-printf '#!/bin/sh\ncat "$PROFILE_FIXTURE"\n' > "$TMP/bin/security"
+printf '#!/bin/sh\ncat "$PROFILE_FIXTURE"\nif [ -n "${MUTATE_PROFILE:-}" ]; then cp "$MUTATE_PROFILE" "$ORIGINAL_PROFILE"; fi\n' > "$TMP/bin/security"
 # Return the same entitlement plist that a signature made with the requested file would expose.
 printf '#!/bin/bash\nif [[ "$1" == -d ]]; then\n  if [[ "$*" == *llama-server* ]]; then cp "$HELPER_ENTITLEMENTS" /dev/stdout; else cp "$APP_ENTITLEMENTS" /dev/stdout; fi\nelse echo "$*" >> "$SIGN_LOG"; fi\n' > "$TMP/bin/codesign"
 chmod +x "$TMP/bin/security" "$TMP/bin/codesign"
@@ -82,8 +82,11 @@ fi
 grep -q 'invalid macOS provisioning profile' "$TMP/error"
 test ! -e "$TMP/Store.app/Contents/embedded.provisionprofile"
 /usr/libexec/PlistBuddy -c 'Delete :BesedaStoreSummary' "$TMP/Store.app/Contents/Info.plist"
-PROFILE_FIXTURE="$TMP/profile" bash "$ROOT/scripts/package_store_summary.sh" "$TMP/Store.app" "$TMP/archive.tar.gz" "$identity" "$TMP/profile"
+cp "$TMP/profile" "$TMP/original-profile"
+PROFILE_FIXTURE="$TMP/profile" MUTATE_PROFILE="$TMP/expired" ORIGINAL_PROFILE="$TMP/original-profile" bash "$ROOT/scripts/package_store_summary.sh" "$TMP/Store.app" "$TMP/archive.tar.gz" "$identity" "$TMP/original-profile"
 cmp "$TMP/profile" "$TMP/Store.app/Contents/embedded.provisionprofile"
+cmp "$TMP/expired" "$TMP/original-profile"
+test "$(stat -f %Lp "$TMP/Store.app/Contents/embedded.provisionprofile")" = 644
 grep -F -- "--verify --strict --deep $TMP/Store.app" "$SIGN_LOG"
 grep -F -- "--verify --strict $TMP/Store.app/Contents/Helpers/llama-server" "$SIGN_LOG"
 for target in ../outside.dylib missing.dylib /tmp/outside.dylib; do
