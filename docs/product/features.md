@@ -6,7 +6,7 @@ type: Feature List
 What the code does today. Settings tabs are named here in Russian: Основные, Запись, Обработка, Хранение,
 Интеграции. First run, menu, settings, archive and export have en/ru string resources in the build bundle;
 `scripts/lib/bundle_app.sh` copies that bundle into the app. Packaged lookup is structurally verified,
-but the app has not been launched on an English system. This does not establish payment readiness.
+but the app has not been launched on an English system. English first-run, permission, recovery, model, summary and archive screens still need a visual runtime check; source tests alone cannot establish payment readiness.
 
 - **Menu bar app.** The popover starts and stops a recording, shows progress and the latest calls, and
   copies a transcript. During recording, status and stop stay at the top, recent calls are hidden, and the
@@ -36,7 +36,7 @@ but the app has not been launched on an English system. This does not establish 
 - **Archive and search.** Calls are indexed in SQLite with transcripts on disk (`Storage/CallStore.swift`).
   The conversations window groups calls by day, plays the audio (`Audio/CallPlayer.swift`) and searches
   call metadata and transcript text. Under Хранение, retention rules delete raw or normalized audio and
-  keep the text (`Storage/StorageJanitor.swift`).
+  keep the text (`Storage/StorageJanitor.swift`). Disk-size labels use system-language units; Russian labels retain their original comma and Cyrillic units.
 - **Summaries.** A summary of a call is written by one of three providers picked under Обработка: the
   built-in Gemma 4 E4B run by a downloaded llama.cpp server, OpenRouter with the user's key, or LM Studio
   (`Summarization/`). The user defines call types (name, description, prompt) under Обработка; the

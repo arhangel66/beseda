@@ -131,15 +131,16 @@ struct StorageJanitor: Sendable {
 }
 
 extension Int64 {
-    /// "3,4 ГБ" — the prototype writes sizes with a comma, as Russian formatting does
-    var byteSizeDescription: String {
+    var byteSizeDescription: String { byteSizeDescription(locale: .current) }
+
+    func byteSizeDescription(locale: Locale) -> String {
         let formatter = ByteCountFormatter()
         formatter.allowedUnits = [.useKB, .useMB, .useGB]
         formatter.countStyle = .file
-        guard self > 0 else {
-            return "0 Б"
+        if locale.language.languageCode?.identifier != "ru" {
+            return formatter.string(fromByteCount: self)
         }
-        // ByteCountFormatter has no locale, and it writes "3.4 GB"; Russian wants "3,4 ГБ"
+        guard self > 0 else { return "0 Б" }
         return formatter.string(fromByteCount: self)
             .replacingOccurrences(of: ".", with: ",")
             .replacingOccurrences(of: "GB", with: "ГБ")
