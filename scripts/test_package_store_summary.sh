@@ -56,6 +56,36 @@ grep -F -- "--entitlements $ROOT/scripts/store_summary.entitlements $TMP/Store.a
 grep -F -- "--entitlements $ROOT/scripts/store_summary_app.entitlements $TMP/Store.app" "$SIGN_LOG"
 grep -F -- "--verify --strict --deep $TMP/Store.app" "$SIGN_LOG"
 test ! -e "$TMP/Store.app/Contents/Resources/runtime/llama/llama-server"
+# Synthetic CMS payload with documented macOS profile keys; no real identity or Keychain access.
+python3 - "$TMP" <<'PY'
+import datetime, hashlib, pathlib, plistlib, sys
+p = pathlib.Path(sys.argv[1]); cert = b'fixture certificate'
+(p/'identity').write_text(hashlib.sha1(cert).hexdigest().upper())
+profile = dict(TeamIdentifier=['TEAM'], Platform=['OSX'],
+    ExpirationDate=datetime.datetime(2099, 1, 1), DeveloperCertificates=[cert],
+    Entitlements={'application-identifier':'TEAM.app.beseda.Beseda'})
+(p/'profile').write_bytes(plistlib.dumps(profile))
+profile['ExpirationDate'] = datetime.datetime(2000, 1, 1)
+(p/'expired').write_bytes(plistlib.dumps(profile))
+PY
+printf '#!/bin/sh\ncat "$PROFILE_FIXTURE"\n' > "$TMP/bin/security"
+# Return the same entitlement plist that a signature made with the requested file would expose.
+printf '#!/bin/bash\nif [[ "$1" == -d ]]; then\n  if [[ "$*" == *llama-server* ]]; then cp "$HELPER_ENTITLEMENTS" /dev/stdout; else cp "$APP_ENTITLEMENTS" /dev/stdout; fi\nelse echo "$*" >> "$SIGN_LOG"; fi\n' > "$TMP/bin/codesign"
+chmod +x "$TMP/bin/security" "$TMP/bin/codesign"
+export APP_ENTITLEMENTS="$ROOT/scripts/store_summary_app.entitlements"
+export HELPER_ENTITLEMENTS="$ROOT/scripts/store_summary.entitlements"
+identity="$(< "$TMP/identity")"
+rm -rf "$TMP/Store.app/Contents/Helpers"
+if PROFILE_FIXTURE="$TMP/expired" bash "$ROOT/scripts/package_store_summary.sh" "$TMP/Store.app" "$TMP/archive.tar.gz" "$identity" "$TMP/expired" >"$TMP/error" 2>&1; then
+    echo 'expired profile accepted for packaging' >&2; exit 1
+fi
+grep -q 'invalid macOS provisioning profile' "$TMP/error"
+test ! -e "$TMP/Store.app/Contents/embedded.provisionprofile"
+/usr/libexec/PlistBuddy -c 'Delete :BesedaStoreSummary' "$TMP/Store.app/Contents/Info.plist"
+PROFILE_FIXTURE="$TMP/profile" bash "$ROOT/scripts/package_store_summary.sh" "$TMP/Store.app" "$TMP/archive.tar.gz" "$identity" "$TMP/profile"
+cmp "$TMP/profile" "$TMP/Store.app/Contents/embedded.provisionprofile"
+grep -F -- "--verify --strict --deep $TMP/Store.app" "$SIGN_LOG"
+grep -F -- "--verify --strict $TMP/Store.app/Contents/Helpers/llama-server" "$SIGN_LOG"
 for target in ../outside.dylib missing.dylib /tmp/outside.dylib; do
     rm -rf "$TMP/Store.app/Contents/Helpers"
     ln -sfn "$target" "$TMP/src/llama-b10819/libggml.0.dylib"
