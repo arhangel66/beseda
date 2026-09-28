@@ -74,6 +74,20 @@ This is a future owner-assisted gate, not a command to run on the owner's active
 | Routing, identity, grant, logs, control or repeat cannot be verified | **Inconclusive:** fix isolation and repeat under supervision; no Store claim. |
 | Isolated nonzero system channel meets threshold and phrase/control checks on both runs, without denials | **Go to later full sandbox runtime checks**, not Store readiness or App Review approval. |
 
+## Provisioned signing prerequisites (local read-only inspection)
+
+BESEDA-336 inspected `security find-identity -v -p codesigning` and decoded the seven locally installed profiles in Xcode's UserData provisioning directory without signing or requesting Keychain access. One valid Apple Development identity and one Developer ID Application identity were present; **no Mac App Distribution identity** was listed. All seven profiles target unrelated iOS application identifiers, not `app.beseda.Beseda`; none declares App Sandbox or audio-input entitlement. Their expiry dates range from 2026-09-30 through 2026-10-03. The legacy MobileDevice profile directory is empty. Team identifiers were present but are omitted here because they do not alter the mismatch. This only establishes what is locally available, not what the owner can obtain from Apple.
+
+| Prerequisite | Available locally? | Owner action |
+|---|---|---|
+| Apple Development signing identity | **Yes** (one valid identity) | Confirm its team matches the intended app profile before use. |
+| Mac App Distribution signing identity | **No** | Obtain the intended team's distribution certificate and private key through the owner's normal Apple Developer workflow. Do not substitute Developer ID Application. |
+| Unexpired macOS development profile for `app.beseda.Beseda` with matching team and sandbox/audio capabilities | **No** | Create/download an explicit macOS development profile for the intended App ID and verify its entitlements and expiry locally before supervised testing. |
+| Store distribution/TestFlight profile for that App ID | **No** | Provision the intended Store distribution path separately; validate the resulting signed bundle/profile before TestFlight. |
+| Packaging support for embedding a profile | **No** | `scripts/package_store_summary.sh` signs helper/dylibs/app with the supplied identity and fixed entitlements, but does not embed an `embedded.provisionprofile` or verify profile/team/application-identifier compatibility. Arrange and validate this before using the experiment runbook. |
+
+Apple's [development profile instructions](https://developer.apple.com/help/account/provisioning-profiles/create-a-development-provisioning-profile/) distinguish explicit App IDs, certificates and registered devices; [TestFlight overview](https://developer.apple.com/help/app-store-connect/test-a-beta-version/testflight-overview/) describes Apple's beta distribution workflow, not a local ad-hoc signature. These local negatives block the intended-identity experiment now. Neither the Developer ID identity nor the ad-hoc Store artifact proves Mac App Store sandbox behavior. No account change, signing, launch or permission request was performed.
+
 ## Proposed decision
 
 Keep the separate Store build and the direct distribution path. Store bundles a pinned signed summary
