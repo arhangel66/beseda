@@ -1,5 +1,7 @@
 # Decisions
 
+- [Native macOS visual directions](native-macos-design.md) — two unselected offscreen SwiftUI proposals for menu and archive.
+
 - [Sales UX screen audit and design proposals](design-review-sales.md) — source-bounded screen review and three static concepts; proposed.
 
 - [English first buyers](english-first-buyers.md) — localized source and bundle audit; visual gate parked.
