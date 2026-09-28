@@ -13,6 +13,7 @@
 - [Trial and access](trial-access.md) — proposed provider-neutral evaluation and archive-safe entitlement boundary.
 - [First payment path](payment-path.md) — conditional comparison of seller eligibility and first $500 gross receipts; proposed.
 - [App Store sandbox audit](app-store-sandbox.md) — direct/Store split, private full-bundle static evidence and parked runtime/Apple gates; proposed.
+- [Isolated process tap probe](isolated-tap-probe.md) — standalone owner-supervised sandbox feasibility contract; proposed.
 - [Pre-handoff UX review, round 2](ux-review-2.md) — first-time-user and psychologist findings across the current native UI; proposed.
 - [Adversarial product and code review](critic-review.md) — product, architecture, speaker, privacy and release findings; proposed.
 - [Development directions](development-directions.md) — where Beseda goes next: Mikhail's answers and the phased plan; approved with changes.

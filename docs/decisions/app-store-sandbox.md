@@ -60,7 +60,7 @@ No legally/publicly downloadable app binary was obtained from these listing/API 
 
 ## Owner-supervised sandbox capture experiment (not run)
 
-**Superseded as the first feasibility test:** the first existential tap test is a separate tiny `app.beseda.TapProbe` app, not the Beseda runner described below. The Beseda exact-ID procedure remains a later gate, permitted only in a separate disposable account/Mac. Do not run the procedure below in the owner's account.
+**Superseded as the first feasibility test:** the first existential trial follows the [isolated process tap probe contract](isolated-tap-probe.md) for a separate `app.beseda.TapProbe` app. Its grant cannot transfer to Beseda or prove full Store runtime. The Beseda exact-ID procedure below remains a later gate, only on a separate disposable account/Mac under owner supervision; never in the owner's account.
 
 This is a future owner-assisted gate, not a command to run on the owner's active session. Use a separate disposable macOS account on a test Mac (or owner-supervised time on a separate disposable account); if neither is available, defer. The [kit's headless probe limitation](../../AGENTS.md#no-focus-no-sound) prohibits a fresh bundle's permission dialog in unattended screenshots; its isolated copies skip permission requests. A CLI `sandbox-exec` probe or the retained ad-hoc Store bundle cannot substitute for the actual provisioned app and TCC flow. BESEDA-222's isolation choice is the boundary: do not borrow the owner's account, output route, grants or recordings.
 
