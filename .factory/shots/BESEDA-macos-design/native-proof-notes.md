@@ -1,0 +1,9 @@
+# Never-ordered native rendering experiment (BESEDA-317)
+
+Run `swiftc native-proof.swift -o /tmp/beseda-native-proof && /tmp/beseda-native-proof .` from this directory. Do not use `swift native-proof.swift`: this host's Swift JIT fails to resolve `___isPlatformVersionAtLeast` before executing the experiment.
+
+The script creates only synthetic SwiftUI views in an `NSHostingView` attached to an `NSWindow` that is constructed but never ordered. It calls `layoutSubtreeIfNeeded`, `displayIfNeeded`, then `bitmapImageRepForCachingDisplay(in:)` and `cacheDisplay(in:to:)` on the hosting view. No Beseda process, TCC, audio, or screen capture is involved. The run printed `window visible: false` for all four cases, and produced 680×900 and 2200×1440 pixels (2×) in both appearances.
+
+I opened each of the four resulting PNGs at full size. The black/transparent background is not a real material: in light mode the idle view is entirely blank, and the archive has only an empty white sidebar strip. In dark mode the idle view shows text, but the Button is a blank white pill and the Toggle is a blank white square with its label. The archive shows detail text, but the segmented picker is an empty white rectangle; list selection, search, toolbar, titlebar and native window chrome are absent. The light and dark outputs disagree about even basic text visibility. There is no evidence of native focus or vibrancy/material behavior; neither can be evaluated from these bitmaps. `cacheDisplay` captures the hosting view's drawing, not the compositor's complete native/window rendering. The generated PNGs were deleted rather than committed as misleading design evidence.
+
+`swift test --jobs 2` passed (320 tests). This technique does **not** satisfy the required native-control fidelity without ordering a window. The script is retained as a reproducible negative test, not as a production or concept rendering path.
