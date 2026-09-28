@@ -81,30 +81,40 @@ public struct NativeConcept: View {
                 }
                 Divider()
                 if direction == .focus {
-                    Text("Recent call").font(.caption).foregroundStyle(.secondary)
-                    Text("Team check-in").font(.headline)
-                    Text("Zoom · 28 min").font(.caption).foregroundStyle(.secondary)
-                    HStack {
-                        Button("Open") {}
+                    Button("Open latest result · Team check-in", systemImage: "doc.text") {}
+                        .accessibilityIdentifier("concept.latestResult")
+                    DisclosureGroup("More") {
                         Button("Copy transcript") {}
+                        Button("Conversations…", systemImage: "rectangle.stack") {}
+                        Button("Settings…", systemImage: "gearshape") {}
+                        Button("Quit Beseda", systemImage: "power") {}
+                            .keyboardShortcut("q", modifiers: .command)
                     }
                 } else {
-                    Text("Recent calls").font(.caption).foregroundStyle(.secondary)
+                    HStack {
+                        Text("Recent calls").font(.headline)
+                        Spacer()
+                        Button("All conversations", systemImage: "arrow.up.right") {}
+                            .accessibilityIdentifier("concept.allConversations")
+                    }
                     ForEach(calls.prefix(3)) { call in
                         Button { } label: {
-                            VStack(alignment: .leading) {
-                                Text(call.title)
-                                Text("\(call.time) · \(call.minutes) min")
+                            HStack {
+                                Text(call.title).lineLimit(1)
+                                Spacer(minLength: 4)
+                                Text("\(call.time) · \(call.minutes)m")
                                     .font(.caption).foregroundStyle(.secondary)
-                            }.frame(maxWidth: .infinity, alignment: .leading)
+                            }
                         }
+                        .accessibilityLabel("Open \(call.title), \(call.time), \(call.minutes) minutes")
+                    }
+                    Divider()
+                    HStack {
+                        Button("Settings…", systemImage: "gearshape") {}
+                        Button("Quit Beseda", systemImage: "power") {}
+                            .keyboardShortcut("q", modifiers: .command)
                     }
                 }
-                Divider()
-                Button("Conversations…", systemImage: "rectangle.stack") {}
-                Button("Settings…", systemImage: "gearshape") {}
-                Button("Quit Beseda", systemImage: "power") {}
-                    .keyboardShortcut("q", modifiers: .command)
             }
         }
         .buttonStyle(.bordered)
@@ -153,8 +163,9 @@ public struct NativeConcept: View {
                 }.pickerStyle(.segmented).fixedSize().padding(.vertical, 16)
                     .accessibilityIdentifier("concept.section")
                 Divider()
+                HStack(alignment: .top, spacing: 0) {
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 18) {
+                    VStack(alignment: .leading, spacing: direction == .focus ? 18 : 10) {
                         if direction == .focus {
                             Text("Call result").font(.title2.weight(.semibold))
                             Text("Review the revised opening on Friday.")
@@ -165,19 +176,40 @@ public struct NativeConcept: View {
                         Text("The team reviewed the current draft and agreed to share feedback before Friday. The next discussion will focus on the revised version. The review identified two open questions: whether the introduction explains the audience clearly and which examples should remain in the final draft. The team will collect written comments before the next discussion. Friday’s review will compare the revised opening with the original and decide which examples to keep. No changes to the release date were agreed in this call.")
                             .textSelection(.enabled)
                             .fixedSize(horizontal: false, vertical: true)
-                        Divider()
-                        Text("Previous call · Planning review")
-                            .font(.callout.weight(.semibold))
-                        Text("Open the previous call to read its result.")
-                            .font(.caption).foregroundStyle(.secondary)
-                        Button("Open previous call") {}
-                            .accessibilityIdentifier("concept.previousCall")
+                        if direction == .focus {
+                            Divider()
+                            Text("Previous call · Planning review")
+                                .font(.callout.weight(.semibold))
+                            Text("Open the previous call to read its result.")
+                                .font(.caption).foregroundStyle(.secondary)
+                            Button("Open previous call") {}
+                                .accessibilityIdentifier("concept.previousCall")
+                        }
                     }
-                    .frame(maxWidth: direction == .focus ? 620 : 760, alignment: .leading)
+                    .frame(maxWidth: direction == .focus ? 620 : .infinity, alignment: .leading)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.vertical, 20)
                 }
-                Spacer(minLength: 0)
+                if direction == .ledger {
+                    Divider()
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Call details").font(.headline)
+                        LabeledContent("Recorded", value: "Today, 10:42")
+                        LabeledContent("Channels", value: "Microphone, system audio")
+                        LabeledContent("Duration", value: "28 minutes")
+                        Divider()
+                        Text("Previous call").font(.headline)
+                        Text("Planning review · Yesterday")
+                            .font(.caption).foregroundStyle(.secondary)
+                        Button("Open previous call") {}
+                            .accessibilityIdentifier("concept.previousCall")
+                        Spacer(minLength: 0)
+                    }
+                    .padding(16)
+                    .frame(width: 240, alignment: .leading)
+                    .accessibilityIdentifier("concept.inspector")
+                }
+                }
                 HStack {
                     Button("Play", systemImage: "play.fill") {}
                     Text("00:00 / 28:00").monospacedDigit()
