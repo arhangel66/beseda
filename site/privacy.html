@@ -8,20 +8,21 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
     <nav aria-label="Main navigation">
       <a href="index.html">Beseda</a>
       <a href="privacy.html" aria-current="page">Privacy</a>
       <a href="support.html">Support</a>
     </nav>
   </header>
-  <main>
+  <main id="main">
     <h1>Privacy</h1>
     <p>Beseda records and transcribes conversations on your Mac. Recording and transcription are local; optional features can send text to services you choose. This page describes the app's data flows and limits.</p>
 
     <section aria-labelledby="stored">
       <h2 id="stored">What stays on your Mac</h2>
-      <p>Beseda keeps call audio, transcription results and transcripts in <code>~/Library/Application Support/Beseda/calls/</code>. Its <code>calls.sqlite</code> index contains call titles, transcript segments, summaries, matched calendar event information and attendee email addresses, and a webhook delivery log including endpoint response bodies. It also writes an app log. The SQLite index is not encrypted by Beseda. OpenRouter keys and webhook secrets are stored in the macOS Keychain.</p>
+      <p>Beseda keeps call audio, transcription results and transcripts in <code>~/Library/Application Support/Beseda/calls/</code>. In the parent <code>Beseda/</code> folder, its <code>calls.sqlite</code> index contains call titles, transcript segments, summaries, matched calendar event information and attendee email addresses, and a webhook delivery log including endpoint response bodies. It also writes an app log. The SQLite index is not encrypted by Beseda. OpenRouter keys and webhook secrets are stored in the macOS Keychain.</p>
       <p>Beseda sets owner-only file permissions in its data folder and uses macOS file protection where supported, which prevents access until the first login after a restart. These measures do not protect calls from someone using your unlocked account, software running as your user, or an administrator. Turn on FileVault to protect a lost Mac's disk.</p>
     </section>
 
@@ -29,7 +30,7 @@
       <h2 id="sharing">When data leaves your Mac</h2>
       <ul>
         <li><strong>OpenRouter summaries:</strong> If selected, Beseda sends the full transcript and call-type prompt to OpenRouter and the model it routes to. The built-in summary model does not send the transcript away.</li>
-        <li><strong>Call-type classification:</strong> With an OpenRouter key and non-local classification, Beseda sends the opening of the transcript and call-type names to OpenRouter's Decisions API (Jev).</li>
+        <li><strong>Call-type classification:</strong> With an OpenRouter key and non-local classification, Beseda sends the opening of the transcript, call weekday and time, duration, and call-type names to OpenRouter's Decisions API (Jev).</li>
         <li><strong>Live key points:</strong> If enabled, accumulated live transcript lines go to the selected summary provider every few minutes. Live transcription itself is local.</li>
         <li><strong>LM Studio:</strong> If selected for summaries or live key points, text goes to the configured LM Studio server. That server may be on another machine; it is not necessarily local to your Mac.</li>
         <li><strong>Webhooks:</strong> If configured, Beseda sends the transcript, title, time and summary to your chosen endpoint. Endpoints must use HTTPS except for localhost. Beseda stores the endpoint's response body in its local index.</li>
