@@ -520,8 +520,10 @@ final class AppSettings {
         }
     }
 
-    static func defaultCallType(legacyPrompt: String?) -> CallType {
-        let prompt = legacyPrompt.flatMap { $0.isEmpty ? nil : $0 } ?? ChatCompletionsProvider.defaultPrompt
+    static func defaultCallType(legacyPrompt: String?, locale: Locale = .current) -> CallType {
+        let prompt = legacyPrompt.flatMap { $0.isEmpty ? nil : $0 }
+            ?? (locale.language.languageCode?.identifier == "ru"
+                ? ChatCompletionsProvider.defaultPrompt : ChatCompletionsProvider.englishDefaultPrompt)
         return CallType(name: CallType.otherName, description: "ни один другой тип не подходит", prompt: prompt, isOther: true)
     }
 

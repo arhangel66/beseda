@@ -27,7 +27,7 @@ import Testing
     #expect(try store.previousRelatedCall(toCallID: call.id)?.callID == previous.id)
     #expect(try store.previousRelatedCall(toCallID: previous.id) == nil)
     #expect(call.summaryText == "The shorter route is ready to review; check the map before leaving.")
-    #expect(try #require(try store.previousRelatedCall(toCallID: call.id)).digest.contains("Check the route at the next call."))
+    #expect(try #require(try store.previousRelatedCall(toCallID: call.id)).digest.contains("**Who does what**\n— You — check the route — next call."))
     let detail = StoredCallDetail(
         summary: call,
         segments: try store.fetchSegments(callID: call.id),

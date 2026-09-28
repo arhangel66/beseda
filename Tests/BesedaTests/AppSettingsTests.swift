@@ -15,7 +15,7 @@ import Testing
     let settings = AppSettings(defaults: defaults, keychain: Keychain(service: suiteName))
     #expect(settings.summaryServerURL == "")
     #expect(settings.summaryModel == "")
-    #expect(settings.callTypes.map(\.prompt) == [ChatCompletionsProvider.defaultPrompt])
+    #expect(settings.callTypes.map(\.prompt) == [AppSettings.defaultCallType(legacyPrompt: nil).prompt])
     #expect(settings.autoProcessCalls == false)
 
     settings.summaryServerURL = "http://localhost:1235/v1"
@@ -100,6 +100,20 @@ import Testing
 
     #expect(settings.onboardingDone)
     #expect(settings.webhookURL == "http://new")
+}
+
+@MainActor
+@Test func freshEnglishAndRussianDefaultsKeepTheirLanguageAndEditedPrompts() {
+    let english = AppSettings.defaultCallType(legacyPrompt: nil, locale: Locale(identifier: "en_US"))
+    let russian = AppSettings.defaultCallType(legacyPrompt: nil, locale: Locale(identifier: "ru_RU"))
+    #expect(english.prompt.contains("write the summary in English"))
+    #expect(english.prompt.contains("**Decisions**"))
+    #expect(english.prompt.contains("**Who does what**"))
+    #expect(english.prompt.contains("**Open questions**"))
+    #expect(russian.prompt == ChatCompletionsProvider.defaultPrompt)
+    #expect(AppSettings.defaultCallType(legacyPrompt: "My edited prompt", locale: Locale(identifier: "en_US")).prompt == "My edited prompt")
+    let edited = CallType(name: "Other", description: "", prompt: "My edited prompt", isOther: true)
+    #expect(AppSettings.migratingStoredCallTypes([edited])[0].prompt == edited.prompt)
 }
 
 @MainActor
