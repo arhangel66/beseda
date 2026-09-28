@@ -3,7 +3,8 @@ html { scroll-behavior: smooth; }
 body { margin: 0; background: #f8f6f0; color: #202b2b; font: 1rem/1.65 system-ui, sans-serif; }
 a { color: #145c58; text-underline-offset: .2em; }
 a:hover { color: #083b39; }
-a:focus-visible { outline: 3px solid #af6123; outline-offset: 4px; }
+a:focus-visible { outline: 3px solid #8c4613; outline-offset: 4px; }
+.button:focus-visible { outline-color: white; box-shadow: 0 0 0 6px #202b2b; }
 .skip { position: absolute; left: 1rem; top: -5rem; background: white; padding: .5rem 1rem; z-index: 2; }
 .skip:focus { top: 1rem; }
 .site-header, footer { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.25rem max(1.5rem, calc((100vw - 72rem)/2)); }
