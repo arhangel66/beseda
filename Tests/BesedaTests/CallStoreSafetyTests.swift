@@ -321,3 +321,79 @@ private let schemaBefore022 = """
     #expect(!columnNames(dbURL, table: "calls").contains("one_other_person"))
     #expect(FileManager.default.fileExists(atPath: store.backupURL(fromVersion: 1).path))
 }
+
+private func tableColumns(_ dbURL: URL) -> [String: Set<String>] {
+    var db: OpaquePointer?
+    var statement: OpaquePointer?
+    sqlite3_open(dbURL.path, &db)
+    defer { sqlite3_finalize(statement); sqlite3_close(db) }
+    sqlite3_prepare_v2(db, "SELECT name FROM sqlite_master WHERE type = 'table'", -1, &statement, nil)
+    var tables: [String: Set<String>] = [:]
+    while sqlite3_step(statement) == SQLITE_ROW {
+        let table = String(cString: sqlite3_column_text(statement, 0))
+        tables[table] = columnNames(dbURL, table: table)
+    }
+    return tables
+}
+
+/// `.schema` of the owner's file as 0.4.1 (build 20260927140744) left it: version 3, but version 1 was
+/// edited after his file passed it (BESEDA-120), so `call_speaker_merges` never came (BESEDA-386)
+private let schemaVersion3WithoutSpeakerMerges = """
+    CREATE TABLE calls (
+        id TEXT PRIMARY KEY, kind TEXT NOT NULL, started_at TEXT NOT NULL, ended_at TEXT, duration_sec REAL,
+        status TEXT NOT NULL, transcript_path TEXT, audio_dir TEXT NOT NULL, error TEXT,
+        created_at TEXT NOT NULL, updated_at TEXT NOT NULL
+    , app_name TEXT, event_title TEXT, event_id TEXT, event_pinned INTEGER NOT NULL DEFAULT 0, summary_text TEXT,
+    call_type TEXT, event_series_id TEXT, participants TEXT, export_path TEXT,
+    processing_pending INTEGER NOT NULL DEFAULT 0, diarizer TEXT);
+    CREATE TABLE transcript_segments (
+        id TEXT PRIMARY KEY, call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE, speaker TEXT NOT NULL,
+        start_sec REAL NOT NULL, end_sec REAL, text TEXT NOT NULL, order_idx INTEGER NOT NULL
+    );
+    CREATE INDEX idx_transcript_segments_call_order ON transcript_segments(call_id, order_idx);
+    CREATE TABLE transcript_jobs (
+        id TEXT PRIMARY KEY, call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE, speaker TEXT NOT NULL,
+        status TEXT NOT NULL, audio_path TEXT NOT NULL, asr_json_path TEXT, audio_duration_sec REAL,
+        wall_time_sec REAL, real_time_factor REAL, error TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL
+    , model TEXT);
+    CREATE INDEX idx_transcript_jobs_call ON transcript_jobs(call_id, speaker);
+    CREATE TABLE call_speakers (
+        call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE, speaker_key TEXT NOT NULL,
+        display_name TEXT NOT NULL, PRIMARY KEY (call_id, speaker_key)
+    );
+    CREATE TABLE webhook_deliveries (
+        id TEXT PRIMARY KEY, call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE,
+        call_title TEXT NOT NULL, attempt INTEGER NOT NULL, event TEXT NOT NULL, url TEXT NOT NULL,
+        state TEXT NOT NULL, http_status INTEGER, response_action TEXT, response_body TEXT, error TEXT,
+        created_at TEXT NOT NULL, sent_at TEXT, finished_at TEXT, next_retry_at TEXT
+    );
+    CREATE INDEX idx_webhook_deliveries_call ON webhook_deliveries(call_id, attempt);
+    CREATE INDEX idx_webhook_deliveries_due ON webhook_deliveries(state, next_retry_at);
+    INSERT INTO calls (id, kind, started_at, duration_sec, status, audio_dir, error, created_at, updated_at, app_name)
+    VALUES ('failed', 'dual', '2026-10-01T09:00:18.008Z', 2505, 'failed', '/calls/failed',
+            'no such table: call_speaker_merges', '2026-10-01T09:00:18.008Z', '2026-10-01T09:42:03.000Z', 'Discord');
+    PRAGMA user_version = 3;
+    """
+
+@Test func aVersion3FileWithoutSpeakerMergesRetriesToReadyWithSegments() throws {
+    let root = try temporaryDirectory()
+    let dbURL = root.appendingPathComponent("calls.sqlite")
+    try execute(dbURL, schemaVersion3WithoutSpeakerMerges)
+    let freshURL = root.appendingPathComponent("fresh.sqlite")
+    try CallStore(dbURL: freshURL).prepare()
+    let store = CallStore(dbURL: dbURL)
+    let transcriptURL = root.appendingPathComponent("transcript.md")
+
+    try store.prepare()
+    try store.markReady(callID: "failed", transcriptURL: transcriptURL, segments: [
+        StoredTranscriptSegment(speaker: "them-1", startSec: 0, endSec: 2, text: "снова расшифровано", orderIndex: 0)
+    ])
+
+    let call = try #require(try store.fetchCall(id: "failed"))
+    #expect(call.status == "ready")
+    #expect(call.transcriptPath == transcriptURL.path)
+    #expect(call.error == nil)
+    #expect(try store.fetchSegments(callID: "failed").map(\.text) == ["снова расшифровано"])
+    #expect(userVersion(dbURL) == store.migrations.count)
+    #expect(tableColumns(dbURL) == tableColumns(freshURL))
+}

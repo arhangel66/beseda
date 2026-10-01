@@ -26,7 +26,7 @@ Old single-microphone calls use `mic.raw.wav`, `mic.16k-mono.wav`, `mic.asr.json
 folder is moved here once by `LegacyDataMigration`.
 
 - **CallStore** — raw `sqlite3` (system library) behind a serial queue. `prepare()` creates the tables
-  `calls`, `transcript_segments`, `transcript_jobs`, `call_speakers` (renames only), `webhook_deliveries`
+  `calls`, `transcript_segments`, `transcript_jobs`, `call_speakers` (renames only), `call_speaker_merges`, `webhook_deliveries`
   with `foreign_keys = ON` and WAL. Migrations are numbered: `CallStore.migrations` is a list, entry *n*
   brings the file to `PRAGMA user_version = n`, each runs in its own transaction with the version bump, so
   a failure rolls back to the last whole version. Version 1 is everything an unversioned file (every 0.3.x
@@ -45,6 +45,11 @@ folder is moved here once by `LegacyDataMigration`.
   diarization. Version 3 also drops `calls.one_other_person`, unused since BESEDA-120. It is also the
   progress mark of the background re-split of old calls ([asr](asr.md)): `replaceSegments` writes the new
   segments and the id together, so a call is either done or picked up again after a quit.
+  Version 4 (BESEDA-166) creates `call_speakers` and `call_speaker_merges` if missing: BESEDA-120 added
+  `call_speaker_merges` to the already released version 1, so a file that had passed version 1 never got it,
+  and every `markReady` failed with `no such table: call_speaker_merges` (BESEDA-386, the owner's 0.4.1 on a
+  version 3 file). `aVersion3FileWithoutSpeakerMergesRetriesToReadyWithSegments` replays that file's schema
+  and checks it ends with the same tables and columns as a new one.
 - **Writes throw** — every index write in the recording and retry pipeline (`saveCall`,
   `upsertTranscriptJob`) throws into the job's error path, which shows the failure in the status line. A
   finished transcript goes in through `markReady`: segments and `status = 'ready'` in one transaction; only

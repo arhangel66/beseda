@@ -20,8 +20,7 @@ if [ "$FLAVOR" = "store" ]; then
     mkdir -p "$APP_DIR/Contents/Resources/Beseda_Beseda.bundle"
     cp -R "$ROOT/Sources/Beseda/Resources" "$APP_DIR/Contents/Resources/Beseda_Beseda.bundle/"
 else
-    # Preserve SwiftPM's generated accessor location for direct distribution.
-    cp -R "$BIN_DIR/Beseda_Beseda.bundle" "$APP_DIR/"
+    cp -R "$BIN_DIR/Beseda_Beseda.bundle" "$APP_DIR/Contents/Resources/"
 fi
 cp "$ROOT/Sources/Beseda/Resources/Info.plist" "$APP_DIR/Contents/Info.plist"
 VERSION="$(tr -d '[:space:]' < "$ROOT/VERSION")"
@@ -67,8 +66,10 @@ if [ "$FLAVOR" = "screenshot" ]; then
     TIMESTAMP=(--timestamp=none)
 else
     IDENTITIES="$(security find-identity -v -p codesigning)"
-    IDENTITY="$(sed -n 's/.*"\(Developer ID Application: .*\)"/\1/p' <<< "$IDENTITIES" | head -n 1)"
+    # the owner's installed copy keeps its Apple Development signature, or Keychain items stop opening silently
+    IDENTITY="${BESEDA_SIGNING_IDENTITY:-$(sed -n 's/.*"\(Developer ID Application: .*\)"/\1/p' <<< "$IDENTITIES" | head -n 1)}"
     TIMESTAMP=(--timestamp)
+    [[ "$IDENTITY" == "Apple Development: "* ]] && TIMESTAMP=(--timestamp=none)
     if [ -z "$IDENTITY" ]; then
         IDENTITY="$(sed -n 's/.*"\(Apple Development: .*\)"/\1/p' <<< "$IDENTITIES" | head -n 1)"
         # a secure timestamp is needed only for notarization and costs a network call per signature
