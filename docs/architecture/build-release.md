@@ -39,10 +39,13 @@ worktrees, in the ignored factory private directory). Both the worktree source a
 `codesign --verify --strict --deep`. This is ad-hoc signing, not provisioned App Store signing or runtime
 sandbox proof. Its resource bundle lives
 at `Contents/Resources/Beseda_Beseda.bundle`, with `Resources/en.lproj/Menu.strings` inside.
-SwiftPM generates an accessor that looks beside the app root; store calls instead use
-`Bundle.besedaResources` to resolve `Bundle.main.resourceURL` while direct calls continue to use
-SwiftPM's generated accessor. When running the store executable target under SwiftPM tests,
-`Bundle.besedaResources` falls back to `.module` because the test runner has no app resource URL.
+SwiftPM generates an accessor that looks beside the app root, where codesign refuses unsealed content
+(BESEDA-216 put the bundle there for direct builds, and no direct build could be signed until BESEDA-386).
+Every flavour now keeps it in `Contents/Resources` and `Bundle.besedaResources` resolves it through
+`Bundle.main.resourceURL`. Under SwiftPM tests it falls back to `.module` because the test runner has no
+app resource URL. `Info.plist` lists `CFBundleLocalizations` (`en`, `ru`): the main bundle holds no
+`.lproj`, and without the list `Locale.current` falls to the development region `en` on every Mac, so the
+interface was English even on a Russian system (BESEDA-386).
 Shell stubs reject missing resources and stray root content.
 The retained BESEDA-290 app passed `codesign --verify --strict --deep`; its helper has sandbox inheritance,
 and app entitlements include sandbox, network client, microphone, calendars and user-selected
@@ -82,7 +85,8 @@ build: fast 27.2 → 11.0 s, full 102.6 s.
   `VERSION` and a timestamp `CFBundleVersion`, `CTranscribe` and `Sparkle` frameworks, licenses, the icon
   compiled by `actool`, then signs inside-out with hardened runtime (see «Developer ID и нотаризация»)
   with the first "Developer ID Application" identity, or the first "Apple Development" one when there is
-  none. Only the `release` flavour adds the Sparkle feed, public EdDSA key and hourly automatic checks.
+  none; `BESEDA_SIGNING_IDENTITY` overrides the pick (the owner's install keeps
+  `Apple Development: arhangel662@gmail.com (QX7LJ7LQ45)`, so its designated requirement and Keychain access stay). Only the `release` flavour adds the Sparkle feed, public EdDSA key and hourly automatic checks.
 - `scripts/Beseda.entitlements` — the app's hardened-runtime entitlements.
 - `scripts/release.sh` — publishes a release (below); runs `full_check.sh` before the release build.
   `scripts/test_release.sh` checks its syntax and exercises the step-6 recovery path with local command stubs.
