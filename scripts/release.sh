@@ -49,7 +49,7 @@ if [ ! -f "$NOTES" ]; then
 fi
 
 if [ "$REQUIRE_NOTARIZATION" = "1" ] \
-    && ! security find-identity -v -p codesigning | grep -q '"Developer ID Application: '; then
+    && ! grep -q '"Developer ID Application: ' <<< "$(security find-identity -v -p codesigning)"; then
     echo "REQUIRE_NOTARIZATION=1 but no Developer ID Application identity in the keychain" >&2
     exit 1
 fi
@@ -92,7 +92,8 @@ if [ "$HAS_ASSET" != "true" ]; then
     APP_DIR="$DIST/Beseda.app"
     "$ROOT/scripts/lib/bundle_app.sh" "$BIN_DIR" "$APP_DIR" release
     # notarytool takes a zip, but the ticket is stapled to the .app, so the shipped zip is made after
-    if codesign -dv --verbose=2 "$APP_DIR" 2>&1 | grep -q '^Authority=Developer ID Application: '; then
+    # grep -q in a pipe exits on the first match, SIGPIPE fails the writer and pipefail the whole test
+    if grep -q '^Authority=Developer ID Application: ' <<< "$(codesign -dv --verbose=2 "$APP_DIR" 2>&1)"; then
         ditto -c -k --keepParent "$APP_DIR" "$DIST/notarize.zip"
         xcrun notarytool submit "$DIST/notarize.zip" --keychain-profile "$NOTARY_PROFILE" --wait
         xcrun stapler staple "$APP_DIR"
