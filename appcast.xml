@@ -3,6 +3,35 @@
     <channel>
         <title>Beseda</title>
         <item>
+            <title>0.4.1</title>
+            <pubDate>Sat, 10 Oct 2026 05:12:47 +0400</pubDate>
+            <sparkle:version>20261010051153</sparkle:version>
+            <sparkle:shortVersionString>0.4.1</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.2</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <description sparkle:format="markdown"><![CDATA[# Beseda 0.4.1
+
+Нужен macOS 14.2 или новее.
+
+## Что нового
+
+- Приложение подписано и проверено Apple: macOS больше не предупреждает о неизвестном разработчике.
+- Говорящих можно назвать по имени, у каждого свой цвет; собеседники в звонках на несколько человек различаются надёжнее, старые звонки переразбиваются в фоне.
+- Интерфейс на английском, если macOS настроена на английский.
+- Понятнее, когда не удаётся связать звонок с календарём, и исправлен запрос доступа к календарю.
+- Настройка «Сразу» для аудио удаляет его сразу после расшифровки.
+- Записи, перенесённые из Подушки, снова находят своё аудио: работают прослушивание и повторная расшифровка.
+
+## Исправления
+
+- Звонок мог не сохраниться с ошибкой `no such table: call_speaker_merges`.
+- Ложное предупреждение, что речевая модель не скачана.
+
+После обновления macOS может один раз спросить доступ к Связке ключей: нажмите «Разрешить всегда».
+]]></description>
+            <enclosure url="https://github.com/arhangel66/beseda/releases/download/v0.4.1/Beseda-0.4.1.zip" length="16369822" type="application/octet-stream" sparkle:edSignature="LEWI6F2WnA6hfH6yHSRYCkmtJMJlPmx4bFKUKzj8xikHZA3vby0mVgMO9C+b9KCFL8WpenTAOx3hQbQ4tmvwDw=="/>
+        </item>
+        <item>
             <title>0.4.0</title>
             <pubDate>Sun, 27 Sep 2026 07:37:13 +0400</pubDate>
             <sparkle:version>20260927073658</sparkle:version>
@@ -35,15 +64,6 @@
             <sparkle:minimumSystemVersion>14.2</sparkle:minimumSystemVersion>
             <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
             <enclosure url="https://github.com/arhangel66/beseda/releases/download/v0.3.5/Beseda-0.3.5.zip" length="15397541" type="application/octet-stream" sparkle:edSignature="YwyM7VMCsKIIvNIGbs0OGdLPOwCSkk07k8ODweSOGVLHDMOpN31Udm0vFoA9Zfn+sYkuvyE2OPN3ZR7HlWYDCw=="/>
-        </item>
-        <item>
-            <title>0.3.4</title>
-            <pubDate>Fri, 11 Sep 2026 07:46:53 +0400</pubDate>
-            <sparkle:version>20260911074648</sparkle:version>
-            <sparkle:shortVersionString>0.3.4</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>14.2</sparkle:minimumSystemVersion>
-            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
-            <enclosure url="https://github.com/arhangel66/beseda/releases/download/v0.3.4/Beseda-0.3.4.zip" length="15345884" type="application/octet-stream" sparkle:edSignature="fWLOBCeqk2D/DlnXmykRDole9SnlTUqNgS9acwNc7Ihyyc6GD1nQW769lXtw7Gz/terryGVmvSjE8BfgPzzIBQ=="/>
         </item>
     </channel>
 </rss>
