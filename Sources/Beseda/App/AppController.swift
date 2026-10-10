@@ -293,6 +293,10 @@ final class AppController {
                 paths: paths,
                 store: callStore
             )
+            let relocated = try callStore.relocateCallFoldersMovedInto(paths.callsDirectory)
+            if relocated > 0 {
+                appendLog("Pointed \(relocated) call(s) at their moved folders in \(paths.callsDirectory.path)")
+            }
             let sweptDirectories = try callStore.failInterruptedCalls(reason: "Обработка прервалась при перезапуске приложения")
             if !sweptDirectories.isEmpty {
                 appendLog("Marked \(sweptDirectories.count) interrupted call(s) as failed")

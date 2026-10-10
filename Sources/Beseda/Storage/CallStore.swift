@@ -514,6 +514,37 @@ final class CallStore: @unchecked Sendable {
         }
     }
 
+    /// how many calls had their stored paths rewritten
+    func relocateCallFoldersMovedInto(_ callsDirectory: URL) throws -> Int {
+        // calls whose folder is gone from its stored path but sits in callsDirectory under the same name:
+        // the Podushka rename and the older checkout layout moved folders without touching the index
+        let fileManager = FileManager.default
+        return try database { db in
+            let calls = try query(db, "SELECT id, audio_dir FROM calls") { (columnString($0, 0) ?? "", columnString($0, 1) ?? "") }
+            var relocated = 0
+            try transaction(db) {
+                for (id, oldFolder) in calls where !oldFolder.isEmpty {
+                    let newFolder = callsDirectory.appendingPathComponent(URL(fileURLWithPath: oldFolder).lastPathComponent).path
+                    guard oldFolder != newFolder, !fileManager.fileExists(atPath: oldFolder),
+                          fileManager.fileExists(atPath: newFolder) else {
+                        continue
+                    }
+                    let oldPrefix = oldFolder + "/", newPrefix = newFolder + "/"
+                    try run(db, """
+                        UPDATE calls SET audio_dir = ?, transcript_path = replace(transcript_path, ?, ?) WHERE id = ?
+                        """, newFolder, oldPrefix, newPrefix, id)
+                    try run(db, """
+                        UPDATE transcript_jobs
+                        SET audio_path = replace(audio_path, ?, ?), asr_json_path = replace(asr_json_path, ?, ?)
+                        WHERE call_id = ?
+                        """, oldPrefix, newPrefix, oldPrefix, newPrefix, id)
+                    relocated += 1
+                }
+            }
+            return relocated
+        }
+    }
+
     func deleteCall(id: String) throws {
         try database { db in
             try execute(db, "PRAGMA foreign_keys = ON")
