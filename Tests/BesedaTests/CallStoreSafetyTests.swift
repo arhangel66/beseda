@@ -151,6 +151,62 @@ private func makeCall(_ store: CallStore, id: String, folder: URL, status: Strin
     #expect(try FileManager.default.contentsOfDirectory(atPath: store.trashURL.path).isEmpty)
 }
 
+// MARK: - moved call folders
+
+private func transcriptJobPaths(_ dbURL: URL) -> [String] {
+    var db: OpaquePointer?
+    var statement: OpaquePointer?
+    sqlite3_open(dbURL.path, &db)
+    defer { sqlite3_finalize(statement); sqlite3_close(db) }
+    sqlite3_prepare_v2(db, "SELECT audio_path, asr_json_path FROM transcript_jobs", -1, &statement, nil)
+    var paths: [String] = []
+    while sqlite3_step(statement) == SQLITE_ROW {
+        paths += [String(cString: sqlite3_column_text(statement, 0)), String(cString: sqlite3_column_text(statement, 1))]
+    }
+    return paths
+}
+
+@Test func aCallFolderMovedWithThePodushkaRenameGetsItsStoredPathsRewritten() throws {
+    let root = try temporaryDirectory()
+    let oldCalls = root.appendingPathComponent("Podushka/calls", isDirectory: true)
+    let newCalls = root.appendingPathComponent("Beseda/calls", isDirectory: true)
+    for id in ["moved", "current"] {
+        try FileManager.default.createDirectory(at: newCalls.appendingPathComponent(id), withIntermediateDirectories: true)
+    }
+    let dbURL = root.appendingPathComponent("Beseda/calls.sqlite")
+    let store = CallStore(dbURL: dbURL)
+    try store.prepare()
+    let oldFolder = oldCalls.appendingPathComponent("moved")
+    try store.upsertCall(
+        id: "moved", kind: "dual", startedAt: Date(), endedAt: Date(), durationSec: 60, status: "failed",
+        transcriptURL: oldFolder.appendingPathComponent("transcript.md"), audioDirectoryURL: oldFolder,
+        error: nil, appName: "Zoom"
+    )
+    try store.upsertTranscriptJob(
+        id: "job", callID: "moved", speaker: "me", status: "done",
+        audioURL: oldFolder.appendingPathComponent("me.asr.wav"), asrJSONURL: oldFolder.appendingPathComponent("me.asr.json"),
+        audioDurationSec: 60, wallTimeSec: 3, realTimeFactor: 0.05, model: nil, error: nil
+    )
+    try makeCall(store, id: "current", folder: newCalls.appendingPathComponent("current"), status: "ready")
+    try makeCall(store, id: "lost", folder: oldCalls.appendingPathComponent("lost"), status: "ready")
+
+    let relocated = try store.relocateCallFoldersMovedInto(newCalls)
+    let relocatedAgain = try store.relocateCallFoldersMovedInto(newCalls)
+
+    let newFolder = newCalls.appendingPathComponent("moved")
+    #expect(relocated == 1)
+    #expect(relocatedAgain == 0)
+    let moved = try #require(try store.fetchCall(id: "moved"))
+    #expect(moved.audioDirectoryPath == newFolder.path)
+    #expect(moved.transcriptPath == newFolder.appendingPathComponent("transcript.md").path)
+    #expect(try store.protectedAudioDirectories() == [newFolder.path])
+    #expect(transcriptJobPaths(dbURL) == [
+        newFolder.appendingPathComponent("me.asr.wav").path, newFolder.appendingPathComponent("me.asr.json").path
+    ])
+    #expect(try store.fetchCall(id: "current")?.audioDirectoryPath == newCalls.appendingPathComponent("current").path)
+    #expect(try store.fetchCall(id: "lost")?.audioDirectoryPath == oldCalls.appendingPathComponent("lost").path)
+}
+
 // MARK: - 12: versioned migrations with a backup
 
 /// every 0.3.x release (v0.3.0 to v0.3.5) ran the same `prepare`, so this is their one schema

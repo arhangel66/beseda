@@ -57,6 +57,10 @@ folder is moved here once by `LegacyDataMigration`.
   auto-processing. A failed write leaves the call not ready with its audio, so retry still works. They feed [related calls](related-calls.md).
 - **Launch recovery** — `AppController.init` takes `AppPaths` (and settings) by injection, default the real
   folder, so tests run a whole controller over a temp one. After `prepare()`:
+  `relocateCallFoldersMovedInto` points a call whose stored folder is gone at `calls/<same name>` when that
+  exists, rewriting `audio_dir`, `transcript_path` and its jobs' paths: the Podushka move and the older
+  checkout layout left absolute paths to folders that no longer exist, which broke playback and retry and
+  left a failed call's audio unprotected from the janitor;
   `failInterruptedCalls` marks calls left in `recording`/`normalizing`/`transcribing` as failed; every
   folder under `calls/` with `me.raw.wav`/`them.raw.wav` (or `mic.raw.wav`) and no row gets a failed row
   («Найдена на диске без записи в индексе»), times from `session.json`, else folder creation and last file
