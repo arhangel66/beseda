@@ -20,13 +20,17 @@ track.
 - **Both** — `DualCapture.record` starts the tap, then the microphone, sleeps until the maximum
   duration (4 h, set in `AppController`; the 4 GB limit ends a 48 kHz stereo call first, but the formats
   come from the devices, so on a mono or lower-rate one the cap still matters), a manual `stop()`, or silence auto-stop. Auto-stop fires when
-  *both* channels have been quiet for the configured time, checked every 2 s. Pause drops buffers on
+  *both* channels have been quiet for the configured time (60 s), checked every 2 s — but only once the
+  system channel has carried sound. Before that the recording is waiting for the other side to join, not
+  hearing a call end, and stops only after 15 min of silence (a host who started early lost the whole call
+  to the 60 s rule). Pause drops buffers on
   both channels so the files stay aligned.
 - **Call detection** — `CallDetector` watches which processes hold the microphone
   (`MicrophoneProcessWatcher`, CoreAudio process objects and `kAudioProcessPropertyIsRunningInput`) and
   matches their bundle ids against the user's allowed list (`knownCallApps`: Zoom, Teams, Slack,
   Telegram, Discord, FaceTime, Telemost, Chrome). The pure `CallRecordingPolicy` decides start/stop: a
-  5 s debounce, 60 s minimum gap, a manual recording wins, and the same app staying on the microphone
+  5 s start debounce, a 10 s stop debounce (call apps reopen the microphone for a moment when someone
+  joins), 60 s minimum gap, a manual recording wins, and the same app staying on the microphone
   after a recording ended is still the same call. `AppController` discards an auto-recording shorter
   than 10 s.
 - **Levels** — `AudioActivityTracker` observes every buffer: peak/RMS for silence detection and a

@@ -94,11 +94,12 @@ final class CallDetector {
         case nil:
             break
         }
-        scheduleReevaluation(waiting: holder != nil && !policy.isRecording)
+        // both debounces run out on their own: a start waiting on a holder, a stop waiting on a release
+        scheduleReevaluation(waiting: (holder != nil && !policy.isRecording) || policy.isWaitingToStop)
     }
 
     private func scheduleReevaluation(waiting: Bool) {
-        // the debounce and the minimum gap run out on their own; no CoreAudio event will wake us for them
+        // the debounces and the minimum gap run out on their own; no CoreAudio event will wake us for them
         evaluationTask?.cancel()
         evaluationTask = nil
         guard waiting else {

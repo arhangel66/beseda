@@ -42,10 +42,42 @@ private let epoch = Date(timeIntervalSince1970: 1_000_000)
     _ = policy.update(holder: zoom, manualRecordingActive: false, now: epoch)
     _ = policy.update(holder: zoom, manualRecordingActive: false, now: epoch + 5)
 
-    let released = policy.update(holder: nil, manualRecordingActive: false, now: epoch + 300)
+    let justReleased = policy.update(holder: nil, manualRecordingActive: false, now: epoch + 300)
+    let stillReleased = policy.update(holder: nil, manualRecordingActive: false, now: epoch + 310)
 
-    #expect(released == .stop)
+    #expect(justReleased == nil)
+    #expect(stillReleased == .stop)
     #expect(!policy.isRecording)
+}
+
+// call apps reopen the microphone for a moment when someone joins; that is still the same call
+@Test func aBriefReleaseWhenSomeoneJoinsKeepsTheRecording() {
+    var policy = CallRecordingPolicy()
+    _ = policy.update(holder: zoom, manualRecordingActive: false, now: epoch)
+    _ = policy.update(holder: zoom, manualRecordingActive: false, now: epoch + 5)
+
+    let released = policy.update(holder: nil, manualRecordingActive: false, now: epoch + 300)
+    let retaken = policy.update(holder: zoom, manualRecordingActive: false, now: epoch + 303)
+    let later = policy.update(holder: zoom, manualRecordingActive: false, now: epoch + 320)
+
+    #expect(released == nil)
+    #expect(retaken == nil)
+    #expect(later == nil)
+    #expect(policy.isRecording)
+}
+
+@Test func aSecondReleaseCountsItsOwnTenSeconds() {
+    var policy = CallRecordingPolicy()
+    _ = policy.update(holder: zoom, manualRecordingActive: false, now: epoch)
+    _ = policy.update(holder: zoom, manualRecordingActive: false, now: epoch + 5)
+    _ = policy.update(holder: nil, manualRecordingActive: false, now: epoch + 300)
+    _ = policy.update(holder: zoom, manualRecordingActive: false, now: epoch + 303)
+
+    _ = policy.update(holder: nil, manualRecordingActive: false, now: epoch + 400)
+    let tooSoon = policy.update(holder: nil, manualRecordingActive: false, now: epoch + 405)
+
+    #expect(tooSoon == nil)
+    #expect(policy.isRecording)
 }
 
 @Test func releaseBeforeTheDebounceRecordsNothing() {
@@ -63,10 +95,11 @@ private let epoch = Date(timeIntervalSince1970: 1_000_000)
     _ = policy.update(holder: zoom, manualRecordingActive: false, now: epoch)
     _ = policy.update(holder: zoom, manualRecordingActive: false, now: epoch + 5)
     _ = policy.update(holder: nil, manualRecordingActive: false, now: epoch + 300)
+    _ = policy.update(holder: nil, manualRecordingActive: false, now: epoch + 310)
 
-    _ = policy.update(holder: zoom, manualRecordingActive: false, now: epoch + 305)
-    let insideGap = policy.update(holder: zoom, manualRecordingActive: false, now: epoch + 310)
-    let afterGap = policy.update(holder: zoom, manualRecordingActive: false, now: epoch + 365)
+    _ = policy.update(holder: zoom, manualRecordingActive: false, now: epoch + 315)
+    let insideGap = policy.update(holder: zoom, manualRecordingActive: false, now: epoch + 320)
+    let afterGap = policy.update(holder: zoom, manualRecordingActive: false, now: epoch + 375)
 
     #expect(insideGap == nil)
     #expect(afterGap == .start(zoom))
