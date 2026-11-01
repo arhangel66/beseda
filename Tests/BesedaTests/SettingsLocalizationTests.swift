@@ -7,6 +7,8 @@ struct SettingsLocalizationTests {
         let english = Locale(identifier: "en_US")
         let russian = Locale(identifier: "ru_RU")
         #expect(SettingsText.get("Готова", locale: english) == "Ready")
+        #expect(SettingsText.get("Чтобы не записывать пустоту после конца встречи. Пока собеседника не слышно, запись ждёт до 15 минут.", locale: english)
+            .contains("waits up to 15 minutes"))
         #expect(SettingsText.get("Выбрана · не скачана", locale: english) == "Selected · not downloaded")
         #expect(SettingsText.get("Скачана", locale: russian) == "Скачана")
         #expect(SettingsText.get("25 языков", locale: english) == "25 languages")

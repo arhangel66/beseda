@@ -7,6 +7,7 @@ final class AudioActivityTracker: @unchecked Sendable {
     private let rmsThreshold: Double
     private let lock = NSLock()
     private var lastActivityDate = Date()
+    private var heardActivity = false
     private var level: Double = 0
     private var levelUpdatedAt = Date()
 
@@ -41,6 +42,7 @@ final class AudioActivityTracker: @unchecked Sendable {
             levelUpdatedAt = now
             if peak >= peakThreshold || rms >= rmsThreshold {
                 lastActivityDate = now
+                heardActivity = true
             }
         }
     }
@@ -50,6 +52,11 @@ final class AudioActivityTracker: @unchecked Sendable {
         lock.withLock {
             lastActivityDate = referenceDate
         }
+    }
+
+    /// whether anything above room noise ever came through this channel
+    var hasHeardActivity: Bool {
+        lock.withLock { heardActivity }
     }
 
     func silentDuration(referenceDate: Date = Date()) -> TimeInterval {

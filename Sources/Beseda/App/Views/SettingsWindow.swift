@@ -223,7 +223,7 @@ private struct RecordingPane: View {
             Section {
                 Toggle(SettingsText.get("Останавливать после минуты тишины"), isOn: Bindable(settings).stopOnSilence)
             } footer: {
-                Text(SettingsText.get("Чтобы не записывать пустоту после конца встречи."))
+                Text(SettingsText.get("Чтобы не записывать пустоту после конца встречи. Пока собеседника не слышно, запись ждёт до 15 минут."))
             }
 
             Section {

@@ -141,7 +141,7 @@ final class DualCapture: @unchecked Sendable {
                         }
                         // both channels have to go quiet: one side listening is still a call
                         let silence = min(microphoneTracker.silentDuration(), systemTracker.silentDuration())
-                        if silence >= autoStopSilenceDuration {
+                        if Self.isSilenceStopDue(silence: silence, otherSideHeard: systemTracker.hasHeardActivity, limit: autoStopSilenceDuration) {
                             self?.stop(reason: .silence)
                             return
                         }
@@ -177,6 +177,14 @@ final class DualCapture: @unchecked Sendable {
             microphone.stopDiscarding()
             throw error
         }
+    }
+
+    /// Until the other side is heard the recording is waiting for a call to begin, not hearing one end;
+    /// the long limit only keeps a recording nobody joined from running for hours.
+    static let silenceLimitBeforeTheOtherSide: TimeInterval = 15 * 60
+
+    static func isSilenceStopDue(silence: TimeInterval, otherSideHeard: Bool, limit: TimeInterval) -> Bool {
+        silence >= (otherSideHeard ? limit : max(limit, silenceLimitBeforeTheOtherSide))
     }
 
     func stop(reason: DualCaptureStopReason = .manual) {

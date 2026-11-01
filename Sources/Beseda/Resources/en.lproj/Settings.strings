@@ -26,7 +26,7 @@
 "Включать запись при начале звонка" = "Start recording when a call begins";
 "Беседа узнаёт звонок по звуку из приложения и записывает микрофон и системный звук." = "Beseda detects calls from app audio and records your microphone and system audio.";
 "Останавливать после минуты тишины" = "Stop after one minute of silence";
-"Чтобы не записывать пустоту после конца встречи." = "Avoid recording silence after the meeting ends.";
+"Чтобы не записывать пустоту после конца встречи. Пока собеседника не слышно, запись ждёт до 15 минут." = "Avoid recording silence after the meeting ends. Until the other side is heard, recording waits up to 15 minutes.";
 "Расшифровывать во время звонка" = "Transcribe during calls";
 "Черновик разговора и ключевые моменты в меню, пока идёт запись. Итоговая расшифровка всё равно делается после звонка." = "See a draft transcript and key points in the menu while recording. Final transcription runs after the call.";
 "Проверка…" = "Checking…";
