@@ -1192,13 +1192,14 @@ final class AppController {
         )
         beginStage(MenuText.get("Расшифровка собеседников"), total - 1, of: total)
         appendLog("Transcribing system audio")
-        let systemAudio = try await transcribeChannel(
+        let systemWithMicEcho = try await transcribeChannel(
             .systemAudio, callID, in: sessionDir,
             audioURL: sessionDir.appendingPathComponent(DualFiles.systemASR),
             rawAudioURL: sessionDir.appendingPathComponent(DualFiles.systemRaw),
             asrJSONURL: sessionDir.appendingPathComponent("them.asr.json")
         )
-        let microphone = try echoGated(microphoneWithEcho, system: systemAudio)
+        let microphone = try echoGated(microphoneWithEcho, system: systemWithMicEcho)
+        let systemAudio = withoutMicEcho(systemWithMicEcho, microphone: microphone)
         let remoteTurns = await diarizedTurns(
             audioURL: systemAudio.normalizedAudioURL,
             segments: systemAudio.segments,
@@ -1245,6 +1246,25 @@ final class AppController {
             audioDurationSec: microphone.audioDurationSec,
             wallTimeSec: microphone.wallTimeSec,
             realTimeFactor: microphone.realTimeFactor
+        )
+    }
+
+    /// the system transcript without the user's own voice the other side sent back; them.asr.json keeps it all
+    private func withoutMicEcho(_ system: TranscriptResult, microphone: TranscriptResult) -> TranscriptResult {
+        let segments = MicEchoFilter.systemSegmentsWithoutMicEcho(system.segments, microphone: microphone.segments)
+        appendLog("Mic echo filter kept \(segments.count) of \(system.segments.count) system sentences")
+        return TranscriptResult(
+            id: system.id,
+            createdAt: system.createdAt,
+            sessionDirectory: system.sessionDirectory,
+            rawAudioURL: system.rawAudioURL,
+            normalizedAudioURL: system.normalizedAudioURL,
+            markdownURL: system.markdownURL,
+            text: segments.map(\.text).joined(separator: " "),
+            segments: segments,
+            audioDurationSec: system.audioDurationSec,
+            wallTimeSec: system.wallTimeSec,
+            realTimeFactor: system.realTimeFactor
         )
     }
 

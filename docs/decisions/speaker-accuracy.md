@@ -260,7 +260,18 @@ The app switched to it; rerun on the final code ([nemotron-switch.md][^switch]):
   has nothing to act on without a knob that takes a count. Against Mikhail's range for the 13:00 dailies (3–6),
   Nemotron is already inside it on 6 of 7; 20260924-130017 (2) is the one miss.[^tuning]
 
+## Mic echo on the system channel
+
+A context audit of 16 Nemotron calls (2026-11-02, LLM read of the transcripts, no audio truth) found the count
+right on 14 and 10 of 3 070 remote lines on the wrong person, all at turn boundaries. Both count misses were the
+user's own voice coming back on the system channel: 20261006-173015 (Google Meet, the other side on speakers)
+got a phantom second person of 115 lines repeating Mikhail ~0.5 s late; 20261016-113955 (Discord screen share
+with sound) got a two-line one. `MicEchoFilter` drops such sentences before diarization (rule in
+[ASR](../architecture/asr.md)). The lag window comes from word times on the stored calls: echo 0.16–1.3 s, the
+other person repeating a phrase 2.3 s, Mikhail repeating them −0.8 to −1.9 s.[^contextAudit]
+
 [^allCalls]: [results/all-calls-nemotron.md](../../untracked/epics/speaker-accuracy/results/all-calls-nemotron.md)
+[^contextAudit]: [context-audit/README.md](../../untracked/epics/speaker-accuracy/context-audit/README.md)
 [^tuning]: [results/nemotron-tuning.md](../../untracked/epics/speaker-accuracy/results/nemotron-tuning.md)
 [^other]: [results/other-diarizers.md](../../untracked/epics/speaker-accuracy/results/other-diarizers.md)
 [^switch]: [results/nemotron-switch.md](../../untracked/epics/speaker-accuracy/results/nemotron-switch.md)
