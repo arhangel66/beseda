@@ -3,3 +3,5 @@ data/cache/
 data/audio/
 hyp/
 truth/
+context-audit/transcripts/
+context-audit/judgments/
