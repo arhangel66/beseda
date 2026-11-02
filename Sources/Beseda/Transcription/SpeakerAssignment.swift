@@ -38,7 +38,7 @@ enum SpeakerAssignment {
         min(abs(interval.start - segment.end), abs(segment.start - interval.end))
     }
 
-    private static func relabelled(_ turns: [SpeakerTurn]) -> [SpeakerTurn] {
+    static func relabelled(_ turns: [SpeakerTurn]) -> [SpeakerTurn] {
         // the diarizer's own ids are arbitrary; numbering follows the order people first speak
         var keys: [String: String] = [:]
         return turns.map { turn in

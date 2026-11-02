@@ -266,9 +266,12 @@ A context audit of 16 Nemotron calls (2026-11-02, LLM read of the transcripts, n
 right on 14 and 10 of 3 070 remote lines on the wrong person, all at turn boundaries. Both count misses were the
 user's own voice coming back on the system channel: 20261006-173015 (Google Meet, the other side on speakers)
 got a phantom second person of 115 lines repeating Mikhail ~0.5 s late; 20261016-113955 (Discord screen share
-with sound) got a two-line one. `MicEchoFilter` drops such sentences before diarization (rule in
-[ASR](../architecture/asr.md)). The lag window comes from word times on the stored calls: echo 0.16–1.3 s, the
-other person repeating a phrase 2.3 s, Mikhail repeating them −0.8 to −1.9 s.[^contextAudit]
+with sound) got a two-line one. `MicEchoFilter` drops such sentences and a speaker made ≥ 25 % of them (rule in
+[ASR](../architecture/asr.md)); on the stored calls with word times that share is 95 % and 28 % for the two
+phantoms and 0 % for every real speaker. The lag window comes from word times: echo 0.4–1.3 s, the other person
+repeating a phrase 2.3 s, Mikhail repeating them −0.8 to −1.9 s, and a Telegram call on laptop speakers whose
+remote voice also reached the mic 0.16–0.24 s — not echo, so the window starts at 0.3 s. The May–June calls
+(no word times, no echo gate yet) have duplicates in both directions and were left as they are.[^contextAudit]
 
 [^allCalls]: [results/all-calls-nemotron.md](../../untracked/epics/speaker-accuracy/results/all-calls-nemotron.md)
 [^contextAudit]: [context-audit/README.md](../../untracked/epics/speaker-accuracy/context-audit/README.md)

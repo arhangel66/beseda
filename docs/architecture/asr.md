@@ -72,10 +72,12 @@ the vendored Swift wrapper in `Vendor/TranscribeCpp`). No audio leaves the machi
   per-frame numbers (~9 bytes per 20 ms) are kept.
 - **Mic echo filter** — the reverse leak: the other side's speakers send the user's voice back into their mic,
   so the system channel repeats them ~0.5 s later and the diarizer makes a phantom person of it.
-  `MicEchoFilter` drops a system sentence before diarization when it has ≥ 3 distinct words, ≥ 80 % of them
-  repeat the echo-gated mic words in order, and their median lag is 0.05–1.5 s. It compares against kept mic
-  words only, so a dropped sentence's text always stays as `me`; `them.asr.json` keeps everything. The
-  background re-split does not apply it ([speaker accuracy](../decisions/speaker-accuracy.md#mic-echo-on-the-system-channel)).
+  `MicEchoFilter` marks a system sentence as echo when it has ≥ 3 distinct words, ≥ 80 % of them repeat the
+  echo-gated mic words in order, and their median lag is 0.3–1.5 s. Diarization still sees every sentence;
+  then echo sentences are dropped, and so is a whole remote speaker whose words are ≥ 25 % echo (its leftover
+  «okay» lines are the user too), and the rest are numbered again. It compares against kept mic words only, so
+  dropped text always stays as `me`; `them.asr.json` keeps everything. The background re-split does not apply
+  it ([speaker accuracy](../decisions/speaker-accuracy.md#mic-echo-on-the-system-channel)).
 - **Memory on long calls (BESEDA-102)** — measured by `peakMemoryOnASyntheticLongCall`
   (`BESEDA_LONG_CALL_MEMORY=echo|asr`, synthetic 4-hour two-channel call in a temp dir, model not run),
   peak RSS of the test process: echo gate 3576 MB before, 62 MB after; reading and cutting for ASR

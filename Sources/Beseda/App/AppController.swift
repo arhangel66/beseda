@@ -1199,12 +1199,17 @@ final class AppController {
             asrJSONURL: sessionDir.appendingPathComponent("them.asr.json")
         )
         let microphone = try echoGated(microphoneWithEcho, system: systemWithMicEcho)
-        let systemAudio = withoutMicEcho(systemWithMicEcho, microphone: microphone)
-        let remoteTurns = await diarizedTurns(
-            audioURL: systemAudio.normalizedAudioURL,
-            segments: systemAudio.segments,
-            step: total,
-            of: total
+        let micEcho = MicEchoFilter.echoSentences(systemWithMicEcho.segments, microphone: microphone.segments)
+        let systemAudio = without(micEcho, systemWithMicEcho)
+        // diarized with the echo in: a speaker mostly made of it is then dropped whole, short lines included
+        let remoteTurns = MicEchoFilter.turnsWithoutMicEcho(
+            await diarizedTurns(
+                audioURL: systemAudio.normalizedAudioURL,
+                segments: systemWithMicEcho.segments,
+                step: total,
+                of: total
+            ),
+            echo: micEcho
         )
 
         let transcriptURL = sessionDir.appendingPathComponent(DualFiles.transcript)
@@ -1250,9 +1255,9 @@ final class AppController {
     }
 
     /// the system transcript without the user's own voice the other side sent back; them.asr.json keeps it all
-    private func withoutMicEcho(_ system: TranscriptResult, microphone: TranscriptResult) -> TranscriptResult {
-        let segments = MicEchoFilter.systemSegmentsWithoutMicEcho(system.segments, microphone: microphone.segments)
-        appendLog("Mic echo filter kept \(segments.count) of \(system.segments.count) system sentences")
+    private func without(_ micEcho: [TranscriptSegment], _ system: TranscriptResult) -> TranscriptResult {
+        let segments = system.segments.filter { !micEcho.contains($0) }
+        appendLog("Mic echo filter dropped \(micEcho.count) of \(system.segments.count) system sentences")
         return TranscriptResult(
             id: system.id,
             createdAt: system.createdAt,
