@@ -8,7 +8,7 @@ HERE = Path(__file__).parent
 RUNTIME = Path.home() / "Library/Application Support/Beseda/runtime"
 LLAMA_SERVER = RUNTIME / "llama/b10819/llama-server"
 MODELS = json.loads((HERE / "models.json").read_text())
-PORT = 8792
+PORT = int(os.environ.get("SPEAKER_NAMES_PORT", "8792"))
 CONTEXT_SIZE = 32768
 
 
@@ -48,6 +48,12 @@ class Server:
 
 
 def schema_for(labels: list[str], prompt: str) -> dict:
+    if prompt == "p4":
+        # names restricted to the team plus unknown, each with the line that carries the clue
+        entry = {"type": "object", "properties": {"name": {"type": "string", "enum": sorted(windows.PEOPLE) + ["unknown"]},
+                 "cue": {"type": "string", "enum": ["addressed", "thanked", "introduced", "none"]}, "line": {"type": "integer"}},
+                 "required": ["name", "cue", "line"], "additionalProperties": False}
+        return {"type": "object", "properties": {l: entry for l in labels}, "required": labels, "additionalProperties": False}
     names = {"type": "object", "properties": {l: {"type": "string"} for l in labels}, "required": labels, "additionalProperties": False}
     if prompt != "p2":
         return names
@@ -103,7 +109,7 @@ def run(configs: list[dict], call_filter) -> None:
         log(f"{model_key}: {len(pending)} pending")
         with Server(model_key):
             for n, (call, config, name, system, user, labels, schema, digest, out) in enumerate(pending, 1):
-                max_tokens = 4000 if config["thinking"] else (1500 if config["prompt"] == "p2" else 400)
+                max_tokens = 4000 if config["thinking"] else (1500 if config["prompt"] == "p2" else 600 if config["prompt"] == "p4" else 400)
                 try:
                     reply = ask(system, user, schema, config["thinking"], max_tokens)
                 except Exception as error:
@@ -111,6 +117,8 @@ def run(configs: list[dict], call_filter) -> None:
                 try:
                     parsed = json.loads(reply["raw"])
                     answer = parsed["names"] if config["prompt"] == "p2" else parsed
+                    if config["prompt"] == "p4":
+                        answer = {label: entry["name"] for label, entry in parsed.items()}
                     invalid = reply["finish"] != "stop" or not isinstance(answer, dict)
                 except (json.JSONDecodeError, KeyError, TypeError):
                     parsed, answer, invalid = None, {}, True
@@ -118,6 +126,9 @@ def run(configs: list[dict], call_filter) -> None:
                 out.parent.mkdir(parents=True, exist_ok=True)
                 tmp = out.with_suffix(".tmp"); tmp.write_text(json.dumps(record, ensure_ascii=False, indent=1)); tmp.replace(out)
                 log(f"{n}/{len(pending)} {name} {call['id']} {reply['seconds']}s {'INVALID' if invalid else ''} {answer}")
+
+
+from score import FAST
 
 
 def grid(models, windows_, contexts_, prompts, thinkings) -> list[dict]:
@@ -129,10 +140,61 @@ if __name__ == "__main__":
     stage = sys.argv[1] if len(sys.argv) > 1 else "smoke"
     if stage == "smoke":
         run(grid(["gemma4-e4b"], ["edges100"], ["roster"], ["p1"], [False]), lambda c: c["id"] == "20261102-125941")
+    elif stage == "smoke-models":
+        run(grid(["gemma4-12b", "qwen3.5-9b"], ["edges100"], ["roster"], ["p1"], [False, True]), lambda c: c["id"] == "20261102-125941")
+    elif stage == "fast1":
+        run(grid(["gemma4-e4b"], ["edges100"], ["none", "roster", "roster+notes"], ["p0", "p1", "p2"], [False])
+            + grid(["gemma4-e4b"], ["clues"], ["none", "roster", "roster+notes"], ["p1", "p3"], [False])
+            + grid(["gemma4-e4b"], ["edges50", "names"], ["roster"], ["p1"], [False]),
+            lambda c: c["id"] in FAST)
+    elif stage == "fast-models":
+        run(grid(["gemma4-12b", "qwen3.5-9b"], ["edges100"], ["none", "roster", "roster+notes"], ["p1"], [False])
+            + grid(["gemma4-12b", "qwen3.5-9b"], ["clues"], ["roster"], ["p3"], [False])
+            + grid(["gemma4-12b", "qwen3.5-9b"], ["edges100"], ["roster"], ["p2"], [False]),
+            lambda c: c["id"] in FAST)
+    elif stage == "fast-hybrid":
+        run(grid(["gemma4-e4b"], ["edges100"], ["rules", "roster+rules", "roster+notes+rules"], ["p1"], [False]), lambda c: c["id"] in FAST)
+    elif stage == "tune-e4b-top":
+        run(grid(["gemma4-e4b"], ["names", "clues"], ["roster", "roster+notes"], ["p1"], [False])
+            + grid(["gemma4-e4b"], ["edges100"], ["roster+notes"], ["p1", "p2"], [False]),
+            lambda c: c["split"] == "tune")
     elif stage == "tune-e4b-plain":
         run(grid(["gemma4-e4b"], ["edges100", "edges50", "names", "full"], ["none", "roster"], ["p0", "p1", "p2"], [False]),
             lambda c: c["split"] == "tune")
     elif stage == "tune-e4b":
-        run(grid(["gemma4-e4b"], ["edges100", "edges50", "names", "full"], ["none", "roster", "prev", "notes", "roster+notes"], ["p0", "p1", "p2"], [False])
-            + grid(["gemma4-e4b"], ["edges100", "full"], ["roster+notes"], ["p1"], [True]),
+        run(grid(["gemma4-e4b"], ["clues"], ["none", "roster", "roster+notes"], ["p1", "p3"], [False])
+            + grid(["gemma4-e4b"], ["edges100", "edges50", "names", "full"], ["none", "roster", "prev", "notes", "roster+notes"], ["p0", "p1", "p2"], [False])
+            + grid(["gemma4-e4b"], ["edges100", "full", "clues"], ["roster+notes"], ["p1"], [True]),
             lambda c: c["split"] == "tune")
+    elif stage == "night1":
+        # finalists on the whole tune half, then Qwen on the fast set
+        run(grid(["gemma4-e4b"], ["edges100"], ["roster+notes"], ["p2"], [False])
+            + grid(["gemma4-e4b"], ["edges100"], ["none"], ["p1"], [False])
+            + grid(["gemma4-e4b"], ["clues"], ["roster+notes"], ["p1"], [False])
+            + grid(["gemma4-e4b"], ["names"], ["roster"], ["p1"], [False])
+            + grid(["gemma4-12b"], ["edges100"], ["roster"], ["p2"], [False])
+            + grid(["gemma4-12b"], ["edges100"], ["roster+notes", "none"], ["p1"], [False]),
+            lambda c: c["split"] == "tune")
+        run(grid(["qwen3.5-9b"], ["edges100"], ["roster"], ["p1", "p2"], [False]), lambda c: c["id"] in FAST)
+    elif stage == "night2":
+        # p4: team-only names with the clue line, gated in code afterwards (gate.py)
+        run(grid(["gemma4-e4b"], ["edges100", "full", "names"], ["none", "roster"], ["p4"], [False]), lambda c: c["id"] in FAST)
+        run(grid(["gemma4-12b"], ["edges100"], ["roster"], ["p4"], [False]), lambda c: c["id"] in FAST)
+    elif stage == "night3":
+        # more 12B voters with different windows on the whole tune half
+        run(grid(["gemma4-12b"], ["names", "clues"], ["none", "roster+notes"], ["p1"], [False])
+            + grid(["gemma4-12b"], ["edges50", "full"], ["none"], ["p1"], [False]),
+            lambda c: c["split"] == "tune")
+    elif stage == "night4":
+        # the finalists' voters, once, on the held-out test half
+        run(grid(["gemma4-e4b"], ["edges100"], ["roster+notes"], ["p2"], [False])
+            + grid(["gemma4-e4b"], ["clues"], ["roster+notes"], ["p1"], [False])
+            + grid(["gemma4-12b"], ["edges100"], ["none", "roster+notes"], ["p1"], [False])
+            + grid(["gemma4-12b"], ["edges100"], ["roster"], ["p2"], [False]),
+            lambda c: c["split"] == "test")
+    elif stage == "night5":
+        # the simplest single-config finalists on test
+        run(grid(["gemma4-12b"], ["full", "names"], ["none"], ["p1"], [False]), lambda c: c["split"] == "test")
+    elif stage == "night6":
+        # 1:1 and two-remote calls: how often the finalist model invents a name where the text gives none
+        run(grid(["gemma4-12b"], ["edges100"], ["none", "roster+notes"], ["p1"], [False]), lambda c: c["group"] in ("one", "two"))

@@ -73,11 +73,23 @@ def notes_block(call: dict, calls: list[dict], refs: dict[str, dict]) -> str:
     return "\n".join(lines)
 
 
+def rules_block(call: dict) -> str:
+    # what the deterministic hand-over/thanks rules already settled for this call (hyp/rules3)
+    answer = json.loads((HERE / f"hyp/rules3__clues__none__-__nothink/{call['id']}.json").read_text())["answer"]
+    settled = [f"{label} = {name}" for label, name in answer.items() if name != "unknown"]
+    if not settled:
+        return "No label could be settled from explicit hand-overs or thanks yet."
+    return ("Already settled from explicit hand-overs and thanks in this call (treat as facts, repeat them in the answer): "
+            + ", ".join(settled) + ". Name the remaining labels only if the transcript gives evidence; otherwise \"unknown\".")
+
+
 def build(context: str, call: dict, calls: list[dict], refs: dict[str, dict]) -> str:
     roster = (HERE / "data/roster.txt").read_text().strip()
-    blocks = {"none": [], "roster": [roster], "prev": [prev_block(call, calls, refs)],
-              "notes": [notes_block(call, calls, refs)], "roster+notes": [roster, notes_block(call, calls, refs)],
-              "roster+prev": [roster, prev_block(call, calls, refs)]}[context]
+    parts = context.split("+")
+    blocks = []
+    for part in parts:
+        blocks.append({"none": "", "roster": roster, "prev": prev_block(call, calls, refs), "notes": notes_block(call, calls, refs),
+                       "rules": rules_block(call)}[part])
     return "\n\n".join(b for b in blocks if b)
 
 

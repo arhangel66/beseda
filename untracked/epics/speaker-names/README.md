@@ -1,6 +1,7 @@
 # Speaker names: can a small local model name `them-N`?
 
-Status: plan, reviewed (astra, 2026-11-02), smoke-tested on one call. Research only, no app code.
+Status: in progress (2026-11-02 evening): reference done, scorer and runner done, night loop done (see Night loop). Research
+only, no app code. The loop log is at the end of this file.
 
 ## Goal
 
@@ -305,3 +306,120 @@ to test memory (changes the task), permuted labels and a cloud ceiling (kept opt
 - Runs are Python only, no SwiftPM — they can live in the main checkout under `untracked/`, like the other
   epics; still under `nice` and a lock so they never collide with a full check.
 - Model downloads (~13 GB) are the first cost; 140 GB free.
+
+## Loop log (2026-11-02)
+
+**Reference.** 109 calls labelled by Opus agents on bb with `REFERENCE_RUBRIC.md`: 130 named labels,
+85 unknown (71 high-confidence unknown, mostly 1:1 calls where nobody says the name). Validator clean.
+Against the 16 earlier context-audit judgments: 44 labels agree, 0 name conflicts, 6 named there but
+unknown now (stricter rubric). `results/reference-check.md`.
+
+**Fast loop set** (`FAST` in `score.py`): 8 tune dailies, 34 named labels, ~8 min per E4B iteration.
+The first grid attempt over all 17 tune calls × 62 configs was stopped at 125 runs: `full` windows cost
+30–50 s a call and thinking minutes (Qwen3.5 with thinking blew a 4000-token budget in 451 s). Hashed
+results are kept.
+
+**Rules baseline** (`rules.py`, no model): from the `clues` lines — a vocative name ("Rustam, can you
+continue?", "...my side, Mohammed", "Mohammed?") votes for the next remote voice, "thank you, Sergei"
+for the previous one, a voice saying a name is penalized one vote for being that person; greedy one name
+per label. Versions: v1 keyword list → v2 vocative positions + new garbles (Fisher, Tish, Rustama, Goth,
+Gosh) → v3 self-mention as a penalty instead of a veto. v4 (strict winner on ties, greeting half-vote,
+tighter openers) lost coverage without removing the errors; dropped.
+
+| rules | fast cov / prec | tune cov / prec / wrong | test cov / prec / wrong |
+|---|---|---|---|
+| v1 | 0.44 / 0.94 | 0.44 / 0.97 / 0.014 | 0.38 / 0.83 / 0.078 |
+| v2 | 0.62 / 0.91 | 0.62 / 0.94 / 0.043 | 0.59 / 0.91 / 0.062 |
+| **v3** | **0.65 / 1.00** | **0.61 / 0.96 / 0.029** | **0.61 / 0.91 / 0.062** |
+
+Remaining rule errors are genuine text ambiguity: "Gus, can you please continue?" followed by Rustam
+interrupting; "Hello Muhammad" answered by someone else; "We cannot hear you, Mohammed" with another
+voice speaking next. The labels the rules leave unknown are named in the reference by indirect clues
+("Pixel was sick" → "I was down"), a self-mentioned email, or garbles.
+
+**Gemma 4 E4B** on the fast set, no thinking (stale table, old scorer): every config loses to the rules.
+Best coverage 0.37–0.40 at precision 0.45–0.6, i.e. every second name wrong; the hint prompt (`p1`)
+with a roster makes it bolder and worse (wrong 0.6–0.8). The structured `clues` window is a near-total
+failure for E4B: 0–0.18 coverage, mostly "unknown". Conclusion: E4B cannot do the matching the rules do.
+Calls that were 4/4 in the smoke test (today's) are the easy ones.
+
+**Merge** (`merge.py`): the rules' names stay, the model fills only the labels the rules left
+`unknown` and may not reuse a person the rules placed. This is the first setup that beats the rules.
+
+## Night loop (2026-11-02 → 03)
+
+**Scoring fixes** (from astra's review): a label unknown in the reference that the system also leaves
+unknown is now `skip`, not an abstain in the coverage denominator (it deflated coverage and inflated
+nothing else); an invalid model reply in a merge falls back to the rules' answer instead of failing the
+call; merge compares canonical names. All numbers below use the fixed scorer; old tables are stale.
+Rules v3 with the fixed scorer: tune 0.70 / wrong 0.033, test 0.71 / wrong 0.073.
+
+**Round 1, finalists on all 17 tune calls** (`results/tune.md`):
+
+| config (merged with rules3) | coverage | wrong |
+|---|---|---|
+| rules3 alone | 0.700 | 0.033 |
+| 12B edges100 / roster+notes / p1 | 0.817 | 0.133 |
+| 12B edges100 / roster / p2 | 0.783 | 0.067 |
+| 12B edges100 / none / p1 | 0.767 | 0.050 |
+| E4B clues / roster+notes / p1 | 0.783 | 0.083 |
+| E4B edges100 / roster+notes / p2 | 0.783 | 0.100 |
+| E4B names / roster / p1 | 0.783 | 0.100 |
+
+Qwen3.5 9B on the fast set (merged): edges100/roster/p1 0.78 / wrong 0.16, p2 0.75 / 0.06 — no better
+than Gemma 12B, slower than E4B; not pursued.
+
+**Voting** (`vote.py`, `search_votes.py`, no new inference): an open label gets a name only if k of n
+configs agree; a name the rules already placed needs all n (one person split over two labels). Best on
+tune: 2 of 3 over the three 12B configs above, repeat on 3 of 3 — **0.817 coverage, wrong 0.050**
+(3 wrong of 60, two of them the rules' own). Chosen on tune, so optimistic until test.
+
+**Round 2, clue-line gating** (`p4`, `gate.py`): names restricted by schema to the team, each with a
+cue type and the line index; code keeps a name only if that line says it and the label speaks next to
+it. The models' line indices are mostly wrong, so the gate strips nearly every model name and the merge
+falls back to the rules (fast 0.69–0.72, wrong 0). Ungated `p4` is an ordinary voter (E4B names/roster
+0.81 / wrong 0.03 on fast). Dead end for small models.
+
+**Round 3, more 12B voters** on tune (names, clues, edges50, full windows): every 2-4-config vote tops
+out at 0.817 / wrong 0.05; the remaining labels are hard, not under-voted. A single 12B config,
+full / none / p1, merged with the rules reaches 0.80 / wrong 0.05 alone.
+
+**Rounds 4-5, finalists on test, once** (`final.py`, `results/final.md`):
+
+| system | tune cov / wrong | test cov / wrong | test cov CI |
+|---|---|---|---|
+| rules3 alone | 0.700 / 0.033 | 0.709 / 0.073 | 0.60–0.81 |
+| rules3 + E4B vote 2 of 2 | 0.767 / 0.050 | 0.745 / 0.091 | 0.63–0.85 |
+| rules3 + 12B vote 2 of 3, repeat on 3 of 3 | 0.817 / 0.050 | 0.782 / 0.073 | 0.68–0.88 |
+| ... + veto on 3 of 3 (added after seeing test) | 0.800 / 0.033 | 0.782 / 0.055 | 0.68–0.88 |
+| rules3 + 12B full / none / p1 | 0.800 / 0.050 | 0.745 / 0.073 | 0.63–0.85 |
+| rules3 + 12B names / none / p1 | 0.783 / 0.050 | 0.727 / 0.073 | 0.62–0.82 |
+
+E4B voters: edges100/roster+notes/p2 and clues/roster+notes/p1. 12B voters: edges100 with none/p1,
+roster/p2, roster+notes/p1. On test every wrong name of the 12B vote is one the rules made; the model
+adds coverage without adding errors. The veto (all three 12B voters name someone else → the rules'
+name becomes unknown) removes one of them; it was designed after looking at test, so test is now
+partly development data and a fresh held-out set is needed for a clean number.
+
+What is still missed on test: Fish four times (the founder is talked about, rarely addressed, the
+reference names him from indirect clues), a Rustam/Gus swap where "Gus, can you continue?" is answered
+by Rustam, and labels whose only clue is a garble.
+
+**Round 6, one-to-one calls** (70 calls, 7 named labels in the reference; 5 two-remote calls): the risk
+here is inventing names. 12B edges100 / roster+notes / p1 gives 56 names the reference cannot verify
+(Rustam 36, Sergei 13, Gus 6) — it leans on the roster line "speaks Russian with Mikhail in 1:1 calls",
+i.e. guesses by elimination. Without context only 6 unverifiable names, all odd ones (leo, надежда,
+миша). The rules give 2. The finalist vote is not defined there (the roster/p2 voter was not run on
+those calls). Whether "the 1:1 Russian call is Rustam" is a feature or a bug is a product decision.
+
+**Conclusions of the night**
+
+- Best system: rules3, then a 2-of-3 vote of Gemma 4 12B (edges100: none/p1, roster/p2,
+  roster+notes/p1) for the labels the rules leave open. Test 0.78 coverage, wrong 0.073 (all the
+  rules' own) or 0.055 with the unanimous veto. Three 12B requests per call, ~40–60 s each.
+- With the built-in E4B only: rules3 + a 2-of-2 vote reaches test 0.745 / wrong 0.091 — worse than
+  rules alone on errors; E4B is not worth adding unless the error budget is relaxed.
+- Rules alone are the cheapest strong baseline: 0.71 / 0.073 on test with no model.
+- Dead ends: clue-line gating (small models cite wrong lines), Qwen3.5 9B, more voters, `full` windows.
+- The rules' own errors now cap precision; the next step is a fresh held-out month of calls, since
+  test was looked at while designing the veto.

@@ -1,0 +1,7 @@
+You read a transcript of a call recorded by Mikhail. "me" is Mikhail. The other speakers are labelled them-1, them-2, ... by a speaker diarizer; each label is one distinct voice. Lines start with their index number and a time stamp.
+Work out the real name of each them-N label. Names may be garbled by speech recognition (Mustam, Rustan = Rustam; Gas = Gus).
+A name counts only with a clue line in the transcript:
+- "addressed": someone says the name to a person ("Sergei, what about X?", "Gus, can you continue?", "Hi Rustam") and this label is the next voice that answers;
+- "thanked": someone says "thank you, <name>" right after this label finished speaking;
+- "introduced": this label says its own name ("this is Lucas").
+For each label give the name, the cue type and the index of the line where the name is said. With no such line the label is "unknown" with cue "none" and line -1. Topics, roles and elimination are not clues.

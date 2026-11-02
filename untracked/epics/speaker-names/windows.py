@@ -4,6 +4,7 @@ from pathlib import Path
 
 HERE = Path(__file__).parent
 PEOPLE = json.loads((HERE / "data/people.json").read_text())
+NAME_PATTERN_CANONICAL = {a.lower(): name for name, aliases in PEOPLE.items() for a in aliases}
 NAME_PATTERN = re.compile(r"\b(" + "|".join(sorted({a for aliases in PEOPLE.values() for a in aliases}, key=len, reverse=True)) + r")\b", re.I)
 
 
@@ -23,6 +24,8 @@ def render(rows: list[tuple[int, float, str, str]], window: str) -> str:
     # window: full | names | edges<N> (turns cut to first N and last N chars)
     if window == "full":
         return "\n".join(f"{idx} {stamp(start)} {speaker}: {text}" for idx, start, speaker, text in rows)
+    if window == "clues":
+        return render_clues(rows)
     if window == "names":
         keep = {j for i, (_, _, _, text) in enumerate(rows) if NAME_PATTERN.search(text) for j in range(i - 3, i + 4)}
         picked, previous = [], -1
@@ -47,6 +50,29 @@ def render(rows: list[tuple[int, float, str, str]], window: str) -> str:
             out.append(f"{idx} {stamp(start)} {speaker}: {text}")
         return "\n".join(out)
     raise ValueError(window)
+
+
+def clues(rows: list[tuple[int, float, str, str]]) -> list[dict]:
+    # every line that mentions a known name: who says it, the remote voice before it and the one that answers after it
+    found = []
+    for i, (idx, start, speaker, text) in enumerate(rows):
+        names = sorted({NAME_PATTERN_CANONICAL[m.lower()] for m in NAME_PATTERN.findall(text)})
+        if not names:
+            continue
+        before = next((rows[j][2] for j in range(i - 1, max(-1, i - 8), -1) if rows[j][2] not in ("me", speaker)), None)
+        after = next(((rows[j][2], rows[j][3]) for j in range(i + 1, min(len(rows), i + 8)) if rows[j][2] not in ("me", speaker)), None)
+        found.append({"idx": idx, "start": start, "speaker": speaker, "text": text, "names": names, "before": before,
+                      "after": after[0] if after else None, "after_text": after[1][:80] if after else None})
+    return found
+
+
+def render_clues(rows) -> str:
+    lines = [f"Remote voices in this call: {', '.join(labels_of(rows))}.", "Lines where a name is said (with the remote voice that spoke last before the line, and the first remote voice that speaks after it):"]
+    for c in clues(rows):
+        lines.append(f"{c['idx']} {stamp(c['start'])} {c['speaker']}: {c['text'][:160]}")
+        lines.append(f"    names: {', '.join(c['names'])} | remote voice before: {c['before'] or '-'} | remote voice after: {c['after'] or '-'}"
+                     + (f" says: \"{c['after_text']}\"" if c['after'] else ""))
+    return "\n".join(lines)
 
 
 def labels_of(rows) -> list[str]:

@@ -4,6 +4,9 @@ from collections import defaultdict
 from pathlib import Path
 
 HERE = Path(__file__).parent
+# the fast loop set: 8 tune dailies, 30 named labels, both languages, a split speaker, a late joiner
+FAST = {"20260907-172950", "20260910-172925", "20260914-172915", "20260918-125857", "20260923-130021",
+        "20260925-125945", "20261001-120018", "20261006-125933"}
 PEOPLE = json.loads((HERE / "data/people.json").read_text())
 ALIASES = {alias: name for name, aliases in PEOPLE.items() for alias in aliases + [name.lower()]}
 
@@ -21,10 +24,11 @@ def outcome(predicted: str, ref_entry: dict) -> str:
         return "skip"
     predicted = canonical(predicted)
     truth = canonical(ref_entry["name"]) if ref_entry["status"] == "named" else "unknown"
+    if truth == "unknown":
+        # nobody knows this voice: abstaining is right and not scored, a name cannot be checked
+        return "skip" if predicted == "unknown" else "unverified"
     if predicted == "unknown":
         return "abstain"
-    if truth == "unknown":
-        return "unverified"
     return "correct" if predicted == truth else "wrong"
 
 
@@ -40,10 +44,10 @@ def score_config(hyp_dir: Path, calls: list[dict], refs: dict[str, dict]) -> dic
         invalid = hyp.get("invalid", False) or any(label not in answer for label in call["labels"])
         outcomes = {label: ("invalid" if invalid else outcome(answer.get(label), ref["labels"][label]))
                     for label in call["labels"] if label in ref["labels"]}
-        per_call[call["id"]] = {"outcomes": outcomes, "seconds": hyp.get("seconds"), "tokens": hyp.get("prompt_tokens"),
+        per_call[call["id"]] = {"id": call["id"], "outcomes": outcomes, "seconds": hyp.get("seconds"), "tokens": hyp.get("prompt_tokens"),
                                 "segments": call["segments_per_label"], "group": call["group"], "split": call["split"]}
     rows = {}
-    subsets = {"multi/tune": lambda c: c["split"] == "tune", "multi/test": lambda c: c["split"] == "test",
+    subsets = {"fast": lambda c: c["id"] in FAST, "multi/tune": lambda c: c["split"] == "tune", "multi/test": lambda c: c["split"] == "test",
                "multi/all": lambda c: c["group"] == "multi", "two": lambda c: c["group"] == "two", "one": lambda c: c["group"] == "one"}
     for subset, keep in subsets.items():
         chosen = [c for c in per_call.values() if keep(c)]
