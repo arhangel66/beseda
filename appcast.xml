@@ -3,6 +3,24 @@
     <channel>
         <title>Beseda</title>
         <item>
+            <title>0.4.2</title>
+            <pubDate>Mon, 02 Nov 2026 20:46:55 +0400</pubDate>
+            <sparkle:version>20261102204604</sparkle:version>
+            <sparkle:shortVersionString>0.4.2</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.2</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <description sparkle:format="markdown"><![CDATA[# Beseda 0.4.2
+
+Нужен macOS 14.2 или новее.
+
+## Исправления
+
+- Запись больше не останавливается, пока вы ждёте собеседника: минута тишины считается, только когда его уже было слышно, а до этого запись ждёт до 15 минут.
+- Автозапись не обрывается, если программа звонка на мгновение отпустила микрофон, например когда к звонку подключается собеседник.
+]]></description>
+            <enclosure url="https://github.com/arhangel66/beseda/releases/download/v0.4.2/Beseda-0.4.2.zip" length="16370671" type="application/octet-stream" sparkle:edSignature="1mYMcGlTHx6/W+/87QMqgzcfc6HuUKmoogt8t+0qF7KlwQRUrUDbJZ5urIR2XkBtXQIlREOeVxdScog3z+fBDA=="/>
+        </item>
+        <item>
             <title>0.4.1</title>
             <pubDate>Sat, 10 Oct 2026 05:12:47 +0400</pubDate>
             <sparkle:version>20261010051153</sparkle:version>
@@ -55,15 +73,6 @@
 - Исправлены падения и случаи, когда пропадала часть записи.
 ]]></description>
             <enclosure url="https://github.com/arhangel66/beseda/releases/download/v0.4.0/Beseda-0.4.0.zip" length="15611923" type="application/octet-stream" sparkle:edSignature="Nr1P/+9TaQwwLlniRMexx8lg6r2F3Gkbou5/+PmwS4ctrFTd6dmiBEtlHzY19Mkq1XpHrhE6WacwBeB6g/cJBg=="/>
-        </item>
-        <item>
-            <title>0.3.5</title>
-            <pubDate>Fri, 11 Sep 2026 08:21:19 +0400</pubDate>
-            <sparkle:version>20260911082115</sparkle:version>
-            <sparkle:shortVersionString>0.3.5</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>14.2</sparkle:minimumSystemVersion>
-            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
-            <enclosure url="https://github.com/arhangel66/beseda/releases/download/v0.3.5/Beseda-0.3.5.zip" length="15397541" type="application/octet-stream" sparkle:edSignature="YwyM7VMCsKIIvNIGbs0OGdLPOwCSkk07k8ODweSOGVLHDMOpN31Udm0vFoA9Zfn+sYkuvyE2OPN3ZR7HlWYDCw=="/>
         </item>
     </channel>
 </rss>
