@@ -1,0 +1,16 @@
+{
+  "call_id": "20261027-125916",
+  "call_kind": "daily",
+  "language": "mixed",
+  "labels": {
+    "them-1": {"name": "Rustam", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 73, "line": "me: Uh okay, uh Rustam, can you please continue?", "why": "Mikhail hands the turn to Rustam; them-1 answers 'Yeah. So it's like this' at 74-75 and gives the ROI update"},
+                 {"idx": 63, "line": "me: That's why I asked uh asked uh two reviewers, uh Rustam and uh Sergei.", "why": "Rustam is on the call as a listener of Mikhail's update"}
+               ]}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {"them-1": "upset NG edge cases remain and Dolphin broke; Fish's comment was about the NG cache; ROI from 23-24% to ~72%, many NG fix PRs released"},
+  "people_named_in_text": ["Fish", "Rustam", "Sergei"],
+  "notes": "Starts as a Russian chat between Mikhail and them-1, then turns into the start of the daily ('mostly all of us is here', 49): Mikhail gives his update and hands over to Rustam at 73, them-1 answers. The recording ends there, so only one remote label. No echo."
+}

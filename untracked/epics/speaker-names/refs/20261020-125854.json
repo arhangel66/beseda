@@ -1,0 +1,31 @@
+{
+  "call_id": "20261020-125854",
+  "call_kind": "daily",
+  "language": "mixed",
+  "labels": {
+    "them-1": {"name": "Rustam", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 66, "line": "me: Um Rustam, can you please continue?", "why": "addressed; them-1 answers at 67 and gives the update (69-100)"},
+                 {"idx": 131, "line": "them-3: One thing, Rustam, you mentioned I have some PRs assigned to me around this uh uh Gmail uh stuff.", "why": "them-3 addresses Rustam about what them-1 said at 19; them-1 answers at 141-145"}
+               ]},
+    "them-2": {"name": "Gus", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 231, "line": "me: Okay, uh gus", "why": "me hands the turn to Gus"},
+                 {"idx": 240, "line": "them-3: Gus.", "why": "hand-over by them-3; the next voice to give an update is them-2 (242-266)"}
+               ]},
+    "them-3": {"name": "Pixel", "status": "named", "confidence": "medium",
+               "evidence": [
+                 {"idx": 19, "line": "them-1: Those PRs are assigned on Pixel and Michael and also on me.", "why": "Rustam says Pixel has Gmail PRs assigned"},
+                 {"idx": 131, "line": "them-3: One thing, Rustam, you mentioned I have some PRs assigned to me around this uh uh Gmail uh stuff.", "why": "them-3 reacts to being the one Rustam talked about at 19"},
+                 {"idx": 144, "line": "them-1: So on the only around 15 or 20 minutes ago I found it and I asked it to return back from back welcome assigned to you and Michael.", "why": "Rustam repeats to them-3 that the PRs are assigned to 'you and Michael', i.e. Pixel"}
+               ]}
+  },
+  "speaking_order": ["them-1", "them-3", "them-2"],
+  "topics_per_label": {
+    "them-1": "Gmail login for provider portal released, Gmail PRs, NG/filler image download root cause fix, offers to take epics",
+    "them-2": "provider Google Ads campaigns with conversions, messaging Pearl/Dolphin LLM users, LLM comparison mentions",
+    "them-3": "unpaid providers payment issue, merged ~30-35 PRs, Postgres maintenance downtime, stats page, blog post, provider portal rework, reviewed Sergei's design"
+  },
+  "people_named_in_text": ["Rustam", "Pixel", "Mikhail", "Fish", "Gus", "Sergei", "Greg"],
+  "notes": "Rustam and Gus are clear from direct hand-overs. Pixel is never addressed by name; it rests on them-3 reacting to Rustam's remark that Pixel has Gmail PRs assigned. 'Greg' (idx 151) is likely a garble, unclear of whom."
+}

@@ -1,0 +1,12 @@
+{
+  "call_id": "20261012-122128",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {"them-1": "initiated a one-month payout delay (referral withdrawal attack, chargebacks) as a precaution, has no numbers; asked to justify the number of days"},
+  "people_named_in_text": ["Fish"],
+  "notes": "Very short Russian Discord 1:1; the remote person is never named. Fish only mentioned (36). No echo."
+}

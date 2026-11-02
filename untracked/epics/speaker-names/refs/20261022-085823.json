@@ -1,0 +1,12 @@
+{
+  "call_id": "20261022-085823",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {"them-1": "fraud accounts: 3DS only on the first payment, auto top-ups can be charged back, card rotation, block accounts, call Colin for disputes"},
+  "people_named_in_text": ["Mikhail", "Colin"],
+  "notes": "Short Russian 1:1 started by them-1 about fraud top-ups. them-1 addresses Mikhail (2) but is never named; Colin is only mentioned. No echo."
+}

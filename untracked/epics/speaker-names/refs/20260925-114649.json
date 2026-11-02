@@ -1,0 +1,12 @@
+{
+  "call_id": "20260925-114649",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "medium", "evidence": []}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {"them-1": "denies his agents are the root cause of Loki crashes, blames weak infra and no alerts, wants to take over infra, 30 PRs ready for release"},
+  "people_named_in_text": ["Mohammed"],
+  "notes": "Russian 1:1. Line 13 me: 'этот запрос сделал вот русская' may be a garble of Rustam naming who made the Loki query (them-1's agent), but 'русская' is not a known garble and it is not an address, so left unknown (re-check candidate)."
+}

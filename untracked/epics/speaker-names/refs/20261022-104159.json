@@ -1,0 +1,12 @@
+{
+  "call_id": "20261022-104159",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {"them-1": "fraud auto top-ups only ~$850/month so leave as is, suspicious accounts list; NG idle time recomputed, B300 ROI ~70%, B300 rentals failing on graceful shutdown, asks Mikhail to take it"},
+  "people_named_in_text": ["Mikhail", "Fish", "Colin"],
+  "notes": "Russian 1:1. them-1 calls Mikhail 'Миша' (185) and mentions Fish and Colin, but nobody names them-1. No echo."
+}

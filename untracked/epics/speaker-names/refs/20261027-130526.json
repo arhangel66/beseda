@@ -1,0 +1,40 @@
+{
+  "call_id": "20261027-130526",
+  "call_kind": "daily",
+  "language": "en",
+  "labels": {
+    "them-1": {"name": "Rustam", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 120, "line": "me: So uh I think um Rustam or Sergei, if you want, you can uh ask your agent to recheck uh which pull requests is uh can be uh shared with uh Muhammad.", "why": "addressed; them-1 answers at 123 'I can I can share Mohammed'"},
+                 {"idx": 215, "line": "them-4: But Rustam, in any case, feel free to assign me the other PRs I will take uh in parallel to look at the LMD stuff as well.", "why": "Mohammed addresses Rustam about the PRs them-1 offered at 123-125"},
+                 {"idx": 209, "line": "them-4: I think some were merged by you, uh Rustam, some by me, some by Sergei, and so on.", "why": "reply to them-1's question at 166-169"}
+               ]},
+    "them-2": {"name": "Sergei", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 43, "line": "me: Uh thank you, Sergei.", "why": "thanks right after them-2's update (28-42)"},
+                 {"idx": 46, "line": "me: Uh Sergei, just um remind I uh I think on weekend I triggered you to some uh issue those uh I found related to the uh back and restart and it seems there is an issue that if uh some", "why": "addressed; them-2 answers at 48 'I'll take care.'"},
+                 {"idx": 12, "line": "them-1: I took away from Sergei cluster PRs because well uh to be honest, Sergei, I was expecting that you will fix it yesterday.", "why": "talked about; them-2 reacts at 29-31 'regarding the clusters PRs ... since you took them'"}
+               ]},
+    "them-3": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []},
+    "them-4": {"name": "Mohammed", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 68, "line": "them-3: That's me, Mohammed.", "why": "hand-over by them-3; the next voice to give an update is them-4 (69)"},
+                 {"idx": 166, "line": "them-1: Mohammed, I I believe before your location uh you had an epic for you related to creating uh bust like binary.", "why": "addressed; them-4 answers at 170"},
+                 {"idx": 119, "line": "me: Right now Mohammed has only one pull request in queue.", "why": "matches them-4's own 'I just have one PR in review' (73)"}
+               ]},
+    "them-5": {"name": "Gus", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 164, "line": "me: Thank you very much, Gus.", "why": "thanks right after them-5's update (134-163)"}
+               ]}
+  },
+  "speaking_order": ["them-1", "them-2", "them-3", "them-4", "them-5"],
+  "topics_per_label": {
+    "them-1": "Dolphin earnings fix, took cluster PRs from Sergei, USDT idle incentive for hotkey providers, Lium D binary for Mohammed",
+    "them-2": "cluster PRs, merged ~44 PRs, pod stability tasks, command id, exposed inspector details in PRs, public report check flow",
+    "them-3": "backup fixes merged and failure rate down to 3%, held S3 bucket PR, blog posts, supporting Mohammed with EKS upgrade",
+    "them-4": "PR review catch-up, EKS and Carpenter upgrade, ephemeral storage, inspector exposure in PRs, Lium D epic",
+    "them-5": "follow-ups on paid placements, customer retention and CRM automation, daily outreach messages"
+  },
+  "people_named_in_text": ["Sergei", "Mikhail", "Mohammed", "Gus", "Rustam", "Fish"],
+  "notes": "Four labels are clear from hand-overs, thanks and direct address. them-3 (backups, blog posts) looks like Pixel by topic, but the name Pixel never appears in the text, so it stays unknown. 'pixes' at 51 is 'fixes', not the name."
+}

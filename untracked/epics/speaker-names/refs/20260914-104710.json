@@ -1,0 +1,14 @@
+{
+  "call_id": "20260914-104710",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {
+    "them-1": "Fish's performance push and Mikhail's overwork, building his own agent on top of Mikhail's PR review, critique of the penalty-grace scheme (validator should decide, remove the miner hop, 12 h too long)"
+  },
+  "people_named_in_text": ["Fish", "Mohammed", "Boris"],
+  "notes": "Long Russian 1:1 with no name for them-1. Fish is talked about throughout (14, 75, 95, 163), Mohammed once in a release example (156), 'ворис' (105) reads as Boris who left. No echo."
+}

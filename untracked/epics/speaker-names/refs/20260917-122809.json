@@ -1,0 +1,14 @@
+{
+  "call_id": "20260917-122809",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {
+    "them-1": "open PRs falling fast, team too big for the new pace, Mohammed and Shumail lagging, scale by projects not people, dark factories, wants to talk to Fish before his vacation"
+  },
+  "people_named_in_text": ["Mikhail", "Mohammed", "Shumail", "Pixel", "Fish", "Boris"],
+  "notes": "them-1 calls Mikhail 'Миша' (296) and talks about Mohammed, Shumail and Pixel in the third person ('любой из вас двоих', 28), which hints he is none of them but is elimination, not evidence. 'Ворис' (286, 292) reads as Boris. Some 'me' lines are English ASR noise ('Mm-hmm'). No echo."
+}

@@ -1,0 +1,38 @@
+{
+  "call_id": "20260908-173122",
+  "call_kind": "daily",
+  "language": "en",
+  "labels": {
+    "them-1": {"name": "Fish", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 231, "line": "them-2: And this is something that I found uh from your previous messages, I think in the last week, Fish.", "why": "them-2 answers them-1's question (25) and addresses Fish; them-1 pushes back at 249-253"},
+                 {"idx": 524, "line": "me: fish ah yes yes I I I started to say that I know that you are using BB ...", "why": "Fish is on the call and addressed by me; supports them-1, whose lines are about 'my agent opened over the weekend' and 'my own shadeform account'"}
+               ]},
+    "them-2": {"name": "Mohammed", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 25, "line": "them-1: Mohammed, I pinged you about this, but are you able to explain that in the call your thought process behind what you what you what you said?", "why": "addressed; them-2 answers at 26-27 about the penalty suggestions"}
+               ]},
+    "them-3": {"name": "Rustam", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 513, "line": "me: Rustam, yes, uh let's just uh let's just have a short call after after this and we will and we will solve for uh everything uh during ripples", "why": "me answers them-3's request at 499 ('Michael, is it okay if you will share ... five or ten minutes'); them-3 replies 'Okay' at 514"},
+                 {"idx": 442, "line": "them-5: And and Rustam, I agree with what you said as well.", "why": "them-5 refers back to them-3's answer at 424-429 about AI review as a prerequisite to the human gate"}
+               ]},
+    "them-4": {"name": "unknown", "status": "unknown", "confidence": "medium", "evidence": []},
+    "them-5": {"name": "Pixel", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 416, "line": "them-1: He was just asking how the how Mikhail merged for uh reviewed 40 APRs.", "why": "follows 412 'No one responded to Pixel.'; them-5 reacts at 417 'No, I did not that was not my question'"},
+                 {"idx": 412, "line": "them-1: No one responded to Pixel.", "why": "the unanswered question is them-5's at 394-401"},
+                 {"idx": 293, "line": "them-2: And uh yeah I I agree with pixel as well, like the context is everywhere.", "why": "refers to them-5's 249 'the context is just too broad now'"}
+               ]}
+  },
+  "speaking_order": ["them-1", "them-2", "them-3", "them-5"],
+  "topics_per_label": {
+    "them-1": "penalty design questioned, $10 renter credit, self-improving reviewing agents, shadeform account, SSO with lium.io emails, architectural decisions need humans",
+    "them-2": "penalty suggestions came from the loop, own Discord bot, human actions, AWS findings, reviewer mismatch Notion/GitHub, scoring PR risk, C binary in public repo",
+    "them-3": "~50 PRs reviewed and 16 releases, dangerous repo-wide PRs, H200 default jobs, Dolphin mining, Lium Core merged into Lium.io and PyPI access",
+    "them-4": "single 'Hi guys.' at 168, right before them-5's update",
+    "them-5": "dev stacks vs prod, loop deployed an unmerged PR, backup credentials, provider notifications PR, staging shadeform nodes, ex-member AWS account, review quality"
+  },
+  "people_named_in_text": ["Mohammed", "Fish", "Pixel", "Rustam", "Mikhail", "Forest", "Bodis"],
+  "notes": "Mohammed and Rustam are clear from direct address; Pixel from 'No one responded to Pixel' followed by them-5 correcting how its question was retold. Fish rests on being addressed by name inside them-2's answer and then pushing back. them-4 is a single 'Hi guys.' just before them-5 starts, probably the start of Pixel's turn split off, but nothing names it."
+}

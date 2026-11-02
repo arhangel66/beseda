@@ -1,0 +1,44 @@
+{
+  "call_id": "20260923-130021",
+  "call_kind": "daily",
+  "language": "en",
+  "labels": {
+    "them-1": {"name": "Rustam", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 552, "line": "them-3: Sorry, what Rustin.", "why": "addressed (garble 'Rustin'); them-1 answers about the Canada visa at 553"},
+                 {"idx": 221, "line": "them-1: Uh pixel, please continue.", "why": "supports: them-1 runs the hand-over like Rustam does; it is not Pixel itself"}
+               ]},
+    "them-2": {"name": "Pixel", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 29, "line": "them-3: Pixel, where are you by the way?", "why": "addressed; them-2 answers 'I'm in Germany' at 32"},
+                 {"idx": 221, "line": "them-1: Uh pixel, please continue.", "why": "hand-over; them-2 says 'Yeah, sure. Thanks.' and gives its update from 222"},
+                 {"idx": 5, "line": "me: hello pixel.", "why": "greeting; them-2 replies 'Hi guys' at 6"}
+               ]},
+    "them-3": {"name": "Fish", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 197, "line": "me: Just one small qualification with fish.", "why": "me then asks 'Tish uh do okay that we will force it' (198); them-3 answers 'Yeah, but we should do the same path...' at 199"},
+                 {"idx": 516, "line": "them-5: i i think i spoke over fish because he asked which part of turkey ...", "why": "talked about; them-3 reacts 'cool have a good trip' at 517"}
+               ]},
+    "them-4": {"name": "unknown", "status": "unknown", "confidence": "medium", "evidence": []},
+    "them-5": {"name": "Gus", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 521, "line": "them-3: Gus, are you going?", "why": "addressed; them-5 answers 'Where? Sorry?' and 'I don't think it's a good idea' at 522-525"}
+               ]},
+    "them-6": {"name": "Gus", "status": "named", "confidence": "medium",
+               "evidence": [
+                 {"idx": 507, "line": "them-6: next week if like if I see success from that I'll also let you guys know uh so that we can kind of implement risk of pad maybe it's worth less focus you know i do this approach you can", "why": "mid-sentence piece of them-5's turn: 506 ends 'step two but', 508 continues 'do an approach where you go'"},
+                 {"idx": 521, "line": "them-3: Gus, are you going?", "why": "names them-5, of which them-6 is a split fragment (also 566 continues them-5's 565)"}
+               ]}
+  },
+  "speaking_order": ["them-3", "them-2", "them-1", "them-4", "them-5"],
+  "topics_per_label": {
+    "them-1": "taking all epic PRs himself, default job strategy PR blocked by loop's request changes, base price epic, tempdev environment, NGC image vs old Sysbox, vacation in Turkey, Russian passport and Canada visa",
+    "them-2": "provider portal and sidebar, pricing pages and orphan links, noisy monitoring channel, guardrail override mode, closing code owners PRs, off until Monday",
+    "them-3": "24/7 prod alerts, merge rules blocking Rustam, tempdev questions, careful Sysbox enforcement, Liam console not needed, bandwidth accuracy, outreach spam, gold sponsor tickets",
+    "them-4": "late on the Redis incident, AWS permissions like Pixel, inspector findings monitor, PVC storage alerts, Redis LRU risk, validator hotkey rotation plan and CVM hashes, closed Liam console PR",
+    "them-5": "provider outreach, European government lead lost on six-month commitment, splitting contact list in three, phased messages, Reddit DMs, not going to the conference",
+    "them-6": "four fragments of them-5's speech"
+  },
+  "people_named_in_text": ["Mikhail", "Pixel", "Mohammed", "Rustam", "Fish", "Gus", "Etienne", "Const", "Natalia"],
+  "notes": "Pixel, Fish, Gus and Rustam are each addressed and answer. them-4 (infra: AWS access, inspector monitor, PVC alerts, hotkey rotation) is never addressed by name: 'Pixel and Mohammed' at 21, 80 and 476 get replies from other labels, so it stays unknown though the topics fit Mohammed. them-6 is a split of Gus (4 fragments inside his sentences)."
+}

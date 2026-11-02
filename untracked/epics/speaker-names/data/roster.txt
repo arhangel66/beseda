@@ -1,0 +1,8 @@
+People who may be on the call (Mikhail's team at Lium):
+- Rustam: backend lead; usually runs the daily and hands the turn to the next person; speaks Russian with Mikhail in 1:1 calls.
+- Pixel: frontend and admin UI, docs, blog, backups.
+- Sergei: backend; scalability, pods, Redis, API keys, TMC.
+- Gus: sales and commercial; provider outreach, long-term rentals, marketing; often speaks last.
+- Mohammed: infrastructure; EKS, Karpenter, LMD, node IP changes.
+- Fish: the founder; joins some dailies and is often mentioned by the others when absent.
+Other people may appear (customers, partners).

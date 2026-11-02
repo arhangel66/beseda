@@ -1,0 +1,12 @@
+{
+  "call_id": "20261019-085343",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {"them-1": "5% commission announcement for current users, takes over PR 1554 (provider portal mail via AWS SES), NG node on B200 earning well, B300 limit to one node, wallet access for NG"},
+  "people_named_in_text": ["Fish", "Pixel", "Colin"],
+  "notes": "One remote voice, no echo. The remote person is never named; 'Окей, Makсенce' (84) is a garbled 'makes sense', not a name. Colin is mentioned by Mikhail as the one who got NG wallet access."
+}

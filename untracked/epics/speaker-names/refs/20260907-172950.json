@@ -1,0 +1,37 @@
+{
+  "call_id": "20260907-172950",
+  "call_kind": "daily",
+  "language": "en",
+  "labels": {
+    "them-1": {"name": "Rustam", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 56, "line": "me: Uh Rustam, can you please continue?", "why": "hand-over; them-1 starts its update at 57"},
+                 {"idx": 158, "line": "them-3: Hi, Rustam.", "why": "them-3 greets the voice that just handed over to it (them-1 at 155-156)"}
+               ]},
+    "them-2": {"name": "Fish", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 431, "line": "me: Uh, Fisher, is it okay if I will uh maybe uh come later with some uh suggestions to adjustment uh your uh loop code?", "why": "addressed; them-2 answers at 433 'you can just send a PR'"},
+                 {"idx": 436, "line": "them-3: Yeah, and and and last thing, fish.", "why": "them-3 asks Fish not to keep AWS admin access; them-2 answers 'yeah, I agree' at 438"},
+                 {"idx": 270, "line": "them-4: So Fish I tagged you as well there.", "why": "security concern addressed to Fish; them-2 answers about the temporary AWS admin access at 279-282"}
+               ]},
+    "them-3": {"name": "Pixel", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 144, "line": "them-2: What were you saying, Pixel?", "why": "addressed; them-3 answers at 145"},
+                 {"idx": 156, "line": "them-1: Your turn on please.", "why": "follows 155 'The pixel.'; them-3 starts its update at 157"}
+               ]},
+    "them-4": {"name": "Mohammed", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 244, "line": "them-3: Yeah, that's it from my side, Mohammed.", "why": "hand-over; them-4 starts its update at 245"},
+                 {"idx": 394, "line": "me: Mohammed, if you are interested, uh, how exactly it's working, I think you can look to the code uh that actually shared it to us.", "why": "addressed; them-4 answers 'Thanks. I will take a look.' at 396-397"}
+               ]}
+  },
+  "speaking_order": ["them-1", "them-2", "them-3", "them-4"],
+  "topics_per_label": {
+    "them-1": "Sentry-on-staging PR, many tightly coupled small PRs, dev environment, proposes epics with a DRI instead of per-PR assignment",
+    "them-2": "apologises for overwhelming the team, staging GPUs on AWS on-demand, code owners, why he built the Lium loop, Twitter posts, Fable/cursor setup",
+    "them-3": "monorepo boundaries, P0 PR reviews, Redis alerts, backups PR, 12-hour test, moving CLI/SDK to a public repo, webhooks vs polling, AWS admin risk",
+    "them-4": "confusing changing priorities doc, notification noise, AWS security concern, end-to-end tests in merge queue, asks Fish about long-term plan"
+  },
+  "people_named_in_text": ["Rustam", "Fish", "Pixel", "Mohammed", "Mikhail"],
+  "notes": "Easy call: every label gets a direct hand-over or address. Opens with a few Russian lines between me and them-1 before switching to English. No echo, no split."
+}

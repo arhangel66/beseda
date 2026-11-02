@@ -1,0 +1,21 @@
+{
+  "call_id": "20261014-195946",
+  "call_kind": "other",
+  "language": "en",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []},
+    "them-2": {"name": "Gus", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 15, "line": "me: Gus is uh writing that he's coming in.", "why": "them-2 joins right after at 17 ('Good afternoon, everyone.')"},
+                 {"idx": 44, "line": "me: Uh Gus, maybe I miss uh the question.", "why": "addressed; them-2 answers at 46 ('Yeah, let me let me ... open up uh a line here')"},
+                 {"idx": 238, "line": "me: Uh Gus", "why": "me asks Gus for anything else; them-2 answers at 241 ('Yeah, nothing, nothing for me.')"}
+               ]}
+  },
+  "speaking_order": ["them-1", "them-2"],
+  "topics_per_label": {
+    "them-1": "external partner building a predictive compute price index; wants hourly rental data feed, free trial then $1000/month or rev share; not a GPU provider",
+    "them-2": "Lium sales side: rental volume and growth numbers, pricing rules, renter choice, referral/rev share, hands tech questions to Mikhail"
+  },
+  "people_named_in_text": ["Gus", "Vlad", "Mikhail"],
+  "notes": "Evening call with an external data partner, not a daily. Gus is named several times and answers each time (also 'Gas'). The partner (them-1) never gives a name; 'Vlad' at 9 is someone they mention, and 'Max' at 286 reads as 'at most tomorrow', not a name."
+}

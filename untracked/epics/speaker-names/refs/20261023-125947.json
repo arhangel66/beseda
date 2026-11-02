@@ -1,0 +1,29 @@
+{
+  "call_id": "20261023-125947",
+  "call_kind": "daily",
+  "language": "mixed",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "medium",
+               "evidence": [
+                 {"idx": 147, "line": "me: Uh Rustam is uh 42 and pixel as I see it's only 29 on you.", "why": "Pixel is named with 'on you', but no voice answers it; them-1 never gets a direct address-and-answer"}
+               ]},
+    "them-2": {"name": "Rustam", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 272, "line": "me: Uh Rustam, uh, one small uh one small uh ending.", "why": "addressed about topping up his balance (273-275); them-2 answers at 277 and explains why it needs the money (279-286)"},
+                 {"idx": 359, "line": "me: And for you, Rustam, yes, if you can please just check that uh the NV link is uh working as expected, and it was no issue that we should fix.", "why": "confirms them-2's own plan at 353 ('I will investigate if we have some kind of bug')"}
+               ]},
+    "them-3": {"name": "Gus", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 278, "line": "me: Okay, uh Gus, can you please continue?", "why": "addressed; after them-2's short interjection ('Please continue', 292) them-3 answers at 293 and gives the update"},
+                 {"idx": 133, "line": "me: Uh hello, gas.", "why": "greeting at 691 s; them-3 says it is late (294), consistent with joining then"}
+               ]}
+  },
+  "speaking_order": ["them-1", "them-2", "them-3"],
+  "topics_per_label": {
+    "them-1": "in Pakistan, missed yesterday, redesigned provider referral program, backups epic with restic and separate S3 bucket, PR queue",
+    "them-2": "PR queue metric, NG profitability and launch speed, GPU reset button, MFA for provider portal, feature toggle cleanup, NVLink bug check",
+    "them-3": "late with fever, B300 spot NVLink refund case for a big customer, ticket 0745, refund flexibility"
+  },
+  "people_named_in_text": ["Mikhail", "Fish", "Sergei", "Rustam", "Pixel", "Gus"],
+  "notes": "them-1 is most likely Pixel (backups, referral program, the 'pixel ... on you' line at 147) but nobody addresses it by name and it never answers to the name, so it stays unknown. Rustam and Gus are clear from direct address. The start has Russian from Mikhail's mic."
+}

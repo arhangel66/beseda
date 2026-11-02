@@ -1,0 +1,12 @@
+{
+  "call_id": "20261016-113955",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {"them-1": "skips standup for a doctor; USDT payout rolled out to prod but untested, hotkey switch UI fixed, email security code vs hotkey signing, asks Mikhail to test a $5 payout"},
+  "people_named_in_text": ["Fish"],
+  "notes": "Only one remote label and it is a real remote voice (answers, asks questions, explains the email confirmation flow), not echo; no second label exists in this transcript, so the expected echo label is absent. A few short them-1 fragments (94 'Setting some', 104 'of the', 121) look like stray screen-share audio, not echo of me lines. Nobody says the remote person's name."
+}

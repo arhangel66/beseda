@@ -1,0 +1,36 @@
+{
+  "call_id": "20261015-125911",
+  "call_kind": "daily",
+  "language": "mixed",
+  "labels": {
+    "them-1": {"name": "Rustam", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 72, "line": "me: Okay, uh Rustan, can you please hand on", "why": "hand-over; them-1 gives the next update at 73-74"},
+                 {"idx": 130, "line": "them-3: Thanks, Rustin.", "why": "thanks right after them-1's update (73-129)"},
+                 {"idx": 174, "line": "them-3: Rustam, you wanted to say something.", "why": "addressed; them-1 answers at 175 ('Yeah, I forgot to mention two important things.')"}
+               ]},
+    "them-2": {"name": "Fish", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 36, "line": "me: Uh fish, I just uh uh sent the link uh about the report from Gas.", "why": "me addresses Fish and asks about the $1000/month price (39); them-2 answers at 41 ('I mean, I just made up that number.')"}
+               ]},
+    "them-3": {"name": "Pixel", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 129, "line": "them-1: Uh Pixel, do you want to be next?", "why": "hand-over; them-3 gives the next update at 130-133"},
+                 {"idx": 166, "line": "them-1: Please finish Pixel.", "why": "addressed; them-3 continues at 167"},
+                 {"idx": 234, "line": "me: But uh the another protection was needed for my clean and maybe Pixel uh if you have admin access, maybe you need to do something uh similar", "why": "addressed; them-3 answers at 235"}
+               ]},
+    "them-4": {"name": "Sergei", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 295, "line": "me: Sergei, I'm very interested about the video that you uh mention.", "why": "names the voice that just mentioned the video (them-4 at 272); them-4 answers at 298 ('sure I'll send the link')"}
+               ]}
+  },
+  "speaking_order": ["them-1", "them-2", "them-3", "them-4"],
+  "topics_per_label": {
+    "them-1": "public endpoint shared for free, node security checks, removing feature flags fast, Vast provider outreach, USDT withdrawals test, Angie vs dolphin earnings, safe/unsafe PR tiering",
+    "them-2": "$1000/month price was made up, stablecoin payouts should just go live, do not follow loop blindly",
+    "them-3": "price change PR almost done, earnings dashboard rework, backup cleanup bug PR, ponytail for loop, AWS SSO only",
+    "them-4": "password manager for keys, 24 PRs merged, Solana and other chains in TMC, shared agent memory with nightly dreaming, local test stand with real GPU"
+  },
+  "people_named_in_text": ["Gus", "Fish", "Rustam", "Pixel", "Sergei", "Mikhail"],
+  "notes": "Starts in Russian, then English. All four voices are named by hand-over, thanks or direct address. them-1's early lines 21-31 ('What was the decision?', public endpoint for free) come right after me addresses Fish and could be Fish, but the text does not show it; kept as Rustam. 'Carstell' at 121 may be a garbled 'Gus still'."
+}

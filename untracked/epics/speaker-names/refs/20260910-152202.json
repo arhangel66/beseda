@@ -1,0 +1,12 @@
+{
+  "call_id": "20260910-152202",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {"them-1": "Notion task on dead nodes: cancel rental after 1-3 days instead of 7, container gone while node answers, Opus hallucinating, Sochi attack, fear of being fired"},
+  "people_named_in_text": ["Fish", "Ворис"],
+  "notes": "Russian 1:1. The remote voice is never named; me's 'Отвечаю ты, палец' (25) is unclear ASR and not a known garble. Ворис is a fired colleague talked about, not on the call. No echo."
+}

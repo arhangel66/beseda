@@ -1,0 +1,32 @@
+{
+  "call_id": "20261013-125927",
+  "call_kind": "daily",
+  "language": "mixed",
+  "labels": {
+    "them-1": {"name": "Rustam", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 79, "line": "me: Uh Rustam, maybe you can kind of", "why": "hand-over; them-1 gives the next update at 80-81"},
+                 {"idx": 222, "line": "me: But as Rustan told, actually, I also checked and I didn't find the any the evidence that the uh reduced amount of GPUs that we saw in the platform.", "why": "refers back to them-1's finding about lost providers at 11-14"}
+               ]},
+    "them-2": {"name": "Pixel", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 127, "line": "me: okay okay okay thank you okay um pixel uh maybe you can continue", "why": "hand-over; them-2 gives the next update at 128-130"},
+                 {"idx": 232, "line": "me: Okay, uh uh pixel uh something else.", "why": "me asks Pixel; them-2 answers at 233 ('No, thanks. That's it for my side.')"}
+               ]},
+    "them-3": {"name": "unknown", "status": "unknown", "confidence": "medium", "evidence": []},
+    "them-4": {"name": "Fish", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 209, "line": "me: Uh fish, I uh I asked you in the channel if you can uh answer uh like um will we uh do the penalty 48 hours in the case if uh the note was go to the uh inactive uh", "why": "me addresses Fish; them-4 answers at 212 ('Then you should only charge for the downtime.')"},
+                 {"idx": 294, "line": "them-2: Fish, did you catch the discussion that we were having about posting an announcement a bit later because we're still making a lot of changes?", "why": "Pixel addresses Fish; them-4 answers at 295 ('No, I just woke up.')"}
+               ]}
+  },
+  "speaking_order": ["them-1", "them-2", "them-4", "them-3"],
+  "topics_per_label": {
+    "them-1": "lost providers and GPU UUIDs returning under other providers, Mailgun block from fake signups, USDT withdrawals, Claude security PRs, Vast provider outreach, mixed GPU nodes",
+    "them-2": "signup credit fraud PRs, delayed incentive attribution fixes, earnings page, 58 PRs queue, announcements timing",
+    "them-3": "meetings with potential providers and a big client, SEO guest posts, Google Ads provider campaign",
+    "them-4": "penalty only for downtime, reliability score needs the binary first, P0 PR priority, announcement with timeline, docs accuracy"
+  },
+  "people_named_in_text": ["Fish", "Pixel", "Sergei", "Mohammed", "Rustam", "Mikhail"],
+  "notes": "Opens in Russian, then English. Rustam, Pixel and Fish are each handed the turn or addressed and answer. them-3 gives an update right after Pixel (providers, SEO, Google Ads; Gus-like topics) but nobody says its name, so unknown. them-4 line 206 ('lot of people.') looks like the end of Pixel's sentence at 203-204, a single stray fragment, not a mixed label."
+}

@@ -1,0 +1,12 @@
+{
+  "call_id": "20260922-084404",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {"them-1": "docs incident, Fish on layoffs, long-term commitments for providers, WatchTower, rental speed P50/P90, filler job not awaited, unresponsive providers, marketing/SEO, going on vacation soon"},
+  "people_named_in_text": ["Fish", "Pierre", "Mohammed"],
+  "notes": "Russian 1:1; Mikhail never addresses them-1 by name and them-1 never introduces themselves. Line 54 'Я согласен, Татьяна, друзья' is an ASR garble, not a name. No echo: them-1 lines never repeat me lines."
+}

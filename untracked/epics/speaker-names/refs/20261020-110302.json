@@ -1,0 +1,12 @@
+{
+  "call_id": "20261020-110302",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {"them-1": "his bot flagged a dangerous feature that was already released, agrees to roll it back and get approval from Fish"},
+  "people_named_in_text": ["Fish", "Boris"],
+  "notes": "One remote voice, no echo. The remote person is never named; 'Окей, максимс' (27) is a garbled 'makes sense'. Boris is mentioned by Mikhail as a past discussion partner."
+}

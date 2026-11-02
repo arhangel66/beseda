@@ -1,0 +1,38 @@
+{
+  "call_id": "20261005-125931",
+  "call_kind": "daily",
+  "language": "en",
+  "labels": {
+    "them-1": {"name": "Mohammed", "status": "named", "confidence": "medium",
+               "evidence": [
+                 {"idx": 43, "line": "me: Muhammad.", "why": "Mikhail calls Mohammed; the next answering voice is them-1 (45: 'can you guys hear me?', headphone trouble); them-2's 44 is a side remark"},
+                 {"idx": 0, "line": "me: Hello, Mohammed.", "why": "greeting; the first remote reply is them-1 'Hello.' (3)"},
+                 {"idx": 328, "line": "them-1: Yeah, I I think Pixel wanted to go ahead.", "why": "them-1 speaks about Pixel in the third person, so it is not Pixel, though 242 'maybe Pixel, can you please contain' was answered by them-1 'I just had a single point' (243)"}
+               ]},
+    "them-2": {"name": "Pixel", "status": "named", "confidence": "low",
+               "evidence": [
+                 {"idx": 328, "line": "them-1: Yeah, I I think Pixel wanted to go ahead.", "why": "Pixel is said to want to go early; them-2 later opens with 'hopefully I can be quick because I have to go' (433); Fish's 'Me?' (329) sits in between, so the hand-over is not clean"},
+                 {"idx": 242, "line": "me: Uh maybe Pixel, can you please contain", "why": "Mikhail hands the turn to Pixel; them-1 interjects 'I just had a single point' (243) before the Pixel turn"},
+                 {"idx": 566, "line": "them-4: and then once all these spot and secure changes are done, we should put an announcement in the Liam Discord pixel.", "why": "Pixel addressed about announcements; no reply from any label, supporting only"}
+               ]},
+    "them-3": {"name": "Gus", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 470, "line": "them-2: And guess you can go next.", "why": "hand-over 'Gus, you can go next' (garbled 'guess'); the next voice to update is them-3 (471-549)"},
+                 {"idx": 55, "line": "me: gus.", "why": "'hello gus' (54-55); the reply is them-3 (57: 'I can't connect my headset, so I connect it on my phone')"}
+               ]},
+    "them-4": {"name": "Fish", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 399, "line": "them-1: Verifying this, but uh what what do you think we should do in in this case, uh fish?", "why": "addressed, and them-4 answers (404: 'Yeah, I don't know... case by case')"},
+                 {"idx": 170, "line": "me: Okay, this is uh very important intent from you fish and uh uh I'm not sure that I catch everything", "why": "reaction naming Fish right after them-4's long economics update (88-169)"}
+               ]}
+  },
+  "speaking_order": ["them-4", "them-1", "them-2", "them-3"],
+  "topics_per_label": {
+    "them-1": "headphone trouble; delay unrented incentive 24 h; banned malicious provider, billing gap of 49 h, upload speed PR",
+    "them-2": "offers to take 10 PRs; reverted spot-for-new-renters PR, TMC pay webhook probe, provider portal speed, blog; leaves early",
+    "them-3": "headset on phone; elevated support emails; Rustam's low-tier provider list, Google Ads ROI, October articles, Grafana dashboard",
+    "them-4": "B300 spot arbitrage, idle incentive economics, penalty and reliability score fixes, 48 h penalty window, support emails"
+  },
+  "people_named_in_text": ["Mohammed", "Rustam", "Gus", "Fish", "Sergei", "Pixel", "Mikhail", "Alex"],
+  "notes": "Fish and Gus are clear. them-1 vs them-2 is the hard part: 'Muhammad.' (43) could be a thanks to them-2 or a call answered by them-1; I read it as a call because them-1 then answers with headphone trouble, and them-1 also talks about Pixel in the third person (328). them-2 = Pixel rests only on the indirect 'Pixel wanted to go ahead' / 'I have to go' pairing; topics (blog, provider portal) fit but are not evidence."
+}

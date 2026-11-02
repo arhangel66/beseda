@@ -1,0 +1,16 @@
+{
+  "call_id": "20260907-113738",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high",
+               "evidence": [
+                 {"idx": 311, "line": "me: Да, то есть, ну представь то, что ты проверяешь ревью пул-реквест от пикселя.", "why": "Pixel is spoken of in third person to them-1, so them-1 is not Pixel"},
+                 {"idx": 134, "line": "me: Я бы подключил Мухаммеда.", "why": "Mohammed is a third party to be called in later, so them-1 is not Mohammed"}
+               ]}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {"them-1": "Lium agents channel, why humans are needed, role shifts to testing and rollback, LLMs lack critical thinking, human gate moved to review"},
+  "people_named_in_text": ["Fish", "Mohammed", "Pixel", "Mikhail"],
+  "notes": "Russian 1:1 that reads like a continuation of 20260907-112222 (same topics), but nobody names the remote voice in this file; them-1 calls Mikhail 'Миш' (328). Continuity is not evidence, so unknown. No echo."
+}

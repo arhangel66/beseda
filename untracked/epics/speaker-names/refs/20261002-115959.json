@@ -1,0 +1,34 @@
+{
+  "call_id": "20261002-115959",
+  "call_kind": "daily",
+  "language": "en",
+  "labels": {
+    "them-1": {"name": "Mohammed", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 202, "line": "them-4: Okay, Mohammed, you can go.", "why": "hand-over; them-1 starts 'Hi guys. Yeah, from my side...' at 203-204"},
+                 {"idx": 246, "line": "me: Mohammed, I will click quick uh just say about the B300 provider.", "why": "me answers them-1's B300 idle incentive abuse finding (232-242)"}
+               ]},
+    "them-2": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []},
+    "them-3": {"name": "Sergei", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 64, "line": "me: Uh Sergei, can you please continue?", "why": "hand-over; them-3 answers 'I'll continue.' at 65 and gives its update"},
+                 {"idx": 103, "line": "me: Sergei, if possible, uh, can you please uh share uh screens?", "why": "addressed; them-3 answers at 109 that its tool is in Russian, better shown privately"}
+               ]},
+    "them-4": {"name": "Pixel", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 144, "line": "me: Um but uh if he's not doing it, I think then um Pixel, I mean if you can, uh please ask your agent to recheck all of the feature flags ...", "why": "me replies by name to them-4's workspaces flag question (134-141); them-4 answers 'Like the like nine things' at 151"},
+                 {"idx": 1, "line": "me: Let's wait one more minute for Pixel and maybe fish.", "why": "supports: Pixel expected on the call"}
+               ]},
+    "them-5": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []}
+  },
+  "speaking_order": ["them-3", "them-4", "them-1"],
+  "topics_per_label": {
+    "them-1": "fixed broken inspector dashboards, banned a provider hunting hotkeys and wallets, providers exec-ing bash into rentals, B300 spot provider farming idle incentive",
+    "them-2": "small talk only: injured foot, boot and crutches",
+    "them-3": "review flow finds intent across repos, closed duplicate PR, infra PRs should go to Mohammed or Pixel, linked PRs blocked, release monitor, teamcpay tasks; tool is in Russian",
+    "them-4": "zero PRs in queue, grouping PRs by theme, pushing follow-up commits himself, 10 human actions, workspaces feature behind a flag needs testing on staging",
+    "them-5": "not a participant: read-aloud audio (Anna Karenina opening in Russian at 147, Frankenstein 'Letter 1... St. Petersburg, Dec. 11th, 17—' at 276-281)"
+  },
+  "people_named_in_text": ["Mikhail", "Pixel", "Fish", "Sergei", "Mohammed"],
+  "notes": "Sergei, Pixel and Mohammed are each named and answer. them-2 only talks about an injured foot in the greeting and nobody names it, so unknown. them-5 is not a person on the call: its 4 lines are audiobook-like readings (Anna Karenina, Frankenstein), not an echo of me."
+}

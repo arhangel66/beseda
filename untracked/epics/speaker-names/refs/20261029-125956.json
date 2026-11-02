@@ -1,0 +1,26 @@
+{
+  "call_id": "20261029-125956",
+  "call_kind": "daily",
+  "language": "en",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high",
+               "evidence": []},
+    "them-2": {"name": "Gus", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 7, "line": "me: Uh Gus, uh, by the way, maybe I miss uh I think you know, I think a couple of weeks a couple of weeks ago we talked with you with some uh strange gu guys uh who wanted to buy", "why": "Mikhail addresses Gus about the data partnership; them-2 answers at 10-11 and 20-24"},
+                 {"idx": 238, "line": "me: gosh.", "why": "likely garble of 'Gus' as a hand-over; them-2 gives the sales update right after (239-252)"}
+               ]},
+    "them-3": {"name": "Rustam", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 83, "line": "me: Uh Rustam, can you please continue?", "why": "hand-over by Mikhail; them-3 starts the next update at 84"}
+               ]}
+  },
+  "speaking_order": ["them-3", "them-1", "them-2"],
+  "topics_per_label": {
+    "them-1": "LMD binary in executor image, node IP/port change epic, inspector payload size and loop guardrail",
+    "them-2": "data partnership with George, website heat map, rental rate drop, Google/X ads, provider outreach",
+    "them-3": "Dolphin emergency measurements, NG API breakage, smart default job selection, USDT idle incentive"
+  },
+  "people_named_in_text": ["Ray", "Gus", "George", "Sergei", "Rustam", "Fish"],
+  "notes": "Gus and Rustam are named directly. them-1 answers 'who's next?' with no name anywhere; its topics (LMD, node IP changes) fit Mohammed, but nobody says the name, so it stays unknown. No echo or split seen."
+}

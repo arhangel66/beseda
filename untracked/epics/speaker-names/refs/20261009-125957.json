@@ -1,0 +1,32 @@
+{
+  "call_id": "20261009-125957",
+  "call_kind": "daily",
+  "language": "en",
+  "labels": {
+    "them-1": {"name": "Fish", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 24, "line": "me: Uh yes, fish.", "why": "Mikhail gives Fish the floor; them-1 speaks next (25: 'Can we make sure we do this before the weekend?')"},
+                 {"idx": 49, "line": "me: It's based on your fish uh um guidelines.", "why": "supporting only: Mikhail reports to Fish after them-1's question"}
+               ]},
+    "them-2": {"name": "Sergei", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 61, "line": "me: Uh Sergei, can you please come to", "why": "hand-over; them-2 answers and gives the next update (62-78)"},
+                 {"idx": 79, "line": "me: I I am sorry, Sergio, let me recheck.", "why": "addressed; them-2 answers (80: 'okay', 82: 'No, no, no, I'm not waiting')"}
+               ]},
+    "them-3": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []},
+    "them-4": {"name": "Gus", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 154, "line": "them-1: Gus, I saw there's multiple emails that came into our support email address", "why": "addressed; them-4 answers (157: 'Where did they go to?')"},
+                 {"idx": 137, "line": "them-3: Guess you want to go next.", "why": "hand-over 'Gus, you want to go next' (garbled 'guess'); them-4 gives the next update (138-153)"}
+               ]}
+  },
+  "speaking_order": ["them-1", "them-2", "them-3", "them-4"],
+  "topics_per_label": {
+    "them-1": "enforce delayed incentive before the weekend, unanswered provider emails in support inbox",
+    "them-2": "TMC pay bug fixed, 16 PRs reviewed and released, Lium CLI release to PyPI, alerting gateway",
+    "them-3": "approved Mikhail's incentive PRs, rewards calculator auth fix, merge queue not enabled, CodeQL disabled, infra tests, vacation next week",
+    "them-4": "20 SEO blogs prepared, Grafana dashboard for provider outreach, support inbox triage"
+  },
+  "people_named_in_text": ["Pixel", "Fish", "Sergei", "Gus", "Mohammed", "Mikhail", "Tim"],
+  "notes": "Fish, Sergei and Gus are clear. them-3 gives a full update but is never named: Gus says 'Muhammad, you did it with the first blog' (145), and them-3 does not react, so it stays unknown. Pixel is said to join later and never speaks."
+}

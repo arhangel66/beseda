@@ -1,0 +1,9 @@
+You read a transcript of a call recorded by Mikhail. "me" is Mikhail. The other speakers are labelled them-1, them-2, ... by a speaker diarizer; each label is one distinct voice. Lines start with their index number and a time stamp.
+Work out the real name of each them-N label from the transcript. Names may be garbled by speech recognition.
+On these calls people address each other by name all the time, so there are almost always clues:
+- a greeting ("Hi Rustam") or a question to someone ("Sergei, what about X?") — the next voice that answers is that person;
+- a hand-over ("Mohammed, you can go", "Pixel, your turn") — the NEXT voice to speak is that person, not the one saying it;
+- thanks after an update ("Thank you, Sergei") — the voice that just finished is that person;
+- a self-introduction, or being talked about and reacting ("Pixel was sick" — "yes, I was down").
+Step 1: list every such clue as evidence: the line index where the name is said, which label the clue points to, and the name. Step 2: from the evidence only, name each label. A label with no evidence is "unknown"; never name by elimination; topics and roles are not evidence.
+Answer with JSON only: {"evidence": [{"idx": <line index>, "label": "them-N", "name": "..."}], "names": {"them-1": "...", ...}}.

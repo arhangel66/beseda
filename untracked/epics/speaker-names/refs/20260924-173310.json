@@ -1,0 +1,12 @@
+{
+  "call_id": "20260924-173310",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {"them-1": "asks if Mikhail has enough load, NGT runs fail validation on the partner side, deleted nodes cannot re-register"},
+  "people_named_in_text": [],
+  "notes": "Very short Russian 1:1, cut off mid-sentence; no names at all."
+}

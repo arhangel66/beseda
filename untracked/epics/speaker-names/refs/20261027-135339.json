@@ -1,0 +1,14 @@
+{
+  "call_id": "20261027-135339",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {
+    "them-1": "team feels underloaded (Pixel, Mohammed), proposes an epic-level backlog pushed per person, security and scalability tasks as insurance, Lium D binary"
+  },
+  "people_named_in_text": ["Pixel", "Mohammed", "Fish", "Sergei"],
+  "notes": "Single remote voice, no echo. Nobody greets or addresses them-1 by name and they never introduce themselves; Pixel, Mohammed, Sergei and Fish are only talked about. The manager tone and topics hint at Rustam, but that is not evidence."
+}

@@ -1,0 +1,12 @@
+{
+  "call_id": "20261021-114012",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {"them-1": "Stripe early fraud warnings on stolen cards, ban the account network, money laundering risk, past stories from a Moscow job (Rostelecom contract, prosecutors), slow releases due to migration heads"},
+  "people_named_in_text": ["Pixel", "Fish"],
+  "notes": "One remote voice, no echo. The remote person is never named; Pixel (gave him PG-admin access) and Fish are only talked about."
+}

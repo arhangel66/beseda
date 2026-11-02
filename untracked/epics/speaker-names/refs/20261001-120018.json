@@ -1,0 +1,42 @@
+{
+  "call_id": "20261001-120018",
+  "call_kind": "daily",
+  "language": "en",
+  "labels": {
+    "them-1": {"name": "Pixel", "status": "named", "confidence": "medium",
+               "evidence": [
+                 {"idx": 21, "line": "me: ... I have prepared my changes uh to fix it, and now it's waiting for pixel review", "why": "talked about (22: 'if pixel still didn't do it'); them-1 reacts 'I'm just gonna go ahead and do it.' at 25 and me thanks at 27-28"},
+                 {"idx": 413, "line": "me: okay uh something else uh sorry pixel I think you uh started something and I uh interrupted you", "why": "weak: addressed at the end, no answer follows"}
+               ]},
+    "them-2": {"name": "Sergei", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 55, "line": "me: Uh maybe Sergei uh can you please continue.", "why": "hand-over; them-2 answers 'Uh yes and uh thank you Mikhail.' and gives its update from 56"},
+                 {"idx": 369, "line": "me: I would like to also add, uh Sergei, I uh saw today when I did some release that it that there also was uh five pull requests from you uh that was merged uh to master.", "why": "addressed; them-2 answers 'No no no all good.' at 377"}
+               ]},
+    "them-3": {"name": "Fish", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 113, "line": "me: Uh fish, I have a small question.", "why": "addressed about container creation time (114-118); them-3 answers 'Yeah, but also we have a fast deploy...' at 119"},
+                 {"idx": 362, "line": "me: I noticed that fish just exit, but maybe uh anyway, uh something else, guys.", "why": "supports: them-3 does not speak after this; its last line is 330"}
+               ]},
+    "them-4": {"name": "Mohammed", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 136, "line": "me: Muhammad, uh, can you please continue?", "why": "hand-over; them-4 answers 'Yeah, I can I can continue.' at 137"},
+                 {"idx": 226, "line": "me: I would like to add Muhammad.", "why": "me replies to them-4's point on multiple reviewers (209-225)"}
+               ]},
+    "them-5": {"name": "Mohammed", "status": "named", "confidence": "medium",
+               "evidence": [
+                 {"idx": 208, "line": "them-5: another annoying thing that I noticed with the agent was", "why": "fragment inside them-4's turn: 207 them-4 'I also', 209 them-4 continues 'some of the PRs were ... reassigned to Sergei'"},
+                 {"idx": 136, "line": "me: Muhammad, uh, can you please continue?", "why": "names them-4, of which them-5 is a split (205 also continues them-4's 204)"}
+               ]}
+  },
+  "speaking_order": ["them-2", "them-3", "them-4", "them-1"],
+  "topics_per_label": {
+    "them-1": "reviews Mikhail's PayTal fix, chargeback history, CI minutes and merge queue, reworking loop PRs and testing on staging, announcing shipped features, one-click model endpoints, PR context",
+    "them-2": "merged 14 PRs, new release tag rule blocks his releases, referral rewards vs chargebacks, release-after-merge with one hour monitoring, shared release tracker",
+    "them-3": "gave maintainer role on all repos, no chargebacks in six months, fast deploy flag still off, many flags never turned on, too many tests, templates hard to maintain",
+    "them-4": "loop not assigning him as reviewer, date-sensitive UI test broke merges, inspector flag merged and whitelisting now public, inspector dashboards broke, multiple reviewers per PR",
+    "them-5": "three fragments of them-4's speech"
+  },
+  "people_named_in_text": ["Mikhail", "Fish", "Mohammed", "Pixel", "Sergei"],
+  "notes": "Sergei, Fish and Mohammed are each addressed by name and answer. Pixel rests on one reaction: me says the PayTal fix waits for Pixel's review and them-1 says 'I'm just gonna go ahead and do it'; the later 'sorry pixel' gets no reply, so medium. them-5 is a split of Mohammed (3 short fragments). 'Vishue' at 103 is a garble of Fish, 'Argus' at 247 refers to them-2's point."
+}

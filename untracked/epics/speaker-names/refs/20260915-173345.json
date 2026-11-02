@@ -1,0 +1,31 @@
+{
+  "call_id": "20260915-173345",
+  "call_kind": "daily",
+  "language": "en",
+  "labels": {
+    "them-1": {"name": "Rustam", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 22, "line": "me: Um just um uh what do you think Rustam um", "why": "addressed; them-1 answers at 23"},
+                 {"idx": 68, "line": "me: Uh Rustam, can you please continue?", "why": "hand-over; them-1 gives its update from 69"}
+               ]},
+    "them-2": {"name": "Pixel", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 101, "line": "them-1: Pixel, do you want to be next?", "why": "hand-over; after me's short remark them-2 starts its update at 115"},
+                 {"idx": 161, "line": "me: I'm sorry, Pixel.", "why": "me asks about the '85' PR them-2 just mentioned at 152"},
+                 {"idx": 201, "line": "them-1: What is time for you, Picture right now?", "why": "addressed (garble of Pixel); them-2 answers 'most 4 p.m.' at 202"}
+               ]},
+    "them-3": {"name": "Mohammed", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 172, "line": "them-2: And Mohammed.", "why": "hand-over; them-3 starts its update at 173"},
+                 {"idx": 218, "line": "me: okay, unfortunately Mohammed we still uh don't hear you.", "why": "addressed; them-3 answers 'Do you hear me now?' at 220"}
+               ]}
+  },
+  "speaking_order": ["them-1", "them-2", "them-3"],
+  "topics_per_label": {
+    "them-1": "temporal dev environment token lacks rights, batch testing on staging, Fish's agent pruning tickets, Dalton income fix, key rotation script",
+    "them-2": "human actions backlog, Google workspace password, P3 mislabel of Discord support fix, PR 85 rebases, validator hotkey rotation, time zone and Pakistan trip",
+    "them-3": "automating review tracking with a bot hosted on AWS, LMD P0 reviews, guard rails on approvals; audio dropped out"
+  },
+  "people_named_in_text": ["Rustam", "Pixel", "Mohammed", "Fish", "Mikhail", "Voris"],
+  "notes": "Easy call: every label is handed the turn or addressed by name and answers. Mohammed's audio dropped mid-update (176-219) and the others talked meanwhile. 'Picture' at 201 is an ASR garble of Pixel."
+}

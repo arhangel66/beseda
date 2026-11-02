@@ -1,0 +1,38 @@
+{
+  "call_id": "20261012-125647",
+  "call_kind": "daily",
+  "language": "en",
+  "labels": {
+    "them-1": {"name": "Rustam", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 10, "line": "me: Actually, Rustam, I'm not sure how much you are over uh how much different tasks you already uh take.", "why": "me addresses Rustam; them-1 answers at 13 ('Just give it to me and tell me the priority of it')"},
+                 {"idx": 114, "line": "them-2: Um Rustom, we we made a bunch of changes on idle incentive that are important uh for you to understand.", "why": "Fish addresses Rustom (garble); them-1 answers at 123 ('Yeah, Michael already shared with me')"}
+               ]},
+    "them-2": {"name": "Fish", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 39, "line": "me: And uh uh fish, I'm I'm not sure uh the rule about the delayed incentive it's the same uh for uh spot nodes too.", "why": "me addresses Fish; them-2 answers at 41 ('spot notes should get paid out immediately')"},
+                 {"idx": 347, "line": "them-3: I mean, fish, we can even save some money even on the existing system by because right now every backup and everything is like standard S3 storage, which is the most expensive tier, and they have this intelligent hearing, which", "why": "Pixel addresses Fish; them-2 reacts at 351"},
+                 {"idx": 373, "line": "them-5: Uh I was thinking about running a Google Ads campaign for providers um fish.", "why": "addressed to Fish; them-2 answers at 377 ('Um yeah, good idea')"}
+               ]},
+    "them-3": {"name": "Pixel", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 110, "line": "them-1: Pixel.", "why": "Rustam hands over ('Who's next? Pixel.'); next update is them-3 at 111-113 ('Hi guys. from my side')"},
+                 {"idx": 333, "line": "them-4: Yeah, so I'll could create uh pars for distributed fix and uh pixel maybe maybe you have uh access to the AWS and delete everything.", "why": "Sergei addresses Pixel; them-3 answers at 334 ('Yeah, I can do that')"}
+               ]},
+    "them-4": {"name": "Sergei", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 152, "line": "them-3: Sergey, maybe you can go next.", "why": "hand-over; them-4 gives the next update at 153-154"}
+               ]},
+    "them-5": {"name": "unknown", "status": "unknown", "confidence": "medium", "evidence": []}
+  },
+  "speaking_order": ["them-2", "them-3", "them-1", "them-4", "them-5"],
+  "topics_per_label": {
+    "them-1": "security weak points, referral code delay, provider portal long transactions hotfix, wants more work",
+    "them-2": "no delay for spot node incentive, idle incentive business logic, volumes billing gap, Hippius backup idea, Google Ads budget",
+    "them-3": "delayed incentive accounting fix, provider earnings page, PR review queue, IAM/volume context, incremental backups, S3 intelligent tiering",
+    "them-4": "PR queue, API attack research, attacker accounts and undeleted S3 volumes, volume creation without balance check, large POST freeze",
+    "them-5": "SEO on pricing page, Google Ads provider campaign, campaign budgets and CPC bidding"
+  },
+  "people_named_in_text": ["Rustam", "Pixel", "Mohammed", "Sergei", "Fish", "Mikhail", "Luke", "Major", "Rob"],
+  "notes": "Rustam, Pixel, Sergei and Fish are each addressed by name and answer. them-5 (SEO, Google Ads, provider campaign; Gus-like topics) is never named: the hand-over at 368 reads 'Yes, maybe you next', which may be a garbled 'Gus' but is not a known garble, so unknown. No echo seen."
+}

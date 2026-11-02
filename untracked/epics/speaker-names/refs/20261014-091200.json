@@ -1,0 +1,12 @@
+{
+  "call_id": "20261014-091200",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {"them-1": "spot vs secure nodes and unpaid incentive when the default job did not start, talked Pixel about the announcement, NG on spot nodes, will investigate average/P99 start time, Fish agent's flood of PRs (mixed GPU)"},
+  "people_named_in_text": ["Fish", "Pixel"],
+  "notes": "Russian Discord 1:1; the remote person is never named. Pixel (28-29) and Fish (FIFA at 8 is a garble) are talked about in the third person, so neither is the speaker. No echo."
+}

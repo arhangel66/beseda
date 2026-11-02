@@ -1,0 +1,6 @@
+models/
+hyp/
+data/transcripts/
+*.log
+smoke-*.json
+__pycache__/

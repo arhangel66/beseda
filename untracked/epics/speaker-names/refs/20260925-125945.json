@@ -1,0 +1,30 @@
+{
+  "call_id": "20260925-125945",
+  "call_kind": "daily",
+  "language": "en",
+  "labels": {
+    "them-1": {"name": "Gus", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 7, "line": "me: Uh so Gus, if you will be able uh to confirm it, uh please um uh please let me know.", "why": "addressed about the GTM tag; them-1 answers 'Can you send me the link to to what you did?' at 9"}
+               ]},
+    "them-2": {"name": "Rustam", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 297, "line": "me: Uh Rustama, I know this is your last day before the weekend before your vacation.", "why": "addressed; them-2 answers 'Okay.' at 300, and them-2 said at 77 'I will be for the next two weeks on vacation'"},
+                 {"idx": 183, "line": "them-3: I think you requested that, uh Rustam.", "why": "about not scraping tempdev Prometheus metrics, which them-2's Loki/tempdev work is about (38-50)"}
+               ]},
+    "them-3": {"name": "Mohammed", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 272, "line": "them-2: Uh Mohammed, uh you are willing to mention something.", "why": "hand-over; them-3 answers 'Yeah, yeah.' and raises the validator hotkey PR at 273-276"},
+                 {"idx": 51, "line": "them-2: So uh I will send PR for review to you, Mohammed, and to you, Mikhail.", "why": "addressed; them-3 replies at 56-58 'would be interested in reviewing your PR as well'"},
+                 {"idx": 99, "line": "them-2: Uh Mohammed.", "why": "hand-over; after me's remark them-3 continues 'I will continue with my updates' at 152"}
+               ]}
+  },
+  "speaking_order": ["them-2", "them-1", "them-3"],
+  "topics_per_label": {
+    "them-1": "leaves early for a meeting with an Asian data center (5090s), hunting providers, will finish Rustam's outreach list",
+    "them-2": "launching dynamic default strategy, Loki as bottleneck for agents, closed loop's insecure onboarding speed PRs, two-week vacation, B300 default job crisis (NGC, Dolphin, Perl)",
+    "them-3": "small Loki limits PR, loop bot review rounds and context, speed test rollout (11 Gbps down), JWT/session rotation, info PRs, priorities feel chaotic, validator hotkey signature PR"
+  },
+  "people_named_in_text": ["Mikhail", "Pixel", "Gus", "Mohammed", "Rustam", "Fish"],
+  "notes": "Easy call: Gus is addressed first, Mohammed is handed the turn twice by them-2, Rustam is wished a good vacation. Pixel is absent. Segments 77-78 under them-2 start with Gus's words ('I'll go now... have a good weekend', 'can you tell fish agent...') glued to Rustam's vacation request, a boundary error rather than a mixed label."
+}

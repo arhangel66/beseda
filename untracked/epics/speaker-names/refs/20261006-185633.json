@@ -1,0 +1,12 @@
+{
+  "call_id": "20261006-185633",
+  "call_kind": "one-to-one",
+  "language": "en",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {"them-1": "idle incentive pool dilution by bad B300 nodes, recalculating 24 h scores vs redirecting the pool to burn, validator reading scores from the backend; will implement a simple version for review"},
+  "people_named_in_text": ["Fish"],
+  "notes": "Short Discord 1:1 in English about the idle incentive design; nobody says the remote person's name. Fish is only mentioned (84). No echo lines."
+}

@@ -1,0 +1,30 @@
+{
+  "call_id": "20260910-172925",
+  "call_kind": "daily",
+  "language": "mixed",
+  "labels": {
+    "them-1": {"name": "Rustam", "status": "named", "confidence": "medium",
+               "evidence": [
+                 {"idx": 60, "line": "me: And um uh Rustam told that he uh founding a lot of critical issues in um in the pull request and uh claimed that because of it his speed is not so fast as he expected.", "why": "me retells them-1's 29-49 (high-risk tickets, three times slower) to Fish as Rustam's words; them-1 picks it up and continues at 62"},
+                 {"idx": 132, "line": "me: Actually, yesterday we told with Rustam and Pixel uh that ideally it should be uh like outo deployment.", "why": "matches them-1's role in the previous day's auto-release talk; supporting only"}
+               ]},
+    "them-2": {"name": "Fish", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 50, "line": "them-1: Hey, hello fish.", "why": "greeting to a joining voice; them-2 answers 'Yes.' at 53 and asks 'Did I miss anything?' at 56"},
+                 {"idx": 202, "line": "me: Uh fish, let me check.", "why": "addressed with a question about the Vast host task; them-2 answers at 204"}
+               ]},
+    "them-3": {"name": "Mohammed", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 256, "line": "them-3: ... I think uh the identity center login uses the Mohammed atlim.io and I didn't get the access to Mohammed.lium.io mailbox.", "why": "them-3 names its own work email, Mohammed@lium.io"},
+                 {"idx": 236, "line": "them-3: Because I think fish you you migrated to Google Workspace and having like a SSO account.", "why": "them-3 addresses Fish, so it is not Fish; them-2 answers at 239"}
+               ]}
+  },
+  "speaking_order": ["them-1", "them-2", "them-3"],
+  "topics_per_label": {
+    "them-1": "Russian chat with me, high-risk tickets tested on staging, conflicting dev-environment PRs, Sentry tickets, chained PRs, Dolphin miner release, long-term commitments",
+    "them-2": "why approved PRs aren't deployed, humans for business decisions, Vast host Discord IDs, AWS creds via bot, against banning big providers, no long-term contracts, docs PRs into platform",
+    "them-3": "staging broken, no AWS access after SSO move, Redis fixed by bot, CI auto-review idea, secret rotation, malicious provider exec into container"
+  },
+  "people_named_in_text": ["Rustam", "Fish", "Mohammed", "Pixel", "Mikhail"],
+  "notes": "Opens in Russian between me and them-1, then English. Rustam rests on me retelling them-1's words under his name (clue 6), backed by the Russian and Dolphin topics; Fish and Mohammed are direct. Odd: me says 'Вот, Мухаммад' at 13 and them-1 answers in Russian at 14, which does not fit Mohammed; read as me noticing Mohammed join, not addressing them-1."
+}

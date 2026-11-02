@@ -1,0 +1,24 @@
+{
+  "call_id": "20260911-172926",
+  "call_kind": "daily",
+  "language": "mixed",
+  "labels": {
+    "them-1": {"name": "Rustam", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 25, "line": "me: Thank you to notice it, Rustam.", "why": "thanks right after them-1 reported the unarchived old repos (3-15)"},
+                 {"idx": 179, "line": "me: Uh I will just notice Rustam, if you are using my BB automation, uh my BB PR uh automated script, ...", "why": "addressed; them-1 answers at 183-186 about its own changes to the script"}
+               ]},
+    "them-2": {"name": "Fish", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 214, "line": "them-1: Again, that's important, Fish.", "why": "them-1 asks Fish to archive the old repos (215); them-2 answers 'Yeah, I can do it right now.' at 231"},
+                 {"idx": 159, "line": "them-1: It's uh congrats to you, Fish.", "why": "praise for the bot right after them-2 described its agent reviewing the platform unprompted (150-154)"}
+               ]}
+  },
+  "speaking_order": ["them-1", "them-2"],
+  "topics_per_label": {
+    "them-1": "old Lium repos not archived and Mohammed's merge there, dev environment PR waiting on Fish, Fishbot found Dolphin drop and false penalties, using my BB script",
+    "them-2": "Vast outreach is like Google Ads, not worried about the company, anonymity, own GPUs for private models, tag me as reviewer, will archive repos"
+  },
+  "people_named_in_text": ["Rustam", "Fish", "Mohammed", "Pixel", "Mikhail"],
+  "notes": "Small daily: Pixel and Mohammed are absent (31). Both labels are named directly. Opens with a short Russian greeting from them-1 before English."
+}

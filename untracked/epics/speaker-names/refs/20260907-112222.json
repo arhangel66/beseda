@@ -1,0 +1,16 @@
+{
+  "call_id": "20260907-112222",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "Rustam", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 181, "line": "me: извини, извини, пожалуйста, Рустам.", "why": "me addresses the only remote voice by name mid-talk; them-1 answers at 187 'Давай, беги, успехов, добра.'"},
+                 {"idx": 47, "line": "them-1: Может быть, нам Мухаммеда еще позвать на созвон, как считаешь?", "why": "them-1 speaks of Mohammed in third person, so it is not Mohammed"}
+               ]}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {"them-1": "Fish's bot flooding PRs, 33 reviews on him, won't release untested code, dev environment and end-to-end tests, how to work with the agent"},
+  "people_named_in_text": ["Rustam", "Fish", "Mohammed"],
+  "notes": "Russian 1:1 about Fish's agent loop and review load. Name rests on me addressing them-1 as Рустам at 181 with a direct reply at 187. No echo."
+}

@@ -1,0 +1,17 @@
+{
+  "call_id": "20261019-134526",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "Rustam", "status": "named", "confidence": "medium",
+               "evidence": [
+                 {"idx": 76, "line": "them-1: Ты просто главное не забудь, что типа, Рустам, ну у меня какая-то получается.", "why": "them-1 tells Mikhail what to say to him if the task stalls: 'Rustam, it is not working for me'"},
+                 {"idx": 78, "line": "them-1: Ну, перехватывай, пожалуйста.", "why": "continues the quoted request: Rustam is the one who would take the task over, i.e. the speaker"},
+                 {"idx": 80, "line": "them-1: Ну, я себе какую-то напоминалку сделаю, буду записи вести, буду прям дрючить.", "why": "the speaker is the one controlling delegation, consistent with being the addressee 'Рустам'"}
+               ]}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {"them-1": "delegation and control, DRI (directly responsible individual) explained, made Sergei the DRI, proactive technical tasks"},
+  "people_named_in_text": ["Sergei", "Rustam"],
+  "notes": "One remote voice, no echo. The name comes from the speaker referring to himself in quoted speech ('just tell me: Rustam, it is not working, take it over'), not from a greeting, hence medium. 'Серега, возьмешь' (13) is him quoting his own words to Sergei, so he is not Sergei."
+}

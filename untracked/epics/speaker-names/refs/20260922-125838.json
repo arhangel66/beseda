@@ -1,0 +1,34 @@
+{
+  "call_id": "20260922-125838",
+  "call_kind": "daily",
+  "language": "mixed",
+  "labels": {
+    "them-1": {"name": "Rustam", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 471, "line": "them-2: By the way, Rust, you asked me for the link about the B300 PC version.", "why": "addressed ('Rust'); them-1 answers 'Oh my gosh. I have so many PRs' at 474"},
+                 {"idx": 57, "line": "me: uh review uh the all of the pull requests uh related to epic, and I'm pushing uh the epic related to the dynamic prices to Rustan.", "why": "talked about; them-1 then says at 92-94 it takes the dynamic base prices epic"},
+                 {"idx": 509, "line": "them-1: Uh Michael, I will call you off to stand up in five minutes, okay.", "why": "supports: them-1 spoke Russian 1:1 with Mikhail at the start (0-15), like Rustam does"}
+               ]},
+    "them-2": {"name": "Fish", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 177, "line": "them-3: And for fish from your side, I think we will need to do like uh hotkey swap, like to get the new critics.", "why": "addressed; them-2 answers 'The hotkey swap for the validator? ... Yeah, I'll do that.' at 180-185"},
+                 {"idx": 316, "line": "me: And I think we should have uh some uh legal, some standard way uh to communicate with providers uh What do you think, Fish?", "why": "addressed; them-2 answers at 321-335 ('what's the goal?')"},
+                 {"idx": 226, "line": "them-1: So probably that's the reason Fisher I'm trying to highlight that probably we need to make some kind of automatization ...", "why": "addressed (garble 'Fisher'); them-2 answers about short videos at 233"}
+               ]},
+    "them-3": {"name": "unknown", "status": "unknown", "confidence": "medium", "evidence": []},
+    "them-4": {"name": "Gus", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 395, "line": "them-4: You can call me Gus.", "why": "self-introduction after them-1 asks his name at 393-394"},
+                 {"idx": 396, "line": "them-1: Okay, Gus.", "why": "them-1 then asks him to share his part; them-4 gives the SEO/ads update at 400"}
+               ]}
+  },
+  "speaking_order": ["them-1", "them-2", "them-3", "them-4"],
+  "topics_per_label": {
+    "them-1": "Russian talk with Mikhail on the idle incentive PR comment, dynamic default job strategy PR, dynamic base prices epic, slowing down on high-risk PRs, brand recognition / short videos, two-week vacation",
+    "them-2": "loop review backlog bug fixed, hotkey swap for validator, short videos are vague, provider emails and tickets, B300 approval, API keys and GPU price watchers, Google auth",
+    "them-3": "inspector findings on Docker socket via SSH, small releases, validator and central miner hotkey rotation plan, DB credential rotation with a new role",
+    "them-4": "SEO stack, guest posts for domain authority, GTM by Pixel, Google ads, provider outreach on Discord and Reddit"
+  },
+  "people_named_in_text": ["Mikhail", "Rustam", "Fish", "Gus", "Pixel", "Mohammed", "Hanet"],
+  "notes": "Fish and Gus are clear; Rustam by 'Rust' at 471 and the dynamic prices epic. them-3 (inspector, hotkey and DB credential rotation) is never named: me's 'Мухаммад.' at 19 is followed by them-1, not them-3, and them-1 calls them-3 'Hanet' at 130, which is no known garble, so it stays unknown although the topics fit Mohammed. them-1 switches from Russian to English mid-thought at 17; no sign of a second voice there."
+}

@@ -1,0 +1,14 @@
+{
+  "call_id": "20261102-133615",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {
+    "them-1": "USDT withdrawal candidates (two miners), sees Mikhail as tech lead, no big epic after USDT withdrawals, Fish wants own inference and higher ROI, Nebius Token Factory and OpenRouter as next direction"
+  },
+  "people_named_in_text": ["Fish"],
+  "notes": "Single remote voice, no echo. Only Fish is mentioned; them-1 is never named. 'и кейт' at 8 is Mikhail's line and reads as an ASR fragment, not a name."
+}

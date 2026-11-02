@@ -1,0 +1,29 @@
+{
+  "call_id": "20260909-172927",
+  "call_kind": "daily",
+  "language": "en",
+  "labels": {
+    "them-1": {"name": "Rustam", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 35, "line": "me: Uh Rustam, can you please continue?", "why": "hand-over; them-1 starts its update at 36"},
+                 {"idx": 342, "line": "me: Maybe Rustam, uh, do you have some experience?", "why": "addressed; them-1 answers at 345 about small PRs and continuous delivery"}
+               ]},
+    "them-2": {"name": "Pixel", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 50, "line": "them-1: Pixel, do you want to be next?", "why": "hand-over; them-2 starts its update at 51"}
+               ]},
+    "them-3": {"name": "Mohammed", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 113, "line": "them-2: Mohammed.", "why": "hand-over at the end of them-2's update; them-3 starts at 114"},
+                 {"idx": 283, "line": "them-1: Mohammed, it's you mostly.", "why": "addressed; them-3 answers at 285 about taking back yesterday's approvals"}
+               ]}
+  },
+  "speaking_order": ["them-1", "them-2", "them-3"],
+  "topics_per_label": {
+    "them-1": "platform PRs released, Lium.io PRs merged without e2e, ~70 reviews, combined 10 PRs on staging, continuous delivery advice, hallucinating bot",
+    "them-2": "deeper look at loop PRs, events foundation PR, namespace CI usage and Docker builds, CVM PR reviewer, Sentry DSN incident, PRs everywhere",
+    "them-3": "rolled back bot approvals, PR tickets with no origin, useless Pulumi tests, e2e tests PR, auto-release on merge, GitHub merge queue"
+  },
+  "people_named_in_text": ["Mohammed", "Pixel", "Rustam", "Fish", "Mikhail"],
+  "notes": "Easy call: a clean hand-over chain me -> Rustam -> Pixel -> Mohammed, each confirmed by a second direct address. No echo, no split."
+}

@@ -1,0 +1,32 @@
+{
+  "call_id": "20260914-172915",
+  "call_kind": "daily",
+  "language": "en",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "medium", "evidence": []},
+    "them-2": {"name": "Mohammed", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 139, "line": "me: Anyway, um Muhammad, you can continue.", "why": "hand-over; them-2 starts its update at 140"},
+                 {"idx": 407, "line": "them-1: One small last thing, Mohammed.", "why": "them-1 asks Mohammed to take an LMD ticket; them-2 answers 'I can take it over' at 413"}
+               ]},
+    "them-3": {"name": "Pixel", "status": "named", "confidence": "medium",
+               "evidence": [
+                 {"idx": 349, "line": "me: Um because uh as I as I know Pixel is in Berlin, yes", "why": "talked about; them-3 reacts at 350-353 about its own time zone ('I usually start working after twelve')"},
+                 {"idx": 347, "line": "me: But for pixel it will be I'm not sure 7 a.m.", "why": "them-3 answers 'Yeah, I' at 348"}
+               ]},
+    "them-4": {"name": "Fish", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 173, "line": "them-2: So yeah, I I I added you uh I Basically the the bot uh is going to ask for your approval fish.", "why": "them-2 addresses Fish; them-4 answers at 176 questioning the approach"},
+                 {"idx": 358, "line": "me: ... we will try to fit uh for fish uh time zone uh to be able to have a call with together.", "why": "talked about; them-4 reacts at 359-361 'I can just work async'"}
+               ]}
+  },
+  "speaking_order": ["them-1", "them-3", "them-2", "them-4"],
+  "topics_per_label": {
+    "them-1": "BB automation burning limits, bot comments tagging no one, temporal dev environments, Sentry frontend PRs, LMD ticket hand-off, closes the call",
+    "them-2": "infra PR reviews, Pulumi preview in CI, inspector findings, providers exec-ing into rental containers, support-ticket warnings",
+    "them-3": "P0 backlog, new review workflow, secret rotation, Grafana password, PR 85, provider landing page, monorepo public mirror",
+    "them-4": "questions the bot-message approach, asks others to run their own agents, early call time, monorepo open source"
+  },
+  "people_named_in_text": ["Fish", "Mohammed", "Pixel", "Mikhail"],
+  "notes": "Mohammed is clear from the hand-over and the LMD ticket exchange; Fish answers right after being addressed and reacts to his time zone talk. Pixel rests on reacting to 'Pixel is in Berlin'. them-1 behaves like the person who runs the call (likely Rustam) but nobody names it; 346 'you rush time' may be a garble of Rustam, too weak to cite."
+}

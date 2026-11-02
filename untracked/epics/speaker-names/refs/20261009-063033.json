@@ -1,0 +1,12 @@
+{
+  "call_id": "20261009-063033",
+  "call_kind": "other",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {"them-1": "personal investment portfolio review: share of stocks near 70%, crypto, gold, US vs other developed markets, EUR/USD trends, answers chat questions"},
+  "people_named_in_text": ["Дмитрий"],
+  "notes": "Not a call: no me lines and no app, it is a recorded Russian webinar/stream about a personal portfolio. The speaker never names himself; Дмитрий (48) is a viewer asking in chat, not the speaker."
+}

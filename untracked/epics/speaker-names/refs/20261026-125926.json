@@ -1,0 +1,38 @@
+{
+  "call_id": "20261026-125926",
+  "call_kind": "daily",
+  "language": "mixed",
+  "labels": {
+    "them-1": {"name": "Rustam", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 147, "line": "me: Okay uh thank you very much guys uh I think Rustam can you please come on", "why": "hand-over; them-1 answers at 148 and gives the update"},
+                 {"idx": 275, "line": "them-4: That uh epic uh you rustam was reviewing with Michael together.", "why": "them-4 addresses Rustam right after them-1 asked it to be next (266)"}
+               ]},
+    "them-2": {"name": "Mohammed", "status": "named", "confidence": "medium",
+               "evidence": [
+                 {"idx": 18, "line": "me: Hello Muhammad.", "why": "greeting; them-2 is the new voice that greets back at 25"},
+                 {"idx": 3, "line": "me: He was missed two weeks, two weeks.", "why": "me says Muhammad missed two weeks (vacation, then personal stuff, 5)"},
+                 {"idx": 31, "line": "them-2: Yeah, I I I just had to take care of some family family issues, family matters.", "why": "them-2 reacts to being asked about the same absence (29); repeats it at 327 'two-week long leave'"}
+               ]},
+    "them-3": {"name": "Pixel", "status": "named", "confidence": "medium",
+               "evidence": [
+                 {"idx": 17, "line": "me: I just see that uh Pixel uh wrote a minute ago that he is trying to fix his microphone and he will be he will join us.", "why": "Pixel is about to join; them-3 is the next new voice (66)"},
+                 {"idx": 332, "line": "them-2: In terms of like the infrastructure PR specifically regarding the uh node pool changes pixel, I was thinking we could maybe pair it with the uh EKS uh EKS cluster version update, just because we need to replace all of", "why": "Mohammed addresses Pixel about the infra/node PRs that them-3 just mentioned (306)"}
+               ]},
+    "them-4": {"name": "Sergei", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 266, "line": "them-1: Um Sergio, do you want to be next?", "why": "hand-over; them-4 answers 'Yeah, yeah.' at 267 and gives the update"},
+                 {"idx": 234, "line": "them-1: And part of the problem, Sergei, is that ideally you you will be required to test both for a seven IB cluster because you ideally need to check that both of them are not broken.", "why": "addressed; them-4 answers 'Yeah, I got it.' at 235"},
+                 {"idx": 101, "line": "me: And uh Sergei, actually I really like your flow.", "why": "addressed about his review flow; them-4 answers at 110 and 114"}
+               ]}
+  },
+  "speaking_order": ["them-1", "them-4", "them-3", "them-2"],
+  "topics_per_label": {
+    "them-1": "USDT payouts for hotkey providers, NG ROI drop and model selection, broken IB clusters, starting bonus abuse",
+    "them-2": "back after two-week leave, infra PRs, node pool change with EKS update, Carpenter, renter-side growth ideas",
+    "them-3": "weekly changelog digest, provider referral program live, backup queue and OOM fixes, infra/node PRs",
+    "them-4": "46 PRs waiting, provider portal running on two pods, TMC indexer, staggered starting bonus suggestion"
+  },
+  "people_named_in_text": ["Pixel", "Mohammed", "Sergei", "Rustam", "Fish", "Mikhail"],
+  "notes": "Rustam and Sergei are clear from hand-overs. Mohammed rests on a greeting plus reacting to his two-week absence. Pixel rests on joining late after the microphone note and on Mohammed addressing Pixel about the infra PRs them-3 had just mentioned; never answers to the name directly."
+}

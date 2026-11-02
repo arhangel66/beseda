@@ -1,0 +1,36 @@
+{
+  "call_id": "20261019-125920",
+  "call_kind": "daily",
+  "language": "en",
+  "labels": {
+    "them-1": {"name": "Gus", "status": "named", "confidence": "medium",
+               "evidence": [
+                 {"idx": 355, "line": "me: Oh, sorry, uh, gas.", "why": "me gives the turn to Gus (garble 'gas'); them-1 answers at 356 ('Yeah, no, I guess my only one was kind of for for fish.')"}
+               ]},
+    "them-2": {"name": "Sergei", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 193, "line": "them-4: So I I I I agree with you Sergei.", "why": "Pixel replies to them-2's point about Opus writing bad docs (183-189)"},
+                 {"idx": 286, "line": "me: First one, uh, Sergei, can you please tell me uh about which four X six error you are talking?", "why": "addressed; them-2 answers at 288 ('the web socket connection uh is break breaking')"},
+                 {"idx": 305, "line": "me: Uh Sergei, if you have time and if you have uh possibility, you can try to uh investigate and suggest uh the way uh how you can uh how you could do it, or you can wait and and I", "why": "addressed; them-2 answers at 307"}
+               ]},
+    "them-3": {"name": "Rustam", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 126, "line": "them-4: Thanks, Rustam.", "why": "thanks right after them-3's update (51-124)"},
+                 {"idx": 331, "line": "me: I think there is some is talking, uh Rustam is very like the idea that uh on Epic uh there is one human is responsible for this epic.", "why": "talked about; them-3 reacts at 333 and 348 ('you always need some kind of DRI person')"}
+               ]},
+    "them-4": {"name": "Pixel", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 124, "line": "them-3: Uh Pixel, do you want to be next?", "why": "hand-over; them-4 gives the next update at 125-129"},
+                 {"idx": 183, "line": "them-2: Pixel, I wanted to mention maybe uh it worth uh change the loop uh bot.", "why": "addressed; them-4 answers at 190 ('Even GPT is much better than opus.')"}
+               ]}
+  },
+  "speaking_order": ["them-3", "them-4", "them-2", "them-1"],
+  "topics_per_label": {
+    "them-1": "Vast provider with 40 5090s put off by switching effort, loyalty bonus idea for providers from Vast",
+    "them-2": "YouTube digest flow, Opus writes bad docs, 10-11 minor PRs, hostname DNS check message, Zapier CLI integration, single backend pod and websocket drops",
+    "them-3": "withdrawals working, Gmail login blockers, NG earnings and container cache workaround, PR review skills grouped by epic, need a DRI per epic",
+    "them-4": "hostname node and provider earnings announced, ~40 PRs merged, SEO and blog posts, WAF rules, docs rewrite AI slop, scoped API keys flag"
+  },
+  "people_named_in_text": ["Mohammed", "Pixel", "Fish", "Rustam", "Gus", "Sergei", "Mikhail"],
+  "notes": "Easy call: Rustam, Pixel and Sergei are each named by thanks, hand-over or direct address. Gus is named only by the garble 'gas' at 355 before them-1 speaks, so medium. Fish and Mohammed are only mentioned, not on the call."
+}

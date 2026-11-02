@@ -1,0 +1,14 @@
+{
+  "call_id": "20260916-143349",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {
+    "them-1": "Fish's top priority on provider acquisition and B300, takes the soft limit / idle incentive change, ~250 unassigned PRs from Fish agent, soft vs hard limit questions"
+  },
+  "people_named_in_text": ["Fish"],
+  "notes": "No name for them-1. Fish is mentioned often (9, 21, 28, 207; 'фильм' at 8 looks like a Fish garble). 'Федота' (59) and 'Слава' (183, likely 'славно') read as garbles, not people; English lines 46 and 48 are ASR noise. No echo."
+}

@@ -1,0 +1,12 @@
+{
+  "call_id": "20260924-173649",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {"them-1": "dynamic strategy selection (+$700/day), automatic probes enabled today, soft/hard limit increase PR, market prices rising, comparing output stats with Mikhail, expensive agent flow"},
+  "people_named_in_text": ["Mikhail", "Mohammed", "Pixel", "Fish"],
+  "notes": "Russian 1:1 continuing the 173310 call; them-1 says 'второй день я Мишу обгоняю' (123), which names Mikhail, not the speaker. '85 FIFA просил' is likely a Fish garble."
+}

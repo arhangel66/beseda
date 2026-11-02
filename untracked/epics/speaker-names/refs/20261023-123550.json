@@ -1,0 +1,15 @@
+{
+  "call_id": "20261023-123550",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "Rustam", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 429, "line": "me: Хорошо, Рустам, спасибо.", "why": "thanks by name to the only remote voice right after its explanation (412-427); them-1 answers 'Давай, давай' at 433"}
+               ]}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {"them-1": "Kimi K3 start split into three steps, RAM as write buffer, cache 30% of free storage (PR 18-22), stop the download instead of limiting RAM, ~50 PRs a day KPI, GLM and NG edge cases"},
+  "people_named_in_text": ["Rustam", "RAF"],
+  "notes": "Russian 1:1 before the daily ('five minutes to the call', 430). One remote voice, named by Mikhail's thanks at 429. RAF is a provider mentioned by Mikhail. No echo."
+}

@@ -1,0 +1,12 @@
+{
+  "call_id": "20261023-133703",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {"them-1": "NVLink vs RoCE/InfiniBand clusters, he did not build NVLink and asks who knows it; praises Gus for taking marketing and customer support"},
+  "people_named_in_text": ["Gus"],
+  "notes": "Short Russian 1:1 about NVLink. Gus is talked about in third person by both (39, 83, 96), so them-1 is not Gus, but nobody names them-1. No echo."
+}

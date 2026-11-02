@@ -1,0 +1,12 @@
+{
+  "call_id": "20260923-101613",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {"them-1": "Opus 5.5 benchmarks, guerrilla marketing via LLM data poisoning with Fish, PR 39 review, docs review rules, Vast customer list split, Redis incident and observability epic, incident severity grades, bot wake-up protocol"},
+  "people_named_in_text": ["Fish", "Gus", "Mohammed", "Pixel", "Mikhail"],
+  "notes": "Russian 1:1; nobody uses them-1's name. Gus, Mohammed and Pixel are talked about in third person, Fish as an absent partner. Line 44 'Дима канал' looks like a garble of the Lium channel (cf. 54 'Ливым канал'), not a person."
+}

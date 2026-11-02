@@ -1,0 +1,12 @@
+{
+  "call_id": "20260907-113243",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {"them-1": "taxi dropped her at departures instead of arrivals, ran in the rain, asks to lower the driver's rating"},
+  "people_named_in_text": [],
+  "notes": "Short personal call, not work: a woman (feminine verb forms 'сказала', 'бежала') arriving at an airport. Nobody is named; not a team member from the roster."
+}

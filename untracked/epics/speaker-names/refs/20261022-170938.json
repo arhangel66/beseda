@@ -1,0 +1,12 @@
+{
+  "call_id": "20261022-170938",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {"them-1": "Kimi K3 load takes up to 120 min, keep a model cache on node storage, 20% vs 30% storage limit covers 19 or 25 of 32 B300 nodes"},
+  "people_named_in_text": ["Fish"],
+  "notes": "Russian 1:1 started by them-1 asking for advice on cache size. Fish is mentioned (52-63); them-1 is never named. No echo."
+}

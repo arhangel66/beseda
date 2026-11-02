@@ -1,0 +1,36 @@
+{
+  "call_id": "20260918-125857",
+  "call_kind": "daily",
+  "language": "mixed",
+  "labels": {
+    "them-1": {"name": "Rustam", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 72, "line": "me: Uh Rustan, can you please continue?", "why": "hand-over (garble of Rustam); them-1 gives its update from 73"},
+                 {"idx": 403, "line": "them-4: No, but now they change it, Rustan.", "why": "addressed about the licence point them-1 made at 389-402; them-1 answers at 406"}
+               ]},
+    "them-2": {"name": "Mohammed", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 30, "line": "me: Uh Muhammad, I will explain what we are talking.", "why": "addressed with the PR assignment rule; them-2 answers 'I was wondering the same thing' at 33-35"}
+               ]},
+    "them-3": {"name": "Fish", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 146, "line": "me: Uh fish, you you told that um you have these emails in the support uh Lium IO.", "why": "addressed; them-3 answers 'Yeah, I'll give everyone access. I'm already in bed though' at 151-152"},
+                 {"idx": 47, "line": "me: ... and oh fish hello.", "why": "me greets Fish joining in the middle of his night; them-3 is the voice that later brings up the support mailbox (76)"},
+                 {"idx": 193, "line": "them-4: And I guess FishU got kicked out and Michael, your account were also kicked out, probably.", "why": "talked about; them-3 reacts 'Why?' and 'As long as you're not spamming people' at 196-202"}
+               ]},
+    "them-4": {"name": "Pixel", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 432, "line": "them-1: Uh Pixel, do you wanna tell us something?", "why": "hand-over; them-4 gives its update from 433"},
+                 {"idx": 158, "line": "me: I'm just rechecking your idea, uh, Pixel.", "why": "me restates the ticket-tool idea them-4 gave at 155-157; them-4 confirms 'Yeah' at 160"}
+               ]}
+  },
+  "speaking_order": ["them-1", "them-3", "them-4", "them-2"],
+  "topics_per_label": {
+    "them-1": "Fish's priority on strong GPU providers, Calendly and sales calls, FishBot PR top-up to 50, release-by-risk pipeline, temp dev issues, Claude licence rules",
+    "them-2": "no PRs assigned, LMD plan and Rust binary, inspector false positives, default template testing, hotkey rotation, open code with DeepSeek, AWS/kubectl access",
+    "them-3": "unanswered support@ mailbox with big GPU providers, dislikes calls, will give everyone access tomorrow",
+    "them-4": "email-to-ticket tool, Vast DM complaints, secret rotation downtime, latency alert PR, cookie banner and ads, WAF rules, roles, message from Voris"
+  },
+  "people_named_in_text": ["Rustam", "Mohammed", "Pixel", "Fish", "Mikhail", "Voris"],
+  "notes": "Fish joined at night and spoke only in the support-mail discussion. All four labels are addressed or handed the turn by name and answer. The first 20 lines are me speaking Russian before the call starts; the rest is English."
+}

@@ -1,0 +1,12 @@
+{
+  "call_id": "20261019-120955",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {"them-1": "email login gives a shared miner hotkey, penalty/ban logic breaks, penalty PRs routed to Mikhail by a fishbot rule, offers to take them over if Mikhail stalls"},
+  "people_named_in_text": [],
+  "notes": "One remote voice, no echo. Nobody says a person's name; only 'фишбота' (the bot) is mentioned."
+}

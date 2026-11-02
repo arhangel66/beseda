@@ -1,0 +1,35 @@
+{
+  "call_id": "20260921-125925",
+  "call_kind": "daily",
+  "language": "en",
+  "labels": {
+    "them-1": {"name": "Rustam", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 45, "line": "me: Uh Rustam, can you please continue?", "why": "hand-over; them-1 gives its update from 46"},
+                 {"idx": 77, "line": "me: I'm sorry, yes, Rustam, I would like to highlight uh while Fish is here.", "why": "addressed right after them-1 finished; them-1 answers 'Uh-huh' at 78"}
+               ]},
+    "them-2": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []},
+    "them-3": {"name": "Fish", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 77, "line": "me: I'm sorry, yes, Rustam, I would like to highlight uh while Fish is here.", "why": "me raises a question for Fish (79-84); them-3 answers with the priority 'figure out how to get more providers' at 85"},
+                 {"idx": 270, "line": "them-4: I think but Fish probably you told it to give some Liam credit, so that's fine ...", "why": "addressed; them-3 answers 'It's smart because it actually it gets us more users too' at 275 and 'for now I'm just doing credits' at 289"},
+                 {"idx": 159, "line": "them-4: ... I think uh Fisher probably told you to post updates on announcement channel ...", "why": "talked about; them-3 reacts 'then I just told my bot to do it because nobody else was doing it' at 168-169"}
+               ]},
+    "them-4": {"name": "Pixel", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 150, "line": "them-1: Pixel do you want to continue", "why": "hand-over; them-4 answers 'yeah yeah sure' at 151 and gives its update"},
+                 {"idx": 191, "line": "me: Pixel, if pixel, if you want, we can discuss it separately.", "why": "addressed about the pre-pull question them-4 just asked; them-4 answers 'Okay' at 194"}
+               ]},
+    "them-5": {"name": "unknown", "status": "unknown", "confidence": "medium", "evidence": []}
+  },
+  "speaking_order": ["them-1", "them-3", "them-4", "them-5"],
+  "topics_per_label": {
+    "them-1": "agent found its old PR, factory-worker reviews, dropped the expensive BB flow for local skills, temp dev still imperfect, P90 rent and slow SSD nodes",
+    "them-2": "one stray Russian line, no content",
+    "them-3": "spend spare time on getting more B300/B200/H200 providers, shared payout pool and crypto payouts blocked on him, announcements bot, Lium credits for bug reporters",
+    "them-4": "requested changes on 90% of PRs, database secret rotation, announcement channel noise, pre-pulling two templates, anchor program docs, read public docs",
+    "them-5": "default template with more packages tested on staging, inspector false positives, moved automation to BB, 8000-line LMD PR, human actions"
+  },
+  "people_named_in_text": ["Fish", "Pixel", "Rustam", "Gus", "Mikhail"],
+  "notes": "Rustam, Pixel and Fish are each addressed or handed the turn by name and answer. them-5 gives a full update last (default template, inspector, LMD) that sounds like Mohammed, but nobody names it, so it stays unknown. them-2 is a single stray Russian line at 20, not a repeat of me."
+}

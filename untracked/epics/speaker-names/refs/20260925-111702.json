@@ -1,0 +1,12 @@
+{
+  "call_id": "20260925-111702",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {"them-1": "Google Authenticator code for a shared account, offers the Lium QR code"},
+  "people_named_in_text": ["Fish"],
+  "notes": "One-minute Russian call about a 2FA code; greeting is a bare 'Здравствуй' with no name."
+}

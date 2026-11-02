@@ -1,0 +1,29 @@
+{
+  "call_id": "20261030-125922",
+  "call_kind": "daily",
+  "language": "en",
+  "labels": {
+    "them-1": {"name": "Mohammed", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 176, "line": "them-3: Um yeah, Mohammed, probably you should be next.", "why": "hand-over by them-3; them-1 gives the next update at 177"},
+                 {"idx": 251, "line": "me: Uh, Muhammad, I I'm sorry, I I I will just check, maybe maybe you told about it, but I miss uh there was uh some epic uh related to the change IP address for the note or something like this.", "why": "Mikhail addresses Mohammed; them-1 answers at 256-262"}
+               ]},
+    "them-2": {"name": "Gus", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 27, "line": "me: Uh and uh Gus, I saw I was invited from you uh to the call today uh in uh six hours after after this as I get.", "why": "Mikhail addresses Gus about the invite; them-2 answers at 30 'I didn't invite you'"}
+               ]},
+    "them-3": {"name": "Rustam", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 23, "line": "me: Uh but um anyway, I I think Rustam will say uh uh anyway our uh situation became uh much better, uh mostly because of Rustam efforts.", "why": "Mikhail passes to Rustam; them-3 starts at 36 'my situation is like this'"},
+                 {"idx": 70, "line": "them-3: And that's the reason why I was calling for help uh for Michael because I had", "why": "matches Mikhail at 17 saying he helped Rustam with default job earnings"}
+               ]}
+  },
+  "speaking_order": ["them-3", "them-1", "them-2"],
+  "topics_per_label": {
+    "them-1": "P0 prioritization, LMD single binary, inspector cleanup, node IP edit missing for self-hosted miners",
+    "them-2": "did not send the invite, NG/subnet 28 cheaper credits, X ads, website listings, provider outreach",
+    "them-3": "Dolphin probes fix, NG breakage, OTP for provider portal, Kimi for UI, USDT for own-hotkey providers, Fish agent P0s"
+  },
+  "people_named_in_text": ["Mohammed", "Pixel", "Gus", "Rustam", "Fish"],
+  "notes": "Easy call: every voice is named by an address or hand-over. Pixel is absent ('I don't see Pixel here'). No echo or split seen."
+}

@@ -1,0 +1,12 @@
+{
+  "call_id": "20260923-125419",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {"them-1": "soft limit vs Vast prices, asks for it in writing, Postgres near-death, idle incentive should depend on GPU scarcity, standup reminder"},
+  "people_named_in_text": ["Mikhail"],
+  "notes": "Short Russian 1:1 cut in mid-topic; them-1 calls Mikhail 'Миша' (90) but is never named. Ends with both leaving for the standup."
+}

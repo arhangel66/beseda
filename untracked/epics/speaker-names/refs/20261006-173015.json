@@ -1,0 +1,16 @@
+{
+  "call_id": "20261006-173015",
+  "call_kind": "one-to-one",
+  "language": "en",
+  "labels": {
+    "them-1": {"name": "Lucas", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 6, "line": "me: Uh Lucas, right?", "why": "Mikhail asks the remote voice if he is Lucas; them-1 answers at 7 ('Yeah, exactly.')"},
+                 {"idx": 9, "line": "them-1: And I think Dennis, uh Dennis is the one who scheduled the call, but I think he's still uh in a sales call.", "why": "them-1 speaks of Dennis in the third person, so them-1 is not Dennis"}
+               ]}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {"them-1": "prospective provider with a server of 8x RTX 6000 Pro: onboarding, revenue per GPU hour, payouts via Bittensor, ports, security, customer types, power"},
+  "people_named_in_text": ["Lucas", "Dennis", "Mikhail"],
+  "notes": "External provider onboarding call on Google Meet; Mikhail confirms the name at 6 and them-1 says yes. Dennis scheduled the call but is not on it. There is no separate echo label: the only echo is a fragment glued onto a them-1 line, 136 starts with 'Uh but I think uh but um' repeating me 135 about 2 s later."
+}

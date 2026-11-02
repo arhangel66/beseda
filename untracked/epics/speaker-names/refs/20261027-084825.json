@@ -1,0 +1,12 @@
+{
+  "call_id": "20261027-084825",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {"them-1": "ROI up from 23% to 70% thanks to NG, PR queue; USDT payout and node hotkeys, old sysbox, NVLink enforcement blocked by the filler; old crutches in Java and Linux, Sergei shipping cluster PRs tested only in emulation"},
+  "people_named_in_text": ["Sergei", "Fish", "Irina"],
+  "notes": "Long Russian 1:1 before the daily. them-1 speaks of Sergei in third person (13, 392-409), so it is not Sergei, but it is never named. Irina is Mikhail's wife. No echo."
+}

@@ -1,0 +1,31 @@
+{
+  "call_id": "20261021-125950",
+  "call_kind": "daily",
+  "language": "en",
+  "labels": {
+    "them-1": {"name": "Rustam", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 142, "line": "them-2: Thanks, Mustam.", "why": "thanks to the previous voice: them-1 just finished and handed over ('Your turn, I believe', 141)"},
+                 {"idx": 265, "line": "them-3: Maybe uh who should I assign uh my PRs to check Russian?", "why": "garbled 'Rustam' addressed; them-1 answers at 268 'I have availability, you can give it to me'"}
+               ]},
+    "them-2": {"name": "Pixel", "status": "named", "confidence": "medium",
+               "evidence": [
+                 {"idx": 282, "line": "me: But uh based on the uh pixel queue, I like fifty-two is not so big, but if we will take an action uh the pixel speed, then I the that's why I'm uh and Pixel also asked uh that he", "why": "me talks about Pixel's queue and manual work"},
+                 {"idx": 283, "line": "me: have a lot of manual work, uh he hope he he don't have so much time uh to review uh the pull request that's I'm uh suggesting to you and Pixel, sirke", "why": "continues: Pixel has a lot of manual work"},
+                 {"idx": 311, "line": "them-2: And and for me it's also fine.", "why": "them-2 reacts: explains it spends time on the backup design and manual testing (312-316)"}
+               ]},
+    "them-3": {"name": "Sergei", "status": "named", "confidence": "medium",
+               "evidence": [
+                 {"idx": 274, "line": "me: As I can see right now, uh Sergei have only uh nine pull requests in queue uh to uh review, and uh I would suggest to Pixel and uh Rustam ask your agents and uh recheck like which pull requests", "why": "me talks about Sergei having few PRs"},
+                 {"idx": 301, "line": "them-3: I I yeah I understand I mean I mean I already uh asked uh uh a few times for the loop uh to give me more work and uh yeah uh for some reason it didn't didn't do the the", "why": "them-3 reacts to being the one with too few PRs"}
+               ]}
+  },
+  "speaking_order": ["them-1", "them-2", "them-3"],
+  "topics_per_label": {
+    "them-1": "NG on B200/B300 and alpha price drop, Dolphin release, fraud accounts with stolen cards, Stripe alerts",
+    "them-2": "blog posts vs RunPod/Vast, backups epic redesign and billing, hidden listings alert, Redis replicas, waiting for Mohammed for Karpenter work",
+    "them-3": "backend running in two pods, startup tasks, validator command id dedup, provider portal replicas, Redis single point of failure, PR review flow"
+  },
+  "people_named_in_text": ["Rustam", "Fish", "Gus", "Mikhail", "Mohammed", "Pixel", "Sergei"],
+  "notes": "Rustam is clear from 'Thanks, Mustam' after his hand-over. Pixel and Sergei are never addressed with an answer; both rest on reacting after Mikhail talks about their PR queues (282-283 and 274). Topics (backups/blog vs scalability/Redis) agree with these names."
+}

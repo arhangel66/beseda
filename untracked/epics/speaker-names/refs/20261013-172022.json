@@ -1,0 +1,12 @@
+{
+  "call_id": "20261013-172022",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {"them-1": "fixed a big customer's unresponsive provider node via the provider's SSH key, waiting for validation cycles, hands the case to Mikhail at the end of the workday"},
+  "people_named_in_text": ["Hardstyle Kid"],
+  "notes": "1.5-minute Russian handover; the remote person is never named. 'Hardstyle Kid' (0) is a nickname of someone who reported the issue, not the speaker. No echo."
+}

@@ -1,0 +1,36 @@
+{
+  "call_id": "20261102-125941",
+  "call_kind": "daily",
+  "language": "en",
+  "labels": {
+    "them-1": {"name": "Sergei", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 329, "line": "me: Thank you very much, Sergei.", "why": "thanks right after them-1's update (314-328)"},
+                 {"idx": 2, "line": "me: By the way, uh Sergei, last week, uh or maybe a week ago, I asked you to think about the uh reliability score.", "why": "Mikhail addresses Sergei; them-1 answers at 14-19"},
+                 {"idx": 298, "line": "them-4: So I think the PR went out to you for review, Sergei.", "why": "them-4 addresses Sergei; them-1 replies at 308"}
+               ]},
+    "them-2": {"name": "Rustam", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 105, "line": "me: Um so um Rustam, can you please continue?", "why": "hand-over by Mikhail; them-2 starts the next update at 106"},
+                 {"idx": 115, "line": "me: Uh uh I'm sorry uh I'm sorry, Rustam.", "why": "Mikhail interrupts them-2's update by name"}
+               ]},
+    "them-3": {"name": "Pixel", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 32, "line": "them-2: I I believe Pixel was sick.", "why": "Pixel talked about; them-3 reacts at 36 'I was down, guys'"},
+                 {"idx": 85, "line": "me: But uh it was uh one interesting uh It situation that I'm extracted to the separate epic, it's related to the to your uh pixel um feature uh to the automatic backup.", "why": "Mikhail addresses Pixel about his backup feature; them-3 answers at 94"}
+               ]},
+    "them-4": {"name": "Mohammed", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 250, "line": "them-3: And maybe Mohammed, you can go.", "why": "hand-over by them-3; them-4 gives the next update at 251"}
+               ]}
+  },
+  "speaking_order": ["them-2", "them-3", "them-4", "them-1"],
+  "topics_per_label": {
+    "them-1": "TMC work, merged ~30 PRs, TMC attack and open API signup, review effort high vs extra high",
+    "them-2": "validator deploy breaks container launch, USDT payouts for own-hotkey providers, Discord ban, ROI fix, reassigned PRs, review benchmarks",
+    "them-3": "was sick, UUID penalty, manual restore, storage deletion at negative balance, validator hotkey swap, automatic backups stats",
+    "them-4": "PR merge flow, encrypted volume slowdowns, LMD shadow mode, node IP change follow-up for self-managed miners"
+  },
+  "people_named_in_text": ["Sergei", "Fish", "Rustam", "Pixel", "Viren", "Mohammed"],
+  "notes": "Easy call: all four voices are named by hand-overs, thanks or direct address. Pixel is named by the 'was sick' -> 'I was down' reaction plus a direct address about backups. No echo or split seen."
+}

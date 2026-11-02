@@ -1,0 +1,12 @@
+{
+  "call_id": "20261019-091159",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {"them-1": "was ill with 'Turkish pox' caught from his son, hospital and clinic visit, cancelled a visit to Irina and Misha, asks for an urgent PR approval"},
+  "people_named_in_text": ["Irina", "Mikhail", "Ilina"],
+  "notes": "One remote voice, no echo. The remote person is never named; 'Ильини'/'Илина' is his wife, 'Ирину и Мишу' are Mikhail and his wife (the visit hosts). Several me lines came out of ASR as English filler ('Mm-hmm', 'I figured')."
+}

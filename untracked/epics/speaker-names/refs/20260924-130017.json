@@ -1,0 +1,23 @@
+{
+  "call_id": "20260924-130017",
+  "call_kind": "daily",
+  "language": "en",
+  "labels": {
+    "them-1": {"name": "Rustam", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 80, "line": "me: Okay, uh Rustan can be Christian change.", "why": "hand-over (garble 'Rustan'); them-1 starts its update 'Yeah, from my perspective' at 81"}
+               ]},
+    "them-2": {"name": "Mohammed", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 170, "line": "them-1: So Mohammed, I believe you are the next.", "why": "hand-over; them-2 starts 'Hi guys' at 171"},
+                 {"idx": 31, "line": "me: Uh so first of first of all, uh Muhammad, please uh make sure that you uh know what's happening with our infrastructure as I get.", "why": "addressed; them-2 answers 'Yeah, I I I think definitely makes sense' at 35"}
+               ]}
+  },
+  "speaking_order": ["them-2", "them-1"],
+  "topics_per_label": {
+    "them-1": "NGC broke after their big release, smart default job strategy fix PR, tempdev overloading Prometheus and a 50-env limit, base price epic, closed PR 1401, how he uses tempdev for risky PRs",
+    "them-2": "Prometheus as single point of failure, tempdev pressure on shared infra (Karpenter, EKS, Loki), node image pull failures in Japan, validator hotkey signature P0 hotfix, new speed test"
+  },
+  "people_named_in_text": ["Mikhail", "Rustam", "Mohammed", "Fish", "Pixel"],
+  "notes": "Easy call: only two remote voices, each handed the turn by name. Fish and Pixel are absent and only mentioned ('Fish is not with us', 'I don't know where the pixel'). them-2 replies to me first at 35, before them-1's update."
+}

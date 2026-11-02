@@ -1,0 +1,15 @@
+{
+  "call_id": "20261008-123827",
+  "call_kind": "one-to-one",
+  "language": "en",
+  "labels": {
+    "them-1": {"name": "Pixel", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 194, "line": "me: Okay, Pixel.", "why": "Mikhail addresses the remote voice by name while closing; them-1 answers at 197 ('okay me too okay okay all right then thanks see you bye')"}
+               ]}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {"them-1": "idle incentive shadow mode and rollout timing (wait until Monday), Fish's penalty change, attribution PR with epoch split and provider earnings UI/API, long-haul flight to Pakistan"},
+  "people_named_in_text": ["Pixel", "Fish"],
+  "notes": "Name appears once, as a direct address at 194, and them-1 replies; the only remote voice. Fish is mentioned several times; 'Liam Loop' is the agent, not a person. A few me lines (101-108) are unrelated stray ASR, and them-1 24 ('My agent.') may be an echo fragment of me 23."
+}

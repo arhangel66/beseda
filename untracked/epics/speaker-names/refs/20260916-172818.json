@@ -1,0 +1,25 @@
+{
+  "call_id": "20260916-172818",
+  "call_kind": "daily",
+  "language": "en",
+  "labels": {
+    "them-1": {"name": "Rustam", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 113, "line": "me: Uh Rustan, can you please continue?", "why": "hand-over (garble of Rustam); them-1 gives its update from 114"},
+                 {"idx": 172, "line": "them-2: And secondly, uh what Michael said to you, Ristim about creating a personal token.", "why": "them-2 addresses the person who asked about the token, which is them-1 (161-165)"}
+               ]},
+    "them-2": {"name": "Pixel", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 205, "line": "them-1: Okay, pixel.", "why": "hand-over; them-2 gives its update from 206"},
+                 {"idx": 46, "line": "them-1: Sorry, what one important thing for your pixel.", "why": "addressed about the cookie banner; them-2 answers at 50"},
+                 {"idx": 248, "line": "me: Two things pixel uh maybe uh now when this pull request already released ...", "why": "addressed right after them-2's update; them-2 answers at 251-255"}
+               ]}
+  },
+  "speaking_order": ["them-1", "them-2"],
+  "topics_per_label": {
+    "them-1": "GDPR cookie banner warning, BB review automation, 250 unassigned PRs, temp dev environment token blocked on Fish, Pierre and idle incentive",
+    "them-2": "GitHub webhooks vs polling, cookie banner PR, talk to Colin about tokens, lacking product direction, events foundation PR, CDN routing incident, B300 prices"
+  },
+  "people_named_in_text": ["Rustam", "Pixel", "Mohammed", "Fish", "Gus", "Mikhail", "Colin", "Pierre"],
+  "notes": "Two-person daily without Mohammed; both labels are handed the turn by name and answer. Rustam shows up garbled as Rustan, Ristim, Rhythm, custom."
+}

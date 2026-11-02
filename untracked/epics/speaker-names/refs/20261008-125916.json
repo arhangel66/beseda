@@ -1,0 +1,29 @@
+{
+  "call_id": "20261008-125916",
+  "call_kind": "daily",
+  "language": "en",
+  "labels": {
+    "them-1": {"name": "Mohammed", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 160, "line": "them-3: Uh Muhammad, over to you.", "why": "hand-over; them-1 gives the next update (161-172)"},
+                 {"idx": 2, "line": "me: Hello, Mohammed.", "why": "greeting answering them-1's 'Hello.' (0)"}
+               ]},
+    "them-2": {"name": "Gus", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 4, "line": "me: Hello, Gus.", "why": "greeting; them-2 replies (6: 'Hey, morning.')"},
+                 {"idx": 7, "line": "me: Gus, I think.", "why": "addressed about unanswered messages; them-2 answers (14-15)"}
+               ]},
+    "them-3": {"name": "Pixel", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 85, "line": "me: Uh okay, uh Pixel, uh maybe can you contain please.", "why": "hand-over; them-3 gives the next update (86-159)"}
+               ]}
+  },
+  "speaking_order": ["them-3", "them-1", "them-2"],
+  "topics_per_label": {
+    "them-1": "stale PR he was reviewer on (referral rate), unwell yesterday, reviewed Pixel's incentive PRs, automation bug in review board",
+    "them-2": "reminds Mikhail about unanswered support and Gmail messages",
+    "them-3": "delayed incentive testing, attribution model PR, CI minutes optimization, 25 miners unpaid by alpha transfer service, rewards calculator"
+  },
+  "people_named_in_text": ["Mohammed", "Gus", "Pixel", "Fish", "Mikhail"],
+  "notes": "Easy call with explicit greetings and hand-overs. The recording stops mid-sentence in Mohammed's update; it continues in 20261008-131619."
+}

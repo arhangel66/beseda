@@ -1,0 +1,26 @@
+{
+  "call_id": "20260917-125931",
+  "call_kind": "daily",
+  "language": "en",
+  "labels": {
+    "them-1": {"name": "Rustam", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 61, "line": "me: Um Rustam, can you please continue?", "why": "hand-over; them-1 gives its update from 62"},
+                 {"idx": 21, "line": "me: only Rustam noticed it.", "why": "me credits Rustam with spotting the slow brute force; them-1 talks about that attack and its own comment on the doc at 89-93"}
+               ]},
+    "them-2": {"name": "Pixel", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 180, "line": "them-1: Next pixel, you.", "why": "hand-over; them-2 answers 'Oh, okay. It's already my turn.' at 181-182 and gives its update"},
+                 {"idx": 301, "line": "me: Uh pixel, as I as I know today, I already saw some pull requests from Liam Bloop ...", "why": "addressed after them-2's B300 suggestion; them-2 answers at 304-312"}
+               ]},
+    "them-3": {"name": "unknown", "status": "unknown", "confidence": "medium", "evidence": []}
+  },
+  "speaking_order": ["them-1", "them-2", "them-3"],
+  "topics_per_label": {
+    "them-1": "Pierre and B300, H200/B200 incentive, temp dev environments working, slow brute force and account lockout, improved BB loop with three subscriptions",
+    "them-2": "POST rate-limit firewall rule never re-enabled, cookie banner, closing behind-login PRs, WAF rules, B300 from another provider",
+    "them-3": "messy stacked PRs, 4000-line PR for 30 ms, Grafana dashboard backups, DSN validation job, PR descriptions, few PRs assigned, LMD design, inspector findings"
+  },
+  "people_named_in_text": ["Rustam", "Pixel", "Mohammed", "Fish", "Mikhail", "Pierre", "Han"],
+  "notes": "Rustam and Pixel are handed the turn by name. them-3 speaks last with infra topics (LMD, inspector) and addresses both Rustam and Pixel, so it is likely Mohammed, but me's 'Hello Mohammed' and 'Muhammad, please recheck' get no reply from it; left unknown. 'Hello Han' at 11 is an unclear name."
+}

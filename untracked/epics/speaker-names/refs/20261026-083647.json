@@ -1,0 +1,16 @@
+{
+  "call_id": "20261026-083647",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "medium",
+               "evidence": [
+                 {"idx": 75, "line": "me: И вот, к сожалению, вообще ссылка на твой аккаунт ушла, вероятно, ты уже вводил проверился свою почту Ахметофустам.", "why": "Mikhail names them-1's email, likely a garble of 'Akhmetov Rustam'; them-1 confirms getting the verify email at 84. Not a known garble, so left unknown"},
+                 {"idx": 84, "line": "them-1: Ну вот мне пришел Е-Мейл, верифай Йор имей адрес.", "why": "them-1 owns the email Mikhail named at 75"}
+               ]}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {"them-1": "ROI dropped, Dolphin broke; Fish's point that USDT payout leaves the idle incentive on old hotkeys, fears providers breaking with central miner; will ask Fish"},
+  "people_named_in_text": ["Fish", "Rustam"],
+  "notes": "Russian 1:1. The only name clue is 'свою почту Ахметофустам' (75), which reads as 'Akhmetov Rustam' and is them-1's email (84); it is not a known garble of Rustam, so the label stays unknown. If 'фустам' is accepted as a garble, them-1 would be Rustam at medium confidence. No echo."
+}

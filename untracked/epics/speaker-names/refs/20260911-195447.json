@@ -1,0 +1,14 @@
+{
+  "call_id": "20260911-195447",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {
+    "them-1": "Dolphin release cut mining slots ~10x (income $1500/day to $100), testing RAM-based slots, plans to switch to NGT on Monday; reacts to Mikhail's Discord ban and his Automatic PR design section"
+  },
+  "people_named_in_text": ["Mikhail", "Fish"],
+  "notes": "them-1 calls Mikhail 'Миша' (79) but is never named himself. Fish is mentioned (96, 100). 'Петро' (164) reads as an ASR garble, not a name. No echo."
+}

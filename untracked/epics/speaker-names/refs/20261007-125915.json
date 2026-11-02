@@ -1,0 +1,32 @@
+{
+  "call_id": "20261007-125915",
+  "call_kind": "daily",
+  "language": "en",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []},
+    "them-2": {"name": "Pixel", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 32, "line": "me: And uh I I didn't notice Pixel uh did you wrote the nouns to to the channel or not", "why": "addressed; them-2 answers (35-36: 'You you can do it. I didn't do it.')"},
+                 {"idx": 211, "line": "me: Uh sorry, Pixel, can you please continue?", "why": "hand-over; them-2 gives the next update (212-241)"},
+                 {"idx": 242, "line": "me: Thank you, Pixel.", "why": "thanks right after them-2's update (212-241)"}
+               ]},
+    "them-3": {"name": "Fish", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 268, "line": "them-2: Just just one more uh one thing to clarify, fish.", "why": "them-2 asks Fish (268-273); them-3 answers (275: 'I didn't hear the question, but yeah, I understand that it's around 24 hour window')"}
+               ]},
+    "them-4": {"name": "Sergei", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 145, "line": "me: Uh Sergei, can you please continue", "why": "hand-over; them-4 gives the next update (146-202)"},
+                 {"idx": 122, "line": "me: Maybe my code was so bad, or maybe Sergei uh pull request reviewer is quite strict, uh, but it was like 60.", "why": "talked about; them-4 reacts (123: 'It could be straight, yeah.')"}
+               ]}
+  },
+  "speaking_order": ["them-3", "them-2", "them-4"],
+  "topics_per_label": {
+    "them-1": "stray lines unrelated to the call ('What is his name? Bingley. How can it affect them?')",
+    "them-2": "announcements policy, blocked abusers and HMAC fix, delayed incentive rule and shadow mode, flight tomorrow, debt vs idle incentive",
+    "them-3": "more announcements for providers, USDT payout 5% fee, 24 h window, 48 h debt blocks idle incentive",
+    "them-4": "15 PRs reviewed, strict review agent, double hotkey incentive bug, memory leak hunt, TMC pay vulnerability probing"
+  },
+  "people_named_in_text": ["Pixel", "Gus", "Mohammed", "Fish", "Sergei", "Mikhail", "Bingley"],
+  "notes": "Clear call for Pixel, Fish and Sergei. them-1 only has a few stray lines (18, 24-28) that answer nothing in the call, likely background audio; left unknown. Gus and Mohammed are said to be absent."
+}

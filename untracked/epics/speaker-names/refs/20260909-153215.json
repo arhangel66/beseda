@@ -1,0 +1,16 @@
+{
+  "call_id": "20260909-153215",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "Rustam", "status": "named", "confidence": "low",
+               "evidence": [
+                 {"idx": 73, "line": "them-1: А они же были как бы описания поблочно, грубо говоря, приоритеты Рустама, приоритеты Михаила, расписанные сверху вниз по приоритетам.", "why": "them-1 complains the per-person blocks listed tickets that were not his (72, 101); Rustam's block is the one at issue"},
+                 {"idx": 80, "line": "me: Я не вижу тут отдельно приоритеты Рустама.", "why": "me looks for Rustam's block as the one them-1 complained about; them-1 answers at 85 that the agent removed it after his complaints (83)"}
+               ]}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {"them-1": "NGT on H200 VRAM limits, loop agent hallucinated his priorities, agent-to-agent interaction multiplies chaos, Mikhail's agent removed itself as reviewer"},
+  "people_named_in_text": ["Rustam", "Mikhail", "Fish"],
+  "notes": "Russian 1:1. No greeting or address by name; the only clue is the 'приоритеты Рустама' block, which them-1 treats as his own and me goes looking for (type 6, indirect), hence low. No echo."
+}

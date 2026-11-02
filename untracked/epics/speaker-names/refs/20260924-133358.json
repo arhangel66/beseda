@@ -1,0 +1,12 @@
+{
+  "call_id": "20260924-133358",
+  "call_kind": "one-to-one",
+  "language": "en",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {"them-1": "referral terms (10%/5%), daily provider search, slow SEO, GTM events task waiting on Fish's agent and Pixel review"},
+  "people_named_in_text": ["Pixel", "Fish"],
+  "notes": "English recording that starts mid-update; topics (providers, SEO, GTM) fit the sales person, but no name is said, so unknown. Mikhail says 'Okay, guys' (58), so others may have been on the line without speaking."
+}

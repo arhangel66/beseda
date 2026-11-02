@@ -1,0 +1,14 @@
+{
+  "call_id": "20261030-122340",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {
+    "them-1": "asks for proof the smart system misbehaves, GLM 5.3 small pool and estimate jumps, ROI fixed to 53% with Dolphin back, earnings page pending payments, USDT withdrawals rollout, 2FA release"
+  },
+  "people_named_in_text": ["Pixel", "Fish"],
+  "notes": "Single remote voice, no echo. Pixel and Fish are only talked about; them-1 is never named. 'Мэксенс'/'Excess' are 'makes sense'."
+}

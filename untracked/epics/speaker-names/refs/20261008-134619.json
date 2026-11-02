@@ -1,0 +1,12 @@
+{
+  "call_id": "20261008-134619",
+  "call_kind": "one-to-one",
+  "language": "en",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {"them-1": "rewards calculator for provider outreach: idle pay dilution, a US data center's A100 inventory, asking the Leo bot, wants a dashboard with top 30-day rate, idle pay and slots per GPU per hour"},
+  "people_named_in_text": ["Fish", "Mikhail"],
+  "notes": "Discord 1:1 with a sales/outreach person; them-1 thanks Mikhail by name (324, 354) but is never named. Role points to Gus, but topics are not evidence. 'Leo'/'Liam' is the bot, Fish only mentioned (85). No echo."
+}

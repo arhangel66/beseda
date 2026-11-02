@@ -1,0 +1,12 @@
+{
+  "call_id": "20260910-170325",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {"them-1": "his migration blocked by a lock held by the live backend, idea to stop the backend for a minute, websocket holding DB connections"},
+  "people_named_in_text": [],
+  "notes": "Russian 1:1 follow-up on the failing migration (PR 208 lock timeouts). The remote voice is only 'дружище', never named. No echo."
+}

@@ -1,0 +1,91 @@
+{
+ "call_id": "20261022-125952",
+ "call_kind": "daily",
+ "language": "en",
+ "labels": {
+  "them-1": {
+   "name": "Rustam",
+   "status": "named",
+   "confidence": "high",
+   "evidence": [
+    {
+     "idx": 87,
+     "line": "me: Okay, um maybe Rustam can you can turn",
+     "why": "addressed; them-1 gives the next update (88-205)"
+    },
+    {
+     "idx": 137,
+     "line": "them-2: So what's the problem, Rustin?",
+     "why": "garbled Rustam addressed; them-1 answers at 139"
+    }
+   ]
+  },
+  "them-2": {
+   "name": "Fish",
+   "status": "named",
+   "confidence": "high",
+   "evidence": [
+    {
+     "idx": 0,
+     "line": "them-1: Hey Fish, are you here?",
+     "why": "addressed with a question (2); them-2 answers at 5"
+    },
+    {
+     "idx": 132,
+     "line": "me: Fish, uh, I think I need to um highlight that as I get when you add the card, you have to have at least one uh successful free DS verification uh top up.",
+     "why": "addressed; them-2 answers at 135-136"
+    }
+   ]
+  },
+  "them-3": {
+   "name": "Sergei",
+   "status": "named",
+   "confidence": "high",
+   "evidence": [
+    {
+     "idx": 207,
+     "line": "them-1: I don't see pixel here, so Sergei, I believe you should continue then.",
+     "why": "hand-over; them-3 answers 'Yes.' at 208 and gives the update"
+    },
+    {
+     "idx": 227,
+     "line": "me: I'm sorry, Sergei, maybe I miss.",
+     "why": "addressed with a question (228); them-3 answers at 229"
+    }
+   ]
+  },
+  "them-4": {
+   "name": "Gus",
+   "status": "named",
+   "confidence": "medium",
+   "evidence": [
+    {
+     "idx": 319,
+     "line": "me: Uh maybe we should go forward to Goth.",
+     "why": "hand-over to 'Goth' = garbled Gus; them-4 answers at 320 and gives a marketing update"
+    }
+   ]
+  }
+ },
+ "speaking_order": [
+  "them-1",
+  "them-2",
+  "them-3",
+  "them-4"
+ ],
+ "topics_per_label": {
+  "them-1": "email enforcement period, fraud with auto top-ups and 3DS, NG on B300 ROI, USDT wallet alerts, approved-not-merged PR flow",
+  "them-2": "frustration with delays (14 days email, feature flags), Stripe radar rules and 3DS, approved PRs not merged",
+  "them-3": "merged ~25 PRs, power cap guard fix, backup credentials PR, backend multi-instance PRs, approval vs release flow",
+  "them-4": "guest posts, LLM rankings and mentions, organic traffic, provider campaign GTM events, Pearl/Dolphin Discord outreach"
+ },
+ "people_named_in_text": [
+  "Fish",
+  "Rustam",
+  "Pixel",
+  "Sergei",
+  "Mikhail",
+  "Gus"
+ ],
+ "notes": "Fish is on this daily and is addressed by name twice. Rustam and Sergei are clear from hand-overs. them-4 is most likely Gus: the hand-over at 319 says 'Goth', which is not a known garble, so it stays unknown. Pixel is said to be absent (207)."
+}

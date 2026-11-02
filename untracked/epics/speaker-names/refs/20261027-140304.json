@@ -1,0 +1,14 @@
+{
+  "call_id": "20261027-140304",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {
+    "them-1": "share the epic board at standups, Sergei strong vs others, gave Mohammed risky tickets (referrals, pod launch), MCP integration with Claude and ChatGPT, own side app earnings, Reddit/Product Hunt, MVP advice"
+  },
+  "people_named_in_text": ["Mohammed", "Rustam", "Sergei", "Pixel", "Fish"],
+  "notes": "Single remote voice, no echo. them-1 never gets named; Rustam appears only in them-1's own examples (20, 263: 'Мухаммед или Рустам') as someone talked about. 'Сандри' at 244 is them-1 addressing Mikhail (garble), not a name for them-1."
+}

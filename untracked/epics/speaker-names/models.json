@@ -1,0 +1,11 @@
+{
+  "gemma4-e4b": {"path": "~/Library/Application Support/Beseda/runtime/models/gemma-4-E4B-it-Q4_0.gguf",
+                 "sha256": "a555b900214b477d8880e7832e0b8925e139b0159640036b09fe472b6f2097f2",
+                 "source": "ggml-org/gemma-4-E4B-it-GGUF (the app's own copy)"},
+  "gemma4-12b": {"path": "models/gemma-4-12B-it-Q4_0.gguf",
+                 "sha256": "3712b9bd32cae83a22f67ee7a4466d8d7a4f21646ac8a07d19bf9418e8767a70",
+                 "source": "ggml-org/gemma-4-12B-it-GGUF, downloaded 2026-11-02"},
+  "qwen3.5-9b": {"path": "models/Qwen3.5-9B-UD-Q4_K_XL.gguf",
+                 "sha256": "6f5d30666c2d8ae16a306e616d95341dcf3cc46810df84d7e6f5a7d1e4c1b293",
+                 "source": "unsloth/Qwen3.5-9B-GGUF, downloaded 2026-11-02"}
+}

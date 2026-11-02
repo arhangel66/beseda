@@ -1,0 +1,35 @@
+{
+  "call_id": "20261014-125957",
+  "call_kind": "daily",
+  "language": "en",
+  "labels": {
+    "them-1": {"name": "Rustam", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 32, "line": "me: Uh maybe Rustam can you risk kind of", "why": "hand-over; them-1 gives the next update at 33-35"},
+                 {"idx": 114, "line": "them-3: Uh thanks Rustam.", "why": "thanks right after them-1's update (33-112)"},
+                 {"idx": 273, "line": "them-5: Rustam, how many did you um message?", "why": "addressed; them-1 answers at 275-277 ('I sent ... only one responded')"}
+               ]},
+    "them-2": {"name": "Fish", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 194, "line": "them-3: I mean fish, I don't even know why it we need flag for everything because there are like so many flags.", "why": "Pixel addresses Fish; them-2 answers at 195 ('Yeah, I don't either.')"},
+                 {"idx": 144, "line": "them-3: And I think fish uh just clarified with you, like it should be only for fingerprint users, but it basically did that for everyone.", "why": "talked about, then them-2 reacts at 147-148 ('I specifically told it to only make that change for the fingerprint users')"}
+               ]},
+    "them-3": {"name": "Pixel", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 112, "line": "them-1: Pixel will you will be next.", "why": "hand-over; them-3 gives the next update at 113-115"},
+                 {"idx": 159, "line": "them-1: Pixel, if you will allow me to advise you a little bit, uh I found for myself much easier to review PRs if I ask Agent to group them by some epic or some reasons behind those PRs.", "why": "addressed; them-3 answers at 161"}
+               ]},
+    "them-4": {"name": "unknown", "status": "unknown", "confidence": "medium", "evidence": []},
+    "them-5": {"name": "unknown", "status": "unknown", "confidence": "medium", "evidence": []}
+  },
+  "speaking_order": ["them-1", "them-2", "them-3", "them-4", "them-5"],
+  "topics_per_label": {
+    "them-1": "Tao secure key moved to backend and rotated, Claude security monitoring, Vast provider outreach, GPUs leaving, DB tunnel blocker, security P0 PRs behind flags",
+    "them-2": "5090s left after a big renter stopped, validation flags must be turned on fast, against long-term contracts without legal cover",
+    "them-3": "accounting follow-up PRs, announcement, provider earnings UI draft, hostname node rollback, PR review overload, too many flags",
+    "them-4": "flags default on, 8 PRs deployed, TMC work, API key hashing, Coinbase webhook signature, client IP behind CloudFront, DB access",
+    "them-5": "long-term rentals pass-through idea, 256 B300 fleet financing, loop stuck on a customer issue, provider onboarding, SEO articles"
+  },
+  "people_named_in_text": ["Sergei", "Rustam", "Pixel", "Fish", "Mikhail"],
+  "notes": "Rustam, Pixel and Fish are each handed the turn or addressed and answer. them-4 (API keys hashing, TMC; Sergei-like) is never named: me greets Sergei at idx 4 but no remote voice replies, so unknown. them-5 (long-term rentals, providers; Gus-like) is never named either; the hand-over at 229 reads 'was good next', possibly a garbled 'Gus', not a known garble."
+}

@@ -1,0 +1,14 @@
+{
+  "call_id": "20261029-114018",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {
+    "them-1": "admin API to rerun the Dolphin probe, fragile code, NG release desync and model-switch errors, GLM ROI estimate, shadow validator for slow B300 disks"
+  },
+  "people_named_in_text": [],
+  "notes": "Single remote voice, no echo. No person name appears at all; 'Мэксенс' at 249 is 'makes sense'. Nothing to name them-1 by."
+}

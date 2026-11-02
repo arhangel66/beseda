@@ -1,0 +1,43 @@
+{
+  "call_id": "20261006-125933",
+  "call_kind": "daily",
+  "language": "en",
+  "labels": {
+    "them-1": {"name": "Fish", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 1, "line": "me: If you can talk fish, uh there is an uh hello Sergei.", "why": "Mikhail asks Fish about force spot (1-6); them-1 answers (7: 'It's okay to manually flip in the spot')"},
+                 {"idx": 125, "line": "them-3: I think uh I don't know, Fish.", "why": "them-3 addresses Fish about delaying payouts; them-1 answers (127: 'How could it not work?')"}
+               ]},
+    "them-2": {"name": "Sergei", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 46, "line": "me: Uh maybe uh Sergei, can you please contain", "why": "hand-over; them-2 gives the next update (47-73)"},
+                 {"idx": 74, "line": "me: Um Sergei, I just would like to highlight.", "why": "addressed; them-2 answers (78: 'sure sure.')"}
+               ]},
+    "them-3": {"name": "Pixel", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 301, "line": "them-5: uh the Grafana dashboard pixel um it's on, but I can't see it because I don't have access.", "why": "Pixel addressed about Grafana access; them-3 answers (303: 'send me your email address and I will probably create an account')"},
+                 {"idx": 411, "line": "them-5: Also thanks, Pixel, and yeah, and I'll continue reaching out", "why": "thanks for the Grafana access that them-3 arranged (303)"}
+               ]},
+    "them-4": {"name": "Mohammed", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 166, "line": "them-3: Mohammed, you can go next then.", "why": "hand-over; them-4 gives the next update (167-233)"},
+                 {"idx": 215, "line": "me: Uh Muhammad I I I am sorry to interrupt.", "why": "addressed; them-4 answers (216: 'yeah, yeah, definitely')"},
+                 {"idx": 257, "line": "them-5: Sorry, Mohammed.", "why": "apology for talking over Mohammed; them-4 resumes (261-292)"}
+               ]},
+    "them-5": {"name": "Gus", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 321, "line": "them-1: Gus, you said this was blocking someone from becoming a provider.", "why": "addressed; them-5 answers (322: 'no, it's from us getting listed in the Nvidia Rev program')"},
+                 {"idx": 345, "line": "them-1: It was in the can you can you give me the code from your from your iPhone, Gus?", "why": "addressed; them-5 answers (348-350)"}
+               ]}
+  },
+  "speaking_order": ["them-1", "them-2", "them-3", "them-4", "them-5"],
+  "topics_per_label": {
+    "them-1": "manual force spot ok, delayed weights 24 h, loop maintenance, demo video for all providers, pause/resume storage design",
+    "them-2": "TMC tasks, 11 PRs approved, PR 1024 flag, stacked PR merge conflicts, AWS cost explorer permission",
+    "them-3": "loop queue slow, blog shipped, keep tempo 360 with off-chain 24 h window, AWS credentials, CI E2E to merge queue, Grafana access",
+    "them-4": "chargebacks plan, loop over-engineering, upload speed test deploy, OOM containers, Celery workers to k8s cron jobs, CI audit",
+    "them-5": "escalated emails, Compute Base demo, NVIDIA Brev suspend/resume, MarkTechPost article deal, Google Ads deposits"
+  },
+  "people_named_in_text": ["Fish", "Sergei", "Pixel", "Mohammed", "Gus", "Mikhail"],
+  "notes": "Easy call: every label is addressed by name and answers, and the hand-overs are explicit. them-5's headset dropped and he talked over Mohammed (234-267), which the text sorts out itself."
+}

@@ -1,0 +1,21 @@
+{
+  "call_id": "20260907-115855",
+  "call_kind": "other",
+  "language": "en",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []},
+    "them-2": {"name": "Pixel", "status": "named", "confidence": "medium",
+               "evidence": [
+                 {"idx": 29, "line": "me: uh like first one I checked that agent uh understand hello pixel", "why": "greeting to a joining person; me catches them up at 30 and them-2 is the new voice that first speaks at 35"},
+                 {"idx": 156, "line": "them-1: But from from what pixel, what I said to Michael was like.", "why": "them-1 addresses Pixel; them-2 answers at 158-159 agreeing to ask for transparency"},
+                 {"idx": 17, "line": "them-1: I'm sure Pixel is asking the same question.", "why": "before them-2 joins, them-1 talks of Pixel in third person, so them-1 is not Pixel"}
+               ]}
+  },
+  "speaking_order": ["them-1", "them-2"],
+  "topics_per_label": {
+    "them-1": "Fish going all-agent like Const, wants transparency on where humans fit, velocity vs cost, support bot, where human value is",
+    "them-2": "assigned ~75 PRs to review, reviews will be automated soon, Fish's AWS admin creds and Sentry loop, disagrees with Rustam on timeline, 280 PRs hard to test"
+  },
+  "people_named_in_text": ["Pixel", "Fish", "Rustam", "Mikhail", "Const"],
+  "notes": "Not a daily: a three-way talk about Fish's agent loop and the team's future. Pixel rests on the greeting at 29 (them-2 appears right after) and them-1 addressing Pixel at 156. them-1 speaks of Pixel and Rustam in third person, so it is neither, but nobody names it; left unknown."
+}

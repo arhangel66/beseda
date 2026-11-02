@@ -1,0 +1,12 @@
+{
+  "call_id": "20260922-115609",
+  "call_kind": "one-to-one",
+  "language": "ru",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "medium", "evidence": []}
+  },
+  "speaking_order": ["them-1"],
+  "topics_per_label": {"them-1": "dynamic pricing epic (base price, soft/hard limit, idle incentive), taking epics not tickets, big PR on default job strategy profitability, NGT penalty ~30%, last weeks before vacation"},
+  "people_named_in_text": ["Voris", "Rustam", "Pixel", "Mohammed", "Fish"],
+  "notes": "Russian 1:1, no greeting or address by name. Line 82 them-1: 'отправляет просто луп-агенту в луп сессию там луп рустам напису' mentions a loop session named after Rustam, which hints them-1 is Rustam, but it is not a self-introduction, so left unknown (re-check candidate)."
+}

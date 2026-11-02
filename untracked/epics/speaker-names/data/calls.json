@@ -1,0 +1,1849 @@
+[
+ {
+  "id": "20260907-112222",
+  "started_at": "2026-09-07T07:22:22.352Z",
+  "minutes": 9.0,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 80
+  },
+  "segments": 189,
+  "split": "other"
+ },
+ {
+  "id": "20260907-113243",
+  "started_at": "2026-09-07T07:32:44.066Z",
+  "minutes": 0.6,
+  "app": "Telegram",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 16
+  },
+  "segments": 35,
+  "split": "other"
+ },
+ {
+  "id": "20260907-113738",
+  "started_at": "2026-09-07T07:37:38.631Z",
+  "minutes": 14.9,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 180
+  },
+  "segments": 347,
+  "split": "other"
+ },
+ {
+  "id": "20260907-115855",
+  "started_at": "2026-09-07T07:58:55.341Z",
+  "minutes": 17.3,
+  "app": "Discord",
+  "group": "two",
+  "labels": [
+   "them-1",
+   "them-2"
+  ],
+  "segments_per_label": {
+   "them-1": 68,
+   "them-2": 58
+  },
+  "segments": 232,
+  "split": "other"
+ },
+ {
+  "id": "20260907-172950",
+  "started_at": "2026-09-07T13:29:50.894Z",
+  "minutes": 39.5,
+  "app": "Discord",
+  "group": "multi",
+  "labels": [
+   "them-1",
+   "them-2",
+   "them-3",
+   "them-4"
+  ],
+  "segments_per_label": {
+   "them-1": 71,
+   "them-2": 166,
+   "them-3": 80,
+   "them-4": 79
+  },
+  "segments": 442,
+  "split": "tune"
+ },
+ {
+  "id": "20260908-141102",
+  "started_at": "2026-09-08T10:11:02.784Z",
+  "minutes": 9.0,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 39
+  },
+  "segments": 138,
+  "split": "other"
+ },
+ {
+  "id": "20260908-173122",
+  "started_at": "2026-09-08T13:31:22.967Z",
+  "minutes": 48.9,
+  "app": "Discord",
+  "group": "multi",
+  "labels": [
+   "them-1",
+   "them-2",
+   "them-3",
+   "them-4",
+   "them-5"
+  ],
+  "segments_per_label": {
+   "them-1": 104,
+   "them-2": 138,
+   "them-3": 83,
+   "them-4": 1,
+   "them-5": 130
+  },
+  "segments": 552,
+  "split": "tune"
+ },
+ {
+  "id": "20260909-153215",
+  "started_at": "2026-09-09T11:32:15.773Z",
+  "minutes": 9.5,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 111
+  },
+  "segments": 209,
+  "split": "other"
+ },
+ {
+  "id": "20260909-172927",
+  "started_at": "2026-09-09T13:29:28.282Z",
+  "minutes": 40.5,
+  "app": "Discord",
+  "group": "multi",
+  "labels": [
+   "them-1",
+   "them-2",
+   "them-3"
+  ],
+  "segments_per_label": {
+   "them-1": 59,
+   "them-2": 69,
+   "them-3": 123
+  },
+  "segments": 441,
+  "split": "tune"
+ },
+ {
+  "id": "20260910-152202",
+  "started_at": "2026-09-10T11:22:02.975Z",
+  "minutes": 18.9,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 150
+  },
+  "segments": 384,
+  "split": "other"
+ },
+ {
+  "id": "20260910-164430",
+  "started_at": "2026-09-10T12:44:31.182Z",
+  "minutes": 1.0,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 17
+  },
+  "segments": 34,
+  "split": "other"
+ },
+ {
+  "id": "20260910-170325",
+  "started_at": "2026-09-10T13:03:26.015Z",
+  "minutes": 4.7,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 24
+  },
+  "segments": 108,
+  "split": "other"
+ },
+ {
+  "id": "20260910-172925",
+  "started_at": "2026-09-10T13:29:26.015Z",
+  "minutes": 38.6,
+  "app": "Discord",
+  "group": "multi",
+  "labels": [
+   "them-1",
+   "them-2",
+   "them-3"
+  ],
+  "segments_per_label": {
+   "them-1": 134,
+   "them-2": 100,
+   "them-3": 102
+  },
+  "segments": 446,
+  "split": "tune"
+ },
+ {
+  "id": "20260911-085057",
+  "started_at": "2026-09-11T04:50:57.605Z",
+  "minutes": 7.8,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 37
+  },
+  "segments": 146,
+  "split": "other"
+ },
+ {
+  "id": "20260911-104722",
+  "started_at": "2026-09-11T06:47:22.422Z",
+  "minutes": 22.1,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 121
+  },
+  "segments": 391,
+  "split": "other"
+ },
+ {
+  "id": "20260911-172926",
+  "started_at": "2026-09-11T13:29:26.623Z",
+  "minutes": 20.1,
+  "app": "Discord",
+  "group": "two",
+  "labels": [
+   "them-1",
+   "them-2"
+  ],
+  "segments_per_label": {
+   "them-1": 90,
+   "them-2": 28
+  },
+  "segments": 239,
+  "split": "other"
+ },
+ {
+  "id": "20260911-175954",
+  "started_at": "2026-09-11T13:59:55.200Z",
+  "minutes": 5.4,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 66
+  },
+  "segments": 129,
+  "split": "other"
+ },
+ {
+  "id": "20260911-185047",
+  "started_at": "2026-09-11T14:50:47.619Z",
+  "minutes": 14.7,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 82
+  },
+  "segments": 259,
+  "split": "other"
+ },
+ {
+  "id": "20260911-195447",
+  "started_at": "2026-09-11T15:54:47.980Z",
+  "minutes": 7.6,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 77
+  },
+  "segments": 179,
+  "split": "other"
+ },
+ {
+  "id": "20260914-104710",
+  "started_at": "2026-09-14T06:47:11.160Z",
+  "minutes": 23.5,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 169
+  },
+  "segments": 495,
+  "split": "other"
+ },
+ {
+  "id": "20260914-172915",
+  "started_at": "2026-09-14T13:29:16.058Z",
+  "minutes": 36.1,
+  "app": "Discord",
+  "group": "multi",
+  "labels": [
+   "them-1",
+   "them-2",
+   "them-3",
+   "them-4"
+  ],
+  "segments_per_label": {
+   "them-1": 92,
+   "them-2": 93,
+   "them-3": 74,
+   "them-4": 36
+  },
+  "segments": 430,
+  "split": "tune"
+ },
+ {
+  "id": "20260915-173345",
+  "started_at": "2026-09-15T13:33:46.385Z",
+  "minutes": 28.9,
+  "app": "Discord",
+  "group": "multi",
+  "labels": [
+   "them-1",
+   "them-2",
+   "them-3"
+  ],
+  "segments_per_label": {
+   "them-1": 68,
+   "them-2": 109,
+   "them-3": 33
+  },
+  "segments": 366,
+  "split": "tune"
+ },
+ {
+  "id": "20260916-103221",
+  "started_at": "2026-09-16T06:32:21.859Z",
+  "minutes": 14.9,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 107
+  },
+  "segments": 335,
+  "split": "other"
+ },
+ {
+  "id": "20260916-140855",
+  "started_at": "2026-09-16T10:08:55.405Z",
+  "minutes": 14.1,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 140
+  },
+  "segments": 271,
+  "split": "other"
+ },
+ {
+  "id": "20260916-143349",
+  "started_at": "2026-09-16T10:33:49.569Z",
+  "minutes": 9.5,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 56
+  },
+  "segments": 221,
+  "split": "other"
+ },
+ {
+  "id": "20260916-172818",
+  "started_at": "2026-09-16T13:28:19.016Z",
+  "minutes": 31.8,
+  "app": "Discord",
+  "group": "two",
+  "labels": [
+   "them-1",
+   "them-2"
+  ],
+  "segments_per_label": {
+   "them-1": 95,
+   "them-2": 157
+  },
+  "segments": 388,
+  "split": "other"
+ },
+ {
+  "id": "20260917-105422",
+  "started_at": "2026-09-17T06:54:23.215Z",
+  "minutes": 1.0,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 12
+  },
+  "segments": 37,
+  "split": "other"
+ },
+ {
+  "id": "20260917-122809",
+  "started_at": "2026-09-17T08:28:09.927Z",
+  "minutes": 17.4,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 242
+  },
+  "segments": 352,
+  "split": "other"
+ },
+ {
+  "id": "20260917-125931",
+  "started_at": "2026-09-17T08:59:32.262Z",
+  "minutes": 29.0,
+  "app": "Discord",
+  "group": "multi",
+  "labels": [
+   "them-1",
+   "them-2",
+   "them-3"
+  ],
+  "segments_per_label": {
+   "them-1": 91,
+   "them-2": 70,
+   "them-3": 65
+  },
+  "segments": 321,
+  "split": "tune"
+ },
+ {
+  "id": "20260918-121954",
+  "started_at": "2026-09-18T08:19:55.122Z",
+  "minutes": 16.6,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 172
+  },
+  "segments": 370,
+  "split": "other"
+ },
+ {
+  "id": "20260918-125857",
+  "started_at": "2026-09-18T08:58:57.621Z",
+  "minutes": 57.4,
+  "app": "Discord",
+  "group": "multi",
+  "labels": [
+   "them-1",
+   "them-2",
+   "them-3",
+   "them-4"
+  ],
+  "segments_per_label": {
+   "them-1": 155,
+   "them-2": 137,
+   "them-3": 32,
+   "them-4": 128
+  },
+  "segments": 684,
+  "split": "tune"
+ },
+ {
+  "id": "20260921-125925",
+  "started_at": "2026-09-21T08:59:25.886Z",
+  "minutes": 31.3,
+  "app": "Discord",
+  "group": "multi",
+  "labels": [
+   "them-1",
+   "them-2",
+   "them-3",
+   "them-4",
+   "them-5"
+  ],
+  "segments_per_label": {
+   "them-1": 62,
+   "them-2": 1,
+   "them-3": 65,
+   "them-4": 72,
+   "them-5": 36
+  },
+  "segments": 327,
+  "split": "tune"
+ },
+ {
+  "id": "20260922-084404",
+  "started_at": "2026-09-22T04:44:04.945Z",
+  "minutes": 22.6,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 209
+  },
+  "segments": 466,
+  "split": "other"
+ },
+ {
+  "id": "20260922-115609",
+  "started_at": "2026-09-22T07:56:09.454Z",
+  "minutes": 12.8,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 97
+  },
+  "segments": 257,
+  "split": "other"
+ },
+ {
+  "id": "20260922-125838",
+  "started_at": "2026-09-22T08:58:38.963Z",
+  "minutes": 47.7,
+  "app": "Discord",
+  "group": "multi",
+  "labels": [
+   "them-1",
+   "them-2",
+   "them-3",
+   "them-4"
+  ],
+  "segments_per_label": {
+   "them-1": 139,
+   "them-2": 125,
+   "them-3": 75,
+   "them-4": 51
+  },
+  "segments": 515,
+  "split": "tune"
+ },
+ {
+  "id": "20260923-101613",
+  "started_at": "2026-09-23T06:16:13.758Z",
+  "minutes": 25.6,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 268
+  },
+  "segments": 594,
+  "split": "other"
+ },
+ {
+  "id": "20260923-125419",
+  "started_at": "2026-09-23T08:54:19.398Z",
+  "minutes": 5.0,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 30
+  },
+  "segments": 98,
+  "split": "other"
+ },
+ {
+  "id": "20260923-130021",
+  "started_at": "2026-09-23T09:00:21.945Z",
+  "minutes": 50.6,
+  "app": "Discord",
+  "group": "multi",
+  "labels": [
+   "them-1",
+   "them-2",
+   "them-3",
+   "them-4",
+   "them-5",
+   "them-6"
+  ],
+  "segments_per_label": {
+   "them-1": 106,
+   "them-2": 88,
+   "them-3": 99,
+   "them-4": 88,
+   "them-5": 109,
+   "them-6": 4
+  },
+  "segments": 592,
+  "split": "tune"
+ },
+ {
+  "id": "20260924-110157",
+  "started_at": "2026-09-24T07:01:57.752Z",
+  "minutes": 4.4,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 58
+  },
+  "segments": 142,
+  "split": "other"
+ },
+ {
+  "id": "20260924-130017",
+  "started_at": "2026-09-24T09:00:17.748Z",
+  "minutes": 32.7,
+  "app": "Discord",
+  "group": "two",
+  "labels": [
+   "them-1",
+   "them-2"
+  ],
+  "segments_per_label": {
+   "them-1": 102,
+   "them-2": 123
+  },
+  "segments": 302,
+  "split": "other"
+ },
+ {
+  "id": "20260924-133358",
+  "started_at": "2026-09-24T09:33:59.092Z",
+  "minutes": 4.7,
+  "app": null,
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 37
+  },
+  "segments": 68,
+  "split": "other"
+ },
+ {
+  "id": "20260924-173310",
+  "started_at": "2026-09-24T13:33:11.182Z",
+  "minutes": 2.6,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 33
+  },
+  "segments": 62,
+  "split": "other"
+ },
+ {
+  "id": "20260924-173649",
+  "started_at": "2026-09-24T13:36:50.255Z",
+  "minutes": 8.9,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 116
+  },
+  "segments": 208,
+  "split": "other"
+ },
+ {
+  "id": "20260925-111702",
+  "started_at": "2026-09-25T07:17:02.537Z",
+  "minutes": 1.4,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 14
+  },
+  "segments": 48,
+  "split": "other"
+ },
+ {
+  "id": "20260925-114649",
+  "started_at": "2026-09-25T07:46:50.115Z",
+  "minutes": 3.9,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 34
+  },
+  "segments": 78,
+  "split": "other"
+ },
+ {
+  "id": "20260925-125945",
+  "started_at": "2026-09-25T08:59:45.583Z",
+  "minutes": 28.8,
+  "app": "Discord",
+  "group": "multi",
+  "labels": [
+   "them-1",
+   "them-2",
+   "them-3"
+  ],
+  "segments_per_label": {
+   "them-1": 12,
+   "them-2": 93,
+   "them-3": 104
+  },
+  "segments": 303,
+  "split": "tune"
+ },
+ {
+  "id": "20261001-120018",
+  "started_at": "2026-10-01T09:00:18.008Z",
+  "minutes": 41.8,
+  "app": "Discord",
+  "group": "multi",
+  "labels": [
+   "them-1",
+   "them-2",
+   "them-3",
+   "them-4",
+   "them-5"
+  ],
+  "segments_per_label": {
+   "them-1": 89,
+   "them-2": 56,
+   "them-3": 39,
+   "them-4": 91,
+   "them-5": 3
+  },
+  "segments": 415,
+  "split": "tune"
+ },
+ {
+  "id": "20261002-115959",
+  "started_at": "2026-10-02T09:00:03.512Z",
+  "minutes": 33.8,
+  "app": "Discord",
+  "group": "multi",
+  "labels": [
+   "them-1",
+   "them-2",
+   "them-3",
+   "them-4",
+   "them-5"
+  ],
+  "segments_per_label": {
+   "them-1": 41,
+   "them-2": 10,
+   "them-3": 45,
+   "them-4": 54,
+   "them-5": 4
+  },
+  "segments": 283,
+  "split": "tune"
+ },
+ {
+  "id": "20261005-125931",
+  "started_at": "2026-10-05T08:59:32.840Z",
+  "minutes": 47.5,
+  "app": "Discord",
+  "group": "multi",
+  "labels": [
+   "them-1",
+   "them-2",
+   "them-3",
+   "them-4"
+  ],
+  "segments_per_label": {
+   "them-1": 105,
+   "them-2": 69,
+   "them-3": 86,
+   "them-4": 175
+  },
+  "segments": 578,
+  "split": "tune"
+ },
+ {
+  "id": "20261006-125933",
+  "started_at": "2026-10-06T08:59:33.546Z",
+  "minutes": 42.4,
+  "app": "Discord",
+  "group": "multi",
+  "labels": [
+   "them-1",
+   "them-2",
+   "them-3",
+   "them-4",
+   "them-5"
+  ],
+  "segments_per_label": {
+   "them-1": 73,
+   "them-2": 23,
+   "them-3": 85,
+   "them-4": 78,
+   "them-5": 94
+  },
+  "segments": 459,
+  "split": "tune"
+ },
+ {
+  "id": "20261006-173015",
+  "started_at": "2026-10-06T13:30:15.923Z",
+  "minutes": 17.3,
+  "app": "Chrome / Google Meet",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 61
+  },
+  "segments": 174,
+  "split": "other"
+ },
+ {
+  "id": "20261006-185633",
+  "started_at": "2026-10-06T14:56:34.002Z",
+  "minutes": 7.2,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 51
+  },
+  "segments": 111,
+  "split": "other"
+ },
+ {
+  "id": "20261007-125915",
+  "started_at": "2026-10-07T08:59:16.398Z",
+  "minutes": 27.9,
+  "app": "Discord",
+  "group": "multi",
+  "labels": [
+   "them-1",
+   "them-2",
+   "them-3",
+   "them-4"
+  ],
+  "segments_per_label": {
+   "them-1": 5,
+   "them-2": 107,
+   "them-3": 15,
+   "them-4": 34
+  },
+  "segments": 324,
+  "split": "tune"
+ },
+ {
+  "id": "20261008-123827",
+  "started_at": "2026-10-08T08:38:28.585Z",
+  "minutes": 13.3,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 85
+  },
+  "segments": 200,
+  "split": "other"
+ },
+ {
+  "id": "20261008-125916",
+  "started_at": "2026-10-08T08:59:17.183Z",
+  "minutes": 16.1,
+  "app": "Discord",
+  "group": "multi",
+  "labels": [
+   "them-1",
+   "them-2",
+   "them-3"
+  ],
+  "segments_per_label": {
+   "them-1": 19,
+   "them-2": 7,
+   "them-3": 58
+  },
+  "segments": 173,
+  "split": "test"
+ },
+ {
+  "id": "20261008-131619",
+  "started_at": "2026-10-08T09:16:20.201Z",
+  "minutes": 24.0,
+  "app": null,
+  "group": "multi",
+  "labels": [
+   "them-1",
+   "them-2",
+   "them-3",
+   "them-4"
+  ],
+  "segments_per_label": {
+   "them-1": 61,
+   "them-2": 80,
+   "them-3": 8,
+   "them-4": 96
+  },
+  "segments": 312,
+  "split": "test"
+ },
+ {
+  "id": "20261008-134619",
+  "started_at": "2026-10-08T09:46:20.129Z",
+  "minutes": 24.2,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 147
+  },
+  "segments": 357,
+  "split": "other"
+ },
+ {
+  "id": "20261009-063033",
+  "started_at": "2026-10-09T02:30:34.079Z",
+  "minutes": 6.2,
+  "app": null,
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 55
+  },
+  "segments": 55,
+  "split": "other"
+ },
+ {
+  "id": "20261009-125957",
+  "started_at": "2026-10-09T08:59:58.206Z",
+  "minutes": 18.6,
+  "app": "Discord",
+  "group": "multi",
+  "labels": [
+   "them-1",
+   "them-2",
+   "them-3",
+   "them-4"
+  ],
+  "segments_per_label": {
+   "them-1": 17,
+   "them-2": 23,
+   "them-3": 48,
+   "them-4": 37
+  },
+  "segments": 203,
+  "split": "test"
+ },
+ {
+  "id": "20261012-090804",
+  "started_at": "2026-10-12T05:08:10.186Z",
+  "minutes": 8.6,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 42
+  },
+  "segments": 138,
+  "split": "other"
+ },
+ {
+  "id": "20261012-122128",
+  "started_at": "2026-10-12T08:21:28.814Z",
+  "minutes": 3.1,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 30
+  },
+  "segments": 63,
+  "split": "other"
+ },
+ {
+  "id": "20261012-125647",
+  "started_at": "2026-10-12T08:56:47.425Z",
+  "minutes": 42.0,
+  "app": "Discord",
+  "group": "multi",
+  "labels": [
+   "them-1",
+   "them-2",
+   "them-3",
+   "them-4",
+   "them-5"
+  ],
+  "segments_per_label": {
+   "them-1": 21,
+   "them-2": 133,
+   "them-3": 119,
+   "them-4": 44,
+   "them-5": 51
+  },
+  "segments": 454,
+  "split": "test"
+ },
+ {
+  "id": "20261012-134331",
+  "started_at": "2026-10-12T09:43:31.951Z",
+  "minutes": 7.9,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 21
+  },
+  "segments": 137,
+  "split": "other"
+ },
+ {
+  "id": "20261013-125927",
+  "started_at": "2026-10-13T08:59:28.142Z",
+  "minutes": 31.7,
+  "app": "Discord",
+  "group": "multi",
+  "labels": [
+   "them-1",
+   "them-2",
+   "them-3",
+   "them-4"
+  ],
+  "segments_per_label": {
+   "them-1": 40,
+   "them-2": 82,
+   "them-3": 16,
+   "them-4": 35
+  },
+  "segments": 342,
+  "split": "test"
+ },
+ {
+  "id": "20261013-172022",
+  "started_at": "2026-10-13T13:20:22.982Z",
+  "minutes": 1.5,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 25
+  },
+  "segments": 46,
+  "split": "other"
+ },
+ {
+  "id": "20261014-091200",
+  "started_at": "2026-10-14T05:12:01.264Z",
+  "minutes": 16.2,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 117
+  },
+  "segments": 287,
+  "split": "other"
+ },
+ {
+  "id": "20261014-125957",
+  "started_at": "2026-10-14T08:59:57.598Z",
+  "minutes": 28.5,
+  "app": "Discord",
+  "group": "multi",
+  "labels": [
+   "them-1",
+   "them-2",
+   "them-3",
+   "them-4",
+   "them-5"
+  ],
+  "segments_per_label": {
+   "them-1": 86,
+   "them-2": 35,
+   "them-3": 77,
+   "them-4": 22,
+   "them-5": 40
+  },
+  "segments": 303,
+  "split": "test"
+ },
+ {
+  "id": "20261014-195946",
+  "started_at": "2026-10-14T15:59:47.791Z",
+  "minutes": 23.2,
+  "app": "Chrome / Google Meet",
+  "group": "two",
+  "labels": [
+   "them-1",
+   "them-2"
+  ],
+  "segments_per_label": {
+   "them-1": 111,
+   "them-2": 80
+  },
+  "segments": 294,
+  "split": "other"
+ },
+ {
+  "id": "20261015-125911",
+  "started_at": "2026-10-15T08:59:12.102Z",
+  "minutes": 31.9,
+  "app": "Discord",
+  "group": "multi",
+  "labels": [
+   "them-1",
+   "them-2",
+   "them-3",
+   "them-4"
+  ],
+  "segments_per_label": {
+   "them-1": 109,
+   "them-2": 19,
+   "them-3": 53,
+   "them-4": 44
+  },
+  "segments": 350,
+  "split": "test"
+ },
+ {
+  "id": "20261016-113955",
+  "started_at": "2026-10-16T07:39:56.243Z",
+  "minutes": 10.1,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 77
+  },
+  "segments": 289,
+  "split": "other"
+ },
+ {
+  "id": "20261019-085343",
+  "started_at": "2026-10-19T04:53:43.312Z",
+  "minutes": 7.0,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 81
+  },
+  "segments": 180,
+  "split": "other"
+ },
+ {
+  "id": "20261019-090145",
+  "started_at": "2026-10-19T05:01:45.459Z",
+  "minutes": 9.0,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 77
+  },
+  "segments": 155,
+  "split": "other"
+ },
+ {
+  "id": "20261019-091159",
+  "started_at": "2026-10-19T05:11:59.323Z",
+  "minutes": 7.1,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 130
+  },
+  "segments": 182,
+  "split": "other"
+ },
+ {
+  "id": "20261019-120955",
+  "started_at": "2026-10-19T08:09:55.589Z",
+  "minutes": 3.1,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 43
+  },
+  "segments": 84,
+  "split": "other"
+ },
+ {
+  "id": "20261019-125920",
+  "started_at": "2026-10-19T08:59:20.474Z",
+  "minutes": 36.2,
+  "app": "Discord",
+  "group": "multi",
+  "labels": [
+   "them-1",
+   "them-2",
+   "them-3",
+   "them-4"
+  ],
+  "segments_per_label": {
+   "them-1": 35,
+   "them-2": 63,
+   "them-3": 77,
+   "them-4": 87
+  },
+  "segments": 419,
+  "split": "test"
+ },
+ {
+  "id": "20261019-134526",
+  "started_at": "2026-10-19T09:45:27.205Z",
+  "minutes": 3.4,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 68
+  },
+  "segments": 118,
+  "split": "other"
+ },
+ {
+  "id": "20261020-110302",
+  "started_at": "2026-10-20T07:03:02.805Z",
+  "minutes": 3.2,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 35
+  },
+  "segments": 75,
+  "split": "other"
+ },
+ {
+  "id": "20261020-125854",
+  "started_at": "2026-10-20T08:58:54.703Z",
+  "minutes": 22.8,
+  "app": "Discord",
+  "group": "multi",
+  "labels": [
+   "them-1",
+   "them-2",
+   "them-3"
+  ],
+  "segments_per_label": {
+   "them-1": 58,
+   "them-2": 26,
+   "them-3": 105
+  },
+  "segments": 268,
+  "split": "test"
+ },
+ {
+  "id": "20261020-132242",
+  "started_at": "2026-10-20T09:22:43.157Z",
+  "minutes": 17.6,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 193
+  },
+  "segments": 346,
+  "split": "other"
+ },
+ {
+  "id": "20261021-114012",
+  "started_at": "2026-10-21T07:40:13.519Z",
+  "minutes": 11.1,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 112
+  },
+  "segments": 254,
+  "split": "other"
+ },
+ {
+  "id": "20261021-125950",
+  "started_at": "2026-10-21T08:59:50.627Z",
+  "minutes": 30.2,
+  "app": "Discord",
+  "group": "multi",
+  "labels": [
+   "them-1",
+   "them-2",
+   "them-3"
+  ],
+  "segments_per_label": {
+   "them-1": 86,
+   "them-2": 72,
+   "them-3": 60
+  },
+  "segments": 339,
+  "split": "test"
+ },
+ {
+  "id": "20261021-133547",
+  "started_at": "2026-10-21T09:35:47.484Z",
+  "minutes": 2.4,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 15
+  },
+  "segments": 41,
+  "split": "other"
+ },
+ {
+  "id": "20261022-085823",
+  "started_at": "2026-10-22T04:58:23.588Z",
+  "minutes": 4.6,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 47
+  },
+  "segments": 94,
+  "split": "other"
+ },
+ {
+  "id": "20261022-104159",
+  "started_at": "2026-10-22T06:41:59.543Z",
+  "minutes": 14.4,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 122
+  },
+  "segments": 267,
+  "split": "other"
+ },
+ {
+  "id": "20261022-125952",
+  "started_at": "2026-10-22T08:59:53.151Z",
+  "minutes": 33.9,
+  "app": "Discord",
+  "group": "multi",
+  "labels": [
+   "them-1",
+   "them-2",
+   "them-3",
+   "them-4"
+  ],
+  "segments_per_label": {
+   "them-1": 108,
+   "them-2": 65,
+   "them-3": 42,
+   "them-4": 20
+  },
+  "segments": 349,
+  "split": "test"
+ },
+ {
+  "id": "20261022-133449",
+  "started_at": "2026-10-22T09:34:49.272Z",
+  "minutes": 4.5,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 26
+  },
+  "segments": 100,
+  "split": "other"
+ },
+ {
+  "id": "20261022-170938",
+  "started_at": "2026-10-22T13:09:38.849Z",
+  "minutes": 5.7,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 57
+  },
+  "segments": 105,
+  "split": "other"
+ },
+ {
+  "id": "20261023-123550",
+  "started_at": "2026-10-23T08:35:51.160Z",
+  "minutes": 20.3,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 205
+  },
+  "segments": 436,
+  "split": "other"
+ },
+ {
+  "id": "20261023-125947",
+  "started_at": "2026-10-23T08:59:48.126Z",
+  "minutes": 35.4,
+  "app": "Discord",
+  "group": "multi",
+  "labels": [
+   "them-1",
+   "them-2",
+   "them-3"
+  ],
+  "segments_per_label": {
+   "them-1": 116,
+   "them-2": 89,
+   "them-3": 58
+  },
+  "segments": 410,
+  "split": "test"
+ },
+ {
+  "id": "20261023-133703",
+  "started_at": "2026-10-23T09:37:03.399Z",
+  "minutes": 3.3,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 45
+  },
+  "segments": 105,
+  "split": "other"
+ },
+ {
+  "id": "20261023-141204",
+  "started_at": "2026-10-23T10:12:04.704Z",
+  "minutes": 5.7,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 66
+  },
+  "segments": 119,
+  "split": "other"
+ },
+ {
+  "id": "20261026-083647",
+  "started_at": "2026-10-26T04:36:47.393Z",
+  "minutes": 9.8,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 72
+  },
+  "segments": 200,
+  "split": "other"
+ },
+ {
+  "id": "20261026-125926",
+  "started_at": "2026-10-26T08:59:27.363Z",
+  "minutes": 33.7,
+  "app": "Discord",
+  "group": "multi",
+  "labels": [
+   "them-1",
+   "them-2",
+   "them-3",
+   "them-4"
+  ],
+  "segments_per_label": {
+   "them-1": 120,
+   "them-2": 37,
+   "them-3": 48,
+   "them-4": 23
+  },
+  "segments": 377,
+  "split": "test"
+ },
+ {
+  "id": "20261027-084825",
+  "started_at": "2026-10-27T04:48:26.366Z",
+  "minutes": 26.2,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 247
+  },
+  "segments": 468,
+  "split": "other"
+ },
+ {
+  "id": "20261027-125916",
+  "started_at": "2026-10-27T08:59:17.354Z",
+  "minutes": 5.1,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 22
+  },
+  "segments": 78,
+  "split": "other"
+ },
+ {
+  "id": "20261027-130526",
+  "started_at": "2026-10-27T09:05:26.740Z",
+  "minutes": 24.0,
+  "app": "Discord",
+  "group": "multi",
+  "labels": [
+   "them-1",
+   "them-2",
+   "them-3",
+   "them-4",
+   "them-5"
+  ],
+  "segments_per_label": {
+   "them-1": 59,
+   "them-2": 17,
+   "them-3": 20,
+   "them-4": 63,
+   "them-5": 30
+  },
+  "segments": 239,
+  "split": "test"
+ },
+ {
+  "id": "20261027-135339",
+  "started_at": "2026-10-27T09:53:39.442Z",
+  "minutes": 8.4,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 60
+  },
+  "segments": 150,
+  "split": "other"
+ },
+ {
+  "id": "20261027-140304",
+  "started_at": "2026-10-27T10:03:06.773Z",
+  "minutes": 12.1,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 159
+  },
+  "segments": 279,
+  "split": "other"
+ },
+ {
+  "id": "20261029-084037",
+  "started_at": "2026-10-29T04:40:38.053Z",
+  "minutes": 13.2,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 172
+  },
+  "segments": 309,
+  "split": "other"
+ },
+ {
+  "id": "20261029-114018",
+  "started_at": "2026-10-29T07:40:18.535Z",
+  "minutes": 14.5,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 128
+  },
+  "segments": 260,
+  "split": "other"
+ },
+ {
+  "id": "20261029-125956",
+  "started_at": "2026-10-29T08:59:56.743Z",
+  "minutes": 26.3,
+  "app": "Discord",
+  "group": "multi",
+  "labels": [
+   "them-1",
+   "them-2",
+   "them-3"
+  ],
+  "segments_per_label": {
+   "them-1": 77,
+   "them-2": 26,
+   "them-3": 53
+  },
+  "segments": 275,
+  "split": "test"
+ },
+ {
+  "id": "20261029-132713",
+  "started_at": "2026-10-29T09:27:14.177Z",
+  "minutes": 6.9,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 65
+  },
+  "segments": 160,
+  "split": "other"
+ },
+ {
+  "id": "20261029-172644",
+  "started_at": "2026-10-29T13:26:44.641Z",
+  "minutes": 13.1,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 171
+  },
+  "segments": 279,
+  "split": "other"
+ },
+ {
+  "id": "20261030-085158",
+  "started_at": "2026-10-30T04:51:59.353Z",
+  "minutes": 16.8,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 139
+  },
+  "segments": 371,
+  "split": "other"
+ },
+ {
+  "id": "20261030-122340",
+  "started_at": "2026-10-30T08:23:40.464Z",
+  "minutes": 13.1,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 102
+  },
+  "segments": 272,
+  "split": "other"
+ },
+ {
+  "id": "20261030-125922",
+  "started_at": "2026-10-30T08:59:22.385Z",
+  "minutes": 24.8,
+  "app": "Discord",
+  "group": "multi",
+  "labels": [
+   "them-1",
+   "them-2",
+   "them-3"
+  ],
+  "segments_per_label": {
+   "them-1": 68,
+   "them-2": 20,
+   "them-3": 113
+  },
+  "segments": 284,
+  "split": "test"
+ },
+ {
+  "id": "20261102-085130",
+  "started_at": "2026-11-02T04:51:31.145Z",
+  "minutes": 10.8,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 91
+  },
+  "segments": 242,
+  "split": "other"
+ },
+ {
+  "id": "20261102-125941",
+  "started_at": "2026-11-02T08:59:41.667Z",
+  "minutes": 35.5,
+  "app": "Discord",
+  "group": "multi",
+  "labels": [
+   "them-1",
+   "them-2",
+   "them-3",
+   "them-4"
+  ],
+  "segments_per_label": {
+   "them-1": 32,
+   "them-2": 89,
+   "them-3": 67,
+   "them-4": 58
+  },
+  "segments": 385,
+  "split": "test"
+ },
+ {
+  "id": "20261102-133615",
+  "started_at": "2026-11-02T09:36:15.319Z",
+  "minutes": 8.6,
+  "app": "Discord",
+  "group": "one",
+  "labels": [
+   "them-1"
+  ],
+  "segments_per_label": {
+   "them-1": 97
+  },
+  "segments": 178,
+  "split": "other"
+ }
+]

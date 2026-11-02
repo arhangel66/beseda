@@ -1,0 +1,28 @@
+{
+  "call_id": "20261008-131619",
+  "call_kind": "daily",
+  "language": "en",
+  "labels": {
+    "them-1": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []},
+    "them-2": {"name": "Fish", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 274, "line": "me: Uh one more fish.", "why": "Mikhail asks Fish why the rewards calculator is behind login (274-277); them-2 answers (278: 'Yes, it should be available without a login.')"},
+                 {"idx": 244, "line": "them-4: Yeah, it says fish sets the numbers, I'm preparing them.", "why": "talked about; them-2 reacts (245: 'I sent which numbers.')"}
+               ]},
+    "them-3": {"name": "unknown", "status": "unknown", "confidence": "high", "evidence": []},
+    "them-4": {"name": "Gus", "status": "named", "confidence": "high",
+               "evidence": [
+                 {"idx": 72, "line": "them-1: On to you, Gus.", "why": "hand-over; them-4 gives the next update (73-102)"},
+                 {"idx": 168, "line": "them-2: just make sure that you're not messaging the same people that Gus already mentioned.", "why": "talked about; them-4 reacts (171: 'Yeah, no, we have separate lists.')"}
+               ]}
+  },
+  "speaking_order": ["them-1", "them-2", "them-3", "them-4"],
+  "topics_per_label": {
+    "them-1": "review agents looping on PRs, CodeQL and E2E CI cost, infra PRs released, vacation next week, incognito window for login bug",
+    "them-2": "CI spend, turn off CodeQL, referral rate change, top priority more providers, be discreet on Vast Discord, public earnings dashboard",
+    "them-3": "agents self-reviewing 10 rounds, flag for human review after 2-3 rounds, CodeQL ~50% of CI minutes",
+    "them-4": "referral fee complaint, Crypto Labs provider, no Discord replies, Vast account, Grafana earnings dashboard"
+  },
+  "people_named_in_text": ["Pixel", "Gus", "Fish", "Mikhail", "Rustam"],
+  "notes": "Second part of the 20261008 daily. Fish and Gus are clear. Nobody names them-1 or them-3 in this part: them-1 says 'Pixel already merged one change' (11) so it is not Pixel, and Mikhail says Pixel left for the airport (292-294), but neither line names the speaker; both stay unknown."
+}
