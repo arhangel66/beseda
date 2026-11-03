@@ -64,6 +64,8 @@ The chosen type's name is stored on the call (`callStore.setCallType`, column `c
    - **Built-in** — `LlamaServer` runs the downloaded `llama-server` with Gemma 4 E4B on
      `127.0.0.1:8734` (64k context, one slot), waits for `/health` up to 300 s, and stops it 10 min after
      the last use and on quit. Budget 150k chars.
+     A picker switches it to Gemma 4 12B (`summaryUsesGemma12B`), the speaker-names model, on its own
+     server at `127.0.0.1:8735` with the same context and budget, so one downloaded model does both.
 3. The text is stored on the call row (`callStore.setSummary`). Errors map to `SummarizationError`; the
    error card offers a recovery (`SummaryRecovery`), e.g. starting LM Studio with `lms server start`.
 

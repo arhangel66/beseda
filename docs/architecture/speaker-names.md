@@ -17,8 +17,9 @@ settings («Люди в звонках»), and keeps why it chose each name.
    voice that says a name gets −1 for that name. Greedy assignment: one name per speaker, one speaker per
    name.
 2. If Gemma 4 12B is downloaded, `SpeakerNamer` sends the whole clean transcript in one request with the
-   eval's p1 prompt (temperature 0, JSON schema, thinking off) to its own `llama-server` on port 8735, then
-   stops it before the summary. The model fills only the speakers the rules left open, and never names a
+   eval's p1 prompt (temperature 0, JSON schema, thinking off) to its own `llama-server` on port 8735. The
+   server is stopped right after, unless the summary that follows also runs on the 12B
+   (`AppSettings.summaryUsesGemma12B`); then it stays loaded and writes the summary. The model fills only the speakers the rules left open, and never names a
    person the rules already placed. Without the 12B the rules alone run.
 3. Every guess goes to `call_speaker_guesses` (name or `unknown`, source `rules`/`model`, evidence, the raw
    model reply). A name goes to `call_speakers` only for a speaker without a manual name; the transcript
@@ -42,4 +43,4 @@ was chosen to watch on real calls first.
 - `Summarization/SpeakerNamer.swift` — `CallPeople`, `SpeakerNameRules`, `SpeakerNamer`.
 - `App/AppController.swift` — `nameSpeakers(of:)`, queue order.
 - `Storage/CallStore.swift` — `call_speaker_guesses` (migration 5).
-- `Summarization/SummaryProvider.swift` — `BundledSummary.speakerNames`, the pinned 12B GGUF.
+- `Summarization/SummaryProvider.swift` — `BundledSummary.gemma12B`, the pinned 12B GGUF.

@@ -97,6 +97,7 @@ final class AppSettings {
     private let autoProcessCallsKey = "beseda.autoProcessCalls"
     private let callPeopleKey = "beseda.callPeople"
     private let namesSpeakersKey = "beseda.namesSpeakers"
+    private let summaryUsesGemma12BKey = "beseda.summaryUsesGemma12B"
     private let exportFolderKey = "beseda.exportFolder"
     private let exportBookmarkKey = "beseda.exportBookmark"
     private let exportBookmarksKey = "beseda.exportBookmarks"
@@ -277,6 +278,13 @@ final class AppSettings {
     var namesSpeakers: Bool {
         didSet {
             defaults.set(namesSpeakers, forKey: namesSpeakersKey)
+        }
+    }
+
+    /// the built-in summary runs on Gemma 4 12B, the speaker-names model, instead of E4B
+    var summaryUsesGemma12B: Bool {
+        didSet {
+            defaults.set(summaryUsesGemma12B, forKey: summaryUsesGemma12BKey)
         }
     }
 
@@ -474,6 +482,7 @@ final class AppSettings {
         self.autoProcessCalls = defaults.bool(forKey: autoProcessCallsKey)
         self.callPeople = defaults.string(forKey: callPeopleKey) ?? ""
         self.namesSpeakers = defaults.bool(forKey: namesSpeakersKey)
+        self.summaryUsesGemma12B = defaults.bool(forKey: summaryUsesGemma12BKey)
         self.webhookEnabled = defaults.bool(forKey: webhookEnabledKey)
         self.exportFolder = defaults.string(forKey: exportFolderKey) ?? ""
         self.webhookURL = defaults.string(forKey: webhookURLKey) ?? ""

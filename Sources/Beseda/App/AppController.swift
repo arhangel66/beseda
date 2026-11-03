@@ -133,7 +133,8 @@ final class AppController {
     @ObservationIgnored let runtime: RuntimeInstaller
     @ObservationIgnored let bundledSummary: BundledSummaryInstaller
     @ObservationIgnored private let llamaServer: LlamaServer
-    @ObservationIgnored let speakerNamesModel: BundledSummaryInstaller
+    @ObservationIgnored let gemma12BModel: BundledSummaryInstaller
+    @ObservationIgnored private let gemma12BServer: LlamaServer
     @ObservationIgnored private let speakerNamer: SpeakerNamer
     @ObservationIgnored let updater = AppUpdater()
     @ObservationIgnored private lazy var processingQueue = SerialQueue<(StoredCallDetail, CallType?, Bool)> { [unowned self] job in
@@ -175,6 +176,7 @@ final class AppController {
     func shutdown() {
         transcriber.shutdown()
         llamaServer.stop()
+        gemma12BServer.stop()
     }
 
     var menuBarSystemImage: String {
@@ -242,13 +244,14 @@ final class AppController {
             _ = try await llamaServer.ensureRunning()
             llamaServer.stop()
         }
-        // its own port: it never runs beside the summary model, but a stale one must not answer for it
-        let speakerNamesServer = LlamaServer(paths: paths, artifacts: .speakerNames, port: 8735, contextTokens: 32_768)
-        speakerNamesModel = BundledSummaryInstaller(paths: paths, artifacts: .speakerNames) {
-            _ = try await speakerNamesServer.ensureRunning()
-            speakerNamesServer.stop()
+        // its own port: E4B and 12B are separate processes, and a stale one must not answer for the other
+        let gemma12BServer = LlamaServer(paths: paths, artifacts: .gemma12B, port: 8735)
+        self.gemma12BServer = gemma12BServer
+        gemma12BModel = BundledSummaryInstaller(paths: paths, artifacts: .gemma12B) {
+            _ = try await gemma12BServer.ensureRunning()
+            gemma12BServer.stop()
         }
-        speakerNamer = SpeakerNamer(paths: paths, server: speakerNamesServer)
+        speakerNamer = SpeakerNamer(paths: paths, server: gemma12BServer)
         transcriber.diagnosticsHandler = { [weak self] message in
             Task { @MainActor in
                 self?.appendLog(message)
@@ -274,7 +277,7 @@ final class AppController {
         llamaServer.log = { [weak self] message in
             self?.appendLog(message)
         }
-        speakerNamesModel.log = { [weak self] message in
+        gemma12BModel.log = { [weak self] message in
             self?.appendLog(message)
         }
         speakerNamer.log = { [weak self] message in
@@ -1081,7 +1084,7 @@ final class AppController {
     private func startLiveTranscription(in sessionDir: URL, capture: DualCapture) {
         let live = LiveTranscription(
             summarize: { [unowned self] text in
-                defer { llamaServer.noteIdle() }
+                defer { summaryServer.noteIdle() }
                 var (provider, characterBudget) = try await makeSummaryProvider()
                 provider.prompt = LiveTranscription.keyPointsPrompt
                 return try await provider.summarize(text: String(text.suffix(characterBudget)))
@@ -1497,6 +1500,9 @@ final class AppController {
         if settings.namesSpeakers, (try? callStore.fetchSpeakerGuesses(callID: detail.id).isEmpty) ?? false {
             detail = await nameSpeakers(of: detail)
         }
+        if !(summarizes && settings.summaryUsesGemma12B) {
+            gemma12BServer.stop()
+        }
         if summarizes {
             summaryError = nil
             summaryRecovery = nil
@@ -1622,7 +1628,7 @@ final class AppController {
                 return
             }
             defer { self.isCheckingSummary = false }
-            defer { self.llamaServer.noteIdle() }
+            defer { self.summaryServer.noteIdle() }
             let startedAt = Date()
             do {
                 let provider = try await self.makeSummaryProvider().provider
@@ -1640,7 +1646,7 @@ final class AppController {
             summarizingCallID = nil
             summaryStartedAt = nil
         }
-        defer { llamaServer.noteIdle() }
+        defer { summaryServer.noteIdle() }
         // a job resumed at launch runs while the Keychain read may still be out: wait for the real key
         await settings.secretsLoad?.value
         do {
@@ -1743,6 +1749,11 @@ final class AppController {
 
     /// The provider the settings point at, and how much transcript it can be given: the built-in
     /// model has a 64k context, the other two take the whole call.
+    /// the built-in model's server the summary settings point at
+    private var summaryServer: LlamaServer {
+        settings.summaryUsesGemma12B ? gemma12BServer : llamaServer
+    }
+
     private func makeSummaryProvider() async throws -> (provider: ChatCompletionsProvider, characterBudget: Int) {
         await settings.secretsLoad?.value
         let prompt = settings.callTypes.other.prompt
@@ -1760,10 +1771,10 @@ final class AppController {
             )
             return (provider, Self.cloudCharacterBudget)
         case .builtIn:
-            let baseURL = try await llamaServer.ensureRunning()
+            let baseURL = try await summaryServer.ensureRunning()
             let provider = ChatCompletionsProvider(
                 baseURL: baseURL,
-                model: BundledSummary.current.modelID,
+                model: settings.summaryUsesGemma12B ? BundledSummary.gemma12B.modelID : BundledSummary.current.modelID,
                 prompt: prompt,
                 serviceName: MenuText.get("Встроенная модель"),
                 timeout: Self.localTimeout

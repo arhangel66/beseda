@@ -57,11 +57,11 @@ struct BundledSummary: Sendable {
         modelID: "gemma-4-e4b"
     )
 
-    /// names a call's remote speakers (SpeakerNamer); same engine as the summary model
+    /// names a call's remote speakers (SpeakerNamer) and, when picked, writes the summary too
     // TODO(Mikhail): pin the URL to a commit revision like the E4B one instead of `main`
-    static let speakerNames = BundledSummary(
-        title: "Gemma 4 12B для имён говорящих",
-        subtitle: "Узнаёт имена собеседников, когда правил не хватает. Запускается после звонка и сразу выгружается.",
+    static let gemma12B = BundledSummary(
+        title: "Gemma 4 12B",
+        subtitle: "Та же модель, что узнаёт имена собеседников: одна модель на итоги и имена. Медленнее E4B.",
         llamaBuild: current.llamaBuild,
         llamaArchiveURL: current.llamaArchiveURL,
         llamaArchiveSHA256: current.llamaArchiveSHA256,

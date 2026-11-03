@@ -382,7 +382,12 @@ private struct ProcessingPane: View {
                 case .openRouter:
                     openRouterRows
                 case .builtIn:
-                    BundledSummaryRow(installer: controller.bundledSummary)
+                    Picker(SettingsText.get("Модель"), selection: Bindable(settings).summaryUsesGemma12B) {
+                        Text(BundledSummary.current.title).tag(false)
+                        Text(BundledSummary.gemma12B.title).tag(true)
+                    }
+                    .pickerStyle(.segmented)
+                    BundledSummaryRow(installer: settings.summaryUsesGemma12B ? controller.gemma12BModel : controller.bundledSummary)
                 case .lmStudio:
                     lmStudioRows
                 }
@@ -412,7 +417,7 @@ private struct ProcessingPane: View {
             Section {
                 Toggle(SettingsText.get("Определять имена собеседников"), isOn: Bindable(settings).namesSpeakers)
                 if settings.namesSpeakers {
-                    BundledSummaryRow(installer: controller.speakerNamesModel)
+                    BundledSummaryRow(installer: controller.gemma12BModel)
                     TextEditor(text: Bindable(settings).callPeople)
                         .font(.body.monospaced())
                         .frame(minHeight: 100)

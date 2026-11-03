@@ -171,13 +171,13 @@ final class SpeakerNamer {
         guard rules.values.contains(where: { $0.name == StoredSpeakerGuess.unknown }) else {
             return rules
         }
-        guard BundledSummary.speakerNames.isModelDownloaded(paths) else {
-            log("Speaker names: rules only, \(BundledSummary.speakerNames.title) is not downloaded")
+        guard BundledSummary.gemma12B.isModelDownloaded(paths) else {
+            log("Speaker names: rules only, \(BundledSummary.gemma12B.title) is not downloaded")
             return rules
         }
         do {
-            // stopped right away: the summary model loads next and the two should not share memory
-            defer { server.stop() }
+            // AppController unloads it at once unless the summary that follows runs on the same model
+            defer { server.noteIdle() }
             let reply = try await askModel(segments)
             return Self.merging(modelReply: reply, into: rules, people: people)
         } catch {
@@ -229,7 +229,7 @@ final class SpeakerNamer {
             return String(format: "%d [%02d:%02d] %@: %@", segment.orderIndex, seconds / 60, seconds % 60, segment.speaker, text)
         }.joined(separator: "\n")
         let body: [String: Any] = [
-            "model": BundledSummary.speakerNames.modelID,
+            "model": BundledSummary.gemma12B.modelID,
             "temperature": 0,
             "max_tokens": 400,
             "stream": false,
@@ -246,7 +246,7 @@ final class SpeakerNamer {
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
         let (data, response) = try await URLSession.shared.data(for: request)
         let reply = try ChatCompletionsProvider.parse(
-            data, status: (response as? HTTPURLResponse)?.statusCode ?? 200, serviceName: BundledSummary.speakerNames.title
+            data, status: (response as? HTTPURLResponse)?.statusCode ?? 200, serviceName: BundledSummary.gemma12B.title
         )
         log("Speaker names: the model answered in \(Int(Date().timeIntervalSince(started))) s")
         return reply
