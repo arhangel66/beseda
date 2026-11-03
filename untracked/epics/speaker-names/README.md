@@ -430,3 +430,22 @@ Three of 16 replies were invalid: DeepSeek flash ran into the 16 000-token cap. 
 0.77 coverage, 0 wrong on the 22 labels of the valid calls — about as good as rules + 12B, and far
 above any local model alone (12B alone 0.41). Merged with rules3: 0.78 / wrong 0, the same as rules +
 12B (0.81 / 0). 5–135 s per request. Not run on tune or test.
+
+**Jev 1.13** (`typesafe/jev-1.13`, a System One decision model, not a chat model; OpenRouter
+`/api/v1/systemone`, `jev.py`, `jev_threshold.py`). One request per call, one Choice question per label
+(team names + `unknown`), each answer with probabilities and a confidence; a name is kept only above a
+confidence threshold. Fast set, 32 requests, under 1 s each, $0.01 in total.
+
+| window | alone, no threshold: cov / wrong | alone, confidence ≥ 0.5 | merged with rules3 |
+|---|---|---|---|
+| full | 0.50 / 0.094 | 0.44 / 0.031 | 0.72 / 0 |
+| edges100 | 0.41 / 0.031 | 0.38 / 0.031 | 0.72 / 0 |
+| names | 0.38 / 0.062 | 0.31 / 0.062 | 0.72 / 0 |
+| clues | 0.13 / 0 | 0.09 / 0 | 0.69 / 0 |
+
+Alone it is about Gemma 12B's level (0.41 / 0.031) at a fraction of the time; with the rules it adds
+one label over rules alone (0.69 → 0.72), against 0.81 for rules + 12B. It answers `unknown` a lot:
+TypeSafe's own notes say jev-1.13 is literal and weak at indirection, and "the next voice that
+answers is the person addressed" is exactly one hop of indirection. A better fit would be literal
+per-line questions (is this name said to someone? is this a thanks?) with the next-voice step in
+code, i.e. Jev replacing the rules' regexes. Not run.

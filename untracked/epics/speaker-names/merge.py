@@ -31,6 +31,6 @@ def merge(rules_dir: str, config: str) -> str:
 if __name__ == "__main__":
     rules_dir = sys.argv[1] if len(sys.argv) > 1 else "rules3__clues__none__-__nothink"
     for config_dir in sorted((HERE / "hyp").iterdir()):
-        if config_dir.name.startswith(("rules", "merge-", "vote-")):
+        if config_dir.name.startswith(("rules", "merge-", "vote-")) or config_dir.name.endswith("__raw"):
             continue
         merge(rules_dir, config_dir.name)
