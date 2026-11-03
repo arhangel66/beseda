@@ -26,7 +26,7 @@ Old single-microphone calls use `mic.raw.wav`, `mic.16k-mono.wav`, `mic.asr.json
 folder is moved here once by `LegacyDataMigration`.
 
 - **CallStore** — raw `sqlite3` (system library) behind a serial queue. `prepare()` creates the tables
-  `calls`, `transcript_segments`, `transcript_jobs`, `call_speakers` (renames only), `call_speaker_merges`, `webhook_deliveries`
+  `calls`, `transcript_segments`, `transcript_jobs`, `call_speakers` (renames only), `call_speaker_merges`, `call_speaker_guesses`, `webhook_deliveries`
   with `foreign_keys = ON` and WAL. Migrations are numbered: `CallStore.migrations` is a list, entry *n*
   brings the file to `PRAGMA user_version = n`, each runs in its own transaction with the version bump, so
   a failure rolls back to the last whole version. Version 1 is everything an unversioned file (every 0.3.x
@@ -50,6 +50,8 @@ folder is moved here once by `LegacyDataMigration`.
   and every `markReady` failed with `no such table: call_speaker_merges` (BESEDA-386, the owner's 0.4.1 on a
   version 3 file). `aVersion3FileWithoutSpeakerMergesRetriesToReadyWithSegments` replays that file's schema
   and checks it ends with the same tables and columns as a new one.
+  Version 5 adds `call_speaker_guesses`: the name [Speaker names](speaker-names.md) guessed per speaker,
+  its source, evidence and the raw model reply; a diarizer change deletes a call's rows with its speakers.
 - **Writes throw** — every index write in the recording and retry pipeline (`saveCall`,
   `upsertTranscriptJob`) throws into the job's error path, which shows the failure in the status line. A
   finished transcript goes in through `markReady`: segments and `status = 'ready'` in one transaction; only

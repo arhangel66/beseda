@@ -57,6 +57,21 @@ struct BundledSummary: Sendable {
         modelID: "gemma-4-e4b"
     )
 
+    /// names a call's remote speakers (SpeakerNamer); same engine as the summary model
+    // TODO(Mikhail): pin the URL to a commit revision like the E4B one instead of `main`
+    static let speakerNames = BundledSummary(
+        title: "Gemma 4 12B для имён говорящих",
+        subtitle: "Узнаёт имена собеседников, когда правил не хватает. Запускается после звонка и сразу выгружается.",
+        llamaBuild: current.llamaBuild,
+        llamaArchiveURL: current.llamaArchiveURL,
+        llamaArchiveSHA256: current.llamaArchiveSHA256,
+        modelFilename: "gemma-4-12B-it-Q4_0.gguf",
+        modelURL: URL(string: "https://huggingface.co/ggml-org/gemma-4-12B-it-GGUF/resolve/main/gemma-4-12B-it-Q4_0.gguf")!,
+        modelSHA256: "3712b9bd32cae83a22f67ee7a4466d8d7a4f21646ac8a07d19bf9418e8767a70",
+        modelBytes: 7_219_673_216,
+        modelID: "gemma-4-12b"
+    )
+
     /// Store mode is declared by the signed app plist, never inferred from a writable path.
     static var storeMode: Bool { Bundle.main.object(forInfoDictionaryKey: "BesedaStoreSummary") as? Bool == true }
 
@@ -89,10 +104,11 @@ struct BundledSummary: Sendable {
         buildDirectory(paths).appendingPathComponent("warm-up.ok")
     }
 
+    /// one per model: the two servers each truncate their own log on start
     func serverLog(_ paths: AppPaths) -> URL {
         paths.runtimeDirectory
             .appendingPathComponent("llama", isDirectory: true)
-            .appendingPathComponent("server.log")
+            .appendingPathComponent("server-\(modelID).log")
     }
 
     func isRuntimeInstalled(_ paths: AppPaths) -> Bool {

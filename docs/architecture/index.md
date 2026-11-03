@@ -9,6 +9,7 @@ explain how the parts fit and what constrains them.
 - [Storage](storage.md) — the SQLite call index, the archive on disk, search and audio retention.
 - [Integrations](integrations.md) — the webhook and other ways calls leave the app.
 - [Summarization](summarization.md) — how a call summary is produced, shown on the call screen and exported to Markdown.
+- [Speaker names](speaker-names.md) — the optional naming of remote speakers from a people list: rules, then Gemma 4 12B.
 - [Related calls](related-calls.md) — the previous related call and a digest of its stored summary, for «В прошлый раз».
 - [App structure](app-structure.md) — the menu bar app, `AppController` and the views.
 - [Build and release](build-release.md) — scripts, signing, updates and the ios kit.

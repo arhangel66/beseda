@@ -206,10 +206,28 @@ struct StoredCallDetail: Identifiable, Hashable {
     let speakerNames: [String: String]
     let markdownText: String?
     let jobStats: StoredJobStats?
+    /// what SpeakerNamer guessed per speaker key, unknown ones included
+    var speakerGuesses: [String: StoredSpeakerGuess] = [:]
 
     var id: String {
         summary.id
     }
+}
+
+/// One row of `call_speaker_guesses`: the name SpeakerNamer picked for a speaker, or "unknown", and why.
+struct StoredSpeakerGuess: Hashable {
+    enum Source: String {
+        case rules
+        case model
+    }
+
+    static let unknown = "unknown"
+
+    let name: String
+    let source: Source
+    let evidence: String
+    /// the model's raw JSON answer, the same for every speaker of the call; nil when the model did not run
+    var modelReply: String? = nil
 }
 
 /// One attempt to hand a call to the webhook: queued → sending → delivered | failed.
@@ -291,7 +309,7 @@ final class CallStore: @unchecked Sendable {
     typealias Migration = (OpaquePointer) throws -> Void
 
     var migrations: [Migration] {
-        [createSchemaV1, addProcessingPending, addDiarizer, addSpeakerEdits]
+        [createSchemaV1, addProcessingPending, addDiarizer, addSpeakerEdits, addSpeakerGuesses]
     }
 
     func prepare() throws {
@@ -482,6 +500,22 @@ final class CallStore: @unchecked Sendable {
                 from_key TEXT NOT NULL,
                 into_key TEXT NOT NULL,
                 PRIMARY KEY (call_id, from_key)
+            )
+            """)
+    }
+
+    /// version 5: why SpeakerNamer named each remote speaker, kept apart from the names the user sees
+    private func addSpeakerGuesses(_ db: OpaquePointer) throws {
+        try execute(db, """
+            CREATE TABLE IF NOT EXISTS call_speaker_guesses (
+                call_id TEXT NOT NULL REFERENCES calls(id) ON DELETE CASCADE,
+                speaker_key TEXT NOT NULL,
+                name TEXT NOT NULL,
+                source TEXT NOT NULL,
+                evidence TEXT NOT NULL,
+                model_reply TEXT,
+                created_at TEXT NOT NULL,
+                PRIMARY KEY (call_id, speaker_key)
             )
             """)
     }
@@ -782,7 +816,7 @@ final class CallStore: @unchecked Sendable {
         _ db: OpaquePointer, callID: String, segments: [StoredTranscriptSegment], diarizer: String?
     ) throws {
         // merges and names pin another model's labels: kept, they would glue or name the wrong people
-        for table in ["call_speaker_merges", "call_speakers"] {
+        for table in ["call_speaker_merges", "call_speakers", "call_speaker_guesses"] {
             try run(db, """
                 DELETE FROM \(table) WHERE call_id = ?
                 AND (SELECT diarizer FROM calls WHERE id = ?) IS NOT ?
@@ -1192,6 +1226,36 @@ final class CallStore: @unchecked Sendable {
                 try? execute(db, "ROLLBACK")
                 throw error
             }
+        }
+    }
+
+    /// replaces the call's guesses; a speaker's name is not touched here
+    func replaceSpeakerGuesses(callID: String, guesses: [String: StoredSpeakerGuess]) throws {
+        try database { db in
+            try transaction(db) {
+                try run(db, "DELETE FROM call_speaker_guesses WHERE call_id = ?", callID)
+                let createdAt = Date().iso8601WithFractions
+                for (speakerKey, guess) in guesses {
+                    try run(db, """
+                        INSERT INTO call_speaker_guesses (call_id, speaker_key, name, source, evidence, model_reply, created_at)
+                        VALUES (?, ?, ?, ?, ?, ?, ?)
+                        """, callID, speakerKey, guess.name, guess.source.rawValue, guess.evidence, guess.modelReply, createdAt)
+                }
+            }
+        }
+    }
+
+    func fetchSpeakerGuesses(callID: String) throws -> [String: StoredSpeakerGuess] {
+        try database { db in
+            let rows = try query(db, "SELECT speaker_key, name, source, evidence, model_reply FROM call_speaker_guesses WHERE call_id = ?", callID) {
+                (columnString($0, 0) ?? "", StoredSpeakerGuess(
+                    name: columnString($0, 1) ?? "",
+                    source: StoredSpeakerGuess.Source(rawValue: columnString($0, 2) ?? "") ?? .rules,
+                    evidence: columnString($0, 3) ?? "",
+                    modelReply: columnString($0, 4)
+                ))
+            }
+            return Dictionary(rows, uniquingKeysWith: { _, last in last })
         }
     }
 

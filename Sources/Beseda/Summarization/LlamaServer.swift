@@ -7,19 +7,16 @@ import Foundation
 final class LlamaServer {
     /// same idle window as the speech model, for the same reason
     private static let idleTimeout: TimeInterval = 10 * 60
-    private static let port = 8734
     /// the first start after an install compiles Metal shaders, which macOS then caches
     private static let startTimeout: TimeInterval = 300
-    /// one summary at a time, so one slot; the whole context goes to it
-    private static let contextTokens = 65_536
-
-    static let baseURL = URL(string: "http://127.0.0.1:\(port)/v1")!
-    private static let healthURL = URL(string: "http://127.0.0.1:\(port)/health")!
 
     var log: (String) -> Void = { _ in }
 
     private let paths: AppPaths
     private let artifacts: BundledSummary
+    private let port: Int
+    /// one request at a time, so one slot; the whole context goes to it
+    private let contextTokens: Int
     private let storeMode: Bool
     private let bundleURL: URL
     private var process: Process?
@@ -28,12 +25,22 @@ final class LlamaServer {
     private var starting: Task<URL, Error>?
     private var idleStop: Task<Void, Never>?
 
-    init(paths: AppPaths, artifacts: BundledSummary = .current,
+    init(paths: AppPaths, artifacts: BundledSummary = .current, port: Int = 8734, contextTokens: Int = 65_536,
          storeMode: Bool = BundledSummary.storeMode, bundleURL: URL = Bundle.main.bundleURL) {
         self.paths = paths
         self.artifacts = artifacts
+        self.port = port
+        self.contextTokens = contextTokens
         self.storeMode = storeMode
         self.bundleURL = bundleURL
+    }
+
+    var baseURL: URL {
+        URL(string: "http://127.0.0.1:\(port)/v1")!
+    }
+
+    private var healthURL: URL {
+        URL(string: "http://127.0.0.1:\(port)/health")!
     }
 
     var isRunning: Bool {
@@ -45,7 +52,7 @@ final class LlamaServer {
         idleStop?.cancel()
         idleStop = nil
         if isRunning {
-            return Self.baseURL
+            return baseURL
         }
         if let starting {
             return try await starting.value
@@ -77,7 +84,7 @@ final class LlamaServer {
         if let process, process.isRunning {
             process.terminate()
             process.waitUntilExit()
-            log("Summary model unloaded")
+            log("\(artifacts.title) unloaded")
         }
         process = nil
         try? logHandle?.close()
@@ -102,8 +109,8 @@ final class LlamaServer {
         process.arguments = [
             "-m", artifacts.modelFile(paths).path,
             "--host", "127.0.0.1",
-            "--port", "\(Self.port)",
-            "-c", "\(Self.contextTokens)",
+            "--port", "\(port)",
+            "-c", "\(contextTokens)",
             "-np", "1",
             "-ngl", "99",
             "-fa", "on",
@@ -127,8 +134,8 @@ final class LlamaServer {
             stop()
             throw error
         }
-        log("Summary model ready in \(String(format: "%.1f", Date().timeIntervalSince(started))) s")
-        return Self.baseURL
+        log("\(artifacts.title) ready in \(String(format: "%.1f", Date().timeIntervalSince(started))) s")
+        return baseURL
     }
 
     private func waitHealthy(_ process: Process) async throws {
@@ -137,7 +144,7 @@ final class LlamaServer {
             guard process.isRunning else {
                 throw SummarizationError.serverDown("Встроенная модель не запустилась. \(logTail())")
             }
-            var request = URLRequest(url: Self.healthURL)
+            var request = URLRequest(url: healthURL)
             request.timeoutInterval = 2
             if let (_, response) = try? await URLSession.shared.data(for: request),
                (response as? HTTPURLResponse)?.statusCode == 200 {

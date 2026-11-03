@@ -17,6 +17,9 @@ marked, oldest first. So a quit mid-queue resumes the rest at the next launch, e
 («Итоги», a picked type) stay in memory only. `AppController(summarize:)` takes a stub in tests; nil means
 `summarizeWithSettings`, the real pipeline below.
 
+With «Определять имена собеседников» on, the same queue job first names the remote speakers
+([Speaker names](speaker-names.md)), and `finishCall` queues the job even when auto-summary is off.
+
 **Call types.** `AppSettings.callTypes` (`[CallType]`, JSON under `beseda.callTypes`) — name, description
 for the classifier, prompt; never empty. The one type with `isOther` is the built-in «Другое» (`CallType.otherName`,
 found by `callTypes.other`, not by position):

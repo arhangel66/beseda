@@ -133,9 +133,11 @@ final class AppController {
     @ObservationIgnored let runtime: RuntimeInstaller
     @ObservationIgnored let bundledSummary: BundledSummaryInstaller
     @ObservationIgnored private let llamaServer: LlamaServer
+    @ObservationIgnored let speakerNamesModel: BundledSummaryInstaller
+    @ObservationIgnored private let speakerNamer: SpeakerNamer
     @ObservationIgnored let updater = AppUpdater()
-    @ObservationIgnored private lazy var processingQueue = SerialQueue<(StoredCallDetail, CallType?)> { [unowned self] job in
-        await self.runQueuedProcessing(of: job.0, as: job.1)
+    @ObservationIgnored private lazy var processingQueue = SerialQueue<(StoredCallDetail, CallType?, Bool)> { [unowned self] job in
+        await self.runQueuedProcessing(of: job.0, as: job.1, summarizes: job.2)
     }
     @ObservationIgnored private var activeTask: Task<Void, Never>?
     @ObservationIgnored private var activeDualCapture: DualCapture?
@@ -240,6 +242,13 @@ final class AppController {
             _ = try await llamaServer.ensureRunning()
             llamaServer.stop()
         }
+        // its own port: it never runs beside the summary model, but a stale one must not answer for it
+        let speakerNamesServer = LlamaServer(paths: paths, artifacts: .speakerNames, port: 8735, contextTokens: 32_768)
+        speakerNamesModel = BundledSummaryInstaller(paths: paths, artifacts: .speakerNames) {
+            _ = try await speakerNamesServer.ensureRunning()
+            speakerNamesServer.stop()
+        }
+        speakerNamer = SpeakerNamer(paths: paths, server: speakerNamesServer)
         transcriber.diagnosticsHandler = { [weak self] message in
             Task { @MainActor in
                 self?.appendLog(message)
@@ -263,6 +272,12 @@ final class AppController {
             self?.appendLog(message)
         }
         llamaServer.log = { [weak self] message in
+            self?.appendLog(message)
+        }
+        speakerNamesModel.log = { [weak self] message in
+            self?.appendLog(message)
+        }
+        speakerNamer.log = { [weak self] message in
             self?.appendLog(message)
         }
         updater.start { [unowned self] in self.isRecording }
@@ -433,7 +448,8 @@ final class AppController {
                 continue
             }
             appendLog("Resuming processing of \(id)")
-            startProcessing(try makeCallDetail(call), as: nil)
+            // only a naming-only setup queues a call without its summary
+            startProcessing(try makeCallDetail(call), as: nil, summarizes: settings.autoProcessCalls || !settings.namesSpeakers)
         }
     }
 
@@ -1347,12 +1363,12 @@ final class AppController {
         cleanupAudioIfNeeded(files: audio)
         status = .completed
         webhooks.enqueue(callID: callID)
-        if settings.autoProcessCalls {
+        if settings.autoProcessCalls || settings.namesSpeakers {
             do {
                 // persisted before it is queued: a quit before it runs resumes it at the next launch
                 try callStore.setProcessingPending(callID: callID, true)
                 if let call = try callStore.fetchCall(id: callID) {
-                    startProcessing(try makeCallDetail(call), as: nil)
+                    startProcessing(try makeCallDetail(call), as: nil, summarizes: settings.autoProcessCalls)
                 }
             } catch {
                 appendLog("Auto processing of \(callID) failed: \(error.localizedDescription)")
@@ -1464,28 +1480,63 @@ final class AppController {
         guard let detail = selectedCallDetail else {
             return
         }
-        startProcessing(detail, as: type)
+        startProcessing(detail, as: type, summarizes: true)
     }
 
     /// a call that finishes while another is processed waits its turn instead of being dropped
-    private func startProcessing(_ detail: StoredCallDetail, as type: CallType?) {
+    private func startProcessing(_ detail: StoredCallDetail, as type: CallType?, summarizes: Bool) {
         if summarizingCallID != nil {
             appendLog("Processing of \(detail.id) queued: another call is being processed")
         }
-        processingQueue.enqueue((detail, type))
+        processingQueue.enqueue((detail, type, summarizes))
     }
 
-    private func runQueuedProcessing(of detail: StoredCallDetail, as type: CallType?) async {
-        summaryError = nil
-        summaryRecovery = nil
-        summarizingCallID = detail.id
-        summaryStartedAt = Date()
-        await runSummary(for: detail, as: type)
+    private func runQueuedProcessing(of queued: StoredCallDetail, as type: CallType?, summarizes: Bool) async {
+        // names first, so the summary already says who said what
+        var detail = queued
+        if settings.namesSpeakers, (try? callStore.fetchSpeakerGuesses(callID: detail.id).isEmpty) ?? false {
+            detail = await nameSpeakers(of: detail)
+        }
+        if summarizes {
+            summaryError = nil
+            summaryRecovery = nil
+            summarizingCallID = detail.id
+            summaryStartedAt = Date()
+            await runSummary(for: detail, as: type)
+        }
         // a failed summary is not retried at every launch: its error card offers the retry
         do {
             try callStore.setProcessingPending(callID: detail.id, false)
         } catch {
             appendLog("Could not clear the processing queue mark of \(detail.id): \(error.localizedDescription)")
+        }
+    }
+
+    /// stores why each remote speaker got its name and shows the name wherever the user has not named them
+    private func nameSpeakers(of detail: StoredCallDetail) async -> StoredCallDetail {
+        let guesses = await speakerNamer.guesses(for: detail.segments, peopleList: settings.callPeople)
+        do {
+            try callStore.replaceSpeakerGuesses(callID: detail.id, guesses: guesses)
+            // a name the user gave while the model ran wins: read them now, not from the queued detail
+            let manual = try callStore.fetchSpeakerNames(callID: detail.id)
+            for (speaker, guess) in guesses where guess.name != StoredSpeakerGuess.unknown && manual[speaker] == nil {
+                try callStore.setSpeakerName(callID: detail.id, speakerKey: speaker, displayName: guess.name)
+            }
+            let names = try callStore.fetchSpeakerNames(callID: detail.id)
+            if let transcriptURL = detail.summary.transcriptURL {
+                try TranscriptMerger.rewriteDialogue(in: transcriptURL, segments: detail.segments, names: names)
+            }
+            appendLog("Named \(guesses.values.filter { $0.name != StoredSpeakerGuess.unknown }.count) of \(guesses.count) remote speakers of \(detail.id)")
+            if selectedCallDetail?.id == detail.id {
+                loadCallDetail(detail.summary)
+            }
+            guard let call = try callStore.fetchCall(id: detail.id) else {
+                return detail
+            }
+            return try makeCallDetail(call)
+        } catch {
+            appendLog("Speaker names of \(detail.id) not stored: \(error.localizedDescription)")
+            return detail
         }
     }
 
@@ -1755,7 +1806,8 @@ final class AppController {
             segments: try callStore.fetchSegments(callID: call.id),
             speakerNames: try callStore.fetchSpeakerNames(callID: call.id),
             markdownText: try readMarkdownIfAvailable(for: call),
-            jobStats: try callStore.fetchJobStats(callID: call.id)
+            jobStats: try callStore.fetchJobStats(callID: call.id),
+            speakerGuesses: try callStore.fetchSpeakerGuesses(callID: call.id)
         )
     }
 

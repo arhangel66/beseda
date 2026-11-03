@@ -184,3 +184,8 @@
 
 "Выберите папку экспорта снова в настройках" = "Select the export folder again in Settings";
 "Для удаления старой копии выберите прежнюю папку и повторите удаление. Затем можно вернуть текущую папку." = "To delete an old copy, select its previous folder and retry deletion. You can then restore the current folder.";
+"Определять имена собеседников" = "Name the other speakers";
+"Имена собеседников" = "Speaker names";
+"После звонка Беседа ищет, кого назвали по имени и кто ответил, а если этого мало, спрашивает Gemma 4 12B. Одна строка на человека: имя, двоеточие, как его искажает распознавание. Например: Rustam: Rustan, Mustam. Имя, которое вы дали сами, не меняется." = "After a call Beseda looks for who was addressed by name and who answered, and asks Gemma 4 12B when that is not enough. One line per person: the name, a colon, how speech recognition garbles it. For example: Rustam: Rustan, Mustam. A name you gave yourself is never changed.";
+"Gemma 4 12B для имён говорящих" = "Gemma 4 12B for speaker names";
+"Узнаёт имена собеседников, когда правил не хватает. Запускается после звонка и сразу выгружается." = "Names the other speakers when the rules are not enough. Runs after a call and unloads right away.";

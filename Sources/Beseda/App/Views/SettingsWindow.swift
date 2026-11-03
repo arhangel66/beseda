@@ -410,6 +410,20 @@ private struct ProcessingPane: View {
             }
 
             Section {
+                Toggle(SettingsText.get("Определять имена собеседников"), isOn: Bindable(settings).namesSpeakers)
+                if settings.namesSpeakers {
+                    BundledSummaryRow(installer: controller.speakerNamesModel)
+                    TextEditor(text: Bindable(settings).callPeople)
+                        .font(.body.monospaced())
+                        .frame(minHeight: 100)
+                }
+            } header: {
+                Text(SettingsText.get("Имена собеседников"))
+            } footer: {
+                Text(SettingsText.get("После звонка Беседа ищет, кого назвали по имени и кто ответил, а если этого мало, спрашивает Gemma 4 12B. Одна строка на человека: имя, двоеточие, как его искажает распознавание. Например: Rustam: Rustan, Mustam. Имя, которое вы дали сами, не меняется."))
+            }
+
+            Section {
                 Toggle(SettingsText.get("Обрабатывать звонки автоматически"), isOn: Bindable(settings).autoProcessCalls)
                 ForEach(Bindable(settings).callTypes) { $type in
                     DisclosureGroup {
@@ -519,8 +533,8 @@ private struct BundledSummaryRow: View {
             control
         } label: {
             VStack(alignment: .leading, spacing: 2) {
-                Text("\(BundledSummary.current.title) · \(BundledSummary.current.modelBytes.byteSizeDescription)")
-                Text(SettingsText.get(BundledSummary.current.subtitle))
+                Text("\(SettingsText.get(installer.artifacts.title)) · \(installer.artifacts.modelBytes.byteSizeDescription)")
+                Text(SettingsText.get(installer.artifacts.subtitle))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

@@ -480,6 +480,7 @@ private struct TranscriptLines: View {
                         mergeTargets: SpeakerNaming.remoteIndex(of: segment.speaker) == nil
                             ? [] : remoteSpeakers.filter { $0 != segment.speaker },
                         names: detail.speakerNames,
+                        autoNameEvidence: autoNameEvidence(segment.speaker),
                         onMerge: { controller.mergeSpeaker(segment.speaker, into: $0) }
                     )
                 }
@@ -509,6 +510,14 @@ private extension TranscriptLines {
         }
     }
 
+    /// why Beseda named this speaker, while the shown name is still its guess and not the user's
+    func autoNameEvidence(_ speaker: String) -> String? {
+        guard let guess = detail.speakerGuesses[speaker], guess.name == detail.speakerNames[speaker] else {
+            return nil
+        }
+        return guess.evidence
+    }
+
     func startRenaming(_ speaker: String) {
         draftName = detail.speakerNames[speaker] ?? ""
         renamedSpeaker = speaker
@@ -535,6 +544,7 @@ private struct TranscriptLine: View {
     let onRename: () -> Void
     let mergeTargets: [String]
     let names: [String: String]
+    let autoNameEvidence: String?
     let onMerge: (String) -> Void
 
     private var style: SpeakerStyle {
@@ -553,6 +563,13 @@ private struct TranscriptLine: View {
 
                     Text(name)
                         .font(.callout.weight(.semibold))
+
+                    if let autoNameEvidence {
+                        Text(ArchiveText.get("авто"))
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                            .help(autoNameEvidence)
+                    }
 
                     timestamp
                 }

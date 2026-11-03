@@ -33,7 +33,7 @@ final class BundledSummaryInstaller {
 
     @ObservationIgnored var log: (String) -> Void = { _ in }
     @ObservationIgnored private let paths: AppPaths
-    @ObservationIgnored private let artifacts: BundledSummary
+    @ObservationIgnored let artifacts: BundledSummary
     @ObservationIgnored private let downloader: RuntimeDownloader
     @ObservationIgnored private let freeSpace: FreeSpaceReader
     @ObservationIgnored private let warmUp: () async throws -> Void
@@ -99,7 +99,7 @@ final class BundledSummaryInstaller {
         }
     }
 
-    /// Frees the 4.6 GB model. The small engine stays so reinstalling only downloads the model.
+    /// Frees the model. The small engine stays so reinstalling only downloads the model.
     func remove() throws {
         let model = artifacts.modelFile(paths)
         if FileManager.default.fileExists(atPath: model.path) {

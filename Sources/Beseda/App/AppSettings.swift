@@ -95,6 +95,8 @@ final class AppSettings {
     private let classifyLocallyKey = "beseda.classifyLocally"
     private let localOnlyKey = "beseda.localOnly"
     private let autoProcessCallsKey = "beseda.autoProcessCalls"
+    private let callPeopleKey = "beseda.callPeople"
+    private let namesSpeakersKey = "beseda.namesSpeakers"
     private let exportFolderKey = "beseda.exportFolder"
     private let exportBookmarkKey = "beseda.exportBookmark"
     private let exportBookmarksKey = "beseda.exportBookmarks"
@@ -268,6 +270,20 @@ final class AppSettings {
     var autoProcessCalls: Bool {
         didSet {
             defaults.set(autoProcessCalls, forKey: autoProcessCallsKey)
+        }
+    }
+
+    /// off by default: naming loads a 7 GB model after every call
+    var namesSpeakers: Bool {
+        didSet {
+            defaults.set(namesSpeakers, forKey: namesSpeakersKey)
+        }
+    }
+
+    /// «Люди в звонках»: one `Name: spelling1, spelling2` per line, read by SpeakerNamer (`CallPeople`)
+    var callPeople: String {
+        didSet {
+            defaults.set(callPeople, forKey: callPeopleKey)
         }
     }
 
@@ -456,6 +472,8 @@ final class AppSettings {
         self.classifyLocally = defaults.bool(forKey: classifyLocallyKey)
         self.localOnly = defaults.bool(forKey: localOnlyKey)
         self.autoProcessCalls = defaults.bool(forKey: autoProcessCallsKey)
+        self.callPeople = defaults.string(forKey: callPeopleKey) ?? ""
+        self.namesSpeakers = defaults.bool(forKey: namesSpeakersKey)
         self.webhookEnabled = defaults.bool(forKey: webhookEnabledKey)
         self.exportFolder = defaults.string(forKey: exportFolderKey) ?? ""
         self.webhookURL = defaults.string(forKey: webhookURLKey) ?? ""
