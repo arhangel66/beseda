@@ -449,3 +449,17 @@ TypeSafe's own notes say jev-1.13 is literal and weak at indirection, and "the n
 answers is the person addressed" is exactly one hop of indirection. A better fit would be literal
 per-line questions (is this name said to someone? is this a thanks?) with the next-voice step in
 code, i.e. Jev replacing the rules' regexes. Not run.
+
+**Prompt p5** (Mikhail's, 2026-11-03: main rule "people say other people's names", per-rule direction,
+evidence written before the name). Fast set, edges100, no context:
+
+| model | alone: cov / wrong | merged with rules3 |
+|---|---|---|
+| 12B p5 | 0.41 / 0.188 | 0.69 / 0.094 |
+| 12B p1 (before) | 0.41 / 0.031 | 0.75 / 0 |
+| E4B p5 | 0.07 / 0.2, 4 of 8 calls invalid | 0.69 / 0.031 |
+
+On the example call (`results/example-gemma12b-miss.txt`) p5 fixed 12B's Gus. Across the fast set it
+made 12B bolder: it reads every name as a clue and keeps garbles as new people ("Sean", "Leo Mayo",
+"Tim", "Мухаммад"), and on 20260910 it applies "being talked about" to "Rustam told that..." E4B quotes
+whole lines as evidence and runs out of its 1500-token budget on half the calls.

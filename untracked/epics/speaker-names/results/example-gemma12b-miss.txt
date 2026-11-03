@@ -1,0 +1,59 @@
+=== SYSTEM
+You read a transcript of a call recorded by Mikhail. "me" is Mikhail. The other speakers are labelled them-1, them-2, ... by a speaker diarizer; each label is one distinct voice. Lines start with their index number and a time stamp.
+Work out the real name of each them-N label from the transcript. Names may be garbled by speech recognition.
+On these calls people address each other by name all the time, so there are almost always clues. Look for them first:
+- a greeting ("Hi Rustam") or a question to someone ("Sergei, what about the reliability score?") — the next voice that answers is that person;
+- a hand-over ("Mohammed, you can go", "Pixel, your turn") — the NEXT voice to speak is that person, not the one saying it;
+- thanks after an update ("Thank you, Sergei") — the voice that just finished is that person;
+- a self-introduction ("this is Lucas"), or being talked about and reacting ("Pixel was sick" — "yes, I was down").
+A person's topics or role are only a second hint. Never name a label by elimination ("the remaining one must be Gus"): "unknown" is better than a guess.
+Answer with JSON only: an object with one key per label, value = the person's name or "unknown".
+
+=== USER
+0 [00:09] me: Hello. One moment. Can you hear me? Okay. Okay. Okay. It seems me that I have a double voice. Okay.  … h some small dashboard, those will help me to understand that everything is go smooth. Uh yes, fish.
+25 [01:54] them-1: Can we make sure we do this before the weekend? Because there's still people are still maxing out the eight XP three hundred incentive.
+27 [02:00] me: Yes, yes, yes, yes. As I told the uh ideal safe uh deployment way was like to deploy on Monday. I I  … k it should be deployed on Monday. Okay. Uh I think I am finished. Uh Sergei, can you please come to
+62 [05:35] them-2: Yes, hello. Uh so uh yesterday um yeah I will again was working uh much of the time on TMC Pay, I ha …  will i'm getting uh alerts almost immediately uh yeah that's pretty much from my side so who's next
+79 [08:03] me: I I am sorry, Sergio, let me recheck.
+80 [08:04] them-2: okay
+81 [08:05] me: Uh, you're waiting for my uh approve on uh in some CI, right?
+82 [08:08] them-2: No, no, no, I'm I'm I'm not waiting. I uh as soon as I uh uh merge uh those priors I will text you once uh we're ready to review them.
+84 [08:18] me: Yes, yes, because uh unfortunately I I yes, I don't have the uh automatic on this, I mean I will not get the notification, so please uh send me the link, like if you will need my approval for the
+85 [08:19] them-2: But it's just uh deployable
+86 [08:29] me: uh release to the PyPy. Okay, thank you.
+88 [08:33] them-2: yeah for sure. That's the only uh thing uh I I think uh which I don't uh have option to release by now so the secondary is okay thank you.
+90 [08:49] them-3: Hey guys. Yeah, from my side I finished approving uh a couple of PRs uh from Michael relating to the …  to get through the list there. And yeah, that's I think it from my site. Guess you want to go next.
+138 [13:31] them-4: Sure. Um I have um I guess this should be for Pixel, but I have prepared um 20 blogs for the next fe … replies again in Discord. Um yeah, I mean that's pretty much what I'm 100% focused on at the moment.
+154 [14:56] them-1: Gus, I saw there's multiple emails that came into our support email address that said they had GPUs and they needed help with like the next steps uh for how to provide them. Okay. Sorry?
+157 [15:12] them-4: Where did they go to?
+158 [15:14] them-1: The Liam email.
+159 [15:16] them-4: No, no, I know. Um, but is it being filtered or is it in the inbox, normal inbox?
+161 [15:22] them-1: I don't know. I just checked the inbox.
+163 [15:24] them-4: Okay, I'll I'll I'll find it.
+164 [15:26] them-1: There's not that many emails in there. It's not it's not that overwhelming to just read the inbox.
+166 [15:33] them-4: Yeah, no, I mean it's just because there's a hundred and fifty um and I'm kind of still going throug … nd I'll I'll start joining them so that eventually I can take these myself. Because right now I just
+172 [16:09] them-1: I saw like three or four of them of potential providers who asked for more information. And I think  … know if it excluded them. Um but some of them might not even need a call. They just need a response.
+176 [16:25] them-4: Okay. Um theoretically the loop sends me a a message every morning. Um with potential providers. So  … one of them being North Vault AI. Oh, this is recent. Okay. Yeah, leave it with me, Tim. Okay, okay.
+185 [16:54] them-1: Yeah. It's not that hard to just read the inbox. Yeah, I'll and we're gonna just we're gonna miss important stuff if if we're just relying on the loop.
+188 [17:05] them-4: Okay. Leave it with me.
+190 [17:27] me: Something else, guys. Okay. Okay, so for me, uh the most important theoretically, it's not super har …  will also write in our channel that this is uh deployed. Okay. Thank you guys then. Thank you. Bye.
+
+=== GEMMA 12B ANSWER (7.2 s, 1540 prompt tokens)
+{
+  "them-1": "Gus",
+  "them-2": "Sergei",
+  "them-3": "unknown",
+  "them-4": "Tim"
+}
+
+=== REFERENCE (Opus)
+them-1: Fish (high)
+   - me: Uh yes, fish. | Mikhail gives Fish the floor; them-1 speaks next (25: 'Can we make sure we do this before the weekend?')
+   - me: It's based on your fish uh um guidelines. | supporting only: Mikhail reports to Fish after them-1's question
+them-2: Sergei (high)
+   - me: Uh Sergei, can you please come to | hand-over; them-2 answers and gives the next update (62-78)
+   - me: I I am sorry, Sergio, let me recheck. | addressed; them-2 answers (80: 'okay', 82: 'No, no, no, I'm not waiting')
+them-3: unknown (high)
+them-4: Gus (high)
+   - them-1: Gus, I saw there's multiple emails that came into our support email address | addressed; them-4 answers (157: 'Where did they go to?')
+   - them-3: Guess you want to go next. | hand-over 'Gus, you want to go next' (garbled 'guess'); them-4 gives the next update (138-153)

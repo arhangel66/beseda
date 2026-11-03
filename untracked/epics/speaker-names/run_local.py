@@ -54,6 +54,11 @@ def schema_for(labels: list[str], prompt: str) -> dict:
                  "cue": {"type": "string", "enum": ["addressed", "thanked", "introduced", "none"]}, "line": {"type": "integer"}},
                  "required": ["name", "cue", "line"], "additionalProperties": False}
         return {"type": "object", "properties": {l: entry for l in labels}, "required": labels, "additionalProperties": False}
+    if prompt == "p5":
+        # evidence before the name, so the model writes its reason first
+        entry = {"type": "object", "properties": {"evidence": {"type": "string"}, "name": {"type": "string"}},
+                 "required": ["evidence", "name"], "additionalProperties": False}
+        return {"type": "object", "properties": {l: entry for l in labels}, "required": labels, "additionalProperties": False}
     names = {"type": "object", "properties": {l: {"type": "string"} for l in labels}, "required": labels, "additionalProperties": False}
     if prompt != "p2":
         return names
@@ -120,7 +125,7 @@ def run(configs: list[dict], call_filter) -> None:
         log(f"{model_key}: {len(pending)} pending")
         with (contextlib.nullcontext() if MODELS[model_key].get("openrouter") else Server(model_key)):
             for n, (call, config, name, system, user, labels, schema, digest, out) in enumerate(pending, 1):
-                max_tokens = 4000 if config["thinking"] else (1500 if config["prompt"] == "p2" else 600 if config["prompt"] == "p4" else 400)
+                max_tokens = 4000 if config["thinking"] else (1500 if config["prompt"] in ("p2", "p5") else 600 if config["prompt"] == "p4" else 400)
                 try:
                     reply = ask(system, user, schema, config["thinking"], max_tokens if not MODELS[model_key].get("openrouter") else 16000, model_key)
                 except Exception as error:
@@ -128,7 +133,7 @@ def run(configs: list[dict], call_filter) -> None:
                 try:
                     parsed = json.loads(reply["raw"])
                     answer = parsed["names"] if config["prompt"] == "p2" else parsed
-                    if config["prompt"] == "p4":
+                    if config["prompt"] in ("p4", "p5"):
                         answer = {label: entry["name"] for label, entry in parsed.items()}
                     invalid = reply["finish"] != "stop" or not isinstance(answer, dict)
                 except (json.JSONDecodeError, KeyError, TypeError):
@@ -212,3 +217,7 @@ if __name__ == "__main__":
     elif stage == "jev-fast":
         run(grid(["jev-router"], ["edges100"], ["none"], ["p1"], [False]) + grid(["jev-router"], ["edges100"], ["roster"], ["p2"], [False]),
             lambda c: c["id"] in FAST)
+    elif stage == "p5-example":
+        run(grid(["gemma4-12b", "gemma4-e4b"], ["edges100"], ["none"], ["p5"], [False]), lambda c: c["id"] == "20261009-125957")
+    elif stage == "p5-fast":
+        run(grid(["gemma4-12b", "gemma4-e4b"], ["edges100"], ["none"], ["p5"], [False]), lambda c: c["id"] in FAST)

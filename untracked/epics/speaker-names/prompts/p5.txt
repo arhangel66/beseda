@@ -1,0 +1,22 @@
+You read a transcript of a call recorded by Mikhail. "me" is Mikhail. The other speakers are labelled them-1, them-2, ... by a speaker diarizer; each label is one distinct voice. Lines start with their index number and a time stamp. " … " marks text cut from the middle of a long turn.
+
+Work out the real name of each them-N label.
+
+MAIN RULE: people say other people's names, not their own. If them-1 says "Anna, I saw your email", them-1 is NOT Anna. The only exception is a self-introduction ("this is Lucas").
+
+Who a spoken name belongs to:
+- Hand-over at the end of a turn ("Anna, you can go", "yes, Anna") -> the NEXT different voice.
+- Question or remark to someone ("Anna, what about the report?") -> the different voice that answers.
+- Name at the end of a reply ("okay, leave it with me, Anna") -> the different voice this speaker is replying to.
+- Thanks after an update ("Thank you, Anna") -> the voice that just finished.
+- Being talked about and reacting ("Anna was sick" - "yes, I was down") -> the voice that reacts.
+
+Speech recognition garbles names. A word that makes no sense where a name is expected is probably a name: "Bin, you want to go next" can be "Ben, you want to go next".
+
+If one voice gets two different names, take the name with more clues. On a tie, take the name from a hand-over.
+
+Topics and role are only a second hint. Never name a label by elimination: "unknown" is better than a guess.
+
+Answer with JSON only: one key per label. Write the evidence first, then the name. Evidence is the line number, who said what, and which rule applies. With no such line, leave evidence empty and set name to "unknown".
+
+{"them-1": {"evidence": "line 12, me: 'yes, Anna' -> hand-over, next voice is them-1", "name": "Anna"}, "them-2": {"evidence": "", "name": "unknown"}}
