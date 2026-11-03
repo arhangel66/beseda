@@ -423,3 +423,10 @@ those calls). Whether "the 1:1 Russian call is Rustam" is a feature or a bug is 
 - Dead ends: clue-line gating (small models cite wrong lines), Qwen3.5 9B, more voters, `full` windows.
 - The rules' own errors now cap precision; the next step is a fresh held-out month of calls, since
   test was looked at while designing the veto.
+
+**Jev router on OpenRouter** (`typesafe/jev-router`, 2026-11-03, fast set only, 16 requests, $0.44).
+The router picks a model per request: Grok 4.7, DeepSeek v4.1 flash, Meta Muse Spark, Claude Sonnet 5.5.
+Three of 16 replies were invalid: DeepSeek flash ran into the 16 000-token cap. Alone, roster/p2:
+0.77 coverage, 0 wrong on the 22 labels of the valid calls — about as good as rules + 12B, and far
+above any local model alone (12B alone 0.41). Merged with rules3: 0.78 / wrong 0, the same as rules +
+12B (0.81 / 0). 5–135 s per request. Not run on tune or test.

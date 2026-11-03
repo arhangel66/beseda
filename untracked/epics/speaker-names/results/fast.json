@@ -929,6 +929,36 @@
   "tokens": 4126,
   "coverage_ci": "0.12\u20130.49"
  },
+ "jev-router__edges100__none__p1__nothink": {
+  "calls": 8,
+  "labels_named": 28,
+  "coverage": 0.679,
+  "precision": 0.95,
+  "wrong": 0.036,
+  "unverified": 0,
+  "seg_coverage": 0.769,
+  "call_clean": 0.75,
+  "call_exact": 0.125,
+  "invalid": 4,
+  "sec": 50.4,
+  "tokens": 4751,
+  "coverage_ci": "0.57\u20130.79"
+ },
+ "jev-router__edges100__roster__p2__nothink": {
+  "calls": 8,
+  "labels_named": 22,
+  "coverage": 0.773,
+  "precision": 1.0,
+  "wrong": 0.0,
+  "unverified": 0,
+  "seg_coverage": 0.886,
+  "call_clean": 0.75,
+  "call_exact": 0.375,
+  "invalid": 11,
+  "sec": 51.9,
+  "tokens": 5105,
+  "coverage_ci": "0.60\u20130.92"
+ },
  "merge-rules3+gate-gemma4-12b__edges100__roster__p4__nothink": {
   "calls": 8,
   "labels_named": 32,
@@ -1858,6 +1888,36 @@
   "sec": 8.3,
   "tokens": 4126,
   "coverage_ci": "0.67\u20130.92"
+ },
+ "merge-rules3+jev-router__edges100__none__p1__nothink": {
+  "calls": 8,
+  "labels_named": 32,
+  "coverage": 0.781,
+  "precision": 0.962,
+  "wrong": 0.031,
+  "unverified": 0,
+  "seg_coverage": 0.851,
+  "call_clean": 0.875,
+  "call_exact": 0.375,
+  "invalid": 0,
+  "sec": 50.4,
+  "tokens": 4751,
+  "coverage_ci": "0.66\u20130.89"
+ },
+ "merge-rules3+jev-router__edges100__roster__p2__nothink": {
+  "calls": 8,
+  "labels_named": 32,
+  "coverage": 0.781,
+  "precision": 1.0,
+  "wrong": 0.0,
+  "unverified": 0,
+  "seg_coverage": 0.849,
+  "call_clean": 1.0,
+  "call_exact": 0.5,
+  "invalid": 0,
+  "sec": 51.9,
+  "tokens": 5105,
+  "coverage_ci": "0.66\u20130.91"
  },
  "merge-rules3+qwen3.5-9b__edges100__roster__p1__nothink": {
   "calls": 8,

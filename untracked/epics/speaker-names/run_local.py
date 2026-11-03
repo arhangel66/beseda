@@ -1,5 +1,5 @@
 # runs (model × window × context × prompt × thinking) configs over a call set through llama-server, resumable by config hash
-import hashlib, json, os, subprocess, sys, time, urllib.request
+import contextlib, hashlib, json, os, subprocess, sys, time, urllib.request
 from pathlib import Path
 
 import contexts, windows
@@ -62,19 +62,30 @@ def schema_for(labels: list[str], prompt: str) -> dict:
     return {"type": "object", "properties": {"evidence": evidence, "names": names}, "required": ["evidence", "names"], "additionalProperties": False}
 
 
-def ask(system: str, user: str, schema: dict, thinking: bool, max_tokens: int) -> dict:
-    body = {"model": "local", "temperature": 0, "max_tokens": max_tokens, "stream": False,
+def ask(system: str, user: str, schema: dict, thinking: bool, max_tokens: int, model_key: str = "") -> dict:
+    remote = MODELS.get(model_key, {}).get("openrouter")
+    body = {"model": remote or "local", "temperature": 0, "max_tokens": max_tokens, "stream": False,
             "response_format": {"type": "json_schema", "json_schema": {"name": "names", "schema": schema}},
             "chat_template_kwargs": {"enable_thinking": thinking},
             "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}]}
-    request = urllib.request.Request(f"http://127.0.0.1:{PORT}/v1/chat/completions", json.dumps(body).encode(), {"Content-Type": "application/json"})
+    url, headers = f"http://127.0.0.1:{PORT}/v1/chat/completions", {"Content-Type": "application/json"}
+    if remote:
+        url, headers["Authorization"] = "https://openrouter.ai/api/v1/chat/completions", f"Bearer {openrouter_key()}"
+        body.pop("chat_template_kwargs")
+    request = urllib.request.Request(url, json.dumps(body).encode(), headers)
     started = time.time()
     reply = json.load(urllib.request.urlopen(request, timeout=1800))
     message = reply["choices"][0]["message"]
     return {"seconds": round(time.time() - started, 1), "prompt_tokens": reply["usage"]["prompt_tokens"],
             "completion_tokens": reply["usage"]["completion_tokens"], "finish": reply["choices"][0]["finish_reason"],
             "raw": message.get("content") or "", "reasoning": message.get("reasoning_content") or "",
-            "cache_tokens": (reply.get("timings") or {}).get("cache_n")}
+            "cache_tokens": (reply.get("timings") or {}).get("cache_n"), "routed_model": reply.get("model"),
+            "cost": (reply.get("usage") or {}).get("cost")}
+
+
+def openrouter_key() -> str:
+    env = Path.home() / ".claude/skills/consilium/.env"
+    return next(line.split("=", 1)[1].strip().strip('"') for line in env.read_text().splitlines() if line.startswith("OPENROUTER_API_KEY="))
 
 
 def run(configs: list[dict], call_filter) -> None:
@@ -107,11 +118,11 @@ def run(configs: list[dict], call_filter) -> None:
         if not pending:
             log(f"{model_key}: nothing pending"); continue
         log(f"{model_key}: {len(pending)} pending")
-        with Server(model_key):
+        with (contextlib.nullcontext() if MODELS[model_key].get("openrouter") else Server(model_key)):
             for n, (call, config, name, system, user, labels, schema, digest, out) in enumerate(pending, 1):
                 max_tokens = 4000 if config["thinking"] else (1500 if config["prompt"] == "p2" else 600 if config["prompt"] == "p4" else 400)
                 try:
-                    reply = ask(system, user, schema, config["thinking"], max_tokens)
+                    reply = ask(system, user, schema, config["thinking"], max_tokens if not MODELS[model_key].get("openrouter") else 16000, model_key)
                 except Exception as error:
                     log(f"ERROR {name} {call['id']}: {error}"); continue
                 try:
@@ -198,3 +209,6 @@ if __name__ == "__main__":
     elif stage == "night6":
         # 1:1 and two-remote calls: how often the finalist model invents a name where the text gives none
         run(grid(["gemma4-12b"], ["edges100"], ["none", "roster+notes"], ["p1"], [False]), lambda c: c["group"] in ("one", "two"))
+    elif stage == "jev-fast":
+        run(grid(["jev-router"], ["edges100"], ["none"], ["p1"], [False]) + grid(["jev-router"], ["edges100"], ["roster"], ["p2"], [False]),
+            lambda c: c["id"] in FAST)
