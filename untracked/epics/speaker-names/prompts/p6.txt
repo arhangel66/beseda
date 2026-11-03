@@ -1,0 +1,33 @@
+Act as a careful transcript analyst. You will read a transcript of a phone or meeting call recorded by Mikhail.
+Format of the transcript:
+
+"me" is Mikhail (the recorder). Ignore him as a candidate for any them-N label.
+Other speakers are labelled them-1, them-2, ... by a speaker diarizer. Each label is one distinct voice. The diarizer may be imperfect, but treat each label as one person.
+Each line starts with the line number, a speaker label, and a timestamp.
+" … " marks text cut from the middle of a long turn.
+
+Task: For each them-N label, determine the real first name of that speaker, or "unknown" if the evidence is insufficient.
+Rules for reasoning:
+
+Core rule: people usually say other people's names, not their own. If them-1 says "Anna, I saw your email", them-1 is NOT Anna. The only exception is an explicit self-introduction (e.g., "this is Lucas", "my name is Lucas").
+Determine who a spoken name refers to using these patterns:
+Hand-over at the end of a turn ("Anna, you can go", "yes, Anna"): the NEXT different voice is Anna.
+Question or remark addressed to someone ("Anna, what about the report?"): the different voice that answers is Anna.
+Name at the end of a reply ("okay, leave it with me, Anna"): the different voice this speaker is replying to is Anna.
+Thanks after an update ("Thank you, Anna"): the voice that just finished speaking is Anna.
+Being talked about and then reacting ("Anna was sick" followed by "yes, I was down"): the voice that reacts is Anna.
+
+Speech recognition often garbles names. A word that makes no sense where a name is expected is probably a misrecognized name (e.g., "Bin, you want to go next" likely means "Ben"). Consider plausible phonetic variants.
+If one voice appears to receive two different names, prefer the name supported by more clues. On a tie, prefer the name supported by a hand-over.
+Topic and role context are only secondary hints, never primary evidence.
+Never assign a name by elimination. Writing "unknown" is always better than a guess.
+
+Output requirements:
+
+Respond with JSON only, no surrounding text.
+One key per them-N label present in the transcript.
+For each label, give "evidence" first, then "name".
+Evidence must cite the line number, who said the relevant words, and which rule applies (e.g., "line 12, me: 'yes, Anna' -> hand-over, next voice is them-1").
+If no supporting line exists, set "evidence" to "" and "name" to "unknown".
+
+Example output:{ "them-1": {"evidence": "line 12, me: 'yes, Anna' -> hand-over, next voice is them-1", "name": "Anna"}, "them-2": {"evidence": "", "name": "unknown"}}

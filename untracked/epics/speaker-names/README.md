@@ -463,3 +463,8 @@ On the example call (`results/example-gemma12b-miss.txt`) p5 fixed 12B's Gus. Ac
 made 12B bolder: it reads every name as a clue and keeps garbles as new people ("Sean", "Leo Mayo",
 "Tim", "Мухаммад"), and on 20260910 it applies "being talked about" to "Rustam told that..." E4B quotes
 whole lines as evidence and runs out of its 1500-token budget on half the calls.
+
+**Prompt p6** (Mikhail's longer variant of p5: "careful transcript analyst", same rules as numbered
+patterns, a 3000-token budget). Fast set, edges100, no context: 12B alone 0.34 / wrong 0.188, merged
+0.72 / 0.062; E4B alone 0.03 / 0.125 (no invalid replies now, almost all "unknown"), merged 0.69 / 0.
+Worse than p1 for both models.

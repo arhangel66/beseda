@@ -179,6 +179,21 @@
   "tokens": 4845,
   "coverage_ci": "0.23\u20130.57"
  },
+ "gemma4-12b__edges100__none__p6__nothink": {
+  "calls": 8,
+  "labels_named": 32,
+  "coverage": 0.344,
+  "precision": 0.647,
+  "wrong": 0.188,
+  "unverified": 0,
+  "seg_coverage": 0.344,
+  "call_clean": 0.625,
+  "call_exact": 0.0,
+  "invalid": 0,
+  "sec": 32.3,
+  "tokens": 5027,
+  "coverage_ci": "0.17\u20130.55"
+ },
  "gemma4-12b__edges100__roster+notes__p1__nothink": {
   "calls": 8,
   "labels_named": 32,
@@ -463,6 +478,21 @@
   "sec": 30.6,
   "tokens": 4841,
   "coverage_ci": "0.00\u20130.15"
+ },
+ "gemma4-e4b__edges100__none__p6__nothink": {
+  "calls": 8,
+  "labels_named": 32,
+  "coverage": 0.031,
+  "precision": 0.2,
+  "wrong": 0.125,
+  "unverified": 0,
+  "seg_coverage": 0.035,
+  "call_clean": 0.75,
+  "call_exact": 0.0,
+  "invalid": 0,
+  "sec": 15.2,
+  "tokens": 5023,
+  "coverage_ci": "0.00\u20130.10"
  },
  "gemma4-e4b__edges100__roster+notes+rules__p1__nothink": {
   "calls": 8,
@@ -1499,6 +1529,21 @@
   "tokens": 4845,
   "coverage_ci": "0.52\u20130.84"
  },
+ "merge-rules3+gemma4-12b__edges100__none__p6__nothink": {
+  "calls": 8,
+  "labels_named": 32,
+  "coverage": 0.719,
+  "precision": 0.92,
+  "wrong": 0.062,
+  "unverified": 0,
+  "seg_coverage": 0.766,
+  "call_clean": 0.75,
+  "call_exact": 0.375,
+  "invalid": 0,
+  "sec": 32.3,
+  "tokens": 5027,
+  "coverage_ci": "0.58\u20130.87"
+ },
  "merge-rules3+gemma4-12b__edges100__roster+notes__p1__nothink": {
   "calls": 8,
   "labels_named": 32,
@@ -1782,6 +1827,21 @@
   "invalid": 0,
   "sec": 30.6,
   "tokens": 4841,
+  "coverage_ci": "0.52\u20130.84"
+ },
+ "merge-rules3+gemma4-e4b__edges100__none__p6__nothink": {
+  "calls": 8,
+  "labels_named": 32,
+  "coverage": 0.688,
+  "precision": 1.0,
+  "wrong": 0.0,
+  "unverified": 0,
+  "seg_coverage": 0.738,
+  "call_clean": 1.0,
+  "call_exact": 0.375,
+  "invalid": 0,
+  "sec": 15.2,
+  "tokens": 5023,
   "coverage_ci": "0.52\u20130.84"
  },
  "merge-rules3+gemma4-e4b__edges100__roster+notes+rules__p1__nothink": {
