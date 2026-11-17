@@ -26,6 +26,8 @@ the vendored Swift wrapper in `Vendor/TranscribeCpp`). No audio leaves the machi
   `UtteranceSplitter.forEachPiece` (at the quietest moment in the window tail; GigaAM windows, 120 s pieces
   otherwise), and runs each piece with word timestamps. A cut looks only inside its window, so reading the
   window plus one sample gives exactly the pieces of the whole-array `split`; only words stay in memory.
+  An empty file gives no pieces and an empty transcript: the model throws on zero samples, which failed
+  the retry of a call whose mic recorded nothing.
   The model is unloaded after 10 minutes idle and on quit (`shutdown`).
 - **Timestamps** — Parakeet returns word times; GigaAM only token times, so `WordAssembler` rebuilds
   words from SentencePiece tokens (U+2581 starts a word). Piece offsets are added back to absolute time.

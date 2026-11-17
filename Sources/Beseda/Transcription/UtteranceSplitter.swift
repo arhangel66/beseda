@@ -32,14 +32,14 @@ enum UtteranceSplitter {
         let maxSamples = Int(maxSeconds * sampleRate)
         let window = maxSamples > 0 ? maxSamples + 1 : source.count
         var cursor = 0
-        repeat {
+        while cursor < source.count {
             let samples = try source.read(cursor..<min(cursor + window, source.count))
             let length = maxSamples > 0 && samples.count > maxSamples
                 ? quietestCut(in: samples, window: maxSamples, sampleRate: sampleRate)
                 : samples.count
             try body(AudioPiece(offsetSec: Double(cursor) / sampleRate, samples: Array(samples.prefix(length))))
             cursor += length
-        } while cursor < source.count
+        }
     }
 
     /// the offset inside the window's tail whose frame is quietest

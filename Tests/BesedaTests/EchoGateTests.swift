@@ -58,3 +58,11 @@ private func makeCall() -> (mic: SampleSource, system: SampleSource) {
     #expect(kept[0].end == 3.4)
     #expect(kept[0].words == Array(words.suffix(2)))
 }
+
+@Test func anEmptyMicrophoneKeepsNoSentences() throws {
+    let call = makeCall()
+
+    let kept = try EchoGate.ownSpeechSegments([], mic: SampleSource([]), system: call.system)
+
+    #expect(kept.isEmpty)
+}

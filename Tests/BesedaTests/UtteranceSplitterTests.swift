@@ -59,3 +59,12 @@ private func tone(seconds: Double, silentFrom: Double? = nil, silentTo: Double? 
     #expect(firstCut > 23.0)
     #expect(firstCut < 23.5)
 }
+
+@Test func emptyAudioYieldsNoPieces() throws {
+    // a microphone that recorded nothing must not reach the model: an empty run throws TranscribeError
+    var pieces = 0
+
+    try UtteranceSplitter.forEachPiece(of: SampleSource([]), sampleRate: sampleRate, maxSeconds: 25) { _ in pieces += 1 }
+
+    #expect(pieces == 0)
+}
