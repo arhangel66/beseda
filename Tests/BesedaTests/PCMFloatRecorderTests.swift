@@ -37,3 +37,19 @@ import Testing
     #expect(readBack.floatChannelData![1][4_999] == -0.5)
     #expect(try AVAudioFile(forReading: url).length == 5_000)
 }
+
+@Test func silenceForAMicrophoneRestartIsWrittenAsZerosUpToHalfTheRing() throws {
+    let directory = FileManager.default.temporaryDirectory
+        .appendingPathComponent("beseda-recorder-\(UUID().uuidString)", isDirectory: true)
+    defer { try? FileManager.default.removeItem(at: directory) }
+    let recorder = try PCMFloatRecorder(
+        url: directory.appendingPathComponent("me.raw.wav"), sampleRate: 48_000, channelCount: 1, activityTracker: nil
+    )
+
+    recorder.appendSilence(seconds: 0.25)
+    recorder.appendSilence(seconds: 60)
+    let metadata = try recorder.finish()
+
+    #expect(metadata.frameCount == 12_000 + Int(48_000 * PCMFloatRecorder.ringSeconds) / 2)
+    #expect(recorder.droppedFrameCount == 0)
+}

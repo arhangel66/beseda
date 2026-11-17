@@ -12,7 +12,13 @@ A call is recorded as two independent files: the microphone ("me") and everythin
 track.
 
 - **Microphone** — `MicrophoneCapture` installs a tap on `AVAudioEngine.inputNode` at the device's own
-  format and asks for microphone permission first.
+  format and asks for microphone permission first. When the input changes format mid-recording the engine
+  stops itself and posts `AVAudioEngineConfigurationChange`; AirPods do this a moment after a call app
+  takes the microphone (48 → 24 kHz headset mode), which left whole calls with an empty `me.raw.wav`. The
+  capture then re-taps at the new format, converts to the rate the file was opened at with
+  `AVAudioConverter`, restarts the engine and fills the gap between the two taps (from buffer host times,
+  at most 2 s) with silence, so the mic stays aligned with the system channel — `EchoGate` only looks for
+  the mic arriving 0–500 ms *after* the system audio.
 - **System audio** — `SystemAudioTap` creates a CoreAudio process tap
   (`CATapDescription(stereoGlobalTapButExcludeProcesses:)`, excluding Beseda's own process, private,
   unmuted), wraps it in a private aggregate device and reads it through an IO proc block on its own

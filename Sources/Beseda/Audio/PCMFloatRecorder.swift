@@ -104,6 +104,15 @@ final class PCMFloatRecorder: @unchecked Sendable {
         lock.withLock { firstWriteError }
     }
 
+    /// zeros for audio the device never delivered, so this channel stays aligned with the other one;
+    /// at most half the ring, since more than the ring holds would count as the writer falling behind
+    func appendSilence(seconds: Double) {
+        guard !isPaused else {
+            return
+        }
+        enqueue(frames: min(Int(seconds * sampleRate), ringFrames / 2)) { _, _ in 0 }
+    }
+
     func append(pcmBuffer: AVAudioPCMBuffer) throws {
         guard !isPaused else {
             return
