@@ -31,7 +31,11 @@ struct CallSidebar: View {
             }
 
             ForEach(controller.groupedCalls) { group in
-                Section(group.day.title()) {
+                // the sidebar's own header style is grey on grey: the day is what the eye looks for here
+                Section(header: Text(group.day.title())
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.primary)
+                    .textCase(nil)) {
                     ForEach(group.calls) { call in
                         CallRow(
                             call: call,
