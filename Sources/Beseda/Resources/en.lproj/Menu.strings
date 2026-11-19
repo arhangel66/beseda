@@ -82,3 +82,5 @@
 "Шаг %d из %d" = "Step %d of %d";
 "осталось %d сек" = "%d sec left";
 "осталось %d мин" = "%d min left";
+
+"Звук с микрофона не поступает. Беседа переподключает микрофон." = "No audio is coming from the microphone. Beseda is reconnecting it.";

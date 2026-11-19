@@ -99,7 +99,8 @@ struct MenuBarPopover: View {
                 ProgressView(value: stage.overall)
                     .accessibilityLabel(stage.title)
             }
-            if let warning = controller.recordingWarning {
+            if let warning = controller.recordingWarning
+                ?? (controller.microphoneInputMissing ? MenuText.get("Звук с микрофона не поступает. Беседа переподключает микрофон.") : nil) {
                 Label(warning, systemImage: "exclamationmark.triangle.fill")
                     .font(.caption)
                     .foregroundStyle(.orange)

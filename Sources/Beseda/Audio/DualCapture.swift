@@ -60,6 +60,10 @@ final class DualCapture: @unchecked Sendable {
         lock.withLock { _microphoneTracker }?.currentMeterLevel() ?? 0
     }
 
+    var microphoneInputMissing: Bool {
+        lock.withLock { _microphone }?.inputMissing ?? false
+    }
+
     var systemAudioLevel: Double {
         lock.withLock { _systemTracker }?.currentMeterLevel() ?? 0
     }

@@ -76,6 +76,7 @@ final class AppController {
     var recordingWarning: String?
     /// the running recording's live preview, only while the setting is on
     var liveTranscription: LiveTranscription?
+    var microphoneInputMissing = false
     var microphoneLevel: Double = 0
     var systemAudioLevel: Double = 0
     var lastReadyCallID: String?
@@ -1878,6 +1879,7 @@ final class AppController {
                 if !self.isPaused {
                     self.elapsedRecordingSeconds = Date().timeIntervalSince(startedAt)
                 }
+                self.microphoneInputMissing = capture.microphoneInputMissing
                 self.microphoneLevel = capture.microphoneLevel
                 self.systemAudioLevel = capture.systemAudioLevel
                 if self.recordingWarning == nil, let writeError = capture.writeError {
@@ -1912,6 +1914,7 @@ final class AppController {
         liveTicker?.invalidate()
         liveTicker = nil
         isPaused = false
+        microphoneInputMissing = false
         microphoneLevel = 0
         systemAudioLevel = 0
     }

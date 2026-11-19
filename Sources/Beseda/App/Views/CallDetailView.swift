@@ -114,6 +114,13 @@ struct CallDetailView: View {
 
     private func header(_ detail: StoredCallDetail) -> some View {
         let summary = detail.summary
+        let audioSource = if summary.isDual {
+            detail.jobStats?.microphoneAudioDurationSec == 0
+                ? ArchiveText.get("системный звук, микрофон не записался")
+                : ArchiveText.get("микрофон и системный звук")
+        } else {
+            ArchiveText.get("только микрофон")
+        }
         return VStack(alignment: .leading, spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 6) {
@@ -126,7 +133,7 @@ struct CallDetailView: View {
                         .lineLimit(2)
                         .textSelection(.enabled)
                 }
-                Text(([summary.whenHeadline, summary.appLabel, summary.isDual ? ArchiveText.get("микрофон и системный звук") : ArchiveText.get("только микрофон")] + [summary.callType].compactMap { $0 }).joined(separator: " · "))
+                Text(([summary.whenHeadline, summary.appLabel, audioSource] + [summary.callType].compactMap { $0 }).joined(separator: " · "))
                     .font(.callout)
                     .foregroundStyle(.secondary)
             }

@@ -1,6 +1,7 @@
 import AVFAudio
 import AVFoundation
 import Foundation
+import OSLog
 
 enum AudioCaptureError: LocalizedError {
     case unsupportedFormat(String)
@@ -22,16 +23,23 @@ enum AudioCaptureError: LocalizedError {
 }
 
 final class MicrophoneCapture: @unchecked Sendable {
-    private let engine = AVAudioEngine()
     private let activityTracker: AudioActivityTracker
-    private(set) var recorder: PCMFloatRecorder?
-    // serializes the restart after a format change with `stop`, so a stopped engine never starts again
-    private let lifecycleLock = NSLock()
+    private let lifecycle = DispatchQueue(label: "app.beseda.microphone", qos: .userInitiated)
+    private var engine: AVAudioEngine?
+    private var activeRecorder: PCMFloatRecorder?
     private var configurationObserver: (any NSObjectProtocol)?
+    private var inputCheck: DispatchSourceTimer?
+    private var engineGeneration = 0
+    private var lastEngineStart: UInt64 = 0
     private let lastBufferEnd = LastBufferEnd()
+    private let logger = Logger(subsystem: "app.beseda.Beseda", category: "microphone")
 
     init(activityTracker: AudioActivityTracker) {
         self.activityTracker = activityTracker
+    }
+
+    var recorder: PCMFloatRecorder? {
+        lifecycle.sync { activeRecorder }
     }
 
     var isPaused: Bool {
@@ -43,129 +51,149 @@ final class MicrophoneCapture: @unchecked Sendable {
         recorder?.droppedBufferCount ?? 0
     }
 
+    var inputMissing: Bool {
+        lastBufferEnd.hostTime.map { Self.inputTimedOut(since: $0) } ?? false
+    }
+
     func start(writingTo url: URL? = nil) async throws {
         if IsolatedCopy.skips("AVAudioEngine.start (microphone)") {
             throw AudioCaptureError.permissionDenied("Беседе не разрешён доступ к микрофону")
         }
         try await requestMicrophonePermission()
 
-        let input = engine.inputNode
-        let format = input.outputFormat(forBus: 0)
-        guard format.sampleRate > 0, format.channelCount > 0 else {
-            throw AudioCaptureError.unsupportedFormat("Микрофон отдаёт звук в неподходящем формате: \(format)")
+        try lifecycle.sync {
+            let recorder = try PCMFloatRecorder(
+                url: url, sampleRate: 48_000, channelCount: 1, activityTracker: activityTracker
+            )
+            lastBufferEnd.hostTime = mach_absolute_time()
+            activeRecorder = recorder
+            openInput(writingTo: recorder)
+            let timer = DispatchSource.makeTimerSource(queue: lifecycle)
+            timer.schedule(deadline: .now() + .milliseconds(500), repeating: .milliseconds(500))
+            timer.setEventHandler { [weak self] in self?.checkInput() }
+            inputCheck = timer
+            timer.resume()
         }
-
-        let recorder = try PCMFloatRecorder(
-            url: url,
-            sampleRate: format.sampleRate,
-            channelCount: Int(format.channelCount),
-            activityTracker: activityTracker
-        )
-        installTap(writingTo: recorder)
-        self.recorder = recorder
-        configurationObserver = NotificationCenter.default.addObserver(
-            forName: .AVAudioEngineConfigurationChange, object: engine, queue: nil
-        ) { [weak self] _ in
-            self?.restartOnTheNewInputFormat()
-        }
-
-        engine.prepare()
-        try engine.start()
     }
 
     func stop() throws -> AudioFileMetadata {
-        stopEngine()
-        guard let recorder else {
+        guard let recorder = lifecycle.sync(execute: endCapture) else {
             throw AudioCaptureError.noFrames("Запись микрофона не запустилась")
         }
         return try recorder.finish()
     }
 
     func stopDiscarding() {
+        _ = lifecycle.sync(execute: endCapture)
+    }
+
+    private func endCapture() -> PCMFloatRecorder? {
+        inputCheck?.cancel()
+        inputCheck = nil
         stopEngine()
+        lastBufferEnd.hostTime = nil
+        let recorder = activeRecorder
+        activeRecorder = nil
+        return recorder
     }
 
     private func stopEngine() {
-        lifecycleLock.withLock {
-            if let configurationObserver {
-                NotificationCenter.default.removeObserver(configurationObserver)
-            }
-            configurationObserver = nil
-            engine.inputNode.removeTap(onBus: 0)
-            engine.stop()
+        engineGeneration += 1
+        if let configurationObserver {
+            NotificationCenter.default.removeObserver(configurationObserver)
         }
+        configurationObserver = nil
+        engine?.inputNode.removeTap(onBus: 0)
+        engine?.stop()
+        engine = nil
     }
 
-    // the engine stops itself when the input changes format, e.g. AirPods switching to headset mode
-    // a moment after a call app takes the microphone; without a restart the call has no "me" channel
-    private func restartOnTheNewInputFormat() {
-        lifecycleLock.withLock {
-            guard configurationObserver != nil, let recorder else {
-                return
-            }
-            engine.inputNode.removeTap(onBus: 0)
-            installTap(writingTo: recorder)
-            do {
-                engine.prepare()
-                try engine.start()
-            } catch {
-                fputs("microphone restart failed: \(error)\n", stderr)
-            }
-        }
-    }
-
-    /// taps the input at the device's current format; a format other than the file's goes through a converter
-    private func installTap(writingTo recorder: PCMFloatRecorder) {
+    private func openInput(writingTo recorder: PCMFloatRecorder) {
+        // Use a fresh engine so it cannot carry over a connection in the previous hardware format.
+        lastEngineStart = mach_absolute_time()
+        let engine = AVAudioEngine()
         let input = engine.inputNode
-        let deviceFormat = input.outputFormat(forBus: 0)
-        guard deviceFormat.sampleRate > 0, deviceFormat.channelCount > 0 else {
-            fputs("microphone has no input format: \(deviceFormat)\n", stderr)
+        let format = input.inputFormat(forBus: 0)
+        guard format.sampleRate > 0, format.channelCount > 0 else {
+            logger.error("Microphone input is unavailable: \(format, privacy: .public)")
             return
         }
+        installTap(on: input, writingTo: recorder)
+        self.engine = engine
+        let generation = engineGeneration
+        configurationObserver = NotificationCenter.default.addObserver(
+            forName: .AVAudioEngineConfigurationChange, object: engine, queue: nil
+        ) { [weak self] _ in
+            // AVAudioEngine sends this on a framework queue that must return before teardown.
+            self?.lifecycle.async { [weak self] in
+                guard let self, self.engineGeneration == generation else { return }
+                self.reopenInput()
+            }
+        }
+        do {
+            engine.prepare()
+            try engine.start()
+        } catch {
+            stopEngine()
+            logger.error("Microphone start failed: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    private func checkInput() {
+        guard activeRecorder != nil else { return }
+        let lastInput = max(lastEngineStart, lastBufferEnd.hostTime ?? 0)
+        // A format change can leave a running engine with no tap callbacks, even for silent samples.
+        if Self.inputTimedOut(since: lastInput) {
+            logger.warning("No microphone buffers for 1.5 seconds, reopening input")
+            reopenInput()
+        }
+    }
+
+    private static func inputTimedOut(since latestBuffer: UInt64) -> Bool {
+        let now = mach_absolute_time()
+        return now > latestBuffer && AVAudioTime.seconds(forHostTime: now - latestBuffer) >= 1.5
+    }
+
+    private func reopenInput() {
+        guard let recorder = activeRecorder else { return }
+        stopEngine()
+        openInput(writingTo: recorder)
+    }
+
+    private func installTap(on input: AVAudioInputNode, writingTo recorder: PCMFloatRecorder) {
+        // Each tap converts its actual buffers to the WAV format and keeps their time on the call timeline.
         let fileFormat = AVAudioFormat(
             standardFormatWithSampleRate: recorder.sampleRate,
             channels: AVAudioChannelCount(recorder.channelCount)
         )!
-        let converter = deviceFormat == fileFormat ? nil : AVAudioConverter(from: deviceFormat, to: fileFormat)
-        // a tap after a restart starts where the previous one ended, the gap between them becomes silence
-        var gapStartHostTime = lastBufferEnd.hostTime
+        var formatConverter = MicrophoneFormatConverter(fileFormat: fileFormat)
         let lastBufferEnd = lastBufferEnd
+        let logger = logger
+        var gapStart = lastBufferEnd.hostTime
+        var receivedFirstBuffer = false
 
-        input.installTap(onBus: 0, bufferSize: 4096, format: deviceFormat) { buffer, when in
-            if when.isHostTimeValid {
-                if let gapStart = gapStartHostTime, when.hostTime > gapStart {
-                    recorder.appendSilence(seconds: AVAudioTime.seconds(forHostTime: when.hostTime - gapStart))
-                }
-                gapStartHostTime = nil
-                let duration = Double(buffer.frameLength) / buffer.format.sampleRate
-                lastBufferEnd.hostTime = when.hostTime + AVAudioTime.hostTime(forSeconds: duration)
-            }
+        input.installTap(onBus: 0, bufferSize: 4096, format: nil) { buffer, when in
             do {
-                if let converter {
-                    try recorder.append(pcmBuffer: Self.converted(buffer, with: converter))
+                let converted = try formatConverter.convert(buffer)
+                if when.isHostTimeValid {
+                    if let gapStart, when.hostTime > gapStart {
+                        recorder.appendSilence(seconds: AVAudioTime.seconds(forHostTime: when.hostTime - gapStart))
+                    }
+                    let duration = Double(buffer.frameLength) / buffer.format.sampleRate
+                    lastBufferEnd.hostTime = when.hostTime + AVAudioTime.hostTime(forSeconds: duration)
                 } else {
-                    try recorder.append(pcmBuffer: buffer)
+                    lastBufferEnd.hostTime = mach_absolute_time()
+                }
+                gapStart = nil
+                try recorder.append(pcmBuffer: converted)
+                if !receivedFirstBuffer {
+                    logger.info("Recording microphone buffers at \(buffer.format.sampleRate, privacy: .public) Hz")
+                    receivedFirstBuffer = true
                 }
             } catch {
-                fputs("microphone append failed: \(error)\n", stderr)
+                logger.error("Microphone buffer rejected: \(error.localizedDescription, privacy: .public)")
             }
         }
-    }
-
-    /// allocates per buffer, which only a device that changed format mid-call pays for
-    static func converted(_ buffer: AVAudioPCMBuffer, with converter: AVAudioConverter) throws -> AVAudioPCMBuffer {
-        let ratio = converter.outputFormat.sampleRate / converter.inputFormat.sampleRate
-        let capacity = AVAudioFrameCount((Double(buffer.frameLength) * ratio).rounded(.up)) + 1
-        let output = AVAudioPCMBuffer(pcmFormat: converter.outputFormat, frameCapacity: capacity)!
-        let feed = OneBufferFeed(buffer)
-        var conversionError: NSError?
-        converter.convert(to: output, error: &conversionError) { _, status in
-            feed.next(status)
-        }
-        if let conversionError {
-            throw conversionError
-        }
-        return output
     }
 
     private func requestMicrophonePermission() async throws {
@@ -186,6 +214,43 @@ final class MicrophoneCapture: @unchecked Sendable {
         if !granted {
             throw AudioCaptureError.permissionDenied("Доступ к микрофону не выдан")
         }
+    }
+}
+
+struct MicrophoneFormatConverter {
+    private let fileFormat: AVAudioFormat
+    private var converter: AVAudioConverter?
+
+    init(fileFormat: AVAudioFormat) {
+        self.fileFormat = fileFormat
+    }
+
+    mutating func convert(_ buffer: AVAudioPCMBuffer) throws -> AVAudioPCMBuffer {
+        // Use the tap buffer's format, which can differ from the engine's reported format during a transition.
+        if buffer.format == fileFormat {
+            converter = nil
+            return buffer
+        }
+        if converter?.inputFormat != buffer.format {
+            converter = AVAudioConverter(from: buffer.format, to: fileFormat)
+            converter?.primeMethod = .none
+        }
+        guard let converter else {
+            throw AudioCaptureError.unsupportedFormat("Не удалось преобразовать звук микрофона: \(buffer.format)")
+        }
+
+        let ratio = fileFormat.sampleRate / buffer.format.sampleRate
+        let capacity = AVAudioFrameCount((Double(buffer.frameLength) * ratio).rounded(.up)) + 1
+        let output = AVAudioPCMBuffer(pcmFormat: fileFormat, frameCapacity: capacity)!
+        let feed = OneBufferFeed(buffer)
+        var error: NSError?
+        converter.convert(to: output, error: &error) { _, status in
+            feed.next(status)
+        }
+        if let error {
+            throw error
+        }
+        return output
     }
 }
 

@@ -453,3 +453,25 @@ private let schemaVersion3WithoutSpeakerMerges = """
     #expect(userVersion(dbURL) == store.migrations.count)
     #expect(tableColumns(dbURL) == tableColumns(freshURL))
 }
+
+@Test func jobStatsDistinguishAnEmptyMicrophoneTrackFromUnknownDuration() throws {
+    let directory = try temporaryDirectory()
+    defer { try? FileManager.default.removeItem(at: directory) }
+    let store = CallStore(dbURL: directory.appendingPathComponent("calls.sqlite"))
+    try store.prepare()
+    try makeCall(store, id: "call", folder: directory, status: "ready")
+    try store.upsertTranscriptJob(
+        id: "call-them", callID: "call", speaker: "them", status: "ready",
+        audioURL: directory.appendingPathComponent("them.asr.wav"), asrJSONURL: nil,
+        audioDurationSec: 60, wallTimeSec: 1, realTimeFactor: nil, model: nil, error: nil
+    )
+    #expect(try store.fetchJobStats(callID: "call")?.microphoneAudioDurationSec == nil)
+
+    try store.upsertTranscriptJob(
+        id: "call-me", callID: "call", speaker: "me", status: "ready",
+        audioURL: directory.appendingPathComponent("me.asr.wav"), asrJSONURL: nil,
+        audioDurationSec: 0, wallTimeSec: 0, realTimeFactor: nil, model: nil, error: nil
+    )
+
+    #expect(try store.fetchJobStats(callID: "call")?.microphoneAudioDurationSec == 0)
+}

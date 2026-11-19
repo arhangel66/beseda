@@ -11,21 +11,22 @@ A call is recorded as two independent files: the microphone ("me") and everythin
 ("them"). Keeping them apart is what lets the transcript say who spoke without guessing from one mixed
 track.
 
-- **Microphone** — `MicrophoneCapture` installs a tap on `AVAudioEngine.inputNode` at the device's own
-  format and asks for microphone permission first. When the input changes format mid-recording the engine
-  stops itself and posts `AVAudioEngineConfigurationChange`; AirPods do this a moment after a call app
-  takes the microphone (48 → 24 kHz headset mode), which left whole calls with an empty `me.raw.wav`. The
-  capture then re-taps at the new format, converts to the rate the file was opened at with
-  `AVAudioConverter`, restarts the engine and fills the gap between the two taps (from buffer host times,
-  at most 2 s) with silence, so the mic stays aligned with the system channel — `EchoGate` only looks for
-  the mic arriving 0–500 ms *after* the system audio.
+- **Microphone** — `MicrophoneCapture` asks for microphone permission and attaches a tap to the
+  system input with no forced bus format. A single 48 kHz mono WAV stays open for the call. The tap
+  reads the format of each delivered buffer and changes its converter when the input changes. When
+  macOS stops the engine and posts `AVAudioEngineConfigurationChange` (for example, when AirPods
+  switch from 48 to 24 kHz), the capture creates a fresh engine on its own serial queue so it cannot
+  inherit the old graph's format. If buffers stop arriving for 1.5 seconds, it reopens the input and
+  the menu shows a warning until data returns. Interruptions are padded from buffer host times within
+  the recorder's two-second padding limit. If a recovered call has a zero-duration microphone track,
+  the archive identifies it as system audio with no microphone recording.
 - **System audio** — `SystemAudioTap` creates a CoreAudio process tap
   (`CATapDescription(stereoGlobalTapButExcludeProcesses:)`, excluding Beseda's own process, private,
   unmuted), wraps it in a private aggregate device and reads it through an IO proc block on its own
   dispatch queue.
 - **Both** — `DualCapture.record` starts the tap, then the microphone, sleeps until the maximum
   duration (4 h, set in `AppController`; the 4 GB limit ends a 48 kHz stereo call first, but the formats
-  come from the devices, so on a mono or lower-rate one the cap still matters), a manual `stop()`, or silence auto-stop. Auto-stop fires when
+  differ by track, so the cap still matters at lower channel counts and rates), a manual `stop()`, or silence auto-stop. Auto-stop fires when
   *both* channels have been quiet for the configured time (60 s), checked every 2 s — but only once the
   system channel has carried sound. Before that the recording is waiting for the other side to join, not
   hearing a call end, and stops only after 15 min of silence (a host who started early lost the whole call

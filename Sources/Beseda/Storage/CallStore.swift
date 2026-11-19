@@ -183,6 +183,7 @@ struct StoredCallSummary: Identifiable, Hashable {
 struct StoredJobStats: Hashable {
     let wallTimeSec: Double
     let realTimeFactor: Double?
+    let microphoneAudioDurationSec: Double?
     /// nil for calls transcribed before the model was recorded
     let model: String?
 
@@ -1127,12 +1128,16 @@ final class CallStore: @unchecked Sendable {
     func fetchJobStats(callID: String) throws -> StoredJobStats? {
         try database { db in
             try query(db, """
-                SELECT SUM(wall_time_sec), AVG(real_time_factor), MAX(model)
+                SELECT SUM(wall_time_sec), AVG(real_time_factor), MAX(model),
+                       MAX(CASE WHEN speaker = 'me' THEN audio_duration_sec END)
                 FROM transcript_jobs
                 WHERE call_id = ? AND status = 'ready'
                 """, callID) { statement in
                 columnDouble(statement, 0).map {
-                    StoredJobStats(wallTimeSec: $0, realTimeFactor: columnDouble(statement, 1), model: columnString(statement, 2))
+                    StoredJobStats(
+                        wallTimeSec: $0, realTimeFactor: columnDouble(statement, 1),
+                        microphoneAudioDurationSec: columnDouble(statement, 3), model: columnString(statement, 2)
+                    )
                 }
             }.first ?? nil
         }
