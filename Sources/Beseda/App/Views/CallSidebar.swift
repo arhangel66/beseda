@@ -31,7 +31,7 @@ struct CallSidebar: View {
             }
 
             ForEach(controller.groupedCalls) { group in
-                Section(group.day.title) {
+                Section(group.day.title()) {
                     ForEach(group.calls) { call in
                         CallRow(
                             call: call,

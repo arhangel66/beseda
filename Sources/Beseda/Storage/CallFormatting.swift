@@ -1,40 +1,58 @@
 import Foundation
 import os
 
-/// The sidebar's day headings, in the order the prototype lists them.
-enum CallDayGroup: Int, CaseIterable, Comparable {
-    case today
-    case yesterday
-    case thisWeek
-    case earlier
+/// The sidebar's headings: a day of its own for the recent days, a month further back.
+enum CallDayGroup: Hashable, Comparable {
+    case day(Date)
+    case month(Date)
 
-    var title: String {
-        switch self {
-        case .today:
-            "Сегодня"
-        case .yesterday:
-            "Вчера"
-        case .thisWeek:
-            "На этой неделе"
-        case .earlier:
-            "Ранее"
-        }
-    }
+    /// how far back a call still gets a heading with its own day
+    static let daysListedSeparately = 10
 
     static func of(_ date: Date, now: Date = Date(), calendar: Calendar = .current) -> CallDayGroup {
-        if calendar.isDate(date, inSameDayAs: now) {
-            return .today
+        let startOfDay = calendar.startOfDay(for: date)
+        let daysBack = calendar.dateComponents([.day], from: startOfDay, to: calendar.startOfDay(for: now)).day ?? .max
+        if daysBack < daysListedSeparately {
+            return .day(startOfDay)
         }
-        if let yesterday = calendar.date(byAdding: .day, value: -1, to: now),
-           calendar.isDate(date, inSameDayAs: yesterday) {
-            return .yesterday
-        }
-        let days = calendar.dateComponents([.day], from: date, to: now).day ?? .max
-        return days < 7 ? .thisWeek : .earlier
+        return .month(calendar.dateInterval(of: .month, for: date)?.start ?? startOfDay)
     }
 
+    /// "Сегодня, пятница" · "Вчера, четверг" · "Понедельник, 17 ноября" · "Октябрь 2026"
+    func title(now: Date = Date(), calendar: Calendar = .current, locale: Locale = .current) -> String {
+        switch self {
+        case .day(let day):
+            let weekday = CallFormatting.weekday(day, locale: locale)
+            if calendar.isDate(day, inSameDayAs: now) {
+                return ArchiveText.format("Сегодня, %@", weekday, locale: locale)
+            }
+            if let yesterday = calendar.date(byAdding: .day, value: -1, to: now),
+               calendar.isDate(day, inSameDayAs: yesterday) {
+                return ArchiveText.format("Вчера, %@", weekday, locale: locale)
+            }
+            return CallFormatting.startingWithACapital("\(weekday), \(CallFormatting.dayAndMonth(day, locale: locale))")
+        case .month(let month):
+            return CallFormatting.startingWithACapital(CallFormatting.monthAndYear(month, locale: locale))
+        }
+    }
+
+    var start: Date {
+        switch self {
+        case .day(let start), .month(let start):
+            return start
+        }
+    }
+
+    var isDay: Bool {
+        if case .day = self {
+            return true
+        }
+        return false
+    }
+
+    /// the sidebar lists the newest group first
     static func < (lhs: CallDayGroup, rhs: CallDayGroup) -> Bool {
-        lhs.rawValue < rhs.rawValue
+        lhs.start > rhs.start
     }
 }
 
@@ -42,8 +60,8 @@ struct CallGroup: Identifiable {
     let day: CallDayGroup
     let calls: [StoredCallSummary]
 
-    var id: Int {
-        day.rawValue
+    var id: Date {
+        day.start
     }
 }
 
@@ -90,17 +108,40 @@ enum CallFormatting {
     /// "сегодня, 16:20" / "вчера, 19:04" / "27 авг, 14:47"
     static func when(_ date: Date, now: Date = Date(), calendar: Calendar = .current, locale: Locale = .current) -> String {
         let time = timeFormatter(locale: locale).string(from: date)
-        switch CallDayGroup.of(date, now: now, calendar: calendar) {
-        case .today:
-            return "\(locale.language.languageCode?.identifier == "ru" ? "сегодня" : "today"), \(time)"
-        case .yesterday:
-            return "\(locale.language.languageCode?.identifier == "ru" ? "вчера" : "yesterday"), \(time)"
-        case .thisWeek, .earlier:
-            // ru "d MMM" ends in a period ("19 авг."), which reads badly before the comma
-            let formatted = dayFormatter(locale: locale).string(from: date)
-            let day = locale.language.languageCode?.identifier == "ru" ? formatted.replacingOccurrences(of: ".", with: "") : formatted
-            return "\(day), \(time)"
+        let russian = locale.language.languageCode?.identifier == "ru"
+        if calendar.isDate(date, inSameDayAs: now) {
+            return "\(russian ? "сегодня" : "today"), \(time)"
         }
+        if let yesterday = calendar.date(byAdding: .day, value: -1, to: now),
+           calendar.isDate(date, inSameDayAs: yesterday) {
+            return "\(russian ? "вчера" : "yesterday"), \(time)"
+        }
+        // ru "d MMM" ends in a period ("19 авг."), which reads badly before the comma
+        let formatted = dayFormatter(locale: locale).string(from: date)
+        let day = russian ? formatted.replacingOccurrences(of: ".", with: "") : formatted
+        return "\(day), \(time)"
+    }
+
+    /// "пятница" — the weekday on its own, for the sidebar's day headings
+    static func weekday(_ date: Date, locale: Locale = .current) -> String {
+        templateFormatter("EEEE", locale: locale).string(from: date)
+    }
+
+    /// "17 ноября" — the day inside its month, for a heading that is neither today nor yesterday
+    static func dayAndMonth(_ date: Date, locale: Locale = .current) -> String {
+        templateFormatter("dMMMM", locale: locale).string(from: date)
+    }
+
+    /// "октябрь 2026" — the heading the older calls fall into
+    static func monthAndYear(_ date: Date, locale: Locale = .current) -> String {
+        // ru "LLLL yyyy 'г'." ends in a narrow space and "г.", which a heading does not need
+        templateFormatter("LLLLyyyy", locale: locale)
+            .string(from: date)
+            .replacingOccurrences(of: "\\s*г\\.$", with: "", options: .regularExpression)
+    }
+
+    static func startingWithACapital(_ text: String) -> String {
+        "\(text.prefix(1).uppercased())\(text.dropFirst())"
     }
 
     /// 1 разговор, 2 разговора, 5 разговоров
@@ -144,9 +185,13 @@ enum CallFormatting {
     }
 
     private static func dayFormatter(locale: Locale) -> DateFormatter {
+        templateFormatter("dMMM", locale: locale)
+    }
+
+    private static func templateFormatter(_ template: String, locale: Locale) -> DateFormatter {
         let formatter = DateFormatter()
         formatter.locale = locale
-        formatter.setLocalizedDateFormatFromTemplate("dMMM")
+        formatter.setLocalizedDateFormatFromTemplate(template)
         return formatter
     }
 }

@@ -137,5 +137,7 @@
 "%@ · %d%% разговора" = "%@ · %d%% of call";
 "%@, %d%% разговора" = "%@, %d%% of call";
 "авто" = "auto";
+"Сегодня, %@" = "Today, %@";
+"Вчера, %@" = "Yesterday, %@";
 
 "системный звук, микрофон не записался" = "system audio, microphone was not recorded";

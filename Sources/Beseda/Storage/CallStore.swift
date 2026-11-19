@@ -110,12 +110,12 @@ struct StoredCallSummary: Identifiable, Hashable {
         "\(whenDescription.prefix(1).uppercased())\(whenDescription.dropFirst()) · \(durationDescription)"
     }
 
-    /// the sidebar's leading column: the time under «Сегодня» and «Вчера», date and time further back
+    /// the sidebar's leading column: the time under a day heading, date and time under a month
     var clockDescription: String {
         guard let startedDate else {
             return "—"
         }
-        return dayGroup <= .yesterday ? CallFormatting.clock(startedDate) : CallFormatting.when(startedDate)
+        return dayGroup.isDay ? CallFormatting.clock(startedDate) : CallFormatting.when(startedDate)
     }
 
     var durationDescription: String {
@@ -123,7 +123,7 @@ struct StoredCallSummary: Identifiable, Hashable {
     }
 
     var dayGroup: CallDayGroup {
-        startedDate.map { CallDayGroup.of($0) } ?? .earlier
+        startedDate.map { CallDayGroup.of($0) } ?? .month(.distantPast)
     }
 
     /// the sidebar's second line: what went wrong, or where the call came from

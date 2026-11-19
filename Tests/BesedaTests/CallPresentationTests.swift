@@ -48,13 +48,38 @@ private let noon = Calendar.current.date(from: DateComponents(year: 2026, month:
     #expect(ArchiveText.get("Микрофон", locale: Locale(identifier: "en_US")) == "Microphone")
 }
 
-@Test func dayGroupSplitsTodayYesterdayThisWeekAndEarlier() {
+@Test func everyRecentDayGetsItsOwnGroupAndOlderCallsFallIntoTheirMonth() {
     let calendar = Calendar.current
 
-    #expect(CallDayGroup.of(noon, now: noon, calendar: calendar) == .today)
-    #expect(CallDayGroup.of(noon - 24 * 3600, now: noon, calendar: calendar) == .yesterday)
-    #expect(CallDayGroup.of(noon - 3 * 24 * 3600, now: noon, calendar: calendar) == .thisWeek)
-    #expect(CallDayGroup.of(noon - 30 * 24 * 3600, now: noon, calendar: calendar) == .earlier)
+    #expect(CallDayGroup.of(noon, now: noon, calendar: calendar) == .day(calendar.startOfDay(for: noon)))
+    #expect(CallDayGroup.of(noon - 3 * 24 * 3600, now: noon, calendar: calendar)
+            == .day(calendar.startOfDay(for: noon - 3 * 24 * 3600)))
+    #expect(CallDayGroup.of(noon - 9 * 24 * 3600, now: noon, calendar: calendar).isDay)
+    #expect(CallDayGroup.of(noon - 10 * 24 * 3600, now: noon, calendar: calendar).isDay == false)
+    #expect(CallDayGroup.of(noon - 30 * 24 * 3600, now: noon, calendar: calendar)
+            == .month(calendar.date(from: DateComponents(year: 2026, month: 7, day: 1))!))
+}
+
+@Test func dayGroupsAreTitledTodayYesterdayWeekdayAndThenMonth() {
+    let calendar = Calendar.current
+    let russian = Locale(identifier: "ru_RU")
+    func title(_ date: Date) -> String {
+        CallDayGroup.of(date, now: noon, calendar: calendar).title(now: noon, calendar: calendar, locale: russian)
+    }
+
+    #expect(title(noon) == "Сегодня, суббота")
+    #expect(title(noon - 24 * 3600) == "Вчера, пятница")
+    #expect(title(noon - 3 * 24 * 3600) == "Среда, 26 августа")
+    #expect(title(noon - 30 * 24 * 3600) == "Июль 2026")
+}
+
+@Test func theNewestGroupComesFirst() {
+    let calendar = Calendar.current
+    let today = CallDayGroup.of(noon, now: noon, calendar: calendar)
+    let lastWeek = CallDayGroup.of(noon - 5 * 24 * 3600, now: noon, calendar: calendar)
+    let lastMonth = CallDayGroup.of(noon - 30 * 24 * 3600, now: noon, calendar: calendar)
+
+    #expect([lastMonth, today, lastWeek].sorted() == [today, lastWeek, lastMonth])
 }
 
 @Test func humanDurationReadsAsTheProtoypeWritesIt() {
