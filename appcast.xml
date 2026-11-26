@@ -3,6 +3,26 @@
     <channel>
         <title>Beseda</title>
         <item>
+            <title>0.4.4</title>
+            <pubDate>Thu, 26 Nov 2026 21:17:38 +0400</pubDate>
+            <sparkle:version>20261126211640</sparkle:version>
+            <sparkle:shortVersionString>0.4.4</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.2</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <description sparkle:format="markdown"><![CDATA[# Beseda 0.4.4
+
+Нужен macOS 14.2 или новее.
+
+## Исправления
+
+- Ваш голос больше не пропадает посреди звонка, когда подключаются наушники или программа звонка меняет микрофон: Беседа сама переподключается к новому микрофону и продолжает запись в тот же файл.
+- Если звук с микрофона перестал приходить, Беседа переподключает его и показывает предупреждение в меню, пока звук не вернётся.
+- Звонок, где микрофон не записался, в архиве так и подписан: «системный звук, микрофон не записался».
+- «Расшифровать снова» работает и для звонка с пустым микрофоном: расшифровывается сторона собеседников.
+]]></description>
+            <enclosure url="https://github.com/arhangel66/beseda/releases/download/v0.4.4/Beseda-0.4.4.zip" length="16382359" type="application/octet-stream" sparkle:edSignature="hYMzcZEq+cnHFQme9fjlspVmxfrxbXvGFyeRGRXMpzALxKNU7eAUVlbC0zJN6A25hQ6C24rL49tlJOdJbJijDw=="/>
+        </item>
+        <item>
             <title>0.4.2</title>
             <pubDate>Mon, 02 Nov 2026 20:46:55 +0400</pubDate>
             <sparkle:version>20261102204604</sparkle:version>
@@ -48,31 +68,6 @@
 После обновления macOS может один раз спросить доступ к Связке ключей: нажмите «Разрешить всегда».
 ]]></description>
             <enclosure url="https://github.com/arhangel66/beseda/releases/download/v0.4.1/Beseda-0.4.1.zip" length="16369822" type="application/octet-stream" sparkle:edSignature="LEWI6F2WnA6hfH6yHSRYCkmtJMJlPmx4bFKUKzj8xikHZA3vby0mVgMO9C+b9KCFL8WpenTAOx3hQbQ4tmvwDw=="/>
-        </item>
-        <item>
-            <title>0.4.0</title>
-            <pubDate>Sun, 27 Sep 2026 07:37:13 +0400</pubDate>
-            <sparkle:version>20260927073658</sparkle:version>
-            <sparkle:shortVersionString>0.4.0</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>14.2</sparkle:minimumSystemVersion>
-            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
-            <description sparkle:format="markdown"><![CDATA[# Beseda 0.4.0
-
-Нужен macOS 14.2 или новее.
-
-## Что нового
-
-- Запись сразу пишется на диск: звонок не теряется, если приложение закрылось или упало посреди разговора.
-- Реже путаются говорящие: фразы собеседников и ваши надёжнее разделяются по голосам.
-- Типы звонков: вы описываете свои виды встреч со своими подсказками, а Jev (или модель итогов) сам определяет тип звонка и пишет итог под него.
-- Экспорт итогов в Markdown: каждый итог с расшифровкой сохраняется в выбранную папку.
-- Блок «В прошлый раз»: на экране звонка и у предстоящей встречи в календаре — решения, следующие шаги и открытые вопросы прошлого связанного звонка.
-- Можно включить расшифровку прямо во время звонка.
-- Переключатель «Только локально»: ничего не уходит с Mac, итоги пишет встроенная модель.
-- Ключи API хранятся в Связке ключей macOS, а не в файле настроек.
-- Исправлены падения и случаи, когда пропадала часть записи.
-]]></description>
-            <enclosure url="https://github.com/arhangel66/beseda/releases/download/v0.4.0/Beseda-0.4.0.zip" length="15611923" type="application/octet-stream" sparkle:edSignature="Nr1P/+9TaQwwLlniRMexx8lg6r2F3Gkbou5/+PmwS4ctrFTd6dmiBEtlHzY19Mkq1XpHrhE6WacwBeB6g/cJBg=="/>
         </item>
     </channel>
 </rss>
