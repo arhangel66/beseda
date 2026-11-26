@@ -57,7 +57,7 @@ clean run takes ~1.5 min and ~1.2 GB of `.build`.
 The full check is `scripts/full_check.sh` (~1.7 min after the build): every test with `BESEDA_FULL_CHECK=1`,
 then the 1 h synthetic-call memory tests. Run it when `Package.swift`, `Storage` migrations, `Audio/` capture
 or the long-call read path (`EchoGate`, `UtteranceSplitter`, `GrowingWAVFile`) change. `release.sh` always
-runs it, and a LaunchAgent runs it nightly on native-ui (`scripts/install_nightly_check.sh`; see
+runs it, and a LaunchAgent runs it nightly on main (`scripts/install_nightly_check.sh`; see
 docs/architecture/build-release.md).
 
 ## No-focus, no-sound

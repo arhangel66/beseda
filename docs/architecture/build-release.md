@@ -96,7 +96,7 @@ build: fast 27.2 → 11.0 s, full 102.6 s.
   `CFFIXED_USER_HOME`, sets `IOS_KIT_CLEAN_DEFAULTS=1` to prevent import from the old `app.podushka.Podushka`
   domain, and deletes the random defaults domain before and after the run. It never touches
   `/Applications/Beseda.app` or its data.
-- `scripts/nightly_check.sh` — the nightly full check: native-ui in its own detached worktree
+- `scripts/nightly_check.sh` — the nightly full check: main in its own detached worktree
   `~/Library/Caches/beseda-nightly-check`, `nice -n 19`, skipped when free memory is under 20 % or a
   Beseda call is recording (an open `*.raw.wav`). Log: `~/Library/Logs/beseda-nightly-check.log`. On
   failure only, one `bb notify` (digest, source and dedupe key `beseda-nightly-check`).

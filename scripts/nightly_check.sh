@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Nightly full check of native-ui in its own worktree, started by the LaunchAgent
+# Nightly full check of main in its own worktree, started by the LaunchAgent
 # app.beseda.nightly-check (install: scripts/install_nightly_check.sh). Skips a busy Mac.
 set -uo pipefail
 
@@ -25,12 +25,12 @@ notify_failure() {
     exit 1
 }
 
-git -C "$REPO" fetch -q origin native-ui 2>/dev/null || true
+git -C "$REPO" fetch -q origin main 2>/dev/null || true
 if [ ! -d "$WORKTREE" ]; then
-    git -C "$REPO" worktree add -q --detach "$WORKTREE" native-ui || notify_failure "could not create the worktree"
+    git -C "$REPO" worktree add -q --detach "$WORKTREE" main || notify_failure "could not create the worktree"
 fi
-# the local native-ui is where the board merges; the worktree is detached so it never holds the branch
-git -C "$WORKTREE" checkout -q --detach native-ui || notify_failure "could not check out native-ui"
-echo "native-ui $(git -C "$WORKTREE" rev-parse HEAD)"
-nice -n 19 "$WORKTREE/scripts/full_check.sh" || notify_failure "full check failed on native-ui $(git -C "$WORKTREE" rev-parse --short HEAD)"
+# detached, so the worktree never holds main and the main checkout can always switch to it
+git -C "$WORKTREE" checkout -q --detach main || notify_failure "could not check out main"
+echo "main $(git -C "$WORKTREE" rev-parse HEAD)"
+nice -n 19 "$WORKTREE/scripts/full_check.sh" || notify_failure "full check failed on main $(git -C "$WORKTREE" rev-parse --short HEAD)"
 echo "passed"
